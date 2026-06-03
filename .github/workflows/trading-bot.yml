@@ -1,0 +1,33 @@
+name: Robinhood Trading Bot
+
+on:
+  schedule:
+    # Every 5 min, 1 PM–8 PM UTC = 9 AM–4 PM ET (covers both EDT and EST)
+    # The bot's own market-hours check is the real gate (9:45 AM–3:55 PM ET)
+    - cron: "*/5 13-20 * * 1-5"
+  workflow_dispatch:   # lets you trigger a manual run from GitHub UI
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          RH_USERNAME:    ${{ secrets.RH_USERNAME }}
+          RH_PASSWORD:    ${{ secrets.RH_PASSWORD }}
+          RH_TOTP_SECRET: ${{ secrets.RH_TOTP_SECRET }}
+        run: python main.py
