@@ -254,76 +254,115 @@ def get_daily_pnl_and_pdt(et):
 
 # Versions to try for order placement, newest first.
 # robin_stocks 2.1.0 ships 1.431.4 which is too old for orders.
-# We iterate until Robinhood doesn't return a version rejection.
-_ORDER_VERSIONS = ["1.432.0"]  # confirmed working version for order placement
+# 1.432.0 was confirmed accepted during market hours.
+_ORDER_VERSION = "1.432.0"
+
 
 def _order_post(payload):
     """
-    POST an order trying API versions newest-first until Robinhood accepts one.
-    The instrument lookup must happen BEFORE this call (at the default version).
+    POST a form-encoded order at the API version that accepts orders.
+    Returns the parsed JSON (an order dict on success, or an error dict with
+    a 'detail' field). Never raises on an HTTP/JSON error — surfaces it instead.
     """
-    _orig_ver = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
-    last = None
+    orig = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
     try:
-        for ver in _ORDER_VERSIONS:
-            rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": ver})
-            resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", data=payload)
-            last = resp.json()
-            detail = str(last.get("detail", "")).lower()
-            if "version" not in detail and "download" not in detail:
-                print(f"  [order API version {ver} accepted]")
-                return last
-            print(f"  [version {ver} rejected: {last.get('detail','')}]")
+        rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": _ORDER_VERSION})
+        resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", data=payload)
+        try:
+            return resp.json()
+        except Exception:
+            return {"detail": f"non-JSON {resp.status_code}: {resp.text[:200]}"}
     finally:
-        rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": _orig_ver})
-    return last   # return last result even if all versions failed
+        rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": orig})
+
+
+def _ok(result):
+    """Robinhood accepted the order iff it echoes an id and has no error detail."""
+    return bool(result) and result.get("id") and not result.get("detail")
+
+
+def _base_order(sym, instrument_url, side):
+    """Common fields. market_hours + extended_hours are what robin_stocks sends on
+    every fractional order and were MISSING from the prior hand-rolled payload —
+    the most likely cause of the persistent rejections."""
+    return {
+        "account":        ACCOUNT_URL,
+        "instrument":     instrument_url,
+        "symbol":         sym,
+        "time_in_force":  "gfd",
+        "trigger":        "immediate",
+        "side":           side,
+        "market_hours":   "regular_hours",
+        "extended_hours": "false",
+        "ref_id":         str(uuid.uuid4()),
+    }
 
 
 def place_buy(sym, dollar_amount, live_price):
     """
-    Fractional market buy locked to ACCOUNT.
-    Uses form-encoded data with fractional quantity + price (marketable limit
-    pattern that Robinhood requires for fractional market buys).
+    Fractional buy locked to ACCOUNT. Two attempts, first success wins:
+      1) market order with an upward price collar (how robin_stocks frames it)
+      2) marketable limit a hair above live
+    Every Robinhood response is logged so a rejection tomorrow is diagnosable.
     """
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
+    inst   = instruments[0]
     shares = round(dollar_amount / live_price, 6)
     if shares < 0.000001:
         raise ValueError(f"Amount too small for {sym}")
-    return _order_post({
-        "account":       ACCOUNT_URL,
-        "instrument":    instruments[0],
-        "symbol":        sym,
-        "type":          "market",
-        "time_in_force": "gfd",
-        "trigger":       "immediate",
-        "side":          "buy",
-        "quantity":      str(shares),
-        "price":         str(round(live_price, 2)),
-        "ref_id":        str(uuid.uuid4()),
-    })
+
+    # Attempt 1 — market + collar price
+    p1 = _base_order(sym, inst, "buy")
+    p1.update({"type": "market", "quantity": str(shares),
+               "price": str(round(live_price * 1.01, 2))})
+    r1 = _order_post(p1)
+    if _ok(r1):
+        return r1
+    print(f"    [buy A1 market rejected: {(r1 or {}).get('detail', r1)}]")
+
+    # Attempt 2 — marketable limit
+    p2 = _base_order(sym, inst, "buy")
+    p2.update({"type": "limit", "quantity": str(shares),
+               "price": str(round(live_price * 1.005, 2))})
+    r2 = _order_post(p2)
+    if _ok(r2):
+        return r2
+    print(f"    [buy A2 limit rejected: {(r2 or {}).get('detail', r2)}]")
+    return r2 or r1
 
 
-def place_sell(sym, qty):
+def place_sell(sym, qty, live_price=None):
     """
-    Market sell locked to ACCOUNT.
-    Same two-step approach as place_buy.
+    Fractional sell locked to ACCOUNT. Market with a downward collar, then a
+    marketable limit fallback (when live_price is known).
     """
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
-    return _order_post({
-        "account":       ACCOUNT_URL,
-        "instrument":    instruments[0],
-        "symbol":        sym,
-        "type":          "market",
-        "time_in_force": "gfd",
-        "trigger":       "immediate",
-        "side":          "sell",
-        "quantity":      str(round(qty, 6)),
-        "ref_id":        str(uuid.uuid4()),
-    })
+    inst = instruments[0]
+    q    = str(round(qty, 6))
+
+    p1 = _base_order(sym, inst, "sell")
+    p1.update({"type": "market", "quantity": q})
+    if live_price:
+        p1["price"] = str(round(live_price * 0.99, 2))
+    r1 = _order_post(p1)
+    if _ok(r1):
+        return r1
+    print(f"    [sell A1 market rejected: {(r1 or {}).get('detail', r1)}]")
+
+    if live_price:
+        p2 = _base_order(sym, inst, "sell")
+        p2.update({"type": "limit", "quantity": q,
+                   "price": str(round(live_price * 0.995, 2))})
+        r2 = _order_post(p2)
+        if _ok(r2):
+            return r2
+        print(f"    [sell A2 limit rejected: {(r2 or {}).get('detail', r2)}]")
+        return r2 or r1
+    return r1
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
@@ -401,7 +440,7 @@ def run_bot(request=None):
         if qty <= 0: continue
         print(f"SELL {sym} qty={qty:.6f} RSI={sig['rsi']:.1f}")
         try:
-            result = place_sell(sym, qty)
+            result = place_sell(sym, qty, market[sym]["live"])
             if result and result.get("id"):
                 print(f"  → Order placed: {result['id']}")
                 buying_power += qty * market[sym]["live"]
