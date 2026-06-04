@@ -250,49 +250,53 @@ def get_daily_pnl_and_pdt(et):
     return pnl, pdt
 
 
-def place_sell(sym, qty):
-    """
-    Place a market sell order explicitly on ACCOUNT_URL.
-    Bypasses robin_stocks order helpers (which use the default account)
-    and posts directly to the Robinhood orders API with our specific account.
-    """
-    instrument_url = rh.stocks.get_instruments_by_symbols(sym, info="url")[0]
-    payload = {
-        "account":         ACCOUNT_URL,
-        "instrument":      instrument_url,
-        "symbol":          sym,
-        "type":            "market",
-        "time_in_force":   "gfd",
-        "trigger":         "immediate",
-        "side":            "sell",
-        "quantity":        str(round(qty, 6)),
-        "ref_id":          str(uuid.uuid4()),
-    }
-    result = rh.helper.request_post("https://api.robinhood.com/orders/", payload=payload)
-    return result
 
 
 def place_buy(sym, dollar_amount):
     """
-    Place a fractional market buy order explicitly on ACCOUNT_URL.
-    Uses rh.helper.SESSION.post with json= so nested dollar_based_amount
-    serialises correctly (request_post uses form-encoding which breaks it).
+    Place a fractional market buy order on ACCOUNT specifically.
+    Uses robin_stocks' proven order placement code, but monkey-patches
+    load_account_profile for the duration so it targets ACCOUNT_URL only.
     """
-    instrument_url = rh.stocks.get_instruments_by_symbols(sym, info="url")[0]
-    payload = {
-        "account":             ACCOUNT_URL,
-        "instrument":          instrument_url,
-        "symbol":              sym,
-        "type":                "market",
-        "time_in_force":       "gfd",
-        "trigger":             "immediate",
-        "side":                "buy",
-        "dollar_based_amount": {"amount": str(round(dollar_amount, 2)),
-                                "currency_code": "USD"},
-        "ref_id":              str(uuid.uuid4()),
-    }
-    resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
-    return resp.json()
+    import robin_stocks.robinhood.account as _rh_acct
+    _orig = _rh_acct.load_account_profile
+
+    # Patch: make robin_stocks resolve account URL to ACCOUNT_URL
+    def _locked(info=None):
+        if info == "url":
+            return ACCOUNT_URL
+        return _orig(info=info)
+
+    _rh_acct.load_account_profile = _locked
+    try:
+        result = rh.orders.order_buy_fractional_by_price(sym, dollar_amount,
+                                                          timeInForce="gfd")
+    finally:
+        _rh_acct.load_account_profile = _orig   # always restore
+
+    return result
+
+
+def place_sell(sym, qty):
+    """
+    Place a market sell order on ACCOUNT specifically.
+    Same monkey-patch approach as place_buy.
+    """
+    import robin_stocks.robinhood.account as _rh_acct
+    _orig = _rh_acct.load_account_profile
+
+    def _locked(info=None):
+        if info == "url":
+            return ACCOUNT_URL
+        return _orig(info=info)
+
+    _rh_acct.load_account_profile = _locked
+    try:
+        result = rh.orders.order_sell_market(sym, qty, timeInForce="gfd")
+    finally:
+        _rh_acct.load_account_profile = _orig
+
+    return result
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
