@@ -252,43 +252,63 @@ def get_daily_pnl_and_pdt(et):
 
 
 
-def _with_account_locked(fn, *args, **kwargs):
+def _order_post(payload):
     """
-    Call fn(*args, **kwargs) with two patches active:
-      1. load_account_profile always returns ACCOUNT_URL (correct account)
-      2. X-Robinhood-API-Version bumped to 1.440.0 (required for order placement)
-    Both patches are restored in a finally block.
+    POST an order to Robinhood using the session's existing auth token but
+    with a bumped API version (1.440.0) that supports order placement.
+    The instrument lookup must be done BEFORE calling this (at default version).
     """
-    import robin_stocks.robinhood.account as _rh_acct
-    _orig_load = _rh_acct.load_account_profile
-    _orig_ver  = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
-
-    def _locked_account(info=None):
-        if info == "url":
-            return ACCOUNT_URL
-        return _orig_load(info=info)
-
-    _rh_acct.load_account_profile = _locked_account
+    _orig_ver = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
     rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": "1.440.0"})
     try:
-        return fn(*args, **kwargs)
+        resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
+        return resp.json()
     finally:
-        _rh_acct.load_account_profile = _orig_load
         rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": _orig_ver})
 
 
 def place_buy(sym, dollar_amount):
-    """Fractional market buy locked to ACCOUNT."""
-    return _with_account_locked(
-        rh.orders.order_buy_fractional_by_price, sym, dollar_amount, timeInForce="gfd"
-    )
+    """
+    Fractional market buy locked to ACCOUNT.
+    Step 1: resolve instrument at default API version (works fine).
+    Step 2: POST order at 1.440.0 (required for order placement).
+    """
+    instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
+    if not instruments:
+        raise ValueError(f"No instrument found for {sym}")
+    return _order_post({
+        "account":             ACCOUNT_URL,
+        "instrument":          instruments[0],
+        "symbol":              sym,
+        "type":                "market",
+        "time_in_force":       "gfd",
+        "trigger":             "immediate",
+        "side":                "buy",
+        "dollar_based_amount": {"amount": str(round(dollar_amount, 2)),
+                                "currency_code": "USD"},
+        "ref_id":              str(uuid.uuid4()),
+    })
 
 
 def place_sell(sym, qty):
-    """Market sell locked to ACCOUNT."""
-    return _with_account_locked(
-        rh.orders.order_sell_market, sym, qty, timeInForce="gfd"
-    )
+    """
+    Market sell locked to ACCOUNT.
+    Same two-step approach as place_buy.
+    """
+    instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
+    if not instruments:
+        raise ValueError(f"No instrument found for {sym}")
+    return _order_post({
+        "account":       ACCOUNT_URL,
+        "instrument":    instruments[0],
+        "symbol":        sym,
+        "type":          "market",
+        "time_in_force": "gfd",
+        "trigger":       "immediate",
+        "side":          "sell",
+        "quantity":      str(round(qty, 6)),
+        "ref_id":        str(uuid.uuid4()),
+    })
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
