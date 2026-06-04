@@ -189,9 +189,6 @@ def rh_login():
             "No trades placed. Exiting."
         )
     print(f"  Account verified: {ACCOUNT} ✓")
-    # robin_stocks 2.1.0 ships an outdated API version header — update it so
-    # Robinhood accepts order placement requests.
-    rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": "1.480.0"})
 
 
 def get_portfolio():
@@ -255,51 +252,43 @@ def get_daily_pnl_and_pdt(et):
 
 
 
-def place_buy(sym, dollar_amount):
+def _with_account_locked(fn, *args, **kwargs):
     """
-    Place a fractional market buy order on ACCOUNT specifically.
-    Uses robin_stocks' proven order placement code, but monkey-patches
-    load_account_profile for the duration so it targets ACCOUNT_URL only.
+    Call fn(*args, **kwargs) with two patches active:
+      1. load_account_profile always returns ACCOUNT_URL (correct account)
+      2. X-Robinhood-API-Version bumped to 1.440.0 (required for order placement)
+    Both patches are restored in a finally block.
     """
     import robin_stocks.robinhood.account as _rh_acct
-    _orig = _rh_acct.load_account_profile
+    _orig_load = _rh_acct.load_account_profile
+    _orig_ver  = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
 
-    # Patch: make robin_stocks resolve account URL to ACCOUNT_URL
-    def _locked(info=None):
+    def _locked_account(info=None):
         if info == "url":
             return ACCOUNT_URL
-        return _orig(info=info)
+        return _orig_load(info=info)
 
-    _rh_acct.load_account_profile = _locked
+    _rh_acct.load_account_profile = _locked_account
+    rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": "1.440.0"})
     try:
-        result = rh.orders.order_buy_fractional_by_price(sym, dollar_amount,
-                                                          timeInForce="gfd")
+        return fn(*args, **kwargs)
     finally:
-        _rh_acct.load_account_profile = _orig   # always restore
+        _rh_acct.load_account_profile = _orig_load
+        rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": _orig_ver})
 
-    return result
+
+def place_buy(sym, dollar_amount):
+    """Fractional market buy locked to ACCOUNT."""
+    return _with_account_locked(
+        rh.orders.order_buy_fractional_by_price, sym, dollar_amount, timeInForce="gfd"
+    )
 
 
 def place_sell(sym, qty):
-    """
-    Place a market sell order on ACCOUNT specifically.
-    Same monkey-patch approach as place_buy.
-    """
-    import robin_stocks.robinhood.account as _rh_acct
-    _orig = _rh_acct.load_account_profile
-
-    def _locked(info=None):
-        if info == "url":
-            return ACCOUNT_URL
-        return _orig(info=info)
-
-    _rh_acct.load_account_profile = _locked
-    try:
-        result = rh.orders.order_sell_market(sym, qty, timeInForce="gfd")
-    finally:
-        _rh_acct.load_account_profile = _orig
-
-    return result
+    """Market sell locked to ACCOUNT."""
+    return _with_account_locked(
+        rh.orders.order_sell_market, sym, qty, timeInForce="gfd"
+    )
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
