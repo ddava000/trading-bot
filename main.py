@@ -180,7 +180,7 @@ def rh_login():
         pickle_path = os.path.join(tokens_dir, "robinhood.pickle")
         import base64
         with open(pickle_path, "wb") as f:
-            f.write(base64.b64decode(RH_SESSION_B64))
+            f.write(base64.b64decode(RH_SESSION_B64.strip()))
         # Login with store_session=True — uses/refreshes the stored session
         rh.login(RH_USERNAME, RH_PASSWORD, store_session=True)
     else:
