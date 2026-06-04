@@ -99,3 +99,10 @@ clean up local tasks → stop PC popups → move to true cloud → chose GitHub 
 - cron-job.org crontab set to market hours only (America/Chicago): `*/15 8-14 * * 1-5` (~28 runs/day, ~1,150 min/mo, under the 2,000 private cap).
 - ⚠️ CAVEAT: on a private repo, the GitHub token cron-job.org uses to call .../dispatches must have `repo` scope. If the next executions 404/403, regenerate that token with repo scope. (Failure-email is enabled on cron-job.org.)
 - Note: bot's internal market-hours check hardcodes EDT (UTC-4); will be 1h off in winter (EST) — fix `check_market()` to UTC-5 after Nov.
+
+## UPDATE 2026-06-04 PM #3 — cloud email alerts
+- main.py now emails from GitHub's cloud (Gmail SMTP) so alerts arrive with PC asleep.
+- Sends on: any order attempt (PLACED/REJECTED/ERROR), the 9:45 ET morning run (daily status even if nothing trades), and a crash during the open window (rate-limited).
+- Sender/recipient default to devondavasher@gmail.com in code; only **GMAIL_APP_PASSWORD** is a required repo secret.
+- Test hook: `gh workflow run trading-bot.yml -f email_test=true` sends one email and exits.
+- ⏳ PENDING USER: add the GMAIL_APP_PASSWORD secret, then run the email_test to confirm.
