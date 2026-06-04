@@ -1,12 +1,11 @@
 name: Robinhood Trading Bot
 
 on:
-  schedule:
-    # Fallback: every 15 min, 1 PM–8 PM UTC = 9 AM–4 PM ET
-    # Primary trigger: cron-job.org hits the workflow_dispatch API every 15 min
-    # Bot's own market-hours check (9:45 AM–3:55 PM ET) is the real gate
-    - cron: "*/15 13-20 * * 1-5"
-  workflow_dispatch:   # lets you trigger a manual run from GitHub UI
+  # Single trigger: cron-job.org pings the workflow_dispatch API every 15 min
+  # during market hours (America/Chicago schedule). The GitHub-native `schedule:`
+  # cron was removed to avoid double-runs (doubles Actions minutes on a private repo).
+  # The bot's own market-hours gate (9:45 AM–3:55 PM ET) is the real safety check.
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # suppress Node.js 20 deprecation warning
