@@ -279,27 +279,28 @@ def _order_post(payload):
     return last   # return last result even if all versions failed
 
 
-def place_buy(sym, dollar_amount):
+def place_buy(sym, dollar_amount, live_price):
     """
     Fractional market buy locked to ACCOUNT.
-    Step 1: resolve instrument at default API version (works fine).
-    Step 2: POST order at 1.440.0 (required for order placement).
+    Uses fractional share quantity (dollar_amount / live_price) instead of
+    dollar_based_amount to avoid persistent API format issues.
     """
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
+    shares = round(dollar_amount / live_price, 6)
+    if shares < 0.000001:
+        raise ValueError(f"Amount too small for {sym}")
     return _order_post({
-        "account":             ACCOUNT_URL,
-        "instrument":          instruments[0],
-        "symbol":              sym,
-        "type":                "market",
-        "time_in_force":       "gfd",
-        "trigger":             "immediate",
-        "side":                "buy",
-        "market_hours":        "regular_hours",
-        "dollar_based_amount": {"amount": str(round(dollar_amount, 2)),
-                                "currency_code": "USD"},
-        "ref_id":              str(uuid.uuid4()),
+        "account":       ACCOUNT_URL,
+        "instrument":    instruments[0],
+        "symbol":        sym,
+        "type":          "market",
+        "time_in_force": "gfd",
+        "trigger":       "immediate",
+        "side":          "buy",
+        "quantity":      str(shares),
+        "ref_id":        str(uuid.uuid4()),
     })
 
 
@@ -418,7 +419,7 @@ def run_bot(request=None):
             if amount < 1.00: continue
             print(f"BUY {sym} ${amount:.2f} RSI={sig['rsi']:.1f}")
             try:
-                result = place_buy(sym, amount)
+                result = place_buy(sym, amount, market[sym]["live"])
                 if result and result.get("id"):
                     print(f"  → Order placed: {result['id']}")
                     buying_power -= amount; spent += amount
