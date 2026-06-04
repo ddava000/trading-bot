@@ -267,7 +267,7 @@ def _order_post(payload):
     try:
         for ver in _ORDER_VERSIONS:
             rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": ver})
-            resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
+            resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", data=payload)
             last = resp.json()
             detail = str(last.get("detail", "")).lower()
             if "version" not in detail and "download" not in detail:
