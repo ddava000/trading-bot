@@ -287,7 +287,6 @@ def place_buy(sym, dollar_amount):
         "trigger":            "immediate",
         "side":               "buy",
         "dollar_based_amount": {"amount": str(round(dollar_amount, 2)), "currency_code": "USD"},
-        "quantity":           None,
         "ref_id":             str(uuid.uuid4()),
     }
     result = rh.helper.request_post("https://api.robinhood.com/orders/", payload=payload)
