@@ -6,6 +6,11 @@ on:
   # cron was removed to avoid double-runs (doubles Actions minutes on a private repo).
   # The bot's own market-hours gate (9:45 AM–3:55 PM ET) is the real safety check.
   workflow_dispatch:
+    inputs:
+      email_test:
+        description: "Send a test email and exit (leave off for normal runs)"
+        type: boolean
+        default: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # suppress Node.js 20 deprecation warning
@@ -30,8 +35,10 @@ jobs:
 
       - name: Run bot
         env:
-          RH_USERNAME:    ${{ secrets.RH_USERNAME }}
-          RH_PASSWORD:    ${{ secrets.RH_PASSWORD }}
-          RH_TOTP_SECRET: ${{ secrets.RH_TOTP_SECRET }}
-          RH_SESSION_B64: ${{ secrets.RH_SESSION_B64 }}
+          RH_USERNAME:        ${{ secrets.RH_USERNAME }}
+          RH_PASSWORD:        ${{ secrets.RH_PASSWORD }}
+          RH_TOTP_SECRET:     ${{ secrets.RH_TOTP_SECRET }}
+          RH_SESSION_B64:     ${{ secrets.RH_SESSION_B64 }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TEST:         ${{ inputs.email_test }}
         run: python main.py

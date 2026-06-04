@@ -25,6 +25,34 @@ RH_PASSWORD    = os.environ["RH_PASSWORD"]
 RH_TOTP_SECRET = os.environ.get("RH_TOTP_SECRET", "")
 RH_SESSION_B64 = os.environ.get("RH_SESSION_B64", "")
 
+# Email alerts — sent from GitHub's cloud so they arrive even if your PC is asleep.
+# Only GMAIL_APP_PASSWORD is a secret; sender/recipient default to your address.
+ALERT_TO     = os.environ.get("ALERT_TO",     "devondavasher@gmail.com")
+GMAIL_USER   = os.environ.get("GMAIL_USER",   "devondavasher@gmail.com")
+GMAIL_APP_PW = os.environ.get("GMAIL_APP_PASSWORD", "")
+
+
+def send_email(subject, body):
+    """Best-effort Gmail alert. Never raises — a mail failure must not break a
+    trading run. No-op if GMAIL_APP_PASSWORD isn't configured as a GitHub secret."""
+    if not GMAIL_APP_PW:
+        print("  [email skipped — GMAIL_APP_PASSWORD not set]")
+        return
+    try:
+        import smtplib
+        from email.mime.text import MIMEText
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"]    = GMAIL_USER
+        msg["To"]      = ALERT_TO
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as s:
+            s.starttls()
+            s.login(GMAIL_USER, GMAIL_APP_PW)
+            s.sendmail(GMAIL_USER, [ALERT_TO], msg.as_string())
+        print(f"  [email sent → {ALERT_TO}: {subject}]")
+    except Exception as e:
+        print(f"  [email failed: {e}]")
+
 
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
 def check_market():
@@ -374,6 +402,7 @@ def run_bot(request=None):
         return ("market_closed", 200)
 
     print(f"=== Bot run {et.strftime('%Y-%m-%d %H:%M ET')} | account={ACCOUNT} ===")
+    events = []   # order outcomes this run — drives the email alert at the end
 
     # Step 2: login (aborts on wrong account)
     rh_login()
@@ -445,10 +474,13 @@ def run_bot(request=None):
                 print(f"  → Order placed: {result['id']}")
                 buying_power += qty * market[sym]["live"]
                 low_cash = False
+                events.append(f"SELL {sym} qty={qty:.6f} → PLACED (id {result['id']})")
             else:
                 print(f"  → SELL rejected: {result}")
+                events.append(f"SELL {sym} → REJECTED: {(result or {}).get('detail', result)}")
         except Exception as e:
             print(f"  → SELL error: {e}")
+            events.append(f"SELL {sym} → ERROR: {e}")
 
     # Step 7: buy
     if not low_cash and not pdt_exhausted:
@@ -464,10 +496,13 @@ def run_bot(request=None):
                     print(f"  → Order placed: {result['id']}")
                     buying_power -= amount; spent += amount
                     positions[sym] = {"qty": 0, "avg_cost": 0}
+                    events.append(f"BUY {sym} ${amount:.2f} → PLACED (id {result['id']})")
                 else:
                     print(f"  → BUY rejected: {result}")
+                    events.append(f"BUY {sym} ${amount:.2f} → REJECTED: {(result or {}).get('detail', result)}")
             except Exception as e:
                 print(f"  → BUY error: {e}")
+                events.append(f"BUY {sym} ${amount:.2f} → ERROR: {e}")
 
     # Step 8: summary
     print(f"\n--- Summary | {et.strftime('%H:%M ET')} | acct={ACCOUNT} | "
@@ -477,9 +512,50 @@ def run_bot(request=None):
             print(f"  {sym}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}")
     print(f"  Zero-consensus: {sum(1 for s in sigs.values() if s['consensus']==0)}")
 
+    # Email alert: send on any order activity, plus once at the morning open run
+    # (9:45 ET) so you get a daily status even when nothing trades. Quiet otherwise.
+    morning = (et.hour == 9 and et.minute >= 45)
+    if events or morning:
+        nonzero = [f"  {s}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}"
+                   for s, sig in sigs.items() if sig["consensus"] != 0]
+        body = [f"Bot run {et.strftime('%Y-%m-%d %H:%M ET')}  (account {ACCOUNT})",
+                f"Equity ${equity:.2f} | Buying power ${buying_power:.2f} | "
+                f"P&L ${daily_pnl:.2f} | PDT {pdt}/3", ""]
+        body.append("ORDERS THIS RUN:" if events else "No orders this run.")
+        body += [f"  • {e}" for e in events]
+        body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
+        if any("PLACED" in e for e in events):
+            subject = "✅ Trading bot — ORDER PLACED"
+        elif any(("REJECTED" in e or "ERROR" in e) for e in events):
+            subject = "⚠️ Trading bot — order rejected"
+        else:
+            subject = "Trading bot — morning status"
+        send_email(subject, "\n".join(body))
+
     rh.logout()
     return ("ok", 200)
 
 
 if __name__ == "__main__":
-    run_bot()
+    # Manual test: `gh workflow run trading-bot.yml -f email_test=true` sends one
+    # email and exits, to confirm alerts work without waiting for market open.
+    if os.environ.get("EMAIL_TEST", "").lower() == "true":
+        send_email("📧 Trading bot — email test OK",
+                   "Cloud email alerts are working. You'll get a morning status each "
+                   "trading day, plus an alert on every order (placed or rejected).")
+        raise SystemExit(0)
+    try:
+        run_bot()
+    except Exception as exc:
+        import traceback
+        tb = traceback.format_exc()
+        print(tb)
+        # Only email a crash during the morning open window, so a persistent
+        # failure can't spam 28 emails/day. Still always visible in the Actions log.
+        try:
+            _, _et = check_market()
+            if _et.hour == 9 and _et.minute >= 45:
+                send_email("❌ Trading bot — CRASHED at open", tb[-3000:])
+        except Exception:
+            pass
+        raise
