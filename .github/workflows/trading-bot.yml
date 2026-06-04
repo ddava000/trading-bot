@@ -2,9 +2,10 @@ name: Robinhood Trading Bot
 
 on:
   schedule:
-    # Every 5 min, 1 PM–8 PM UTC = 9 AM–4 PM ET (covers both EDT and EST)
-    # The bot's own market-hours check is the real gate (9:45 AM–3:55 PM ET)
-    - cron: "*/5 13-20 * * 1-5"
+    # Fallback: every 15 min, 1 PM–8 PM UTC = 9 AM–4 PM ET
+    # Primary trigger: cron-job.org hits the workflow_dispatch API every 15 min
+    # Bot's own market-hours check (9:45 AM–3:55 PM ET) is the real gate
+    - cron: "*/15 13-20 * * 1-5"
   workflow_dispatch:   # lets you trigger a manual run from GitHub UI
 
 env:
