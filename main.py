@@ -159,11 +159,16 @@ def fetch_screener():
 # EVERY function below explicitly targets ACCOUNT / ACCOUNT_URL.
 # None of them use robin_stocks defaults that could resolve to a different account.
 
+def rh_api_get(url, params=None):
+    """Authenticated GET via robin_stocks session — returns parsed JSON."""
+    return rh.helper.request_get(url, dataType="regular", payload=params)
+
+
 def rh_login():
     """Login and HARD-ABORT if we are not on account 950942706."""
     if RH_SESSION_B64:
-        home       = os.path.expanduser("~")
-        token_dir  = os.path.join(home, ".tokens")
+        home      = os.path.expanduser("~")
+        token_dir = os.path.join(home, ".tokens")
         os.makedirs(token_dir, exist_ok=True)
         with open(os.path.join(token_dir, "robinhood.pickle"), "wb") as f:
             f.write(base64.b64decode(RH_SESSION_B64.strip()))
@@ -172,10 +177,11 @@ def rh_login():
         mfa = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
         rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa, store_session=False)
 
-    # ── HARD ACCOUNT CHECK — must pass before any trading logic runs ──────────
-    profile      = rh.account.load_account_profile(account_number=ACCOUNT)
-    actual_url   = profile.get("url", "").rstrip("/")
-    actual_acct  = actual_url.split("/")[-1]
+    # ── HARD ACCOUNT CHECK — call the specific account URL directly ───────────
+    # This bypasses robin_stocks defaults and hits our account exclusively.
+    profile     = rh_api_get(ACCOUNT_URL)
+    actual_url  = (profile or {}).get("url", "").rstrip("/")
+    actual_acct = actual_url.split("/")[-1]
     if actual_acct != ACCOUNT:
         rh.logout()
         raise SystemExit(
@@ -186,16 +192,22 @@ def rh_login():
 
 
 def get_portfolio():
-    """Load buying power and equity specifically for ACCOUNT."""
-    acct = rh.account.load_account_profile(account_number=ACCOUNT)
-    port = rh.account.load_portfolio_profile(account_number=ACCOUNT)
+    """Load buying power and equity directly from ACCOUNT_URL."""
+    acct = rh_api_get(ACCOUNT_URL)
+    port = rh_api_get(f"https://api.robinhood.com/portfolios/{ACCOUNT}/")
     return float(acct["buying_power"]), float(port["equity"])
 
 
 def get_positions():
-    """Load open positions for ACCOUNT only."""
+    """Load open positions filtered to ACCOUNT only."""
     pos = {}
-    for p in rh.account.get_open_stock_positions(account_number=ACCOUNT):
+    # Filter positions by account URL to guarantee we only see ACCOUNT's positions
+    raw = rh_api_get("https://api.robinhood.com/positions/",
+                     params={"account_number": ACCOUNT, "nonzero": "true"})
+    items = raw if isinstance(raw, list) else (raw or {}).get("results", [])
+    for p in items:
+        if ACCOUNT_URL not in p.get("account", ""):
+            continue
         sym = rh.stocks.get_symbol_by_url(p["instrument"])
         qty = float(p["quantity"])
         if qty > 0:
