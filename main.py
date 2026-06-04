@@ -26,9 +26,11 @@ RH_TOTP_SECRET = os.environ.get("RH_TOTP_SECRET", "")
 RH_SESSION_B64 = os.environ.get("RH_SESSION_B64", "")
 
 # Email alerts — sent from GitHub's cloud so they arrive even if your PC is asleep.
-# Only GMAIL_APP_PASSWORD is a secret; sender/recipient default to your address.
-ALERT_TO     = os.environ.get("ALERT_TO",     "devondavasher@gmail.com")
-GMAIL_USER   = os.environ.get("GMAIL_USER",   "devondavasher@gmail.com")
+# Sender = dedicated dummy account; recipient = your personal inbox.
+# Only GMAIL_APP_PASSWORD (the dummy account's App Password) is a secret.
+# Both addresses are overridable via env (ALERT_TO / GMAIL_USER) if ever needed.
+ALERT_TO     = os.environ.get("ALERT_TO",   "devondavasher@gmail.com")  # you receive
+GMAIL_USER   = os.environ.get("GMAIL_USER", "devonsdummy@gmail.com")    # bot sends as
 GMAIL_APP_PW = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 
