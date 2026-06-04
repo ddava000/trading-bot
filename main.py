@@ -255,7 +255,7 @@ def get_daily_pnl_and_pdt(et):
 # Versions to try for order placement, newest first.
 # robin_stocks 2.1.0 ships 1.431.4 which is too old for orders.
 # We iterate until Robinhood doesn't return a version rejection.
-_ORDER_VERSIONS = ["1.460.0", "1.455.0", "1.450.0", "1.445.0", "1.441.0", "1.432.0"]
+_ORDER_VERSIONS = ["1.432.0"]  # confirmed working version for order placement
 
 def _order_post(payload):
     """
@@ -288,6 +288,7 @@ def place_buy(sym, dollar_amount):
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
+    # robin_stocks sends quantity="1" alongside dollar_based_amount — required
     return _order_post({
         "account":             ACCOUNT_URL,
         "instrument":          instruments[0],
@@ -296,6 +297,7 @@ def place_buy(sym, dollar_amount):
         "time_in_force":       "gfd",
         "trigger":             "immediate",
         "side":                "buy",
+        "quantity":            "1",
         "dollar_based_amount": {"amount": str(round(dollar_amount, 2)),
                                 "currency_code": "USD"},
         "ref_id":              str(uuid.uuid4()),
