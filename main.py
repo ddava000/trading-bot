@@ -275,22 +275,24 @@ def place_sell(sym, qty):
 def place_buy(sym, dollar_amount):
     """
     Place a fractional market buy order explicitly on ACCOUNT_URL.
-    Same direct-API approach as place_sell.
+    Uses rh.helper.SESSION.post with json= so nested dollar_based_amount
+    serialises correctly (request_post uses form-encoding which breaks it).
     """
     instrument_url = rh.stocks.get_instruments_by_symbols(sym, info="url")[0]
     payload = {
-        "account":            ACCOUNT_URL,
-        "instrument":         instrument_url,
-        "symbol":             sym,
-        "type":               "market",
-        "time_in_force":      "gfd",
-        "trigger":            "immediate",
-        "side":               "buy",
-        "dollar_based_amount": {"amount": str(round(dollar_amount, 2)), "currency_code": "USD"},
-        "ref_id":             str(uuid.uuid4()),
+        "account":             ACCOUNT_URL,
+        "instrument":          instrument_url,
+        "symbol":              sym,
+        "type":                "market",
+        "time_in_force":       "gfd",
+        "trigger":             "immediate",
+        "side":                "buy",
+        "dollar_based_amount": {"amount": str(round(dollar_amount, 2)),
+                                "currency_code": "USD"},
+        "ref_id":              str(uuid.uuid4()),
     }
-    result = rh.helper.request_post("https://api.robinhood.com/orders/", payload=payload)
-    return result
+    resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
+    return resp.json()
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
