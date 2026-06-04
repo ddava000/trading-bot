@@ -7,6 +7,9 @@ on:
     - cron: "*/5 13-20 * * 1-5"
   workflow_dispatch:   # lets you trigger a manual run from GitHub UI
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # suppress Node.js 20 deprecation warning
+
 jobs:
   trade:
     runs-on: ubuntu-latest
