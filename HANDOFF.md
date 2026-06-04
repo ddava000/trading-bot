@@ -92,3 +92,10 @@ ref_id: <uuid4>
 
 ## User's running request log (for context)
 clean up local tasks → stop PC popups → move to true cloud → chose GitHub over Google Cloud → repo live (ddava000/trading-bot) → secrets set → login fixed via session injection → order API debugging (unsolved) → added $25 buying power to enable a live test → resume to fix order placement.
+
+## UPDATE 2026-06-04 PM #2 — repo private + single trigger
+- Repo flipped to **PRIVATE** (hides strategy + account #; password was always in Secrets, never exposed).
+- Removed the GitHub-native `schedule:` cron from trading-bot.yml. **cron-job.org is now the SOLE trigger** (single point of failure — see caveat).
+- cron-job.org crontab set to market hours only (America/Chicago): `*/15 8-14 * * 1-5` (~28 runs/day, ~1,150 min/mo, under the 2,000 private cap).
+- ⚠️ CAVEAT: on a private repo, the GitHub token cron-job.org uses to call .../dispatches must have `repo` scope. If the next executions 404/403, regenerate that token with repo scope. (Failure-email is enabled on cron-job.org.)
+- Note: bot's internal market-hours check hardcodes EDT (UTC-4); will be 1h off in winter (EST) — fix `check_market()` to UTC-5 after Nov.
