@@ -106,3 +106,9 @@ clean up local tasks → stop PC popups → move to true cloud → chose GitHub 
 - Sender/recipient default to devondavasher@gmail.com in code; only **GMAIL_APP_PASSWORD** is a required repo secret.
 - Test hook: `gh workflow run trading-bot.yml -f email_test=true` sends one email and exits.
 - ⏳ PENDING USER: add the GMAIL_APP_PASSWORD secret, then run the email_test to confirm.
+
+## UPDATE 2026-06-04 PM #4 — email alerts VERIFIED ✅
+- GMAIL_APP_PASSWORD secret set; test run 26981358389 logged `[email sent]`.
+- Sender devonsdummy@gmail.com → recipient devondavasher@gmail.com works from the cloud.
+- Tomorrow: morning status email at the 9:45 ET run + an alert on every order. No PC needed.
+- (If first emails land in spam, mark Not Spam — brand-new sender.)
