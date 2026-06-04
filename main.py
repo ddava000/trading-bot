@@ -252,19 +252,31 @@ def get_daily_pnl_and_pdt(et):
 
 
 
+# Versions to try for order placement, newest first.
+# robin_stocks 2.1.0 ships 1.431.4 which is too old for orders.
+# We iterate until Robinhood doesn't return a version rejection.
+_ORDER_VERSIONS = ["1.460.0", "1.455.0", "1.450.0", "1.445.0", "1.441.0", "1.432.0"]
+
 def _order_post(payload):
     """
-    POST an order to Robinhood using the session's existing auth token but
-    with a bumped API version (1.440.0) that supports order placement.
-    The instrument lookup must be done BEFORE calling this (at default version).
+    POST an order trying API versions newest-first until Robinhood accepts one.
+    The instrument lookup must happen BEFORE this call (at the default version).
     """
     _orig_ver = rh.helper.SESSION.headers.get("X-Robinhood-API-Version", "")
-    rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": "1.440.0"})
+    last = None
     try:
-        resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
-        return resp.json()
+        for ver in _ORDER_VERSIONS:
+            rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": ver})
+            resp = rh.helper.SESSION.post("https://api.robinhood.com/orders/", json=payload)
+            last = resp.json()
+            detail = str(last.get("detail", "")).lower()
+            if "version" not in detail and "download" not in detail:
+                print(f"  [order API version {ver} accepted]")
+                return last
+            print(f"  [version {ver} rejected: {last.get('detail','')}]")
     finally:
         rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": _orig_ver})
+    return last   # return last result even if all versions failed
 
 
 def place_buy(sym, dollar_amount):
