@@ -30,4 +30,5 @@ jobs:
           RH_USERNAME:    ${{ secrets.RH_USERNAME }}
           RH_PASSWORD:    ${{ secrets.RH_PASSWORD }}
           RH_TOTP_SECRET: ${{ secrets.RH_TOTP_SECRET }}
+          RH_SESSION_B64: ${{ secrets.RH_SESSION_B64 }}
         run: python main.py

@@ -21,8 +21,8 @@ SPEND_CAP_PCT  = 0.75
 
 RH_USERNAME    = os.environ["RH_USERNAME"]
 RH_PASSWORD    = os.environ["RH_PASSWORD"]
-RH_TOTP_SECRET = os.environ.get("RH_TOTP_SECRET", "")   # from authenticator app
-RH_DEVICE_TOKEN = os.environ.get("RH_DEVICE_TOKEN", "")  # fixed UUID to identify this bot as a trusted device
+RH_TOTP_SECRET  = os.environ.get("RH_TOTP_SECRET", "")
+RH_SESSION_B64  = os.environ.get("RH_SESSION_B64", "")   # base64 session from setup_session.py
 
 
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
@@ -168,18 +168,24 @@ def fetch_screener():
 
 # ── Robinhood helpers ─────────────────────────────────────────────────────────
 def rh_login():
-    mfa         = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
-    device_token = RH_DEVICE_TOKEN if RH_DEVICE_TOKEN else str(uuid.uuid4())
-    try:
-        rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa,
-                 device_token=device_token, store_session=False)
-    except Exception as e:
-        # Robinhood sometimes sends a device-challenge response that robin_stocks
-        # mis-parses. Surface a clear message instead of a raw KeyError.
-        raise RuntimeError(
-            f"Robinhood login failed — likely a new-device challenge. "
-            f"Make sure RH_DEVICE_TOKEN secret is set. Raw error: {e}"
-        ) from e
+    """
+    Login via a pre-captured session (RH_SESSION_B64) so GitHub Actions is
+    treated as a known device.  Falls back to username/password if not set.
+    """
+    if RH_SESSION_B64:
+        # Write the stored session pickle so robin_stocks finds it
+        home        = os.path.expanduser("~")
+        tokens_dir  = os.path.join(home, ".tokens")
+        os.makedirs(tokens_dir, exist_ok=True)
+        pickle_path = os.path.join(tokens_dir, "robinhood.pickle")
+        import base64
+        with open(pickle_path, "wb") as f:
+            f.write(base64.b64decode(RH_SESSION_B64))
+        # Login with store_session=True — uses/refreshes the stored session
+        rh.login(RH_USERNAME, RH_PASSWORD, store_session=True)
+    else:
+        mfa = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
+        rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa, store_session=False)
 
 def get_positions():
     pos = {}
