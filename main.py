@@ -22,6 +22,7 @@ SPEND_CAP_PCT  = 0.75
 RH_USERNAME    = os.environ["RH_USERNAME"]
 RH_PASSWORD    = os.environ["RH_PASSWORD"]
 RH_TOTP_SECRET = os.environ.get("RH_TOTP_SECRET", "")   # from authenticator app
+RH_DEVICE_TOKEN = os.environ.get("RH_DEVICE_TOKEN", "")  # fixed UUID to identify this bot as a trusted device
 
 
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
@@ -167,8 +168,18 @@ def fetch_screener():
 
 # ── Robinhood helpers ─────────────────────────────────────────────────────────
 def rh_login():
-    mfa = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
-    rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa, store_session=False)
+    mfa         = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
+    device_token = RH_DEVICE_TOKEN if RH_DEVICE_TOKEN else str(uuid.uuid4())
+    try:
+        rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa,
+                 device_token=device_token, store_session=False)
+    except Exception as e:
+        # Robinhood sometimes sends a device-challenge response that robin_stocks
+        # mis-parses. Surface a clear message instead of a raw KeyError.
+        raise RuntimeError(
+            f"Robinhood login failed — likely a new-device challenge. "
+            f"Make sure RH_DEVICE_TOKEN secret is set. Raw error: {e}"
+        ) from e
 
 def get_positions():
     pos = {}
