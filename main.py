@@ -189,6 +189,9 @@ def rh_login():
             "No trades placed. Exiting."
         )
     print(f"  Account verified: {ACCOUNT} ✓")
+    # robin_stocks 2.1.0 ships an outdated API version header — update it so
+    # Robinhood accepts order placement requests.
+    rh.helper.SESSION.headers.update({"X-Robinhood-API-Version": "1.480.0"})
 
 
 def get_portfolio():
