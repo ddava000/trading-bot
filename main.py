@@ -282,8 +282,8 @@ def _order_post(payload):
 def place_buy(sym, dollar_amount, live_price):
     """
     Fractional market buy locked to ACCOUNT.
-    Uses fractional share quantity (dollar_amount / live_price) instead of
-    dollar_based_amount to avoid persistent API format issues.
+    Uses form-encoded data with fractional quantity + price (marketable limit
+    pattern that Robinhood requires for fractional market buys).
     """
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
@@ -300,6 +300,7 @@ def place_buy(sym, dollar_amount, live_price):
         "trigger":       "immediate",
         "side":          "buy",
         "quantity":      str(shares),
+        "price":         str(round(live_price, 2)),
         "ref_id":        str(uuid.uuid4()),
     })
 
