@@ -171,9 +171,10 @@ def rh_login():
     """
     Login via a pre-captured session (RH_SESSION_B64) so GitHub Actions is
     treated as a known device.  Falls back to username/password if not set.
+    After login, hard-checks that we are on the correct account (ACCOUNT).
+    Aborts immediately if the wrong account is detected — no trades ever fire.
     """
     if RH_SESSION_B64:
-        # Write the stored session pickle so robin_stocks finds it
         home        = os.path.expanduser("~")
         tokens_dir  = os.path.join(home, ".tokens")
         os.makedirs(tokens_dir, exist_ok=True)
@@ -181,11 +182,23 @@ def rh_login():
         import base64
         with open(pickle_path, "wb") as f:
             f.write(base64.b64decode(RH_SESSION_B64.strip()))
-        # Login with store_session=True — uses/refreshes the stored session
         rh.login(RH_USERNAME, RH_PASSWORD, store_session=True)
     else:
         mfa = pyotp.TOTP(RH_TOTP_SECRET).now() if RH_TOTP_SECRET else None
         rh.login(RH_USERNAME, RH_PASSWORD, mfa_code=mfa, store_session=False)
+
+    # ── HARD ACCOUNT GUARD ────────────────────────────────────────────────────
+    # Extract account number from the account profile URL.
+    # robin_stocks URL format: https://api.robinhood.com/accounts/XXXXXXXXX/
+    profile = rh.account.load_account_profile()
+    url = profile.get("url", "")
+    actual_account = url.rstrip("/").split("/")[-1]
+    if actual_account != ACCOUNT:
+        rh.logout()
+        raise RuntimeError(
+            f"🚨 SAFETY ABORT: Connected to wrong account '{actual_account}'. "
+            f"Expected '{ACCOUNT}'. No trades placed. Exiting."
+        )
 
 def get_positions():
     pos = {}
