@@ -39,6 +39,7 @@ jobs:
           RH_PASSWORD:        ${{ secrets.RH_PASSWORD }}
           RH_TOTP_SECRET:     ${{ secrets.RH_TOTP_SECRET }}
           RH_SESSION_B64:     ${{ secrets.RH_SESSION_B64 }}
+          RH_API_VERSION:     ${{ secrets.RH_API_VERSION }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_TEST:         ${{ inputs.email_test }}
         run: python main.py

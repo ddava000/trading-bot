@@ -283,9 +283,9 @@ def get_daily_pnl_and_pdt(et):
 
 
 # Versions to try for order placement, newest first.
-# robin_stocks 2.1.0 ships 1.431.4 which is too old for orders.
-# 1.432.0 was confirmed accepted during market hours.
-_ORDER_VERSION = "1.432.0"
+# robin_stocks 2.1.0 ships API version 1.431.4, which Robinhood rejects for orders.
+# Overridable via the RH_API_VERSION secret so we can chase the gate without a code push.
+_ORDER_VERSION = os.environ.get("RH_API_VERSION") or "1.432.0"
 
 
 def _order_post(payload):
@@ -330,69 +330,37 @@ def _base_order(sym, instrument_url, side):
 
 def place_buy(sym, dollar_amount, live_price):
     """
-    Fractional buy locked to ACCOUNT. Two attempts, first success wins:
-      1) market order with an upward price collar (how robin_stocks frames it)
-      2) marketable limit a hair above live
-    Every Robinhood response is logged so a rejection tomorrow is diagnosable.
+    Fractional MARKET buy locked to ACCOUNT. Limit orders cannot hold fractional
+    shares, so market is the only valid order type here. Logs RH's response.
     """
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
-    inst   = instruments[0]
     shares = round(dollar_amount / live_price, 6)
     if shares < 0.000001:
         raise ValueError(f"Amount too small for {sym}")
-
-    # Attempt 1 — market + collar price
-    p1 = _base_order(sym, inst, "buy")
-    p1.update({"type": "market", "quantity": str(shares),
-               "price": str(round(live_price * 1.01, 2))})
-    r1 = _order_post(p1)
-    if _ok(r1):
-        return r1
-    print(f"    [buy A1 market rejected: {(r1 or {}).get('detail', r1)}]")
-
-    # Attempt 2 — marketable limit
-    p2 = _base_order(sym, inst, "buy")
-    p2.update({"type": "limit", "quantity": str(shares),
-               "price": str(round(live_price * 1.005, 2))})
-    r2 = _order_post(p2)
-    if _ok(r2):
-        return r2
-    print(f"    [buy A2 limit rejected: {(r2 or {}).get('detail', r2)}]")
-    return r2 or r1
+    p = _base_order(sym, instruments[0], "buy")
+    p.update({"type": "market", "quantity": str(shares),
+              "price": str(round(live_price * 1.01, 2))})   # RH requires a price field
+    r = _order_post(p)
+    if not _ok(r):
+        print(f"    [buy market rejected: {(r or {}).get('detail', r)}]")
+    return r
 
 
 def place_sell(sym, qty, live_price=None):
-    """
-    Fractional sell locked to ACCOUNT. Market with a downward collar, then a
-    marketable limit fallback (when live_price is known).
-    """
+    """Fractional MARKET sell locked to ACCOUNT."""
     instruments = rh.stocks.get_instruments_by_symbols(sym, info="url")
     if not instruments:
         raise ValueError(f"No instrument found for {sym}")
-    inst = instruments[0]
-    q    = str(round(qty, 6))
-
-    p1 = _base_order(sym, inst, "sell")
-    p1.update({"type": "market", "quantity": q})
+    p = _base_order(sym, instruments[0], "sell")
+    p.update({"type": "market", "quantity": str(round(qty, 6))})
     if live_price:
-        p1["price"] = str(round(live_price * 0.99, 2))
-    r1 = _order_post(p1)
-    if _ok(r1):
-        return r1
-    print(f"    [sell A1 market rejected: {(r1 or {}).get('detail', r1)}]")
-
-    if live_price:
-        p2 = _base_order(sym, inst, "sell")
-        p2.update({"type": "limit", "quantity": q,
-                   "price": str(round(live_price * 0.995, 2))})
-        r2 = _order_post(p2)
-        if _ok(r2):
-            return r2
-        print(f"    [sell A2 limit rejected: {(r2 or {}).get('detail', r2)}]")
-        return r2 or r1
-    return r1
+        p["price"] = str(round(live_price * 0.99, 2))
+    r = _order_post(p)
+    if not _ok(r):
+        print(f"    [sell market rejected: {(r or {}).get('detail', r)}]")
+    return r
 
 
 # ── Main bot ──────────────────────────────────────────────────────────────────
