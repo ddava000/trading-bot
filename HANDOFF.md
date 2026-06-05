@@ -112,3 +112,14 @@ clean up local tasks → stop PC popups → move to true cloud → chose GitHub 
 - Sender devonsdummy@gmail.com → recipient devondavasher@gmail.com works from the cloud.
 - Tomorrow: morning status email at the 9:45 ET run + an alert on every order. No PC needed.
 - (If first emails land in spam, mark Not Spam — brand-new sender.)
+
+## UPDATE 2026-06-05 EOD — paused until Monday
+- DECISION: Option B (Robinhood, local MCP) as stopgap; Alpaca is the planned real home.
+- GitHub robin_stocks bot DISABLED — RH blocks order placement ("app version" gate, unsolved lib issue). Order code is now market-only.
+- LIVE: local task `robinhood-trading-bot-cloud` = SELL/MANAGE-ONLY via MCP, every 15 min 8-15 CT weekdays. Needs PC on + Claude app open + tools pre-approved.
+- 2026-06-05 was a ~-8% down day; bot HELD all 15 positions (sells gated by "50-day trend still up"). Nothing sold. Biggest loss IBM -$19.68. Equity $459.52 + cash $25.74.
+- MONDAY OPEN ITEMS:
+  1. Verify the task can actually PLACE sells — click "Run now" to pre-approve place_equity_order; check task History for permission stalls.
+  2. Pause cron-job.org (Enable OFF) or the disabled GitHub workflow → failure emails Monday AM.
+  3. Decide: keep managing vs liquidate all 15 for the Alpaca move.
+  4. Optional: migrate to always-on backup laptop (easy — task is self-contained; install Claude Code, sign in, reconnect Robinhood, recreate task w/ laptop-TZ cron, Run now).
