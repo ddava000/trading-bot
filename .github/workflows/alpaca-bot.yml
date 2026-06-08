@@ -1,0 +1,45 @@
+name: Alpaca Trading Bot
+
+on:
+  # Manual for now (paper testing). Once validated, cron-job.org will hit this
+  # workflow_dispatch endpoint on a market-hours schedule, same as the RH bot did.
+  workflow_dispatch:
+    inputs:
+      email_test:
+        description: "Send a test email and exit"
+        type: boolean
+        default: false
+      order_test:
+        description: "Place a $1 paper test order and exit (paper only)"
+        type: boolean
+        default: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-alpaca.txt
+
+      - name: Run Alpaca bot
+        env:
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TEST:         ${{ inputs.email_test }}
+          ORDER_TEST:         ${{ inputs.order_test }}
+        run: python alpaca_bot.py
