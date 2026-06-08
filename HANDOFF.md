@@ -123,3 +123,12 @@ clean up local tasks → stop PC popups → move to true cloud → chose GitHub 
   2. Pause cron-job.org (Enable OFF) or the disabled GitHub workflow → failure emails Monday AM.
   3. Decide: keep managing vs liquidate all 15 for the Alpaca move.
   4. Optional: migrate to always-on backup laptop (easy — task is self-contained; install Claude Code, sign in, reconnect Robinhood, recreate task w/ laptop-TZ cron, Run now).
+
+## UPDATE 2026-06-08 — ALPACA WORKS ✅ (the pivot)
+- Robinhood order placement = dead end (robin_stocks "app version" gate, unsolved). Abandoned.
+- Built `alpaca_bot.py`: SAME signal engine/strategy, orders via Alpaca's OFFICIAL API (fractional dollar `notional` buys). Defaults to PAPER (ALPACA_BASE_URL overrides for live).
+- ORDER PLACEMENT VALIDATED on paper from the cloud: $1 AAPL notional buy returned an order id. Run 27165230390.
+- Secrets: ALPACA_API_KEY, ALPACA_SECRET_KEY (paper). GMAIL_APP_PASSWORD reused for alerts.
+- Workflow `alpaca-bot.yml`: schedule */15 13-20 UTC weekdays (paper auto-run) + workflow_dispatch (email_test, order_test). requirements-alpaca.txt = just requests.
+- Paper account is $100k default → paper position sizes are large (30% = ~$30k/name); normal, scales down when live.
+- NEXT: watch full paper cycles (Tue+). When clean → go LIVE: set ALPACA_BASE_URL secret to https://api.alpaca.markets + live keys; fund by selling RH / moving cash. Then point cron-job.org at alpaca-bot.yml for reliable triggering.
