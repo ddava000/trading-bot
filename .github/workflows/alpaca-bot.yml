@@ -1,11 +1,10 @@
 name: Alpaca Trading Bot
 
 on:
-  schedule:
-    # Paper-phase auto-run: every 15 min, 9 AM–4:59 PM ET (13–20 UTC), weekdays.
-    # Runs in GitHub's cloud (no PC). The bot's own 9:45–3:55 ET gate trims it.
-    # Once paper looks good, we move to live + the reliable cron-job.org trigger.
-    - cron: "*/15 13-20 * * 1-5"
+  # Sole trigger: cron-job.org hits this workflow_dispatch endpoint every 15 min
+  # during market hours (America/Chicago). The GitHub-native schedule was removed
+  # so the two don't double-fire (which risks duplicate orders). The bot's own
+  # 9:45–3:55 ET gate is the real control.
   workflow_dispatch:
     inputs:
       email_test:
