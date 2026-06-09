@@ -189,15 +189,17 @@ def alpaca_get(path):
     return r.json()
 
 def alpaca_account():
-    """Returns (buying_power, equity, daily_pnl, daytrade_count).
-    daily_pnl = equity − last_equity (today's total account change; used only for
-    the safety loss-cap). PDT count comes straight from Alpaca's daytrade_count."""
+    """Returns (cash, equity, daily_pnl, daytrade_count).
+    We size off CASH — NOT Alpaca's margin cash — so the bot never trades on
+    leverage. This keeps paper swings realistic and matches a small live cash account.
+    daily_pnl = equity − last_equity (today's total change; for the safety loss-cap).
+    PDT count comes straight from Alpaca's daytrade_count."""
     a = alpaca_get("/v2/account")
-    bp  = float(a["buying_power"])
-    eq  = float(a["equity"])
-    leq = float(a.get("last_equity") or eq)
-    pdt = int(a.get("daytrade_count") or 0)
-    return bp, eq, eq - leq, pdt
+    cash = float(a.get("cash") or 0)
+    eq   = float(a["equity"])
+    leq  = float(a.get("last_equity") or eq)
+    pdt  = int(a.get("daytrade_count") or 0)
+    return cash, eq, eq - leq, pdt
 
 def alpaca_positions():
     pos = {}
@@ -272,14 +274,14 @@ def run_bot():
     events     = []   # human-readable order outcomes (drives the email)
     trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
-    buying_power, equity, daily_pnl, pdt = alpaca_account()
+    cash, equity, daily_pnl, pdt = alpaca_account()
     max_pos   = equity * MAX_POS_PCT
-    spend_cap = buying_power * SPEND_CAP_PCT
+    spend_cap = max(0.0, cash) * SPEND_CAP_PCT   # never spend more than 75% of CASH (no margin)
     spent     = 0.0
-    low_cash  = buying_power < 5.00
+    low_cash  = cash < 5.00
     positions = alpaca_positions()
     plan      = load_plan(et)
-    print(f"  BP=${buying_power:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}")
+    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
     # Circuit breakers
@@ -337,7 +339,7 @@ def run_bot():
             r = place_sell(sym, qty)
             if _ok(r):
                 print(f"  → placed {r['id']}")
-                buying_power += qty * market[sym]["live"]; low_cash = False
+                cash += qty * market[sym]["live"]; low_cash = False
                 events.append(f"SELL {sym} qty={qty} → PLACED ({r['id']})")
                 trades_log.append({
                     "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "symbol": sym,
@@ -358,14 +360,14 @@ def run_bot():
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
             if spent >= spend_cap: break
-            amount = min(max_pos * vix_scale * plan["risk"], buying_power * 0.95, spend_cap - spent)
+            amount = min(max_pos * vix_scale * plan["risk"], cash * 0.95, spend_cap - spent)
             if amount < 1.00: continue
             print(f"BUY {sym} ${amount:.2f} RSI={sig['rsi']:.1f}")
             try:
                 r = place_buy(sym, amount)
                 if _ok(r):
                     print(f"  → placed {r['id']}")
-                    buying_power -= amount; spent += amount
+                    cash -= amount; spent += amount
                     positions[sym] = {"qty": 0, "avg_cost": 0}
                     events.append(f"BUY {sym} ${amount:.2f} → PLACED ({r['id']})")
                     trades_log.append({
@@ -382,7 +384,7 @@ def run_bot():
 
     # Summary
     print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | PDT={pdt} | "
-          f"dayP&L=${daily_pnl:.2f} | BP=${buying_power:.2f} ---")
+          f"dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
     for sym, sig in sigs.items():
         if sig["consensus"] != 0:
             print(f"  {sym}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}")
@@ -395,7 +397,7 @@ def run_bot():
                    for s, sig in sigs.items() if sig["consensus"] != 0]
         body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}",
                 f"Plan: {plan['regime']} | risk {plan['risk']} | avoid {sorted(plan['avoid'])}",
-                f"Equity ${equity:.2f} | Buying power ${buying_power:.2f} | "
+                f"Equity ${equity:.2f} | Cash ${cash:.2f} | "
                 f"dayP&L ${daily_pnl:.2f} | PDT {pdt}/3", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
         body += [f"  • {e}" for e in events]
