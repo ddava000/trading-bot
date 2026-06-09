@@ -1,0 +1,36 @@
+name: Alpaca Weekly Review
+
+on:
+  schedule:
+    # Fridays 8:30 PM UTC = 4:30 PM ET (just after the close). Weekly cadence,
+    # so GitHub cron drift doesn't matter.
+    - cron: "30 20 * * 5"
+  workflow_dispatch:   # run a review on demand
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-alpaca.txt
+
+      - name: Run weekly review
+        env:
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python review.py

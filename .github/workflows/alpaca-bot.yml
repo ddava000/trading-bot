@@ -23,6 +23,8 @@ jobs:
   trade:
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    permissions:
+      contents: write   # allow committing trade_log.jsonl back to the repo
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,3 +47,16 @@ jobs:
           EMAIL_TEST:         ${{ inputs.email_test }}
           ORDER_TEST:         ${{ inputs.order_test }}
         run: python alpaca_bot.py
+
+      - name: Persist trade log
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain trade_log.jsonl)" ]; then
+            git config user.name  "alpaca-bot"
+            git config user.email "alpaca-bot@users.noreply.github.com"
+            git add trade_log.jsonl
+            git commit -m "trade log $(date -u +%FT%TZ)"
+            git push || (git pull --rebase --autostash origin main && git push) || true
+          else
+            echo "no new trades to log"
+          fi

@@ -127,7 +127,8 @@ def compute_signals(sym, closes, vols, live, meme_tickers):
     if raw == -1 and trend == "up":   con = 0
     if sym in meme_tickers and meme_b == 2 and buys >= 2 and trend != "down": con = 1
 
-    return {"sym": sym, "rsi": r, "trend": trend, "consensus": con, "delta": delta}
+    return {"sym": sym, "rsi": r, "trend": trend, "consensus": con, "delta": delta,
+            "buys": buys, "sells": sells, "macd_up": hist > 0, "bb": bb, "meme": meme_b > 0}
 
 
 # ── Yahoo Finance helpers (broker-agnostic, identical) ────────────────────────
@@ -243,7 +244,8 @@ def run_bot():
         return
 
     print(f"=== Alpaca bot run {et.strftime('%Y-%m-%d %H:%M ET')} | {MODE} ===")
-    events = []
+    events     = []   # human-readable order outcomes (drives the email)
+    trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
     buying_power, equity, daily_pnl, pdt = alpaca_account()
     max_pos   = equity * MAX_POS_PCT
@@ -308,6 +310,13 @@ def run_bot():
                 print(f"  → placed {r['id']}")
                 buying_power += qty * market[sym]["live"]; low_cash = False
                 events.append(f"SELL {sym} qty={qty} → PLACED ({r['id']})")
+                trades_log.append({
+                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "symbol": sym,
+                    "side": "sell", "qty": qty, "order_id": r["id"],
+                    "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
+                    "trend": sig["trend"], "consensus": sig["consensus"],
+                    "delta": round(sig["delta"], 4), "sells": sig["sells"],
+                    "macd_up": sig["macd_up"], "vix": round(vix, 1)})
             else:
                 events.append(f"SELL {sym} → REJECTED: {(r or {}).get('message', r)}")
         except Exception as e:
@@ -328,6 +337,13 @@ def run_bot():
                     buying_power -= amount; spent += amount
                     positions[sym] = {"qty": 0, "avg_cost": 0}
                     events.append(f"BUY {sym} ${amount:.2f} → PLACED ({r['id']})")
+                    trades_log.append({
+                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "symbol": sym,
+                        "side": "buy", "notional": round(amount, 2), "order_id": r["id"],
+                        "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
+                        "trend": sig["trend"], "consensus": sig["consensus"],
+                        "delta": round(sig["delta"], 4), "buys": sig["buys"],
+                        "macd_up": sig["macd_up"], "meme": sig["meme"], "vix": round(vix, 1)})
                 else:
                     events.append(f"BUY {sym} ${amount:.2f} → REJECTED: {(r or {}).get('message', r)}")
             except Exception as e:
@@ -359,6 +375,14 @@ def run_bot():
         else:
             subject = f"Alpaca bot ({MODE}) — morning status"
         send_email(subject, "\n".join(body))
+
+    # Persist structured trade context for the weekly review / pattern analysis.
+    # The workflow commits trade_log.jsonl back to the repo so it survives runs.
+    if trades_log:
+        with open("trade_log.jsonl", "a") as f:
+            for t in trades_log:
+                f.write(json.dumps(t) + "\n")
+        print(f"  [logged {len(trades_log)} trade(s) to trade_log.jsonl]")
 
 
 if __name__ == "__main__":
