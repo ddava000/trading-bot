@@ -12,10 +12,10 @@ import os, math, json, requests
 from datetime import datetime, timezone, timedelta
 
 # ── Config ────────────────────────────────────────────────────────────────────
-# Daily loss cap scales with the account: max(3% of equity, $20). On the $100k
-# paper account that's ~$3k (ignores normal intraday noise); on a small live
-# account the $20 floor still applies — fits both without a code change.
-LOSS_CAP_PCT     = 0.03
+# Daily loss halt = max(10% of equity, $20). Loose on purpose: it only stops the
+# day on a genuine crash, so it never kneecaps a small ($250-500) live account on
+# normal noise. The real risk controls are the 40% exposure cap + 10%/name cap below.
+LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
 PDT_LIMIT        = 3
 MAX_INVESTED_PCT = 0.40   # cap TOTAL deployed capital at 40% of equity (60% stays cash)
