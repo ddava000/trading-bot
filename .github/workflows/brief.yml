@@ -1,0 +1,52 @@
+name: Research Brief (morning + intraday)
+
+on:
+  schedule:
+    - cron: "30 12 * * 1-5"   #  8:30 AM ET — pre-open game plan
+    - cron: "30 15 * * 1-5"   # 11:30 AM ET — midday re-check
+    - cron: "0 18 * * 1-5"    #  2:00 PM ET — afternoon re-check
+  workflow_dispatch:           # run a brief on demand
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write   # commit daily_plan.json + journal.md back to the repo
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-brief.txt
+
+      - name: Run research brief
+        env:
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python brief.py
+
+      - name: Persist plan + journal
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain daily_plan.json journal.md)" ]; then
+            git config user.name  "alpaca-bot"
+            git config user.email "alpaca-bot@users.noreply.github.com"
+            git add daily_plan.json journal.md
+            git commit -m "brief $(date -u +%FT%TZ)"
+            git push || (git pull --rebase --autostash origin main && git push) || true
+          else
+            echo "no plan/journal changes"
+          fi

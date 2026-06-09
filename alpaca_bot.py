@@ -203,6 +203,27 @@ def alpaca_positions():
             pos[p["symbol"]] = {"qty": q, "avg_cost": float(p.get("avg_entry_price") or 0)}
     return pos
 
+
+def load_plan(et):
+    """Read today's research plan (daily_plan.json, written by brief.py).
+    risk is clamped to [0,1] — the plan can only scale buys DOWN, never past the
+    bot's hard rails. A missing or stale (not-today) plan → neutral defaults, so the
+    bot is unaffected when the brief hasn't run."""
+    neutral = {"regime": "neutral", "risk": 1.0, "avoid": set(), "favor": [], "notes": "no plan"}
+    try:
+        if not os.path.exists("daily_plan.json"):
+            return neutral
+        p = json.load(open("daily_plan.json"))
+        if p.get("date") != et.strftime("%Y-%m-%d"):
+            return neutral   # stale plan from a previous day — ignore
+        rs = max(0.0, min(1.0, float(p.get("risk_scale", 1.0))))
+        return {"regime": p.get("regime", "neutral"), "risk": rs,
+                "avoid": set(p.get("avoid_symbols", [])),
+                "favor": list(p.get("favor_symbols", [])),
+                "notes": p.get("notes", "")}
+    except Exception:
+        return neutral
+
 def alpaca_order(payload):
     """POST an order. Returns Alpaca's JSON — has 'id' on success, 'message' on error."""
     try:
@@ -253,7 +274,9 @@ def run_bot():
     spent     = 0.0
     low_cash  = buying_power < 5.00
     positions = alpaca_positions()
+    plan      = load_plan(et)
     print(f"  BP=${buying_power:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}")
+    print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
     # Circuit breakers
     if daily_pnl <= -DAILY_LOSS_CAP:
@@ -269,7 +292,7 @@ def run_bot():
         wsb    = fetch_wsb()
         screen = fetch_screener()
         meme_tickers = wsb
-        for s in wsb + screen:
+        for s in wsb + screen + plan["favor"]:   # plan's favored names get considered too
             if len(universe) < 20: universe.add(s)
     universe = list(universe)
     print(f"UNIVERSE ({len(universe)}): {universe}")
@@ -326,8 +349,10 @@ def run_bot():
     if not low_cash and not pdt_exhausted:
         for sym, sig in sigs.items():
             if sig["consensus"] != 1 or sym in positions: continue
+            if sym in plan["avoid"]:
+                print(f"  SKIP {sym} (plan avoid-list)"); continue
             if spent >= spend_cap: break
-            amount = min(max_pos * vix_scale, buying_power * 0.95, spend_cap - spent)
+            amount = min(max_pos * vix_scale * plan["risk"], buying_power * 0.95, spend_cap - spent)
             if amount < 1.00: continue
             print(f"BUY {sym} ${amount:.2f} RSI={sig['rsi']:.1f}")
             try:
@@ -363,6 +388,7 @@ def run_bot():
         nonzero = [f"  {s}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}"
                    for s, sig in sigs.items() if sig["consensus"] != 0]
         body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}",
+                f"Plan: {plan['regime']} | risk {plan['risk']} | avoid {sorted(plan['avoid'])}",
                 f"Equity ${equity:.2f} | Buying power ${buying_power:.2f} | "
                 f"dayP&L ${daily_pnl:.2f} | PDT {pdt}/3", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
