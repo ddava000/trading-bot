@@ -12,7 +12,11 @@ import os, math, json, requests
 from datetime import datetime, timezone, timedelta
 
 # ── Config ────────────────────────────────────────────────────────────────────
-DAILY_LOSS_CAP = 20.00
+# Daily loss cap scales with the account: max(3% of equity, $20). On the $100k
+# paper account that's ~$3k (ignores normal intraday noise); on a small live
+# account the $20 floor still applies — fits both without a code change.
+LOSS_CAP_PCT   = 0.03
+LOSS_CAP_FLOOR = 20.00
 PDT_LIMIT      = 3
 MAX_POS_PCT    = 0.30
 SPEND_CAP_PCT  = 0.75
@@ -279,8 +283,10 @@ def run_bot():
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
     # Circuit breakers
-    if daily_pnl <= -DAILY_LOSS_CAP:
-        print("Daily loss cap hit. Stopping."); return
+    loss_cap = max(LOSS_CAP_FLOOR, equity * LOSS_CAP_PCT)
+    if daily_pnl <= -loss_cap:
+        print(f"Daily loss cap hit (dayP&L ${daily_pnl:.2f} <= -${loss_cap:.2f}). Stopping.")
+        return
     pdt_exhausted = pdt >= PDT_LIMIT
 
     # Universe
