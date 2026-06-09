@@ -19,6 +19,13 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+# One run at a time — stops overlapping runs from racing to commit trade_log.jsonl
+# (the cause of the intermittent "job cancelled" emails). In-progress runs finish;
+# a new trigger queues behind them. Trading is unaffected either way.
+concurrency:
+  group: alpaca-bot
+  cancel-in-progress: false
+
 jobs:
   trade:
     runs-on: ubuntu-latest
