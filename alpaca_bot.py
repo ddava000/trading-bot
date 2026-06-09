@@ -15,11 +15,12 @@ from datetime import datetime, timezone, timedelta
 # Daily loss cap scales with the account: max(3% of equity, $20). On the $100k
 # paper account that's ~$3k (ignores normal intraday noise); on a small live
 # account the $20 floor still applies — fits both without a code change.
-LOSS_CAP_PCT   = 0.03
-LOSS_CAP_FLOOR = 20.00
-PDT_LIMIT      = 3
-MAX_POS_PCT    = 0.30
-SPEND_CAP_PCT  = 0.75
+LOSS_CAP_PCT     = 0.03
+LOSS_CAP_FLOOR   = 20.00
+PDT_LIMIT        = 3
+MAX_INVESTED_PCT = 0.40   # cap TOTAL deployed capital at 40% of equity (60% stays cash)
+MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
+SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
 
 ALPACA_KEY    = os.environ["ALPACA_API_KEY"]
 ALPACA_SECRET = os.environ["ALPACA_SECRET_KEY"]
@@ -275,13 +276,17 @@ def run_bot():
     trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
     cash, equity, daily_pnl, pdt = alpaca_account()
-    max_pos   = equity * MAX_POS_PCT
-    spend_cap = max(0.0, cash) * SPEND_CAP_PCT   # never spend more than 75% of CASH (no margin)
-    spent     = 0.0
-    low_cash  = cash < 5.00
-    positions = alpaca_positions()
-    plan      = load_plan(et)
+    max_pos     = equity * MAX_POS_PCT
+    spend_cap   = max(0.0, cash) * SPEND_CAP_PCT        # ≤25% of CASH per run (no margin)
+    invested    = max(0.0, equity - cash)               # current $ held in positions
+    invest_room = max(0.0, equity * MAX_INVESTED_PCT - invested)  # headroom to the 40% cap
+    spent       = 0.0
+    low_cash    = cash < 5.00
+    positions   = alpaca_positions()
+    plan        = load_plan(et)
     print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}")
+    print(f"  Invested ${invested:,.0f} of ${equity*MAX_INVESTED_PCT:,.0f} cap "
+          f"({(invested/equity*100 if equity else 0):.0f}% of equity) — room ${invest_room:,.0f}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
     # Circuit breakers
@@ -359,8 +364,9 @@ def run_bot():
             if sig["consensus"] != 1 or sym in positions: continue
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
-            if spent >= spend_cap: break
-            amount = min(max_pos * vix_scale * plan["risk"], cash * 0.95, spend_cap - spent)
+            if spent >= min(spend_cap, invest_room): break   # per-run or exposure cap reached
+            amount = min(max_pos * vix_scale * plan["risk"], cash * 0.95,
+                         spend_cap - spent, invest_room - spent)
             if amount < 1.00: continue
             print(f"BUY {sym} ${amount:.2f} RSI={sig['rsi']:.1f}")
             try:
