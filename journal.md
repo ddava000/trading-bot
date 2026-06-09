@@ -10,3 +10,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ'] | favor: ['DTE', 'AAL']
 - notes: VIX climbed to ~19.9 with a tech-led rotation selloff (chip rebound failed, MU continuing to fall) and a critical May CPI print looming alongside hawkish rate repricing and renewed US-Iran tensions. Dialing risk down to 0.5 and avoiding the semis and beta-heavy QQQ until macro clears.
 - journal: Tape deteriorated since the open — Nasdaq/S&P closed red on tech selloff, MU down -3.3% and bleeding, VIX up from 18.1 to 19.9. Cut risk to 0.5 ahead of CPI; rotating posture toward defensives (DTE utility, AAL on oil/Google tailwind) and steering clear of chips. Watching CPI release for a volatility spike.
+
+### 2026-06-09T19:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.5
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Tech rotation selloff persists with chips bleeding (MU -3.7%, MRVL -2.5%), VIX elevated at 19.9, US-Iran military strikes adding geopolitical risk, and a critical May CPI print looming with hawkish rate repricing. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs until macro and geopolitics clear.
+- journal: Conditions still risk-off into the close — chip names continuing to fall, US launched strikes against Iran (new geopolitical overhang), CPI still ahead. Kept risk at 0.5, added SPY to avoids as it tracks MU weakness; staying with defensives DTE and AAL (oil tailwind/Google deal). Watching CPI release and Iran headlines for a vol spike.
