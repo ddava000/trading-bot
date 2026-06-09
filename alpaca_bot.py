@@ -276,6 +276,7 @@ def run_bot():
     trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
     cash, equity, daily_pnl, pdt = alpaca_account()
+    acct_tag    = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]  # tags each trade so an account swap can't silently corrupt the log/review
     max_pos     = equity * MAX_POS_PCT
     spend_cap   = max(0.0, cash) * SPEND_CAP_PCT        # ≤25% of CASH per run (no margin)
     invested    = max(0.0, equity - cash)               # current $ held in positions
@@ -284,7 +285,7 @@ def run_bot():
     low_cash    = cash < 5.00
     positions   = alpaca_positions()
     plan        = load_plan(et)
-    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}")
+    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}  acct=…{acct_tag}")
     print(f"  Invested ${invested:,.0f} of ${equity*MAX_INVESTED_PCT:,.0f} cap "
           f"({(invested/equity*100 if equity else 0):.0f}% of equity) — room ${invest_room:,.0f}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
@@ -347,7 +348,7 @@ def run_bot():
                 cash += qty * market[sym]["live"]; low_cash = False
                 events.append(f"SELL {sym} qty={qty} → PLACED ({r['id']})")
                 trades_log.append({
-                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "symbol": sym,
+                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
                     "side": "sell", "qty": qty, "order_id": r["id"],
                     "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
                     "trend": sig["trend"], "consensus": sig["consensus"],
@@ -377,7 +378,7 @@ def run_bot():
                     positions[sym] = {"qty": 0, "avg_cost": 0}
                     events.append(f"BUY {sym} ${amount:.2f} → PLACED ({r['id']})")
                     trades_log.append({
-                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "symbol": sym,
+                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
                         "side": "buy", "notional": round(amount, 2), "order_id": r["id"],
                         "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
                         "trend": sig["trend"], "consensus": sig["consensus"],
