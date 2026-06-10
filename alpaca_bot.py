@@ -10,27 +10,41 @@ https://api.alpaca.markets (and use live API keys).
 
 import os, math, json, requests
 from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 
 # ── Config ────────────────────────────────────────────────────────────────────
 # Daily loss halt = max(10% of equity, $20). Loose on purpose: it only stops the
-# day on a genuine crash, so it never kneecaps a small ($250-500) live account on
-# normal noise. The real risk controls are the sleeve caps + per-name caps below.
+# day on a genuine crash — and even then it only blocks BUYS; exits keep running
+# so the bot can always de-risk. The real risk controls are the sleeve caps,
+# per-name caps, and per-position brackets below.
 #
 # Capital is split into two sleeves (max 70% deployed, 30% cash floor):
-#   TRADING sleeve (40%): signal-driven buys the day-trade sell logic manages.
+#   TRADING sleeve (40%): signal-driven buys managed by brackets + sell signals.
 #   HOLD sleeve (30%):    strong-signal names (4+ buy votes AND uptrend) bought to
-#                         KEEP — exempt from sell signals; only a -25% disaster stop
-#                         (thesis broken) exits them. Compounding lives here, and on
-#                         a small live account it also burns zero PDT day trades.
+#                         KEEP — exempt from sell signals; exit only on the basis
+#                         stop (-25%) or the peak ratchet (gives back 40% from high).
+#
+# NOTE: FINRA retired the Pattern Day Trader rule on 2026-06-04 and Alpaca is
+# removing daytrade_count from the API — the old 3-day-trade ration is gone.
+# The bot sizes off CASH (never margin), so the new intraday-margin framework
+# doesn't bind either.
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-PDT_LIMIT        = 3
 MAX_INVESTED_PCT = 0.40   # TRADING sleeve: cap on signal-traded capital
 HOLD_PCT         = 0.30   # HOLD sleeve: buy-and-hold allocation on strong signals
-HOLD_STOP        = 0.75   # disaster stop — sell a hold at 75% of basis (-25%)
+HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
+HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
-SMALLCAP_POS_PCT = 0.05   # small-caps get HALF size (5% of equity) — higher growth, higher blowup risk
+SMALLCAP_POS_PCT = 0.05   # small/cheap names get HALF size (5%) — higher growth, higher blowup risk
 SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
+STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (overrides signals)
+TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (≈2:1 R:R)
+RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
+SMALL_PX         = 15.00  # live price under this sizes at the smallcap (half) cap
+CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin names fill 5-20x worse at market
+STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
+
+ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
 
 ALPACA_KEY    = os.environ["ALPACA_API_KEY"]
 ALPACA_SECRET = os.environ["ALPACA_SECRET_KEY"]
@@ -67,8 +81,7 @@ def send_email(subject, body):
 
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
 def check_market():
-    utc = datetime.now(timezone.utc)
-    et  = utc - timedelta(hours=4)   # EDT Mar–Nov; change to 5 in winter
+    et = datetime.now(ET_TZ)
     if et.weekday() >= 5:
         return False, et
     open_  = et.replace(hour=9,  minute=45, second=0, microsecond=0)
@@ -217,23 +230,72 @@ def fetch_smallcaps():
             continue
     return out[:8]
 
+def fetch_day_gainers():
+    """Yahoo's whole-market day-gainers screener — momentum candidates from
+    anywhere in the market, same quality rails as the smallcap screen."""
+    try:
+        url = ("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved"
+               "?formatted=false&scrIds=day_gainers&count=15")
+        qs = requests.get(url, headers=YF_HEADERS, timeout=10).json()["finance"]["result"][0]["quotes"]
+        qs = [q for q in qs if (q.get("regularMarketPrice",0) or 0) >= 0.25
+              and (q.get("averageDailyVolume3Month",0) or 0) >= 500_000
+              and "." not in q["symbol"] and "-" not in q["symbol"]]
+        return [q["symbol"] for q in qs[:10]]
+    except Exception: return []
+
+
 # ── Alpaca broker layer (official REST API) ───────────────────────────────────
+ALPACA_DATA = "https://data.alpaca.markets"
+
 def alpaca_get(path):
     r = requests.get(ALPACA_BASE + path, headers=ALPACA_HDRS, timeout=15)
     return r.json()
 
+def alpaca_data_get(path):
+    r = requests.get(ALPACA_DATA + path, headers=ALPACA_HDRS, timeout=10)
+    return r.json()
+
+def fetch_market_movers():
+    """ENTIRE-market momentum sweep: Alpaca's screener ranks every listed US
+    equity by % change server-side (SIP data, resets at open). Top gainers join
+    the candidate pool — the signal engine still has to vote each one in."""
+    try:
+        d = alpaca_data_get("/v1beta1/screener/stocks/movers?top=20")
+        out = []
+        for g in d.get("gainers", []):
+            sym, px = g.get("symbol", ""), float(g.get("price") or 0)
+            if px >= 0.25 and sym and all(c not in sym for c in "./-"):
+                out.append(sym)
+        return out[:15]
+    except Exception: return []
+
+def fetch_most_actives():
+    """Highest share-volume names across the entire market (Alpaca screener)."""
+    try:
+        d = alpaca_data_get("/v1beta1/screener/stocks/most-actives?by=volume&top=15")
+        return [a["symbol"] for a in d.get("most_actives", [])
+                if a.get("symbol") and all(c not in a["symbol"] for c in "./-")][:10]
+    except Exception: return []
+
 def alpaca_account():
-    """Returns (cash, equity, daily_pnl, daytrade_count).
-    We size off CASH — NOT Alpaca's margin cash — so the bot never trades on
-    leverage. This keeps paper swings realistic and matches a small live cash account.
-    daily_pnl = equity − last_equity (today's total change; for the safety loss-cap).
-    PDT count comes straight from Alpaca's daytrade_count."""
+    """Returns (cash, equity, daily_pnl).
+    We size off CASH — NOT Alpaca's margin buying power — so the bot never trades
+    on leverage. daily_pnl = equity − last_equity (today's change, for the loss cap).
+    daytrade_count is gone: FINRA retired the PDT rule 2026-06-04."""
     a = alpaca_get("/v2/account")
     cash = float(a.get("cash") or 0)
     eq   = float(a["equity"])
     leq  = float(a.get("last_equity") or eq)
-    pdt  = int(a.get("daytrade_count") or 0)
-    return cash, eq, eq - leq, pdt
+    return cash, eq, eq - leq
+
+def alpaca_open_orders():
+    """Symbols with a pending (unfilled) order — skipped this run so a lingering
+    limit order can't double-buy or double-sell."""
+    try:
+        return {o["symbol"] for o in alpaca_get("/v2/orders?status=open&limit=100")
+                if o.get("symbol")}
+    except Exception:
+        return set()
 
 def alpaca_positions():
     pos = {}
@@ -257,6 +319,22 @@ def load_holds():
 def save_holds(holds):
     with open("holds.json", "w") as f:
         json.dump(holds, f, indent=1, sort_keys=True)
+
+def recent_stop_outs(days=STOP_COOLDOWN_D):
+    """Symbols whose stop fired within the cooldown window — no revenge re-entry.
+    Read from the tail of trade_log.jsonl (committed to the repo every run)."""
+    latest = {}
+    try:
+        with open("trade_log.jsonl") as f:
+            for line in f.readlines()[-400:]:
+                try: d = json.loads(line)
+                except Exception: continue
+                if d.get("side") == "sell" and (d.get("stop_loss") or d.get("hold_stop")):
+                    latest[d["symbol"]] = d.get("ts", "")
+    except Exception:
+        return set()
+    cut = (datetime.now(ET_TZ) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
+    return {s for s, ts in latest.items() if ts >= cut}
 
 
 def load_plan(et):
@@ -302,29 +380,47 @@ def alpaca_asset(sym):
         except Exception: _ASSET_CACHE[sym] = {}
     return _ASSET_CACHE[sym]
 
+def _px(p):
+    """Limit-price rounding: sub-$1 names quote in 4 decimals, others in 2."""
+    return round(p, 4 if p < 1 else 2)
+
 def place_buy(sym, dollar_amount, live=None):
-    """MARKET buy. Fractionable names buy by dollar amount (notional). Names Alpaca
-    won't fraction (most sub-$1 / low-cap tickers) buy WHOLE shares instead —
-    qty = floor(amount / live) — so cheap small-caps are still reachable."""
+    """Buy with spread protection. Liquid fractionable names: MARKET notional
+    (dollar amount). Cheap names (<$5, incl. all sub-$1): WHOLE-SHARE marketable
+    LIMIT at live*1.02 — thin names fill 5-20x worse at market, so the limit caps
+    slippage at ~2%. Non-fractionable names fall back to whole-share orders too."""
     a = alpaca_asset(sym)
+    cheap = live is not None and live < CHEAP_PX
     if a and a.get("tradable") is False:
         r = {"message": f"{sym} not tradable on Alpaca"}
-    elif a.get("fractionable", True):
+    elif a.get("fractionable", True) and not cheap:
         r = alpaca_order({"symbol": sym, "notional": str(round(dollar_amount, 2)),
                           "side": "buy", "type": "market", "time_in_force": "day"})
     elif live and live > 0 and int(dollar_amount // live) >= 1:
-        r = alpaca_order({"symbol": sym, "qty": str(int(dollar_amount // live)),
-                          "side": "buy", "type": "market", "time_in_force": "day"})
+        payload = {"symbol": sym, "qty": str(int(dollar_amount // live)),
+                   "side": "buy", "time_in_force": "day"}
+        if cheap:
+            payload.update({"type": "limit", "limit_price": str(_px(live * 1.02))})
+        else:
+            payload.update({"type": "market"})
+        r = alpaca_order(payload)
     else:
         r = {"message": f"{sym} not fractionable; ${dollar_amount:.2f} buys <1 share"}
     if not _ok(r):
         print(f"    [buy rejected: {(r or {}).get('message', r)}]")
     return r
 
-def place_sell(sym, qty):
-    """Fractional MARKET sell of a held quantity."""
-    r = alpaca_order({"symbol": sym, "qty": str(qty),
-                      "side": "sell", "type": "market", "time_in_force": "day"})
+def place_sell(sym, qty, live=None):
+    """Sell a held quantity. Cheap names with whole-share qty sell via marketable
+    LIMIT at live*0.98 (spread protection); fractional quantities must go MARKET
+    (Alpaca restriction), as do liquid names where market fills are fine."""
+    payload = {"symbol": sym, "qty": str(qty), "side": "sell", "time_in_force": "day"}
+    whole = float(qty) == int(float(qty))
+    if live is not None and live < CHEAP_PX and whole:
+        payload.update({"type": "limit", "limit_price": str(_px(live * 0.98))})
+    else:
+        payload.update({"type": "market"})
+    r = alpaca_order(payload)
     if not _ok(r):
         print(f"    [sell rejected: {(r or {}).get('message', r)}]")
     return r
@@ -341,13 +437,15 @@ def run_bot():
     events     = []   # human-readable order outcomes (drives the email)
     trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
-    cash, equity, daily_pnl, pdt = alpaca_account()
+    cash, equity, daily_pnl = alpaca_account()
     acct_tag    = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]  # tags each trade so an account swap can't silently corrupt the log/review
     max_pos     = equity * MAX_POS_PCT
     spend_cap   = max(0.0, cash) * SPEND_CAP_PCT        # ≤25% of CASH per run (no margin)
     low_cash    = cash < 5.00
     positions   = alpaca_positions()
     plan        = load_plan(et)
+    pending     = alpaca_open_orders()                  # unfilled orders — skip those names
+    cooldown    = recent_stop_outs()                    # stopped recently — no re-entry yet
 
     # Sleeve accounting: holds (buy-and-keep ledger) vs trading (everything else).
     holds       = load_holds()
@@ -360,32 +458,37 @@ def run_bot():
     invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
     hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
     spent = trade_spent = hold_spent = 0.0
-    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}  acct=…{acct_tag}")
+    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=…{acct_tag}")
     print(f"  Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} (room ${invest_room:,.0f}) | "
           f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | holds: {sorted(holds) or '—'}")
+    if pending:  print(f"  PENDING orders (skipped this run): {sorted(pending)}")
+    if cooldown: print(f"  STOP COOLDOWN ({STOP_COOLDOWN_D}d): {sorted(cooldown)}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
-    # Circuit breakers
+    # Circuit breaker: a >10% down day blocks NEW buying — but exits (stops,
+    # take-profits, signal sells) always run, so the bot can still de-risk.
     loss_cap = max(LOSS_CAP_FLOOR, equity * LOSS_CAP_PCT)
-    if daily_pnl <= -loss_cap:
-        print(f"Daily loss cap hit (dayP&L ${daily_pnl:.2f} <= -${loss_cap:.2f}). Stopping.")
-        return
-    pdt_exhausted = pdt >= PDT_LIMIT
+    halted   = daily_pnl <= -loss_cap
+    if halted:
+        print(f"⛔ Daily loss cap (dayP&L ${daily_pnl:.2f} <= -${loss_cap:.2f}) — buys OFF, exits still live.")
 
-    # Universe
+    # Universe — whole-market candidate sweep, then the signal engine votes.
     universe     = set(positions.keys()) | {"SPY"}
     meme_tickers = []
     small_caps   = set()
     if low_cash:
         print("LOW_CASH — positions only.")
     else:
-        wsb    = fetch_wsb()
-        screen = fetch_screener()
-        smalls = fetch_smallcaps()
+        wsb     = fetch_wsb()              # WallStreetBets chatter (meme bonus)
+        smalls  = fetch_smallcaps()        # small-cap gainers/aggressive screens
+        movers  = fetch_market_movers()    # Alpaca: top %-gainers across EVERY listed stock
+        gainers = fetch_day_gainers()      # Yahoo: whole-market day gainers
+        screen  = fetch_screener()         # Yahoo: most-active megacaps
+        actives = fetch_most_actives()     # Alpaca: top volume across the whole market
         meme_tickers = wsb
         small_caps   = set(smalls)
-        for s in wsb + screen + smalls + plan["favor"]:   # plan's favored names get considered too
-            if len(universe) < 28: universe.add(s)
+        for s in plan["favor"] + wsb + smalls + movers + gainers + screen + actives:
+            if len(universe) < 45: universe.add(s)
     universe = list(universe)
     print(f"UNIVERSE ({len(universe)}): {universe}")
     if small_caps & set(universe):
@@ -398,14 +501,14 @@ def run_bot():
         print("VIX>35. Halt."); return
     vix_scale = 0.50 if vix > 25 else (0.75 if vix > 20 else 1.00)
 
-    market, consec = {}, 0
+    market, fails = {}, 0
     for sym in universe:
         c, v = yf_ohlcv(sym)
         if c is None:
-            consec += 1
-            if consec >= 3: break
+            fails += 1
+            if fails >= 10:
+                print(f"  [market data: {fails} failures — stopping the scan early]"); break
             continue
-        consec = 0
         live = yf_live(sym)
         if live: market[sym] = {"closes": c, "volumes": v, "live": live}
 
@@ -415,65 +518,89 @@ def run_bot():
         rr = compute_signals(sym, d["closes"], d["volumes"], d["live"], meme_tickers)
         if rr: sigs[sym] = rr
 
-    # SELL first (frees buying power). Hold-sleeve names are exempt — they only
-    # exit via the disaster stop below.
+    sold_now = set()   # exits this run — never re-buy the same name the same run
+
+    def _exit(sym, qty, live, tag, extra, sig=None):
+        """Shared exit path: place the sell, book cash, log with context."""
+        nonlocal cash, low_cash
+        print(f"{tag} {sym} qty={qty} {extra}")
+        try:
+            r = place_sell(sym, qty, live)
+            if _ok(r):
+                print(f"  → placed {r['id']}")
+                cash += qty * live; low_cash = False; sold_now.add(sym)
+                events.append(f"{tag} {sym} qty={qty} {extra} → PLACED ({r['id']})")
+                entry = {"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                         "symbol": sym, "side": "sell", "qty": qty, "order_id": r["id"],
+                         "live": round(live, 2), "vix": round(vix, 1)}
+                if tag == "STOP-LOSS":   entry["stop_loss"]   = True
+                if tag == "TAKE-PROFIT": entry["take_profit"] = True
+                if tag == "HOLD-STOP":   entry["hold_stop"]   = True
+                if sig: entry.update({"rsi": round(sig["rsi"], 1), "trend": sig["trend"],
+                                      "consensus": sig["consensus"], "sells": sig.get("sells")})
+                trades_log.append(entry)
+                return True
+            events.append(f"{tag} {sym} → REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"{tag} {sym} → ERROR: {e}")
+        return False
+
+    # 1) BRACKET exits (trading sleeve): hard stop -7% — risk is cut no matter
+    #    what the signals say; take-profit +15% banked unless the signal is still
+    #    an active buy (let confirmed winners run). ~2:1 reward:risk.
+    for sym, p in list(positions.items()):
+        if sym in holds or sym in pending: continue
+        live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
+        if not live or cost <= 0 or p["qty"] <= 0: continue
+        con = sigs.get(sym, {}).get("consensus", 0)
+        if live <= cost * STOP_LOSS_PCT:
+            _exit(sym, p["qty"], live, "STOP-LOSS",
+                  f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
+        elif live >= cost * TAKE_PROFIT_PCT and con <= 0:
+            _exit(sym, p["qty"], live, "TAKE-PROFIT",
+                  f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
+
+    # 2) SIGNAL sells (frees buying power). Hold-sleeve names are exempt.
     for sym, sig in sigs.items():
         if sig["consensus"] != -1 or sym not in positions: continue
+        if sym in sold_now or sym in pending: continue
         if sym in holds:
             print(f"  KEEP {sym} (hold sleeve — sell signal ignored)"); continue
         qty = positions[sym]["qty"]
         if qty <= 0: continue
-        print(f"SELL {sym} qty={qty} RSI={sig['rsi']:.1f}")
-        try:
-            r = place_sell(sym, qty)
-            if _ok(r):
-                print(f"  → placed {r['id']}")
-                cash += qty * market[sym]["live"]; low_cash = False
-                events.append(f"SELL {sym} qty={qty} → PLACED ({r['id']})")
-                trades_log.append({
-                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
-                    "side": "sell", "qty": qty, "order_id": r["id"],
-                    "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
-                    "trend": sig["trend"], "consensus": sig["consensus"],
-                    "delta": round(sig["delta"], 4), "sells": sig["sells"],
-                    "macd_up": sig["macd_up"], "vix": round(vix, 1)})
-            else:
-                events.append(f"SELL {sym} → REJECTED: {(r or {}).get('message', r)}")
-        except Exception as e:
-            events.append(f"SELL {sym} → ERROR: {e}")
+        _exit(sym, qty, market[sym]["live"], "SELL", f"RSI={sig['rsi']:.1f}", sig)
 
-    # HOLD disaster stop: a hold trading at <=75% of its basis is a broken thesis —
-    # sell it and free the sleeve. (This is the ONLY way the bot exits a hold.)
+    # 3) HOLD stops: exit a hold at -25% from basis (thesis broken), OR once well
+    #    in profit, if it gives back 40% from its peak (ratchet — a +200% winner
+    #    can't round-trip to a loss). Peaks persist in holds.json.
     for sym in list(holds):
-        if sym not in positions: continue
-        live  = market.get(sym, {}).get("live")
-        basis = float(holds[sym].get("basis") or 0)
-        if not live or basis <= 0 or live > basis * HOLD_STOP: continue
-        qty = positions[sym]["qty"]
-        print(f"HOLD-STOP {sym} qty={qty} (live ${live:.2f} <= {HOLD_STOP:.0%} of basis ${basis:.2f})")
-        try:
-            r = place_sell(sym, qty)
-            if _ok(r):
-                print(f"  → placed {r['id']}")
-                cash += qty * live; low_cash = False
-                holds.pop(sym); holds_dirty = True
-                events.append(f"HOLD-STOP {sym} qty={qty} (-25% from basis) → PLACED ({r['id']})")
-                trades_log.append({
-                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
-                    "side": "sell", "hold_stop": True, "qty": qty, "order_id": r["id"],
-                    "live": round(live, 2), "basis": round(basis, 2), "vix": round(vix, 1)})
-            else:
-                events.append(f"HOLD-STOP {sym} → REJECTED: {(r or {}).get('message', r)}")
-        except Exception as e:
-            events.append(f"HOLD-STOP {sym} → ERROR: {e}")
+        if sym not in positions or sym in pending or sym in sold_now: continue
+        live = market.get(sym, {}).get("live")
+        h = holds[sym]; basis = float(h.get("basis") or 0)
+        if not live or basis <= 0: continue
+        peak = max(float(h.get("peak") or 0), live)
+        if peak > float(h.get("peak") or 0):
+            h["peak"] = round(peak, 4)
+            if peak >= float(h.get("peak_saved") or basis) * 1.05:
+                h["peak_saved"] = round(peak, 4); holds_dirty = True
+        floor_ = max(basis * HOLD_STOP, peak * HOLD_TRAIL)
+        if live > floor_: continue
+        why = ("-25% from basis" if floor_ == basis * HOLD_STOP
+               else f"gave back 40% from peak ${peak:.2f}")
+        if _exit(sym, positions[sym]["qty"], live, "HOLD-STOP",
+                 f"(live ${live:.2f} <= ${floor_:.2f}: {why})"):
+            holds.pop(sym); holds_dirty = True
 
     # BUY — new entries AND adds to held winners, up to the per-name cap.
-    # Small-caps size at SMALLCAP_POS_PCT (half) — growthier but blowup-prone.
+    # Cheap/small names size at SMALLCAP_POS_PCT (half) — growthier but blowup-prone.
     # Sleeve routing: STRONG signals (4+ buy votes AND uptrend) buy into the HOLD
-    # sleeve (kept until the disaster stop); everything else is a trading-sleeve buy.
-    if not low_cash and not pdt_exhausted:
+    # sleeve (kept until a stop); everything else is a trading-sleeve buy.
+    if not low_cash and not halted:
         for sym, sig in sigs.items():
             if sig["consensus"] != 1: continue
+            if sym in sold_now or sym in pending: continue    # just exited / order in flight
+            if sym in cooldown:
+                print(f"  SKIP {sym} (stop-loss cooldown)"); continue
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
             if spent >= spend_cap: break                      # per-run pacing cap reached
@@ -483,11 +610,15 @@ def run_bot():
             held_value = 0.0
             if sym in positions and positions[sym]["qty"] > 0 and sym in market:
                 held_value = positions[sym]["qty"] * market[sym]["live"]
+            if held_value == 0 and sig["rsi"] > RSI_ENTRY_MAX:
+                print(f"  SKIP {sym} (RSI {sig['rsi']:.0f} > {RSI_ENTRY_MAX:.0f} — blow-off chase guard)"); continue
+            live     = market[sym]["live"]
+            is_small = sym in small_caps or live < SMALL_PX   # cheap names = half size
             strong   = sig["buys"] >= 4 and sig["trend"] == "up"
             use_hold = (sym in holds) or (strong and sym not in positions
                                           and (hold_room - hold_spent) >= 1.00)
             sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
-            name_cap     = equity * (SMALLCAP_POS_PCT if sym in small_caps else MAX_POS_PCT)
+            name_cap     = equity * (SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
             room_in_name = name_cap - held_value
             if room_in_name < 1.00: continue
             amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
@@ -495,11 +626,10 @@ def run_bot():
             if amount < 1.00: continue
             if held_value > 0 and amount < name_cap * 0.20:
                 continue   # near its cap — skip dribble top-ups every run
-            live = market[sym]["live"]
             verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
                     else ("ADD" if held_value > 0 else "BUY"))
             print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
-                  + (" [smallcap]" if sym in small_caps else ""))
+                  + (" [smallcap]" if is_small else ""))
             try:
                 r = place_buy(sym, amount, live)
                 if _ok(r):
@@ -527,7 +657,7 @@ def run_bot():
                     events.append(f"{verb} {sym} ${actual:.2f} → PLACED ({r['id']})")
                     trades_log.append({
                         "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
-                        "side": "buy", "add": held_value > 0, "smallcap": sym in small_caps,
+                        "side": "buy", "add": held_value > 0, "smallcap": is_small,
                         "hold": use_hold, "notional": round(actual, 2), "order_id": r["id"],
                         "live": round(live, 2), "rsi": round(sig["rsi"], 1),
                         "trend": sig["trend"], "consensus": sig["consensus"],
@@ -539,7 +669,7 @@ def run_bot():
                 events.append(f"{verb} {sym} ${amount:.2f} → ERROR: {e}")
 
     # Summary
-    print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | PDT={pdt} | "
+    print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | "
           f"dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
     if holds:
         hl = []
@@ -560,7 +690,9 @@ def run_bot():
         body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}",
                 f"Plan: {plan['regime']} | risk {plan['risk']} | avoid {sorted(plan['avoid'])}",
                 f"Equity ${equity:.2f} | Cash ${cash:.2f} | "
-                f"dayP&L ${daily_pnl:.2f} | PDT {pdt}/3", ""]
+                f"dayP&L ${daily_pnl:.2f}",
+                f"Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
+                f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} ({len(holds)} holds)", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
         body += [f"  • {e}" for e in events]
         body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
@@ -598,8 +730,8 @@ if __name__ == "__main__":
         print(f"=== ORDER_TEST ({MODE}) ===")
         if MODE == "LIVE":
             print("Refusing ORDER_TEST on a LIVE account."); raise SystemExit(1)
-        bp, eq, dpnl, pdt = alpaca_account()
-        print(f"Account OK: BP=${bp:.2f}  EQ=${eq:.2f}  PDT={pdt}")
+        cash_, eq, dpnl = alpaca_account()
+        print(f"Account OK: Cash=${cash_:.2f}  EQ=${eq:.2f}")
         print("Placing $1 notional AAPL market buy (paper)...")
         r = place_buy("AAPL", 1.00)
         print("Order result:", json.dumps(r)[:400])
