@@ -22,3 +22,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
 - notes: Hot May CPI (+4.2% YoY, 3-year high) confirmed hawkish rate repricing, with VIX at 20.2 and chip-led tape still soft; one bright spot is easing Iran tensions and falling oil lifting airlines. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs into the rate-fear digestion.
 - journal: CPI printed hot (+4.2%) as feared — inflation/rate overhang now the dominant risk, while Iran de-escalation removes some geopolitical premium and falling oil helps AAL. Keeping risk-off at 0.5, still avoiding MU/MRVL/QQQ/SPY; watching whether VIX cools below 19 or chips stabilize before adding risk back.
+
+### 2026-06-10T17:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL'] | favor: ['DTE', 'CLOV', 'CHOW']
+- notes: Conditions deteriorated: Dow off 900+ on a worsening chip selloff, VIX up to 22.2, hot May CPI (3-year high) plus re-escalating US-Iran tensions lifting oil. AAL flipped negative on a fuel shock + downgrade so it's off the favor list and now an avoid; cutting risk to 0.4 and steering clear of semis, beta ETFs, and AAPL (post-WWDC disappointment).
+- journal: Tape got materially worse since this morning — VIX 20.2->22.2, Dow worst day of 2026, chips still bleeding (MU -7.4%, MRVL -8.5%), and oil now rising again hurting AAL (fuel shock + downgrade). Dropped AAL from favor to avoid, added AAPL to avoids, cut risk to 0.4. Rotating to defensives DTE/CLOV/CHOW; watching for VIX to cool and Iran headlines.
