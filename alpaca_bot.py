@@ -18,11 +18,14 @@ from zoneinfo import ZoneInfo
 # so the bot can always de-risk. The real risk controls are the sleeve caps,
 # per-name caps, and per-position brackets below.
 #
-# Capital is split into two sleeves (max 70% deployed, 30% cash floor):
+# Capital is split into three sleeves (max 80% deployed, 20% cash floor):
 #   TRADING sleeve (40%): signal-driven buys managed by brackets + sell signals.
 #   HOLD sleeve (30%):    strong-signal names (4+ buy votes AND uptrend) bought to
 #                         KEEP — exempt from sell signals; exit only on the basis
 #                         stop (-25%) or the peak ratchet (gives back 40% from high).
+#   CRYPTO sleeve (10%):  DOGE-style moonshot exposure via Alpaca crypto (spot,
+#                         long-only, 24/7 assets traded on the bot's schedule).
+#                         Wider brackets (-15%/+30%) for crypto volatility.
 #
 # NOTE: FINRA retired the Pattern Day Trader rule on 2026-06-04 and Alpaca is
 # removing daytrade_count from the API — the old 3-day-trade ration is gone.
@@ -47,6 +50,15 @@ CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin nam
 STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
 TIME_STOP_DAYS   = 5      # trading position going nowhere for 5+ days with no signal = exit
 CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (concentration cap)
+
+# Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
+# wider than stocks because 5-10% daily swings are normal here.
+CRYPTO_PCT       = 0.10   # max 10% of equity in crypto total
+CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
+CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
+CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
+CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
+                    "LINK/USD", "AVAX/USD", "LTC/USD"]
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
 
@@ -315,6 +327,43 @@ def alpaca_latest_multi(symbols):
     except Exception:
         return {}
 
+def crypto_data_get(path):
+    """Crypto market data is PUBLIC — send no auth headers (invalid keys would
+    401, and the data needs no entitlement)."""
+    r = requests.get(ALPACA_DATA + path, timeout=10)
+    return r.json()
+
+def crypto_bars_multi(pairs, days=90):
+    """Daily OHLCV for all crypto pairs in one call (v1beta3, free, no scraping).
+    Returns {pair: (closes, volumes)} keyed by slash form, e.g. 'DOGE/USD'."""
+    out = {}
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(days=days * 2)).strftime("%Y-%m-%d")
+        base = ("/v1beta3/crypto/us/bars?timeframe=1Day&limit=10000"
+                f"&start={start}&symbols=" + ",".join(pairs))
+        token = None
+        for _ in range(4):
+            d = crypto_data_get(base + (f"&page_token={token}" if token else ""))
+            for s, bars in (d.get("bars") or {}).items():
+                c = [b["c"] for b in bars if b.get("c")]
+                v = [b.get("v") or 0 for b in bars if b.get("c")]
+                pc, pv = out.get(s, ([], []))
+                out[s] = (pc + c, pv + v)
+            token = d.get("next_page_token")
+            if not token: break
+    except Exception:
+        pass
+    return out
+
+def crypto_latest_multi(pairs):
+    """Latest crypto trade price per pair. {pair: price}."""
+    try:
+        d = crypto_data_get("/v1beta3/crypto/us/latest/trades?symbols=" + ",".join(pairs))
+        return {s: float(t.get("p") or 0) for s, t in (d.get("trades") or {}).items()
+                if t.get("p")}
+    except Exception:
+        return {}
+
 def alpaca_account():
     """Returns (cash, equity, daily_pnl).
     We size off CASH — NOT Alpaca's margin buying power — so the bot never trades
@@ -462,6 +511,22 @@ def place_buy(sym, dollar_amount, live=None):
         print(f"    [buy rejected: {(r or {}).get('message', r)}]")
     return r
 
+def place_crypto_buy(pair, dollar_amount):
+    """Crypto MARKET buy by dollar amount. Crypto orders require tif=gtc/ioc."""
+    r = alpaca_order({"symbol": pair, "notional": str(round(dollar_amount, 2)),
+                      "side": "buy", "type": "market", "time_in_force": "gtc"})
+    if not _ok(r):
+        print(f"    [crypto buy rejected: {(r or {}).get('message', r)}]")
+    return r
+
+def place_crypto_sell(pair, qty):
+    """Crypto MARKET sell of a held quantity (fractional fine)."""
+    r = alpaca_order({"symbol": pair, "qty": str(qty),
+                      "side": "sell", "type": "market", "time_in_force": "gtc"})
+    if not _ok(r):
+        print(f"    [crypto sell rejected: {(r or {}).get('message', r)}]")
+    return r
+
 def place_sell(sym, qty, live=None):
     """Sell a held quantity. Cheap names with whole-share qty sell via marketable
     LIMIT at live*0.98 (spread protection); fractional quantities must go MARKET
@@ -507,14 +572,19 @@ def run_bot():
     hold_val    = sum(positions[s]["mkt_val"] for s in holds)
     cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds
                          if float(positions[s].get("avg_cost") or 99) < CHEAP_PX)
+    crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}   # DOGEUSD -> DOGE/USD
+    crypto_pos  = {s: p for s, p in positions.items() if s in crypto_flat}
+    crypto_val  = sum(p["mkt_val"] for p in crypto_pos.values())
     invested    = max(0.0, equity - cash)               # total $ held in positions
-    trade_val   = max(0.0, invested - hold_val)         # signal-traded portion
+    trade_val   = max(0.0, invested - hold_val - crypto_val)  # signal-traded stocks
     invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
     hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
+    crypto_room = max(0.0, equity * CRYPTO_PCT - crypto_val)       # crypto-sleeve headroom
     spent = trade_spent = hold_spent = cheap_hold_spent = 0.0
     print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=…{acct_tag}")
     print(f"  Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} (room ${invest_room:,.0f}) | "
-          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | holds: {sorted(holds) or '—'}")
+          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | "
+          f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f} | holds: {sorted(holds) or '—'}")
     if pending:  print(f"  PENDING orders (skipped this run): {sorted(pending)}")
     if cooldown: print(f"  STOP COOLDOWN ({STOP_COOLDOWN_D}d): {sorted(cooldown)}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
@@ -527,7 +597,8 @@ def run_bot():
         print(f"⛔ Daily loss cap (dayP&L ${daily_pnl:.2f} <= -${loss_cap:.2f}) — buys OFF, exits still live.")
 
     # Universe — whole-market candidate sweep, then the signal engine votes.
-    universe     = set(positions.keys()) | {"SPY"}
+    # (Crypto positions are excluded here; they have their own sleeve below.)
+    universe     = {s for s in positions if s not in crypto_flat} | {"SPY"}
     meme_tickers = []
     small_caps   = set()
     movers_today = set()
@@ -626,7 +697,7 @@ def run_bot():
     #    stop: a position going nowhere for 5+ days with no signal is dead money.
     buy_dates = last_buy_dates(set(positions) - set(holds))
     for sym, p in list(positions.items()):
-        if sym in holds or sym in pending: continue
+        if sym in holds or sym in pending or sym in crypto_flat: continue
         live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
         if not live or cost <= 0 or p["qty"] <= 0: continue
         con = sigs.get(sym, {}).get("consensus", 0)
@@ -786,6 +857,82 @@ def run_bot():
             except Exception as e:
                 events.append(f"{verb} {sym} ${amount:.2f} → ERROR: {e}")
 
+    # ── CRYPTO sleeve (10%): DOGE-style moonshots, same discipline, wider brackets.
+    # Spot only, cash only, no averaging down. Crypto trades 24/7 but is managed on
+    # the bot's market-hours schedule; the -15% stop covers overnight gaps at exit.
+    try:
+        cbars  = crypto_bars_multi(CRYPTO_UNIVERSE)
+        clasts = crypto_latest_multi(CRYPTO_UNIVERSE)
+        csigs  = {}
+        for pair in CRYPTO_UNIVERSE:
+            c, v = cbars.get(pair, (None, None))
+            live = clasts.get(pair)
+            if c and len(c) >= 20 and live:
+                rr = compute_signals(pair, c, v, live, [])
+                if rr: csigs[pair] = rr
+
+        # Exits first: -15% stop (always) / +30% take-profit (unless still a buy).
+        for flat, p in list(crypto_pos.items()):
+            pair = crypto_flat[flat]
+            live = clasts.get(pair); cost = float(p.get("avg_cost") or 0)
+            if flat in pending or not live or cost <= 0 or p["qty"] <= 0: continue
+            con = csigs.get(pair, {}).get("consensus", 0)
+            tag = None
+            if live <= cost * CRYPTO_STOP:                 tag = "CRYPTO-STOP"
+            elif live >= cost * CRYPTO_TP and con <= 0:    tag = "CRYPTO-TP"
+            if not tag: continue
+            print(f"{tag} {pair} qty={p['qty']} ({(live/cost-1)*100:+.1f}% from ${cost:.6g})")
+            try:
+                r = place_crypto_sell(pair, p["qty"])
+                if _ok(r):
+                    print(f"  → placed {r['id']}")
+                    cash += p["qty"] * live
+                    events.append(f"{tag} {pair} ({(live/cost-1)*100:+.1f}%) → PLACED ({r['id']})")
+                    trades_log.append({
+                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                        "symbol": pair, "side": "sell", "crypto": True, "qty": p["qty"],
+                        "stop_loss": tag == "CRYPTO-STOP", "take_profit": tag == "CRYPTO-TP",
+                        "order_id": r["id"], "live": live, "vix": round(vix, 1)})
+                else:
+                    events.append(f"{tag} {pair} → REJECTED: {(r or {}).get('message', r)}")
+            except Exception as e:
+                events.append(f"{tag} {pair} → ERROR: {e}")
+
+        # Entries: +1 consensus, not already held, no blow-off chasing, sleeve+coin caps.
+        if not low_cash and not halted:
+            crypto_spent = 0.0
+            for pair, sig in csigs.items():
+                flat = pair.replace("/", "")
+                if sig["consensus"] != 1 or flat in crypto_pos or flat in pending: continue
+                if sig["rsi"] > RSI_ENTRY_MAX:
+                    print(f"  SKIP {pair} (RSI {sig['rsi']:.0f} — blow-off chase guard)"); continue
+                room = crypto_room - crypto_spent
+                amount = min(equity * CRYPTO_POS_PCT, room, cash * 0.95, spend_cap - spent)
+                if amount < max(1.00, equity * MIN_ORDER_PCT): continue
+                print(f"CRYPTO-BUY {pair} ${amount:.2f} RSI={sig['rsi']:.1f}")
+                try:
+                    r = place_crypto_buy(pair, amount)
+                    if _ok(r):
+                        print(f"  → placed {r['id']}")
+                        cash -= amount; spent += amount; crypto_spent += amount
+                        events.append(f"CRYPTO-BUY {pair} ${amount:.2f} → PLACED ({r['id']})")
+                        trades_log.append({
+                            "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                            "symbol": pair, "side": "buy", "crypto": True,
+                            "notional": round(amount, 2), "order_id": r["id"], "live": sig and clasts.get(pair),
+                            "rsi": round(sig["rsi"], 1), "trend": sig["trend"],
+                            "consensus": sig["consensus"], "buys": sig["buys"],
+                            "macd_up": sig["macd_up"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"CRYPTO-BUY {pair} ${amount:.2f} → REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"CRYPTO-BUY {pair} ${amount:.2f} → ERROR: {e}")
+        if csigs:
+            cline = [f"{p} {s['consensus']:+d} RSI={s['rsi']:.0f}" for p, s in csigs.items() if s["consensus"] != 0]
+            print(f"  CRYPTO signals: {', '.join(cline) if cline else '(all neutral)'}")
+    except Exception as e:
+        print(f"  [crypto sleeve error (stocks unaffected): {e}]")
+
     # Summary
     print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | "
           f"dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
@@ -810,7 +957,8 @@ def run_bot():
                 f"Equity ${equity:.2f} | Cash ${cash:.2f} | "
                 f"dayP&L ${daily_pnl:.2f}",
                 f"Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
-                f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} ({len(holds)} holds)", ""]
+                f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} ({len(holds)} holds) | "
+                f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f}", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
         body += [f"  • {e}" for e in events]
         body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
