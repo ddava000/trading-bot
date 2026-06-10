@@ -16,3 +16,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
 - notes: Tech rotation selloff persists with chips bleeding (MU -3.7%, MRVL -2.5%), VIX elevated at 19.9, US-Iran military strikes adding geopolitical risk, and a critical May CPI print looming with hawkish rate repricing. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs until macro and geopolitics clear.
 - journal: Conditions still risk-off into the close — chip names continuing to fall, US launched strikes against Iran (new geopolitical overhang), CPI still ahead. Kept risk at 0.5, added SPY to avoids as it tracks MU weakness; staying with defensives DTE and AAL (oil tailwind/Google deal). Watching CPI release and Iran headlines for a vol spike.
+
+### 2026-06-10T10:26 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.5
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Hot May CPI (+4.2% YoY, 3-year high) confirmed hawkish rate repricing, with VIX at 20.2 and chip-led tape still soft; one bright spot is easing Iran tensions and falling oil lifting airlines. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs into the rate-fear digestion.
+- journal: CPI printed hot (+4.2%) as feared — inflation/rate overhang now the dominant risk, while Iran de-escalation removes some geopolitical premium and falling oil helps AAL. Keeping risk-off at 0.5, still avoiding MU/MRVL/QQQ/SPY; watching whether VIX cools below 19 or chips stabilize before adding risk back.
