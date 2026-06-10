@@ -212,7 +212,7 @@ def fetch_screener():
 
 def fetch_smallcaps():
     """Low-cap growth discovery via Yahoo's small-cap screeners. Quality rails:
-    price >= $0.25 (allows liquid sub-$1 movers — bought as WHOLE shares since
+    price >= $0.10 — the practical floor for LISTED stocks (sub-penny names are OTC, untradeable on Alpaca; allows liquid sub-$1 movers — bought as WHOLE shares since
     Alpaca blocks notional orders on non-fractionable names; true OTC penny stocks
     aren't tradeable on Alpaca at all), >=500k shares/day AND >=$5M/day traded so
     spreads don't eat the edge. These are only CANDIDATES — the signal engine
@@ -227,7 +227,7 @@ def fetch_smallcaps():
                 px  = q.get("regularMarketPrice", 0) or 0
                 vol = q.get("averageDailyVolume3Month", 0) or 0
                 sym = q.get("symbol", "")
-                if (px >= 0.25 and vol >= 500_000 and px*vol >= 5_000_000
+                if (px >= 0.10 and vol >= 500_000 and px*vol >= 5_000_000
                         and sym and "." not in sym and "-" not in sym and sym not in seen):
                     seen.add(sym); out.append(sym)
         except Exception:
@@ -268,7 +268,7 @@ def fetch_market_movers():
         out = []
         for g in d.get("gainers", []):
             sym, px = g.get("symbol", ""), float(g.get("price") or 0)
-            if px >= 0.25 and sym and all(c not in sym for c in "./-"):
+            if px >= 0.10 and sym and all(c not in sym for c in "./-"):
                 out.append(sym)
         return out[:25]
     except Exception: return []
