@@ -618,6 +618,18 @@ def run_bot():
                 print(f"  SKIP {sym} (RSI {sig['rsi']:.0f} > {RSI_ENTRY_MAX:.0f} — blow-off chase guard)"); continue
             live     = market[sym]["live"]
             is_small = sym in small_caps or live < SMALL_PX   # cheap names = half size
+            # NEVER average down: adds only pyramid into strength (live above the
+            # position's own basis). Adding to a faller turns one bad entry into a
+            # max-size bad position — the classic microcap-pump account killer.
+            if held_value > 0:
+                ref = (float(holds[sym].get("basis") or 0) if sym in holds
+                       else float(positions[sym].get("avg_cost") or 0))
+                if ref > 0 and live < ref * 1.02:
+                    print(f"  SKIP {sym} add (live ${live:.4g} ≤ basis ${ref:.4g}+2% — no averaging down)")
+                    continue
+                if sym in holds and sig["rsi"] > HOLD_RSI_MAX:
+                    print(f"  SKIP {sym} hold-add (RSI {sig['rsi']:.0f} > {HOLD_RSI_MAX:.0f})")
+                    continue
             # Hold entries demand QUALITY, not just strength: 4+ votes in an uptrend,
             # a calm entry (RSI<=70), and never a daily-spike movers name — those are
             # trade material, not buy-and-hold material (pump risk).
