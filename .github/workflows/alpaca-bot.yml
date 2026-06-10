@@ -32,9 +32,28 @@ jobs:
     timeout-minutes: 8
     permissions:
       contents: write   # allow committing trade_log.jsonl back to the repo
+      actions: write    # allow dispatching brief.yml when the plan is stale
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # GitHub's native cron (brief.yml) regularly fires hours late or not at all
+      # (skipped entirely on 2026-06-10). cron-job.org triggers THIS workflow
+      # reliably — so bootstrap the brief from here: if daily_plan.json isn't
+      # today's, dispatch it. The bot trades neutral this run and picks up the
+      # fresh plan next run (15 min later).
+      - name: Ensure fresh research brief
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          today=$(TZ=America/New_York date +%F)
+          plan_date=$(python3 -c "import json; print(json.load(open('daily_plan.json')).get('date',''))" 2>/dev/null || echo "none")
+          if [ "$plan_date" != "$today" ]; then
+            echo "plan stale ($plan_date != $today) — dispatching brief.yml"
+            gh workflow run brief.yml --repo "$GITHUB_REPOSITORY" || true
+          else
+            echo "plan is fresh ($plan_date)"
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
