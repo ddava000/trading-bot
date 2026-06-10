@@ -40,6 +40,8 @@ SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all
 STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (overrides signals)
 TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (≈2:1 R:R)
 RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
+HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
+MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity (min $1)
 SMALL_PX         = 15.00  # live price under this sizes at the smallcap (half) cap
 CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin names fill 5-20x worse at market
 STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
@@ -476,6 +478,7 @@ def run_bot():
     universe     = set(positions.keys()) | {"SPY"}
     meme_tickers = []
     small_caps   = set()
+    movers_today = set()
     if low_cash:
         print("LOW_CASH — positions only.")
     else:
@@ -487,6 +490,7 @@ def run_bot():
         actives = fetch_most_actives()     # Alpaca: top volume across the whole market
         meme_tickers = wsb
         small_caps   = set(smalls)
+        movers_today = set(movers)         # day-spike names: tradeable, but never HOLD entries
         for s in plan["favor"] + wsb + smalls + movers + gainers + screen + actives:
             if len(universe) < 45: universe.add(s)
     universe = list(universe)
@@ -614,7 +618,11 @@ def run_bot():
                 print(f"  SKIP {sym} (RSI {sig['rsi']:.0f} > {RSI_ENTRY_MAX:.0f} — blow-off chase guard)"); continue
             live     = market[sym]["live"]
             is_small = sym in small_caps or live < SMALL_PX   # cheap names = half size
-            strong   = sig["buys"] >= 4 and sig["trend"] == "up"
+            # Hold entries demand QUALITY, not just strength: 4+ votes in an uptrend,
+            # a calm entry (RSI<=70), and never a daily-spike movers name — those are
+            # trade material, not buy-and-hold material (pump risk).
+            strong   = (sig["buys"] >= 4 and sig["trend"] == "up"
+                        and sig["rsi"] <= HOLD_RSI_MAX and sym not in movers_today)
             use_hold = (sym in holds) or (strong and sym not in positions
                                           and (hold_room - hold_spent) >= 1.00)
             sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
@@ -623,7 +631,7 @@ def run_bot():
             if room_in_name < 1.00: continue
             amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
                          spend_cap - spent, sleeve_room)
-            if amount < 1.00: continue
+            if amount < max(1.00, equity * MIN_ORDER_PCT): continue   # no dust orders
             if held_value > 0 and amount < name_cap * 0.20:
                 continue   # near its cap — skip dribble top-ups every run
             verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
