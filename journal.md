@@ -34,3 +34,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'CHOW']
 - notes: Conditions remain dangerous: Dow down ~950 to close below 50K, Nasdaq -2% on a worsening chip rout, VIX 22.2, hot May CPI (3-yr high) and renewed US-Iran strikes lifting oil. Day P&L -$15k with chips (MU -8%, MRVL -9%) and MTEN -12.6% bleeding; holding risk at 0.4 and steering clear of semis, beta ETFs, AAPL, and AAL (fuel shock).
 - journal: Still risk-off into the close — Dow plunged below 50K, tech rout deepening, Iran re-escalation and hot CPI both pressuring tape. CLOV got a Medicare rating upgrade (bright spot), CHOW still strong (+20.7%). Added deep losers MTEN/HXHX/GLE to avoids; keeping risk 0.4, leaning defensive DTE/CLOV/CHOW. Watching for VIX cooling under 20 and chip stabilization before adding back.
+
+### 2026-06-10T19:16 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'CHOW']
+- notes: Dangerous tape persists: Dow -950 below 50K, Nasdaq -2% on a deepening chip rout, VIX 22.2, hot May CPI (3-yr high) and renewed US-Iran strikes lifting oil. Day P&L -$13k with semis (MU -9%, MRVL -10.7%) and MTEN -13.5% bleeding; keeping risk at 0.4, avoiding semis, beta ETFs, AAPL and AAL (fuel shock).
+- journal: Still risk-off near the close — conditions essentially unchanged from prior check (VIX 22.2, chips weak, Iran/CPI overhang). CLOV strength holding on Medicare upgrade, CHOW +36%. Maintaining 0.4 and defensive tilt; watching for VIX under 20 and chip stabilization before adding risk back.
