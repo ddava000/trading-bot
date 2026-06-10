@@ -14,11 +14,20 @@ from datetime import datetime, timezone, timedelta
 # ── Config ────────────────────────────────────────────────────────────────────
 # Daily loss halt = max(10% of equity, $20). Loose on purpose: it only stops the
 # day on a genuine crash, so it never kneecaps a small ($250-500) live account on
-# normal noise. The real risk controls are the 40% exposure cap + 10%/name cap below.
+# normal noise. The real risk controls are the sleeve caps + per-name caps below.
+#
+# Capital is split into two sleeves (max 70% deployed, 30% cash floor):
+#   TRADING sleeve (40%): signal-driven buys the day-trade sell logic manages.
+#   HOLD sleeve (30%):    strong-signal names (4+ buy votes AND uptrend) bought to
+#                         KEEP — exempt from sell signals; only a -25% disaster stop
+#                         (thesis broken) exits them. Compounding lives here, and on
+#                         a small live account it also burns zero PDT day trades.
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
 PDT_LIMIT        = 3
-MAX_INVESTED_PCT = 0.40   # cap TOTAL deployed capital at 40% of equity (60% stays cash)
+MAX_INVESTED_PCT = 0.40   # TRADING sleeve: cap on signal-traded capital
+HOLD_PCT         = 0.30   # HOLD sleeve: buy-and-hold allocation on strong signals
+HOLD_STOP        = 0.75   # disaster stop — sell a hold at 75% of basis (-25%)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
 SMALLCAP_POS_PCT = 0.05   # small-caps get HALF size (5% of equity) — higher growth, higher blowup risk
 SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
@@ -186,10 +195,11 @@ def fetch_screener():
 
 def fetch_smallcaps():
     """Low-cap growth discovery via Yahoo's small-cap screeners. Quality rails:
-    price >= $1 (sub-$1 names are delisting-zone junk, and Alpaca blocks notional
-    orders on them anyway — true OTC penny stocks aren't tradeable on Alpaca at all),
-    >=500k shares/day AND >=$5M/day traded so spreads don't eat the edge. These are
-    only CANDIDATES — the signal engine still has to vote them in like any name."""
+    price >= $0.25 (allows liquid sub-$1 movers — bought as WHOLE shares since
+    Alpaca blocks notional orders on non-fractionable names; true OTC penny stocks
+    aren't tradeable on Alpaca at all), >=500k shares/day AND >=$5M/day traded so
+    spreads don't eat the edge. These are only CANDIDATES — the signal engine
+    still has to vote them in like any name."""
     out, seen = [], set()
     for scr in ("small_cap_gainers", "aggressive_small_caps"):
         try:
@@ -200,7 +210,7 @@ def fetch_smallcaps():
                 px  = q.get("regularMarketPrice", 0) or 0
                 vol = q.get("averageDailyVolume3Month", 0) or 0
                 sym = q.get("symbol", "")
-                if (px >= 1.00 and vol >= 500_000 and px*vol >= 5_000_000
+                if (px >= 0.25 and vol >= 500_000 and px*vol >= 5_000_000
                         and sym and "." not in sym and "-" not in sym and sym not in seen):
                     seen.add(sym); out.append(sym)
         except Exception:
@@ -233,6 +243,20 @@ def alpaca_positions():
             pos[p["symbol"]] = {"qty": q, "avg_cost": float(p.get("avg_entry_price") or 0),
                                 "mkt_val": float(p.get("market_value") or 0)}
     return pos
+
+
+def load_holds():
+    """The buy-and-hold ledger (holds.json, committed back to the repo like the
+    trade log). Maps symbol -> {ts, basis, notional}. Symbols here are EXEMPT from
+    sell signals — only the HOLD_STOP disaster stop exits them."""
+    try:
+        return json.load(open("holds.json"))
+    except Exception:
+        return {}
+
+def save_holds(holds):
+    with open("holds.json", "w") as f:
+        json.dump(holds, f, indent=1, sort_keys=True)
 
 
 def load_plan(et):
@@ -270,11 +294,29 @@ def _ok(result):
     """Alpaca accepted the order iff it echoes an id and carries no error message."""
     return bool(result) and result.get("id") and not result.get("message")
 
-def place_buy(sym, dollar_amount):
-    """Fractional MARKET buy by dollar amount (notional). Alpaca computes the
-    share count — no live price needed, no version gate."""
-    r = alpaca_order({"symbol": sym, "notional": str(round(dollar_amount, 2)),
-                      "side": "buy", "type": "market", "time_in_force": "day"})
+_ASSET_CACHE = {}
+def alpaca_asset(sym):
+    """Asset metadata (tradable/fractionable), cached per run."""
+    if sym not in _ASSET_CACHE:
+        try:    _ASSET_CACHE[sym] = alpaca_get(f"/v2/assets/{sym}") or {}
+        except Exception: _ASSET_CACHE[sym] = {}
+    return _ASSET_CACHE[sym]
+
+def place_buy(sym, dollar_amount, live=None):
+    """MARKET buy. Fractionable names buy by dollar amount (notional). Names Alpaca
+    won't fraction (most sub-$1 / low-cap tickers) buy WHOLE shares instead —
+    qty = floor(amount / live) — so cheap small-caps are still reachable."""
+    a = alpaca_asset(sym)
+    if a and a.get("tradable") is False:
+        r = {"message": f"{sym} not tradable on Alpaca"}
+    elif a.get("fractionable", True):
+        r = alpaca_order({"symbol": sym, "notional": str(round(dollar_amount, 2)),
+                          "side": "buy", "type": "market", "time_in_force": "day"})
+    elif live and live > 0 and int(dollar_amount // live) >= 1:
+        r = alpaca_order({"symbol": sym, "qty": str(int(dollar_amount // live)),
+                          "side": "buy", "type": "market", "time_in_force": "day"})
+    else:
+        r = {"message": f"{sym} not fractionable; ${dollar_amount:.2f} buys <1 share"}
     if not _ok(r):
         print(f"    [buy rejected: {(r or {}).get('message', r)}]")
     return r
@@ -303,15 +345,24 @@ def run_bot():
     acct_tag    = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]  # tags each trade so an account swap can't silently corrupt the log/review
     max_pos     = equity * MAX_POS_PCT
     spend_cap   = max(0.0, cash) * SPEND_CAP_PCT        # ≤25% of CASH per run (no margin)
-    invested    = max(0.0, equity - cash)               # current $ held in positions
-    invest_room = max(0.0, equity * MAX_INVESTED_PCT - invested)  # headroom to the 40% cap
-    spent       = 0.0
     low_cash    = cash < 5.00
     positions   = alpaca_positions()
     plan        = load_plan(et)
+
+    # Sleeve accounting: holds (buy-and-keep ledger) vs trading (everything else).
+    holds       = load_holds()
+    holds_dirty = False
+    stale = [s for s in holds if s not in positions]    # sold manually / stopped out
+    for s in stale: holds.pop(s); holds_dirty = True
+    hold_val    = sum(positions[s]["mkt_val"] for s in holds)
+    invested    = max(0.0, equity - cash)               # total $ held in positions
+    trade_val   = max(0.0, invested - hold_val)         # signal-traded portion
+    invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
+    hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
+    spent = trade_spent = hold_spent = 0.0
     print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  PDT={pdt}  acct=…{acct_tag}")
-    print(f"  Invested ${invested:,.0f} of ${equity*MAX_INVESTED_PCT:,.0f} cap "
-          f"({(invested/equity*100 if equity else 0):.0f}% of equity) — room ${invest_room:,.0f}")
+    print(f"  Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} (room ${invest_room:,.0f}) | "
+          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | holds: {sorted(holds) or '—'}")
     print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
 
     # Circuit breakers
@@ -364,9 +415,12 @@ def run_bot():
         rr = compute_signals(sym, d["closes"], d["volumes"], d["live"], meme_tickers)
         if rr: sigs[sym] = rr
 
-    # SELL first (frees buying power)
+    # SELL first (frees buying power). Hold-sleeve names are exempt — they only
+    # exit via the disaster stop below.
     for sym, sig in sigs.items():
         if sig["consensus"] != -1 or sym not in positions: continue
+        if sym in holds:
+            print(f"  KEEP {sym} (hold sleeve — sell signal ignored)"); continue
         qty = positions[sym]["qty"]
         if qty <= 0: continue
         print(f"SELL {sym} qty={qty} RSI={sig['rsi']:.1f}")
@@ -388,42 +442,94 @@ def run_bot():
         except Exception as e:
             events.append(f"SELL {sym} → ERROR: {e}")
 
+    # HOLD disaster stop: a hold trading at <=75% of its basis is a broken thesis —
+    # sell it and free the sleeve. (This is the ONLY way the bot exits a hold.)
+    for sym in list(holds):
+        if sym not in positions: continue
+        live  = market.get(sym, {}).get("live")
+        basis = float(holds[sym].get("basis") or 0)
+        if not live or basis <= 0 or live > basis * HOLD_STOP: continue
+        qty = positions[sym]["qty"]
+        print(f"HOLD-STOP {sym} qty={qty} (live ${live:.2f} <= {HOLD_STOP:.0%} of basis ${basis:.2f})")
+        try:
+            r = place_sell(sym, qty)
+            if _ok(r):
+                print(f"  → placed {r['id']}")
+                cash += qty * live; low_cash = False
+                holds.pop(sym); holds_dirty = True
+                events.append(f"HOLD-STOP {sym} qty={qty} (-25% from basis) → PLACED ({r['id']})")
+                trades_log.append({
+                    "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
+                    "side": "sell", "hold_stop": True, "qty": qty, "order_id": r["id"],
+                    "live": round(live, 2), "basis": round(basis, 2), "vix": round(vix, 1)})
+            else:
+                events.append(f"HOLD-STOP {sym} → REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"HOLD-STOP {sym} → ERROR: {e}")
+
     # BUY — new entries AND adds to held winners, up to the per-name cap.
     # Small-caps size at SMALLCAP_POS_PCT (half) — growthier but blowup-prone.
+    # Sleeve routing: STRONG signals (4+ buy votes AND uptrend) buy into the HOLD
+    # sleeve (kept until the disaster stop); everything else is a trading-sleeve buy.
     if not low_cash and not pdt_exhausted:
         for sym, sig in sigs.items():
             if sig["consensus"] != 1: continue
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
-            if spent >= min(spend_cap, invest_room): break   # per-run or exposure cap reached
+            if spent >= spend_cap: break                      # per-run pacing cap reached
+            if (invest_room - trade_spent) < 1.00 and (hold_room - hold_spent) < 1.00:
+                break                                         # both sleeves full
             # A strong signal can top up a held name, but never past its per-name cap.
             held_value = 0.0
             if sym in positions and positions[sym]["qty"] > 0 and sym in market:
                 held_value = positions[sym]["qty"] * market[sym]["live"]
+            strong   = sig["buys"] >= 4 and sig["trend"] == "up"
+            use_hold = (sym in holds) or (strong and sym not in positions
+                                          and (hold_room - hold_spent) >= 1.00)
+            sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
             name_cap     = equity * (SMALLCAP_POS_PCT if sym in small_caps else MAX_POS_PCT)
             room_in_name = name_cap - held_value
             if room_in_name < 1.00: continue
             amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
-                         spend_cap - spent, invest_room - spent)
+                         spend_cap - spent, sleeve_room)
             if amount < 1.00: continue
             if held_value > 0 and amount < name_cap * 0.20:
                 continue   # near its cap — skip dribble top-ups every run
-            verb = "ADD" if held_value > 0 else "BUY"
+            live = market[sym]["live"]
+            verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
+                    else ("ADD" if held_value > 0 else "BUY"))
             print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
                   + (" [smallcap]" if sym in small_caps else ""))
             try:
-                r = place_buy(sym, amount)
+                r = place_buy(sym, amount, live)
                 if _ok(r):
-                    print(f"  → placed {r['id']}")
-                    cash -= amount; spent += amount
+                    # Whole-share orders may spend slightly less than requested.
+                    actual = amount
+                    if r.get("qty") and not r.get("notional"):
+                        actual = round(float(r["qty"]) * live, 2)
+                    print(f"  → placed {r['id']} (${actual:.2f})")
+                    cash -= actual; spent += actual
+                    if use_hold: hold_spent  += actual
+                    else:        trade_spent += actual
                     if sym not in positions:
                         positions[sym] = {"qty": 0, "avg_cost": 0, "mkt_val": 0.0}
-                    events.append(f"{verb} {sym} ${amount:.2f} → PLACED ({r['id']})")
+                    if use_hold:
+                        h = holds.get(sym)
+                        if h:   # weighted-average basis across adds
+                            prev = float(h.get("notional") or 0)
+                            tot  = prev + actual
+                            h["basis"]    = round((float(h["basis"])*prev + live*actual)/tot, 4) if tot else live
+                            h["notional"] = round(tot, 2)
+                        else:
+                            holds[sym] = {"ts": et.strftime("%Y-%m-%dT%H:%M"),
+                                          "basis": round(live, 4), "notional": round(actual, 2)}
+                        holds_dirty = True
+                    events.append(f"{verb} {sym} ${actual:.2f} → PLACED ({r['id']})")
                     trades_log.append({
                         "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
                         "side": "buy", "add": held_value > 0, "smallcap": sym in small_caps,
-                        "notional": round(amount, 2), "order_id": r["id"],
-                        "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
+                        "hold": use_hold, "notional": round(actual, 2), "order_id": r["id"],
+                        "live": round(live, 2), "rsi": round(sig["rsi"], 1),
                         "trend": sig["trend"], "consensus": sig["consensus"],
                         "delta": round(sig["delta"], 4), "buys": sig["buys"],
                         "macd_up": sig["macd_up"], "meme": sig["meme"], "vix": round(vix, 1)})
@@ -435,6 +541,12 @@ def run_bot():
     # Summary
     print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | PDT={pdt} | "
           f"dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
+    if holds:
+        hl = []
+        for s, h in sorted(holds.items()):
+            lv = market.get(s, {}).get("live")
+            hl.append(f"{s} {((lv/float(h['basis'])-1)*100):+.1f}%" if lv and float(h.get("basis") or 0) > 0 else s)
+        print(f"  HOLDS vs basis: {', '.join(hl)}")
     for sym, sig in sigs.items():
         if sig["consensus"] != 0:
             print(f"  {sym}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}")
@@ -461,12 +573,15 @@ def run_bot():
         send_email(subject, "\n".join(body))
 
     # Persist structured trade context for the weekly review / pattern analysis.
-    # The workflow commits trade_log.jsonl back to the repo so it survives runs.
+    # The workflow commits trade_log.jsonl (and holds.json) back to the repo.
     if trades_log:
         with open("trade_log.jsonl", "a") as f:
             for t in trades_log:
                 f.write(json.dumps(t) + "\n")
         print(f"  [logged {len(trades_log)} trade(s) to trade_log.jsonl]")
+    if holds_dirty:
+        save_holds(holds)
+        print(f"  [holds.json updated — {len(holds)} hold(s)]")
 
 
 if __name__ == "__main__":
