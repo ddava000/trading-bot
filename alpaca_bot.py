@@ -45,6 +45,8 @@ MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity (min $1)
 SMALL_PX         = 15.00  # live price under this sizes at the smallcap (half) cap
 CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin names fill 5-20x worse at market
 STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
+TIME_STOP_DAYS   = 5      # trading position going nowhere for 5+ days with no signal = exit
+CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (concentration cap)
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
 
@@ -279,6 +281,40 @@ def fetch_most_actives():
                 if a.get("symbol") and all(c not in a["symbol"] for c in "./-")][:10]
     except Exception: return []
 
+def alpaca_bars_multi(symbols, days=90):
+    """Daily OHLCV for the WHOLE universe in 1-2 batch calls via Alpaca's official
+    data API (key-authed, real rate limits). This is the PRIMARY data source —
+    Yahoo scraping gets 429-blocked from cloud IPs, and the stops/exits depend on
+    this data, so the primary must be something we're entitled to. Returns
+    {sym: (closes, volumes)}."""
+    out = {}
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(days=days * 2)).strftime("%Y-%m-%d")
+        base = ("/v2/stocks/bars?timeframe=1Day&adjustment=split&feed=iex&limit=10000"
+                f"&start={start}&symbols=" + ",".join(symbols))
+        token = None
+        for _ in range(6):                      # paginate defensively
+            d = alpaca_data_get(base + (f"&page_token={token}" if token else ""))
+            for s, bars in (d.get("bars") or {}).items():
+                c = [b["c"] for b in bars if b.get("c")]
+                v = [b.get("v") or 0 for b in bars if b.get("c")]
+                pc, pv = out.get(s, ([], []))
+                out[s] = (pc + c, pv + v)
+            token = d.get("next_page_token")
+            if not token: break
+    except Exception:
+        pass
+    return out
+
+def alpaca_latest_multi(symbols):
+    """Latest trade price for many symbols in one call. {sym: price}."""
+    try:
+        d = alpaca_data_get("/v2/stocks/trades/latest?feed=iex&symbols=" + ",".join(symbols))
+        return {s: float(t.get("p") or 0) for s, t in (d.get("trades") or {}).items()
+                if t.get("p")}
+    except Exception:
+        return {}
+
 def alpaca_account():
     """Returns (cash, equity, daily_pnl).
     We size off CASH — NOT Alpaca's margin buying power — so the bot never trades
@@ -337,6 +373,20 @@ def recent_stop_outs(days=STOP_COOLDOWN_D):
         return set()
     cut = (datetime.now(ET_TZ) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
     return {s for s, ts in latest.items() if ts >= cut}
+
+def last_buy_dates(held_syms):
+    """Most recent buy timestamp per held symbol, from the local trade log.
+    Drives the time stop: an add resets the clock (renewed conviction)."""
+    out = {}
+    try:
+        for line in open("trade_log.jsonl"):
+            try: d = json.loads(line)
+            except Exception: continue
+            if d.get("side") == "buy" and d.get("symbol") in held_syms:
+                out[d["symbol"]] = d.get("ts", "")
+    except Exception:
+        pass
+    return out
 
 
 def load_plan(et):
@@ -455,11 +505,13 @@ def run_bot():
     stale = [s for s in holds if s not in positions]    # sold manually / stopped out
     for s in stale: holds.pop(s); holds_dirty = True
     hold_val    = sum(positions[s]["mkt_val"] for s in holds)
+    cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds
+                         if float(positions[s].get("avg_cost") or 99) < CHEAP_PX)
     invested    = max(0.0, equity - cash)               # total $ held in positions
     trade_val   = max(0.0, invested - hold_val)         # signal-traded portion
     invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
     hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
-    spent = trade_spent = hold_spent = 0.0
+    spent = trade_spent = hold_spent = cheap_hold_spent = 0.0
     print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=…{acct_tag}")
     print(f"  Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} (room ${invest_room:,.0f}) | "
           f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | holds: {sorted(holds) or '—'}")
@@ -505,16 +557,29 @@ def run_bot():
         print("VIX>35. Halt."); return
     vix_scale = 0.50 if vix > 25 else (0.75 if vix > 20 else 1.00)
 
+    # Market data — Alpaca official batch API first (2 calls for the whole
+    # universe, no scraping-block roulette); Yahoo only as per-symbol fallback
+    # for IEX coverage gaps. Exits depend on this data, so reliability is king.
+    bars  = alpaca_bars_multi(universe)
+    lasts = alpaca_latest_multi(universe)
     market, fails = {}, 0
     for sym in universe:
-        c, v = yf_ohlcv(sym)
-        if c is None:
+        c, v = bars.get(sym, (None, None))
+        if not c or len(c) < 20:
+            c, v = yf_ohlcv(sym)                 # fallback: Yahoo scrape
+        live = lasts.get(sym) or yf_live(sym)
+        if c and len(c) >= 20 and live:
+            market[sym] = {"closes": c, "volumes": v, "live": live}
+        else:
             fails += 1
-            if fails >= 10:
-                print(f"  [market data: {fails} failures — stopping the scan early]"); break
-            continue
-        live = yf_live(sym)
-        if live: market[sym] = {"closes": c, "volumes": v, "live": live}
+    if fails:
+        print(f"  [market data: {fails}/{len(universe)} symbols unavailable]")
+
+    # Regime filter (practitioner staple): SPY under its 50-day SMA = weak tape —
+    # no NEW hold-sleeve entries (multi-day risk needs a supportive market).
+    spy_c   = market.get("SPY", {}).get("closes") or []
+    risk_on = len(spy_c) >= 50 and spy_c[-1] > sum(spy_c[-50:]) / 50
+    print(f"  REGIME: {'risk-on (SPY>SMA50)' if risk_on else 'risk-off (SPY<SMA50) — new holds disabled'}")
 
     # Signals
     sigs = {}
@@ -540,6 +605,7 @@ def run_bot():
                 if tag == "STOP-LOSS":   entry["stop_loss"]   = True
                 if tag == "TAKE-PROFIT": entry["take_profit"] = True
                 if tag == "HOLD-STOP":   entry["hold_stop"]   = True
+                if tag == "TIME-STOP":   entry["time_stop"]   = True
                 if sig: entry.update({"rsi": round(sig["rsi"], 1), "trend": sig["trend"],
                                       "consensus": sig["consensus"], "sells": sig.get("sells")})
                 trades_log.append(entry)
@@ -551,18 +617,32 @@ def run_bot():
 
     # 1) BRACKET exits (trading sleeve): hard stop -7% — risk is cut no matter
     #    what the signals say; take-profit +15% banked unless the signal is still
-    #    an active buy (let confirmed winners run). ~2:1 reward:risk.
+    #    an active buy (let confirmed winners run). ~2:1 reward:risk. Plus a TIME
+    #    stop: a position going nowhere for 5+ days with no signal is dead money.
+    buy_dates = last_buy_dates(set(positions) - set(holds))
     for sym, p in list(positions.items()):
         if sym in holds or sym in pending: continue
         live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
         if not live or cost <= 0 or p["qty"] <= 0: continue
         con = sigs.get(sym, {}).get("consensus", 0)
+        age_d = None
+        if buy_dates.get(sym):
+            try:
+                age_d = (et - datetime.strptime(buy_dates[sym][:10], "%Y-%m-%d")
+                         .replace(tzinfo=ET_TZ)).days
+            except Exception:
+                age_d = None
         if live <= cost * STOP_LOSS_PCT:
             _exit(sym, p["qty"], live, "STOP-LOSS",
                   f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
         elif live >= cost * TAKE_PROFIT_PCT and con <= 0:
             _exit(sym, p["qty"], live, "TAKE-PROFIT",
                   f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
+        elif (age_d is not None and age_d >= TIME_STOP_DAYS
+              and con <= 0 and live < cost * 1.02):
+            _exit(sym, p["qty"], live, "TIME-STOP",
+                  f"({(live/cost-1)*100:+.1f}% after {age_d}d, no signal — dead money)",
+                  sigs.get(sym))
 
     # 2) SIGNAL sells (frees buying power). Hold-sleeve names are exempt.
     for sym, sig in sigs.items():
@@ -580,7 +660,10 @@ def run_bot():
     for sym in list(holds):
         if sym not in positions or sym in pending or sym in sold_now: continue
         live = market.get(sym, {}).get("live")
-        h = holds[sym]; basis = float(h.get("basis") or 0)
+        h = holds[sym]
+        # Broker's avg_entry_price is the true blended basis (our ledger's is an
+        # estimate from order-time prices) — prefer it when available.
+        basis = float(positions[sym].get("avg_cost") or 0) or float(h.get("basis") or 0)
         if not live or basis <= 0: continue
         peak = max(float(h.get("peak") or 0), live)
         if peak > float(h.get("peak") or 0):
@@ -622,8 +705,8 @@ def run_bot():
             # position's own basis). Adding to a faller turns one bad entry into a
             # max-size bad position — the classic microcap-pump account killer.
             if held_value > 0:
-                ref = (float(holds[sym].get("basis") or 0) if sym in holds
-                       else float(positions[sym].get("avg_cost") or 0))
+                ref = (float(positions[sym].get("avg_cost") or 0)
+                       or (float(holds[sym].get("basis") or 0) if sym in holds else 0))
                 if ref > 0 and live < ref * 1.02:
                     print(f"  SKIP {sym} add (live ${live:.4g} ≤ basis ${ref:.4g}+2% — no averaging down)")
                     continue
@@ -634,9 +717,16 @@ def run_bot():
             # a calm entry (RSI<=70), and never a daily-spike movers name — those are
             # trade material, not buy-and-hold material (pump risk).
             strong   = (sig["buys"] >= 4 and sig["trend"] == "up"
-                        and sig["rsi"] <= HOLD_RSI_MAX and sym not in movers_today)
+                        and sig["rsi"] <= HOLD_RSI_MAX and sym not in movers_today
+                        and risk_on)               # no NEW holds into a weak tape
             use_hold = (sym in holds) or (strong and sym not in positions
                                           and (hold_room - hold_spent) >= 1.00)
+            # Concentration cap: sub-$5 names may fill at most half the hold sleeve.
+            if use_hold and live < CHEAP_PX:
+                cheap_cap = equity * HOLD_PCT * CHEAP_HOLD_MAX
+                if cheap_hold_val + cheap_hold_spent >= cheap_cap:
+                    print(f"  SKIP {sym} hold (sub-$5 holds at their {CHEAP_HOLD_MAX:.0%} sleeve cap)")
+                    continue
             sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
             name_cap     = equity * (SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
             room_in_name = name_cap - held_value
@@ -659,8 +749,11 @@ def run_bot():
                         actual = round(float(r["qty"]) * live, 2)
                     print(f"  → placed {r['id']} (${actual:.2f})")
                     cash -= actual; spent += actual
-                    if use_hold: hold_spent  += actual
-                    else:        trade_spent += actual
+                    if use_hold:
+                        hold_spent += actual
+                        if live < CHEAP_PX: cheap_hold_spent += actual
+                    else:
+                        trade_spent += actual
                     if sym not in positions:
                         positions[sym] = {"qty": 0, "avg_cost": 0, "mkt_val": 0.0}
                     if use_hold:
