@@ -264,13 +264,13 @@ def fetch_market_movers():
     equity by % change server-side (SIP data, resets at open). Top gainers join
     the candidate pool — the signal engine still has to vote each one in."""
     try:
-        d = alpaca_data_get("/v1beta1/screener/stocks/movers?top=20")
+        d = alpaca_data_get("/v1beta1/screener/stocks/movers?top=35")
         out = []
         for g in d.get("gainers", []):
             sym, px = g.get("symbol", ""), float(g.get("price") or 0)
             if px >= 0.25 and sym and all(c not in sym for c in "./-"):
                 out.append(sym)
-        return out[:15]
+        return out[:25]
     except Exception: return []
 
 def fetch_most_actives():
@@ -543,8 +543,13 @@ def run_bot():
         meme_tickers = wsb
         small_caps   = set(smalls)
         movers_today = set(movers)         # day-spike names: tradeable, but never HOLD entries
+        # The screeners above each scan the ENTIRE market server-side (movers ranks
+        # every listed US equity by % change, most-actives every stock by volume,
+        # Yahoo screens sweep the whole market) — this cap is only how many top
+        # candidates get the full 90-day indicator analysis per run. It rotates
+        # every 15 minutes, so a full day deep-analyzes hundreds of distinct names.
         for s in plan["favor"] + wsb + smalls + movers + gainers + screen + actives:
-            if len(universe) < 45: universe.add(s)
+            if len(universe) < 60: universe.add(s)
     universe = list(universe)
     print(f"UNIVERSE ({len(universe)}): {universe}")
     if small_caps & set(universe):
