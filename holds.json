@@ -1,22 +1,27 @@
 {
  "CHOW": {
-  "basis": 0.6496,
-  "notional": 18564.92,
+  "basis": 0.6012,
+  "notional": 37069.32,
+  "peak": 0.5527,
   "ts": "2026-06-10T11:00"
  },
  "GLE": {
-  "basis": 0.6408,
-  "notional": 18564.62,
+  "basis": 0.6753,
+  "notional": 37068.64,
+  "peak": 0.71,
+  "peak_saved": 0.71,
   "ts": "2026-06-10T11:00"
  },
  "HXHX": {
-  "basis": 0.71,
-  "notional": 18564.37,
+  "basis": 0.7117,
+  "notional": 37068.54,
+  "peak": 0.7134,
   "ts": "2026-06-10T11:00"
  },
  "MTEN": {
-  "basis": 2.1487,
-  "notional": 18564.77,
+  "basis": 2.1389,
+  "notional": 37068.78,
+  "peak": 2.1291,
   "ts": "2026-06-10T11:00"
  }
 }
