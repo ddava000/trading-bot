@@ -20,6 +20,7 @@ LOSS_CAP_FLOOR   = 20.00
 PDT_LIMIT        = 3
 MAX_INVESTED_PCT = 0.40   # cap TOTAL deployed capital at 40% of equity (60% stays cash)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
+SMALLCAP_POS_PCT = 0.05   # small-caps get HALF size (5% of equity) — higher growth, higher blowup risk
 SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
 
 ALPACA_KEY    = os.environ["ALPACA_API_KEY"]
@@ -183,6 +184,28 @@ def fetch_screener():
         return [q["symbol"] for q in qs[:10]]
     except Exception: return ["AAPL","MSFT","NVDA","AMD","TSLA","META","GOOGL","AMZN"]
 
+def fetch_smallcaps():
+    """Low-cap growth discovery via Yahoo's small-cap screeners. Quality rails:
+    price >= $1 (sub-$1 names are delisting-zone junk, and Alpaca blocks notional
+    orders on them anyway — true OTC penny stocks aren't tradeable on Alpaca at all),
+    >=500k shares/day AND >=$5M/day traded so spreads don't eat the edge. These are
+    only CANDIDATES — the signal engine still has to vote them in like any name."""
+    out, seen = [], set()
+    for scr in ("small_cap_gainers", "aggressive_small_caps"):
+        try:
+            url = ("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved"
+                   f"?formatted=false&scrIds={scr}&count=15")
+            qs = requests.get(url, headers=YF_HEADERS, timeout=10).json()["finance"]["result"][0]["quotes"]
+            for q in qs:
+                px  = q.get("regularMarketPrice", 0) or 0
+                vol = q.get("averageDailyVolume3Month", 0) or 0
+                sym = q.get("symbol", "")
+                if (px >= 1.00 and vol >= 500_000 and px*vol >= 5_000_000
+                        and sym and "." not in sym and "-" not in sym and sym not in seen):
+                    seen.add(sym); out.append(sym)
+        except Exception:
+            continue
+    return out[:8]
 
 # ── Alpaca broker layer (official REST API) ───────────────────────────────────
 def alpaca_get(path):
@@ -207,7 +230,8 @@ def alpaca_positions():
     for p in alpaca_get("/v2/positions"):
         q = float(p.get("qty_available") or p.get("qty") or 0)
         if q > 0:
-            pos[p["symbol"]] = {"qty": q, "avg_cost": float(p.get("avg_entry_price") or 0)}
+            pos[p["symbol"]] = {"qty": q, "avg_cost": float(p.get("avg_entry_price") or 0),
+                                "mkt_val": float(p.get("market_value") or 0)}
     return pos
 
 
@@ -300,16 +324,21 @@ def run_bot():
     # Universe
     universe     = set(positions.keys()) | {"SPY"}
     meme_tickers = []
+    small_caps   = set()
     if low_cash:
         print("LOW_CASH — positions only.")
     else:
         wsb    = fetch_wsb()
         screen = fetch_screener()
+        smalls = fetch_smallcaps()
         meme_tickers = wsb
-        for s in wsb + screen + plan["favor"]:   # plan's favored names get considered too
-            if len(universe) < 20: universe.add(s)
+        small_caps   = set(smalls)
+        for s in wsb + screen + smalls + plan["favor"]:   # plan's favored names get considered too
+            if len(universe) < 28: universe.add(s)
     universe = list(universe)
     print(f"UNIVERSE ({len(universe)}): {universe}")
+    if small_caps & set(universe):
+        print(f"  smallcap candidates (half-size): {sorted(small_caps & set(universe))}")
 
     # Market data
     vix = yf_vix()
@@ -359,35 +388,49 @@ def run_bot():
         except Exception as e:
             events.append(f"SELL {sym} → ERROR: {e}")
 
-    # BUY
+    # BUY — new entries AND adds to held winners, up to the per-name cap.
+    # Small-caps size at SMALLCAP_POS_PCT (half) — growthier but blowup-prone.
     if not low_cash and not pdt_exhausted:
         for sym, sig in sigs.items():
-            if sig["consensus"] != 1 or sym in positions: continue
+            if sig["consensus"] != 1: continue
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
             if spent >= min(spend_cap, invest_room): break   # per-run or exposure cap reached
-            amount = min(max_pos * vix_scale * plan["risk"], cash * 0.95,
+            # A strong signal can top up a held name, but never past its per-name cap.
+            held_value = 0.0
+            if sym in positions and positions[sym]["qty"] > 0 and sym in market:
+                held_value = positions[sym]["qty"] * market[sym]["live"]
+            name_cap     = equity * (SMALLCAP_POS_PCT if sym in small_caps else MAX_POS_PCT)
+            room_in_name = name_cap - held_value
+            if room_in_name < 1.00: continue
+            amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
                          spend_cap - spent, invest_room - spent)
             if amount < 1.00: continue
-            print(f"BUY {sym} ${amount:.2f} RSI={sig['rsi']:.1f}")
+            if held_value > 0 and amount < name_cap * 0.20:
+                continue   # near its cap — skip dribble top-ups every run
+            verb = "ADD" if held_value > 0 else "BUY"
+            print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
+                  + (" [smallcap]" if sym in small_caps else ""))
             try:
                 r = place_buy(sym, amount)
                 if _ok(r):
                     print(f"  → placed {r['id']}")
                     cash -= amount; spent += amount
-                    positions[sym] = {"qty": 0, "avg_cost": 0}
-                    events.append(f"BUY {sym} ${amount:.2f} → PLACED ({r['id']})")
+                    if sym not in positions:
+                        positions[sym] = {"qty": 0, "avg_cost": 0, "mkt_val": 0.0}
+                    events.append(f"{verb} {sym} ${amount:.2f} → PLACED ({r['id']})")
                     trades_log.append({
                         "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
-                        "side": "buy", "notional": round(amount, 2), "order_id": r["id"],
+                        "side": "buy", "add": held_value > 0, "smallcap": sym in small_caps,
+                        "notional": round(amount, 2), "order_id": r["id"],
                         "live": round(market[sym]["live"], 2), "rsi": round(sig["rsi"], 1),
                         "trend": sig["trend"], "consensus": sig["consensus"],
                         "delta": round(sig["delta"], 4), "buys": sig["buys"],
                         "macd_up": sig["macd_up"], "meme": sig["meme"], "vix": round(vix, 1)})
                 else:
-                    events.append(f"BUY {sym} ${amount:.2f} → REJECTED: {(r or {}).get('message', r)}")
+                    events.append(f"{verb} {sym} ${amount:.2f} → REJECTED: {(r or {}).get('message', r)}")
             except Exception as e:
-                events.append(f"BUY {sym} ${amount:.2f} → ERROR: {e}")
+                events.append(f"{verb} {sym} ${amount:.2f} → ERROR: {e}")
 
     # Summary
     print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | PDT={pdt} | "
