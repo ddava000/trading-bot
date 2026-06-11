@@ -58,3 +58,9 @@
 - avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
 - notes: Relief rally holding into the close — Dow up ~930, tech rebounding, VIX steady at 19.4 and chips firm (MU +4.1%, MRVL +3.2%). Staying neutral at 0.65 rather than going risk-on given hot CPI and a Fed that may be forced to hike; deep losers GLE/HXHX, oil-pressured refiner PBF, dilutive AMC offering, and post-WWDC AAPL stay avoids.
 - journal: Conditions stable vs the 17:10 check — bounce held, VIX flat at 19.4, chips still green. Keeping risk 0.65 and same tilt; added AMC to avoids after its $150M ATM dilution. Watching CPI/Fed rate-hike overhang and whether VIX stays sub-20 before adding risk back.
+
+### 2026-06-11T19:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX back up to 22.2 from 19.4 even as the Dow surged 900pts on Iran de-escalation/falling oil — the rebound is real but volatility is re-elevating and a hot CPI plus a Fed possibly forced to hike are live overhangs. Trimming risk to 0.55; deep losers GLE/HXHX, dilutive AMC, refiner PBF, post-WWDC AAPL, and now CLOV (insider selling) stay avoids.
+- journal: VIX jumped 19.4->22.2 despite the index rally, so I'm pulling risk 0.65->0.55 — the surface looks calm but the vol bid says otherwise. Added CLOV to avoids on insider 10b5-1 sales. Watching whether VIX retreats under 20 and how the market digests the hot inflation/Fed-hike narrative before adding back.
