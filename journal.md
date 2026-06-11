@@ -40,3 +40,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'CHOW']
 - notes: Dangerous tape persists: Dow -950 below 50K, Nasdaq -2% on a deepening chip rout, VIX 22.2, hot May CPI (3-yr high) and renewed US-Iran strikes lifting oil. Day P&L -$13k with semis (MU -9%, MRVL -10.7%) and MTEN -13.5% bleeding; keeping risk at 0.4, avoiding semis, beta ETFs, AAPL and AAL (fuel shock).
 - journal: Still risk-off near the close — conditions essentially unchanged from prior check (VIX 22.2, chips weak, Iran/CPI overhang). CLOV strength holding on Medicare upgrade, CHOW +36%. Maintaining 0.4 and defensive tilt; watching for VIX under 20 and chip stabilization before adding risk back.
+
+### 2026-06-11T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'AAL']
+- notes: Tape attempting a bounce — futures higher as US says Iran strikes are 'completed' and oil slips, with VIX easing to 21.5 from 22.2. Still elevated risk with a hot 3-yr-high May CPI and a deep -$34.9k overnight drawdown, so staying defensive at 0.45; chips (MU/MRVL) still soft and AAPL post-WWDC disappointment remain avoids.
+- journal: Slight thaw vs yesterday's rout: Iran strikes done, oil falling, VIX 22.2->21.5, futures green. AAL flipped to a positive catalyst (Google deal + lower fuel) so moved from avoid to favor. Nudged risk 0.4->0.45 but staying risk-off given hot CPI and big P&L hole. Watching VIX under 20 and chip stabilization to add back.
