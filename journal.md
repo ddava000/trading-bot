@@ -46,3 +46,9 @@
 - avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'AAL']
 - notes: Tape attempting a bounce — futures higher as US says Iran strikes are 'completed' and oil slips, with VIX easing to 21.5 from 22.2. Still elevated risk with a hot 3-yr-high May CPI and a deep -$34.9k overnight drawdown, so staying defensive at 0.45; chips (MU/MRVL) still soft and AAPL post-WWDC disappointment remain avoids.
 - journal: Slight thaw vs yesterday's rout: Iran strikes done, oil falling, VIX 22.2->21.5, futures green. AAL flipped to a positive catalyst (Google deal + lower fuel) so moved from avoid to favor. Nudged risk 0.4->0.45 but staying risk-off given hot CPI and big P&L hole. Watching VIX under 20 and chip stabilization to add back.
+
+### 2026-06-11T17:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.65
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
+- notes: Sharp relief rally — Dow +900, tech rebounding and oil falling on news US is calling off Iran strikes, VIX cooled to 19.4 from 21.5. Chips stabilizing (MU +3.2%, MRVL +1.9%) so easing off risk-off to neutral at 0.65, but a hot CPI and Fed rate-hike risk keep me from going full risk-on; deep losers GLE/HXHX and refiner PBF (oil down) stay avoids.
+- journal: Big regime shift vs morning: Iran de-escalation sparked a 900pt Dow surge, VIX fell under 20, chips bounced — flipping from risk-off 0.45 to neutral 0.65 and moving MU/MRVL/AAL back to favor. Still cautious on hot CPI and a Fed that may be forced to hike; PBF added to avoids as falling oil pressures refiners. Watching whether the bounce holds and VIX stays sub-20.
