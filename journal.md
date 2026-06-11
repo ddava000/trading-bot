@@ -52,3 +52,9 @@
 - avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
 - notes: Sharp relief rally — Dow +900, tech rebounding and oil falling on news US is calling off Iran strikes, VIX cooled to 19.4 from 21.5. Chips stabilizing (MU +3.2%, MRVL +1.9%) so easing off risk-off to neutral at 0.65, but a hot CPI and Fed rate-hike risk keep me from going full risk-on; deep losers GLE/HXHX and refiner PBF (oil down) stay avoids.
 - journal: Big regime shift vs morning: Iran de-escalation sparked a 900pt Dow surge, VIX fell under 20, chips bounced — flipping from risk-off 0.45 to neutral 0.65 and moving MU/MRVL/AAL back to favor. Still cautious on hot CPI and a Fed that may be forced to hike; PBF added to avoids as falling oil pressures refiners. Watching whether the bounce holds and VIX stays sub-20.
+
+### 2026-06-11T18:24 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.65
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
+- notes: Relief rally holding into the close — Dow up ~930, tech rebounding, VIX steady at 19.4 and chips firm (MU +4.1%, MRVL +3.2%). Staying neutral at 0.65 rather than going risk-on given hot CPI and a Fed that may be forced to hike; deep losers GLE/HXHX, oil-pressured refiner PBF, dilutive AMC offering, and post-WWDC AAPL stay avoids.
+- journal: Conditions stable vs the 17:10 check — bounce held, VIX flat at 19.4, chips still green. Keeping risk 0.65 and same tilt; added AMC to avoids after its $150M ATM dilution. Watching CPI/Fed rate-hike overhang and whether VIX stays sub-20 before adding risk back.
