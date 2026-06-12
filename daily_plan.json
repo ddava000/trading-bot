@@ -1,6 +1,6 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.55,
+  "risk_scale": 0.5,
   "avoid_symbols": [
     "GLE",
     "HXHX",
@@ -16,9 +16,9 @@
     "AAL",
     "DTE"
   ],
-  "notes": "VIX is calm at 17.7 and the Iran de-escalation/oil-down relief rally held into the close (chips firm, AAL +5.1%), but this is the post-close Friday read with hot-inflation/Fed-hike overhang and live Iran headline risk over the weekend, so I'm easing to 0.55 rather than reaching. Refiner PBF (-3.9%), dilutive AMC (just printed a $150M ATM), extended MTEN (+12.2%), post-WWDC AAPL, and whipsawing CLOV stay avoids.",
-  "journal_entry": "VIX slipped further to 17.7 and the bounce closed intact, but I'm trimming 0.6->0.55 into the weekend given unresolved Iran and a Fed-possibly-forced-to-hike narrative \u2014 surface calm but event-heavy. MTEN now +12.2% and overextended, AMC confirmed dilution. Watching Monday's gap and whether the Fed-hike story hardens before adding back.",
+  "notes": "VIX still calm at 17.7 and the relief rally held into the Friday close (AAL +5.1%, chips firm), but headlines now show a fresh round of US strikes on Iran, reviving weekend geopolitical/oil risk on top of the hot-inflation/Fed-hike overhang \u2014 so I'm trimming to 0.5 into the long weekend. Dilutive AMC ($150M ATM), oil-pressured refiner PBF (-3.9%), extended MTEN (+14.5%), post-WWDC AAPL, and whipsaw CLOV stay avoids.",
+  "journal_entry": "Post-close Friday: surface tape calm (VIX 17.7) but a fresh US-Iran strike headline reintroduces escalation risk that conflicts with the prior de-escalation narrative, so easing 0.55->0.5 ahead of the weekend gap. MTEN now overextended at +14.5%. Watching Monday's open for an Iran/oil gap and whether the Fed-hike story hardens before adding risk back.",
   "date": "2026-06-12",
   "mode": "INTRADAY",
-  "updated_at": "2026-06-12T17:20 ET"
+  "updated_at": "2026-06-12T19:02 ET"
 }
