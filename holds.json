@@ -8,7 +8,7 @@
  "AMC": {
   "basis": 2.235,
   "notional": 22130.97,
-  "peak": 2.38,
+  "peak": 2.385,
   "peak_saved": 2.38,
   "ts": "2026-06-11T14:45"
  },
@@ -29,8 +29,8 @@
  "MTEN": {
   "basis": 2.1236,
   "notional": 50153.24,
-  "peak": 2.33,
-  "peak_saved": 2.33,
+  "peak": 2.545,
+  "peak_saved": 2.545,
   "ts": "2026-06-10T11:00"
  }
 }
