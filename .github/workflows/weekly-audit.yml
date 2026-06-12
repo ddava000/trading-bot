@@ -1,0 +1,56 @@
+name: Weekly Best-Practices Audit
+
+on:
+  schedule:
+    # Sundays 15:00 UTC = 10:00 AM CT. Weekly cadence, so GitHub cron drift
+    # doesn't matter. Market closed — code changes only.
+    - cron: "0 15 * * 0"
+  workflow_dispatch:
+    inputs:
+      smoke_test:
+        description: "Just verify the headless Claude CLI works, then exit"
+        type: boolean
+        default: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write   # the audit commits + pushes its upgrades
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so the audit can read the week's commits
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "weekly-audit-bot"
+          git config user.email "weekly-audit-bot@users.noreply.github.com"
+
+      - name: Smoke test
+        if: ${{ inputs.smoke_test }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: claude -p "Reply with exactly: CLOUD AUDIT OK" --model claude-opus-4-8
+
+      - name: Run weekly audit
+        if: ${{ !inputs.smoke_test }}
+        env:
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GH_TOKEN:           ${{ github.token }}   # lets the audit read run history via gh
+          # The audit only reads market data and edits code — it gets NO Alpaca
+          # keys, so it cannot place trades even by accident.
+        run: |
+          claude -p "$(cat .github/audit-prompt.md)" \
+            --model claude-opus-4-8 \
+            --dangerously-skip-permissions \
+            --max-turns 80
