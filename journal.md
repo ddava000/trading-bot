@@ -70,3 +70,9 @@
 - avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC'] | favor: ['MU', 'MRVL', 'AAL', 'DTE', 'CLOV']
 - notes: VIX back down to 19.4 and the Iran de-escalation/oil-down relief rally is holding with tech rebounding, so nudging risk 0.55->0.60. Hot CPI and a Fed possibly forced to hike keep me from going full risk-on; deep losers GLE/HXHX, oil-pressured PBF, dilutive AMC, and extended MTEN/post-WWDC AAPL stay avoids.
 - journal: VIX retreated from 22.2 back to 19.4 overnight and futures are up on a potential Iran peace deal, so I'm easing risk 0.55->0.60. Moved CLOV off avoids to favor after its Medicare rating upgrade. Watching the hot inflation/Fed-hike overhang and whether VIX stays sub-20 before adding more.
+
+### 2026-06-12T15:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX eased to 18.2 and the Iran de-escalation/oil-down relief rally is holding with chips firm (MU +3.4%, MRVL +4.8%), but it's late Friday with a hot-inflation/Fed-hike-overhang and Iran headline risk over the weekend, so I'm holding at 0.6 rather than reaching. Refiner PBF (-4% on falling oil), dilutive AMC, extended MTEN (+10.8%), post-WWDC AAPL, and now whipsawing CLOV (-5.9%) stay avoids.
+- journal: VIX slipped further 19.4->18.2 and the bounce is intact, but with it being 15:33 Friday I won't add risk into the weekend given lingering Iran/Fed-hike headlines — holding 0.6. Moved CLOV back to avoid after a -5.9% reversal off its court-order spike. Watching whether VIX holds sub-19 and how the Fed-hike narrative develops Monday.
