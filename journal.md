@@ -100,3 +100,9 @@
 - avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'AAL', 'QQQ']
 - notes: Constructive tape: Dow record close, oil tumbling on the US-Iran Hormuz pact, VIX easing to 16.2, and broad tech/chip strength (MRVL +13%, MU +13.9%). I'm leaning risk-on but capping at 0.65 because a hot jobs/inflation print keeps a Fed-hike narrative alive into a data-heavy week (Jun 15-19). MTEN is parabolic (+62.7%) and must not be added; AMC just printed a $150M ATM, CLOV has RSU-vesting share sales, AAPL stays post-WWDC, BFLY has a Jun 18 conference event.
 - journal: Rally held and extended into a record close with VIX 16.2 and oil down on the Iran deal, so nudging 0.6->0.65 risk-on. MTEN now blown out to +62.7% (no chase), AMC dilution and CLOV insider sales confirmed. Watching this week's inflation/rate data for whether the Fed-hike story hardens enough to flip posture defensive again.
+
+### 2026-06-15T19:07 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
+- notes: Tape stays constructive into the close: Dow record, oil lower on the US-Iran Hormuz pact, VIX calm at 16.2, and chips/memory leading (MRVL +12%, MU +13.3%, AMD buying MEXT for memory). Holding 0.65 risk-on but not higher because a hot jobs/inflation print keeps the Fed-hike narrative alive in a data-heavy week (Jun 15-19).
+- journal: Steady from last check at 0.65 — rally intact, VIX 16.2, oil soft. MTEN parabolic at +63.1% (no chase), AMC ATM dilution and CLOV RSU sales confirmed, AAPL post-WWDC, BFLY has a Jun 18 conference event. Watching this week's inflation/rate data for any hardening of the hike story that would force a defensive flip.
