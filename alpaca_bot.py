@@ -124,7 +124,7 @@ def calc_ema_series(prices, n):
     return out
 
 def compute_signals(sym, closes, vols, live, meme_tickers):
-    if len(closes) < 20: return None
+    if len(closes) < 35: return None  # MACD slow EMA needs ≥26 bars + 9 for signal line
     closes, vols = list(closes), list(vols)
     closes[-1] = live
 
