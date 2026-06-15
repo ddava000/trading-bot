@@ -15,13 +15,14 @@
  "MTEN": {
   "basis": 2.1236,
   "notional": 50153.24,
-  "peak": 2.57,
-  "peak_saved": 2.545,
+  "peak": 2.99,
+  "peak_saved": 2.99,
   "ts": "2026-06-10T11:00"
  },
  "ROKU": {
   "basis": 145.4,
   "notional": 59304.8,
+  "peak": 140.86,
   "ts": "2026-06-12T15:45"
  }
 }
