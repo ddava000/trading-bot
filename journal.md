@@ -88,3 +88,9 @@
 - avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
 - notes: VIX still calm at 17.7 and the relief rally held into the Friday close (AAL +5.1%, chips firm), but headlines now show a fresh round of US strikes on Iran, reviving weekend geopolitical/oil risk on top of the hot-inflation/Fed-hike overhang — so I'm trimming to 0.5 into the long weekend. Dilutive AMC ($150M ATM), oil-pressured refiner PBF (-3.9%), extended MTEN (+14.5%), post-WWDC AAPL, and whipsaw CLOV stay avoids.
 - journal: Post-close Friday: surface tape calm (VIX 17.7) but a fresh US-Iran strike headline reintroduces escalation risk that conflicts with the prior de-escalation narrative, so easing 0.55->0.5 ahead of the weekend gap. MTEN now overextended at +14.5%. Watching Monday's open for an Iran/oil gap and whether the Fed-hike story hardens before adding risk back.
+
+### 2026-06-15T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['PBF', 'AMC', 'MTEN', 'AAPL', 'CLOV', 'BFLY'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: Weekend Iran headline risk resolved constructively — a US-Iran pact reopening Hormuz sent futures soaring and oil diving, with VIX easing to 16.6, so the tape is genuinely improved. But a hot jobs/inflation print has markets pricing higher rates and a busy data week (Jun 15-19), so I'm nudging up to 0.6 rather than chasing the gap. Oil-pressured refiner PBF (-7.9%), dilutive AMC, extended MTEN (+24.8%) and pre-market-spiking BFLY (+23%), post-WWDC AAPL, and whipsaw CLOV stay avoids.
+- journal: Big shift since Friday: the Iran escalation fear flipped to a peace-deal relief gap, oil down, VIX 16.6 — so I'm adding risk back 0.5->0.6. Fed-hike/inflation narrative is now the main overhang into a data-heavy week. MTEN ballooned to +24.8% (very extended) and BFLY popped 23% pre-market — both too hot to buy. Watching whether the rally holds past the open and how the rate-hike story develops.
