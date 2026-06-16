@@ -8,8 +8,8 @@
  "AMC": {
   "basis": 2.235,
   "notional": 22130.97,
-  "peak": 2.45,
-  "peak_saved": 2.38,
+  "peak": 2.525,
+  "peak_saved": 2.525,
   "ts": "2026-06-11T14:45"
  },
  "AMD": {
@@ -34,6 +34,7 @@
  "SABR": {
   "basis": 1.945,
   "notional": 3967.8,
+  "peak": 2.015,
   "ts": "2026-06-16T14:30"
  },
  "SNDK": {
