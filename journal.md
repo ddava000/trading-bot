@@ -130,3 +130,9 @@
 - avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
 - notes: Holding defensive into the Fed rate decision with inflation at a 3-year high and Warsh's debut as the dominant event risk; VIX calm at 16.4 but day P&L -$29k and a split tape (chip rollover) confirm fading breadth. No reason to re-risk before the decision prints.
 - journal: Nudged 0.45 to 0.40 — still neutral and defensive ahead of the Fed. Tape stayed soft (AMD -7.1%, ROKU -5.0%, CRVO -13.7%), oil down on US-Iran framework helps AAL/airlines but I'm not chasing. Same avoids: parabolic MTEN, AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event. Waiting on the rate outcome before re-risking.
+
+### 2026-06-16T19:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Staying defensive into the Fed decision with inflation at a 3-year high and Warsh's debut as the dominant event risk; VIX calm at 16.4 but day P&L -$29k and a split tape (Dow record vs. S&P tech sell-off) confirm fading breadth. No reason to re-risk before the decision prints.
+- journal: Holding 0.40 neutral into the Fed — tape unchanged (tech soft, chips rolling), oil sub-$80 on US-Iran framework lifts AAL but I'm not chasing extended winners. Same avoids: parabolic MTEN, AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event, AMD/ROKU/CRVO adverse momentum. Waiting on the rate outcome before re-risking.
