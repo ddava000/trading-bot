@@ -112,3 +112,9 @@
 - avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
 - notes: End-of-day posture unchanged: Dow record close, VIX calm at 16.2, oil soft on the US-Iran framework, and chips/memory still leading (MU +13.2%, MRVL +12.2%, AMD buying MEXT). Capping at 0.65 because a hot jobs/inflation print keeps the Fed-hike narrative alive into a data-heavy week (Jun 15-19).
 - journal: Steady at 0.65 into the close — rally intact, big day P&L (+$41.7k), VIX 16.2. MTEN now blown out to +61.2% (no chase), AMC ATM dilution and CLOV RSU sales confirmed, AAPL post-WWDC, BFLY Jun 18 event. Watching this week's inflation/rate data for any hardening of the hike story that would flip me defensive.
+
+### 2026-06-16T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
+- notes: Constructive but flat open: S&P futures slightly lower while Dow holds near record, VIX calm at 16.1, oil soft on the US-Iran Hormuz framework, and chips/memory still leading (MU +15.4%, MRVL +10.4%, AMD buying MEXT). Holding 0.65 — not higher — because a data-heavy week (Jun 15-19) and Warsh/inflation chatter keep a Fed-hike risk alive.
+- journal: Overnight rally held into Tuesday with VIX easing to 16.1; posture unchanged at 0.65 risk-on. New wrinkle: Fox buying ROKU (we hold ROKU -3.0%) — deal news already priced, no chase. MTEN still parabolic (+59.4%, no add), AMC ATM dilution and CLOV insider sales confirmed, AAPL extended post-50% run, BFLY has a Jun 18 conference. Watching this week's inflation data for any hike-story hardening that flips me defensive.
