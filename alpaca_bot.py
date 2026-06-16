@@ -39,6 +39,8 @@ HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
 SMALLCAP_POS_PCT = 0.05   # small/cheap names get HALF size (5%) — higher growth, higher blowup risk
+MICRO_PX         = 2.00   # under this, gaps routinely blow past the -7% stop (audit wk1: realized
+MICRO_POS_PCT    = 0.025  # stop-outs ran -14% to -25%), so QUARTER size — keeps access, caps the bleed
 SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
 STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (overrides signals)
 TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (≈2:1 R:R)
@@ -776,7 +778,8 @@ def run_bot():
             if held_value == 0 and sig["rsi"] > RSI_ENTRY_MAX:
                 print(f"  SKIP {sym} (RSI {sig['rsi']:.0f} > {RSI_ENTRY_MAX:.0f} — blow-off chase guard)"); continue
             live     = market[sym]["live"]
-            is_small = sym in small_caps or live < SMALL_PX   # cheap names = half size
+            is_micro = live < MICRO_PX                          # sub-$2: gappy, stops unreliable → quarter size
+            is_small = sym in small_caps or live < SMALL_PX     # cheap names = half size
             # NEVER average down: adds only pyramid into strength (live above the
             # position's own basis). Adding to a faller turns one bad entry into a
             # max-size bad position — the classic microcap-pump account killer.
@@ -804,7 +807,8 @@ def run_bot():
                     print(f"  SKIP {sym} hold (sub-$5 holds at their {CHEAP_HOLD_MAX:.0%} sleeve cap)")
                     continue
             sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
-            name_cap     = equity * (SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
+            name_cap     = equity * (MICRO_POS_PCT if is_micro else
+                                     SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
             room_in_name = name_cap - held_value
             if room_in_name < 1.00: continue
             amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
@@ -815,7 +819,7 @@ def run_bot():
             verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
                     else ("ADD" if held_value > 0 else "BUY"))
             print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
-                  + (" [smallcap]" if is_small else ""))
+                  + (" [micro]" if is_micro else " [smallcap]" if is_small else ""))
             try:
                 r = place_buy(sym, amount, live)
                 if _ok(r):
