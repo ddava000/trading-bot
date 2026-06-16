@@ -118,3 +118,9 @@
 - avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
 - notes: Constructive but flat open: S&P futures slightly lower while Dow holds near record, VIX calm at 16.1, oil soft on the US-Iran Hormuz framework, and chips/memory still leading (MU +15.4%, MRVL +10.4%, AMD buying MEXT). Holding 0.65 — not higher — because a data-heavy week (Jun 15-19) and Warsh/inflation chatter keep a Fed-hike risk alive.
 - journal: Overnight rally held into Tuesday with VIX easing to 16.1; posture unchanged at 0.65 risk-on. New wrinkle: Fox buying ROKU (we hold ROKU -3.0%) — deal news already priced, no chase. MTEN still parabolic (+59.4%, no add), AMC ATM dilution and CLOV insider sales confirmed, AAPL extended post-50% run, BFLY has a Jun 18 conference. Watching this week's inflation data for any hike-story hardening that flips me defensive.
+
+### 2026-06-16T18:01 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Dialing down: a Fed rate decision is looming with inflation at a 3-year high and Warsh's debut, while the tape split (Dow record but S&P tech sell-off) and a -$27k day signal fading breadth. VIX still calm at 16.4 but event risk plus the rollover in chips (AMD -7.6%, ROKU -5.0%) warrant a defensive posture into the decision.
+- journal: Cut from 0.65 to 0.45 and flipped to neutral — Fed decision with hot inflation is the dominant risk this week, and today's tape soured (tech sell-off, day P&L -$27k). Avoiding AMD/ROKU on adverse momentum; still no chase on parabolic MTEN (+37.9%), AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event. Watching the rate decision outcome before re-risking.
