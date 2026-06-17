@@ -18,9 +18,9 @@ from zoneinfo import ZoneInfo
 # so the bot can always de-risk. The real risk controls are the sleeve caps,
 # per-name caps, and per-position brackets below.
 #
-# Capital is split into three sleeves (max 80% deployed, 20% cash floor):
-#   TRADING sleeve (40%): signal-driven buys managed by brackets + sell signals.
-#   HOLD sleeve (30%):    strong-signal names (4+ buy votes AND uptrend) bought to
+# Capital is split into three sleeves (max 90% deployed, 10% cash floor):
+#   TRADING sleeve (30%): signal-driven buys managed by brackets + sell signals.
+#   HOLD sleeve (50%):    strong-signal names (4+ buy votes AND uptrend) bought to
 #                         KEEP — exempt from sell signals; exit only on the basis
 #                         stop (-25%) or the peak ratchet (gives back 40% from high).
 #   CRYPTO sleeve (10%):  DOGE-style moonshot exposure via Alpaca crypto (spot,
@@ -33,8 +33,8 @@ from zoneinfo import ZoneInfo
 # doesn't bind either.
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-MAX_INVESTED_PCT = 0.40   # TRADING sleeve: cap on signal-traded capital
-HOLD_PCT         = 0.30   # HOLD sleeve: buy-and-hold allocation on strong signals
+MAX_INVESTED_PCT = 0.30   # TRADING sleeve: cap on signal-traded capital (trimmed 40->30: backtest showed the churn trails SPY)
+HOLD_PCT         = 0.50   # HOLD sleeve: buy-and-keep core (raised 30->50: most index-like, lowest bleed)
 HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
