@@ -154,3 +154,9 @@
 - avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'GPUS', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
 - notes: Post-Fed digestion continues: Warsh's hawkish debut spiked yields and pressured tech, VIX at 18.4 and day P&L -$8.8k. With a 2026 rate-hike risk now live and inflation at a 3-year high, I'm holding defensive until the yield/tech selloff stabilizes.
 - journal: Holding 0.35 risk-off after end-of-day reassessment — tape still soft (day P&L -$8.8k, improved from -$15k but red), VIX 18.4. Avoids unchanged: parabolic MTEN/GPUS, AMC dilution, CLOV insider sales, AAPL extended, BFLY TD Cowen event tomorrow (Jun 18), AMD/ROKU/CRVO weak momentum. Watching whether yields ease and tech finds a floor before re-risking.
+
+### 2026-06-17T19:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'GPUS', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Post-Fed digestion ongoing after Warsh's hawkish debut spiked yields and pressured tech; VIX 18.4, day P&L -$8.6k. With a 2026 rate-hike risk live and inflation at a 3-year high, I'm holding defensive until the yield/tech selloff stabilizes.
+- journal: Holding 0.35 risk-off into the close — tape still soft (day P&L -$8.6k, VIX 18.4) but slowly improving from -$15k earlier. Avoids unchanged: parabolic MTEN/GPUS (+40.9%), AMC dilution, CLOV insider sales, AAPL extended, BFLY TD Cowen event tomorrow (Jun 18), AMD/ROKU/CRVO weak momentum. Watching whether yields ease and tech finds a floor before re-risking; MU/MRVL holding green on the AMD-MEXT memory-shortage theme.
