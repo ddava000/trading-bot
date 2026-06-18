@@ -166,3 +166,9 @@
 - avoid: ['AMC', 'GPUS', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'NBIS']
 - notes: VIX eased to 17.1 from 18.4 and futures are rebounding from the Fed-led selloff, with chips (Intel/AI names) leading; day P&L is +$24.7k. Stepping up from 0.35 to 0.5 but staying cautious given Warsh's live 2026 rate-hike risk and 3-year-high inflation.
 - journal: Bumped to 0.5 neutral as tape stabilizes — VIX 17.1, futures green, big P&L recovery (+$24.7k) versus yesterday's red. Avoids: parabolic AMC/GPUS (+56%), CLOV insider sales, AAPL extended, AMD/ROKU/SABR weak momentum, BFLY event window. Memory theme MU/MRVL still favored; watching whether yields ease further before re-risking past 0.5.
+
+### 2026-06-18T17:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Tape healed nicely — VIX down to 16.4, Nasdaq +~2% led by chips, oil retreating on Iran peace deal, day P&L +$30.9k. Nudging up to 0.55 but capping risk into the Juneteenth holiday (market closed Friday) since long-weekend gap risk argues against fully re-risking.
+- journal: Stepped 0.5→0.55 as conditions improved: VIX 16.4, broad chip-led rally, big P&L (+$30.9k). Staying measured because tomorrow is Juneteenth (closed) — limiting fresh exposure over the long weekend. Avoids: parabolic AMC(+25%)/BFLY(+65%)/GPUS, CLOV insider sales, AAPL extended, AMD/ROKU/SABR weak. Memory theme MU/MRVL/SNDK still leading; watching yields and whether momentum holds Monday.
