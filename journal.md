@@ -172,3 +172,9 @@
 - avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
 - notes: Tape healed nicely — VIX down to 16.4, Nasdaq +~2% led by chips, oil retreating on Iran peace deal, day P&L +$30.9k. Nudging up to 0.55 but capping risk into the Juneteenth holiday (market closed Friday) since long-weekend gap risk argues against fully re-risking.
 - journal: Stepped 0.5→0.55 as conditions improved: VIX 16.4, broad chip-led rally, big P&L (+$30.9k). Staying measured because tomorrow is Juneteenth (closed) — limiting fresh exposure over the long weekend. Avoids: parabolic AMC(+25%)/BFLY(+65%)/GPUS, CLOV insider sales, AAPL extended, AMD/ROKU/SABR weak. Memory theme MU/MRVL/SNDK still leading; watching yields and whether momentum holds Monday.
+
+### 2026-06-18T18:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Strong constructive close — VIX 16.4, Nasdaq +~2% led by chips, oil back to pre-war levels, day P&L +$30.5k. Trimming slightly to 0.5 into the Juneteenth holiday (market closed Friday) since fresh exposure over a 3-day weekend carries gap risk despite the healed tape.
+- journal: Held neutral and nudged 0.55→0.5 ahead of Juneteenth long weekend — tape is good (VIX 16.4, chip-led rally, +$30.5k) but I don't want big fresh positions sitting over the closure. Avoids unchanged: parabolic AMC(+24.5%)/BFLY(+63.8%)/GPUS(-22%), CLOV insider/Star-rating pop, AAPL extended, AMD/ROKU/SABR soft. Memory theme MU/MRVL/SNDK/NBIS still leading; watching whether momentum and yields hold into Monday.
