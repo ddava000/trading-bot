@@ -202,3 +202,9 @@
 - avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
 - notes: Market closed today for Juneteenth — no live trading. VIX 16.8 with a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after strong jobs); holding 0.45 into the long weekend and a heavy data slate June 22-26.
 - journal: End-of-week check on Juneteenth closure — staying flat at 0.45 neutral. Tape healthy (VIX 16.8, chips leading) but rate expectations rising and busy data week ahead. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip theme MU/MRVL/SNDK/NBIS still leaders; reassess re-risking Monday on yields and rally follow-through.
+
+### 2026-06-19T17:52 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Market closed today for Juneteenth — no live trading. VIX 16.8 with a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after a strong jobs report); holding 0.45 into the long weekend ahead of a heavy data slate June 22-26.
+- journal: Final Juneteenth-closure check — staying flat at 0.45 neutral, no action possible. Tape healthy (VIX 16.8, chips leading) but rate expectations are creeping higher and a busy data week looms. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip names MU/MRVL/SNDK/NBIS still leaders; reassess re-risking Monday on yields and rally follow-through.
