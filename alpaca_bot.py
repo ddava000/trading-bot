@@ -98,9 +98,22 @@ def send_email(subject, body):
 
 
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
+# NYSE/NASDAQ full-closure holidays (observed dates). Hardcoded for verifiable
+# correctness; refresh every couple of years (the weekly audit can top it up).
+# Does NOT yet cover half-days (1pm early closes, e.g. day after Thanksgiving) —
+# low-frequency, minor; a follow-up if it ever bites.
+MARKET_HOLIDAYS = {
+    "2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25",
+    "2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25",
+    "2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31",
+    "2027-06-18","2027-07-05","2027-09-06","2027-11-25","2027-12-24",
+}
+
 def check_market():
     et = datetime.now(ET_TZ)
-    if et.weekday() >= 5:
+    if et.weekday() >= 5:                            # weekend
+        return False, et
+    if et.strftime("%Y-%m-%d") in MARKET_HOLIDAYS:   # market holiday — skip like a weekend
         return False, et
     open_  = et.replace(hour=9,  minute=45, second=0, microsecond=0)
     close_ = et.replace(hour=15, minute=55, second=0, microsecond=0)
