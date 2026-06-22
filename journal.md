@@ -220,3 +220,9 @@
 - avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
 - notes: Closing brief: Nasdaq slid sharply on big-tech weakness while Dow held up; VIX 17.3 with rate expectations climbing after strong jobs data and a heavy data week ongoing. Tech/chip rotation is choppy, so staying defensive at 0.50 neutral.
 - journal: Day finished +$3.3k with AAL (+13%), MU (+29%), AMC (+22%), BFLY (+34%) and SNDK leading. Tape split — Dow up, Nasdaq down hard on tech — so keeping 0.50 rather than re-risking into a softening Nasdaq. Avoids unchanged on parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR; added TTWO and SLDB as laggards. Chip leaders still favored but watching rate fears and the rest of the June 22-26 data slate. Let oversized winners ride, no chasing.
+
+### 2026-06-22T18:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB', 'ASML'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: After-hours brief: S&P/Nasdaq closed lower on big-tech weakness, Dow held with back-to-back gains; VIX 17.3, oil under $74. ASML added to avoids on the China tech-restriction headline. Holding defensive at 0.50 into a heavy June 22-26 data week.
+- journal: End-of-day Monday check, +$2.9k day. Tape stays split — Dow firm, Nasdaq soft on tech rotation. Added ASML to avoids on U.S./China tech-concern report; kept parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR/TTWO/SLDB. Chip leaders MU/MRVL/SNDK/NBIS still favored. Watching rate expectations and the rest of the data slate before re-risking; oversized winners ride, no chasing.
