@@ -208,3 +208,9 @@
 - avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
 - notes: Market closed today for Juneteenth — no live trading. VIX 16.8 with a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after a strong jobs report); holding 0.45 into the long weekend ahead of a heavy data slate June 22-26.
 - journal: Final Juneteenth-closure check — staying flat at 0.45 neutral, no action possible. Tape healthy (VIX 16.8, chips leading) but rate expectations are creeping higher and a busy data week looms. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip names MU/MRVL/SNDK/NBIS still leaders; reassess re-risking Monday on yields and rally follow-through.
+
+### 2026-06-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'GPUS', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: First live session back after Juneteenth; VIX 17.1 with futures muted on U.S.-Iran talks progress and easing oil, but the tape stays rate-sensitive after strong jobs data and a busy data week (June 22-26). Holding modestly defensive at 0.50 neutral, nudged up slightly as conditions remain orderly.
+- journal: Reopened Monday after the holiday — bumped from 0.45 to 0.50 as VIX ticks to 17.1 and the tape is orderly with Iran-deal optimism and easing oil. Watching rising rate expectations and the heavy data slate this week. Chip leaders MU/MRVL/SNDK/NBIS still favored; avoids unchanged on parabolic AMC/BFLY/GPUS, spec CLOV, extended AAPL, and soft AMD/ROKU/SABR. AAL up big (+12%) on falling oil — let it run but no adds.
