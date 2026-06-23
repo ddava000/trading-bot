@@ -244,3 +244,9 @@
 - avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
 - notes: Tech/chip rout persists into the afternoon, VIX 19.5 and PCE inflation data looming; day P&L -$45.5k off the open lows but tape still ugly with global AI doubts and rate jitters. Holding risk-off at 0.30 — no chasing falling chip names, AMC diluting via $200M offering.
 - journal: Mid-afternoon Tuesday, day -$45.5k (improved from -$55k open). Regime unchanged risk-off/0.30. Chips still the epicenter; added AMC dilution risk and weak SPY/WBI to avoids. Only defensive DTE and resilient AAL (+13%) look constructive. Watching for chip stabilization and PCE print before re-risking — let winners ride, no buying knives.
+
+### 2026-06-23T17:20 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Second straight day of tech/chip rout into the close; Nasdaq and S&P ended sharply lower, Micron results loom after the bell and PCE inflation data is later this week. VIX 19.5, day P&L -$45.5k — staying risk-off at 0.30, no chasing falling chip/AI names.
+- journal: End-of-day Tuesday, day -$45.5k. Regime unchanged risk-off/0.30 into the close. Micron earnings after the bell is the key event risk that could set chip tone tomorrow; semis remain the epicenter. Defensive DTE and resilient AAL (+13%) the only constructive names. Watching Micron reaction and PCE print before any re-risking — let winners ride, no buying knives.
