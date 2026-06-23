@@ -17,15 +17,17 @@
     "AAPL",
     "SABR",
     "TTWO",
-    "SLDB"
+    "SLDB",
+    "WBI",
+    "SPY"
   ],
   "favor_symbols": [
     "DTE",
     "AAL"
   ],
-  "notes": "Global tech rout: Nasdaq futures -3%, chips routed worldwide, Micron -9%; VIX up to 20.1 with PCE inflation data looming. Open day P&L already -$54.9k, so flipping to risk-off at 0.30 and pulling chip names from favor \u2014 the prior leaders (MU/MRVL/SNDK/NBIS) are now the epicenter of the selloff.",
-  "journal_entry": "Big change from yesterday's neutral/0.50: overnight chip selloff routed semis globally (Micron -9%), VIX 17.3->20.1, and account opened down ~$55k. Dropped risk to 0.30 risk-off and moved former chip favorites to avoid; only defensive DTE and resilient AAL look constructive. Watching PCE data and whether chips stabilize before re-risking \u2014 let winners ride, no buying into falling knives.",
+  "notes": "Tech/chip rout persists into the afternoon, VIX 19.5 and PCE inflation data looming; day P&L -$45.5k off the open lows but tape still ugly with global AI doubts and rate jitters. Holding risk-off at 0.30 \u2014 no chasing falling chip names, AMC diluting via $200M offering.",
+  "journal_entry": "Mid-afternoon Tuesday, day -$45.5k (improved from -$55k open). Regime unchanged risk-off/0.30. Chips still the epicenter; added AMC dilution risk and weak SPY/WBI to avoids. Only defensive DTE and resilient AAL (+13%) look constructive. Watching for chip stabilization and PCE print before re-risking \u2014 let winners ride, no buying knives.",
   "date": "2026-06-23",
-  "mode": "MORNING",
-  "updated_at": "2026-06-23T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-06-23T15:30 ET"
 }
