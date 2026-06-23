@@ -232,3 +232,9 @@
 - avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB', 'ASML'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
 - notes: Final after-hours read on Monday: S&P and Nasdaq closed lower on big-tech weakness, Dow held back-to-back gains; VIX 17.3, oil below $74. Rate expectations climbing on strong jobs data; staying defensive at 0.50 into the heavy June 22-26 data slate.
 - journal: Late Monday check, day roughly flat (-$288). No regime change — tape still split with Dow firm and Nasdaq soft on tech rotation. Avoids unchanged: parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR/TTWO/SLDB, ASML on China headline. Chip leaders MU/MRVL/SNDK/NBIS favored; watching rate fears and rest of data week before re-risking. Oversized winners ride, no chasing.
+
+### 2026-06-23T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB'] | favor: ['DTE', 'AAL']
+- notes: Global tech rout: Nasdaq futures -3%, chips routed worldwide, Micron -9%; VIX up to 20.1 with PCE inflation data looming. Open day P&L already -$54.9k, so flipping to risk-off at 0.30 and pulling chip names from favor — the prior leaders (MU/MRVL/SNDK/NBIS) are now the epicenter of the selloff.
+- journal: Big change from yesterday's neutral/0.50: overnight chip selloff routed semis globally (Micron -9%), VIX 17.3->20.1, and account opened down ~$55k. Dropped risk to 0.30 risk-off and moved former chip favorites to avoid; only defensive DTE and resilient AAL look constructive. Watching PCE data and whether chips stabilize before re-risking — let winners ride, no buying into falling knives.
