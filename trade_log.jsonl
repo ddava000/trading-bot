@@ -84,3 +84,5 @@
 {"symbol": "SPY", "side": "buy", "index": true, "notional": 70.32, "live": 732.32, "order_id": "954815c3-6689-45b5-a77a-6413f9b96c1f", "ts": "2026-06-24T13:30", "mode": "PAPER", "acct": "RRQ1", "vix": 19.1}
 {"symbol": "SPY", "side": "buy", "index": true, "notional": 52.74, "live": 732.16, "order_id": "db399998-fb69-4a44-a9e5-1e81ee7c7a5c", "ts": "2026-06-24T13:45", "mode": "PAPER", "acct": "RRQ1", "vix": 20.0}
 {"symbol": "SPY", "side": "buy", "index": true, "notional": 39.56, "live": 731.82, "order_id": "43f7acf0-4a07-499f-acdc-cd712a427247", "ts": "2026-06-24T14:00", "mode": "PAPER", "acct": "RRQ1", "vix": 20.0}
+{"symbol": "SPY", "side": "buy", "index": true, "notional": 18.76, "live": 733.02, "order_id": "596e92cc-8d09-47a5-b144-60828b4ee25c", "ts": "2026-06-24T14:15", "mode": "PAPER", "acct": "RRQ1", "vix": 20.0}
+{"symbol": "BRBR", "side": "buy", "slot": true, "notional": 10.91, "live": 11.925, "rsi": 77.9, "trend": "up", "order_id": "4789d25c-586d-43c8-ad87-992a9795ce53", "ts": "2026-06-24T14:15", "mode": "PAPER", "acct": "RRQ1", "vix": 20.0}
