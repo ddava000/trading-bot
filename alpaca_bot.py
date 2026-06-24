@@ -33,8 +33,8 @@ from zoneinfo import ZoneInfo
 # doesn't bind either.
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-MAX_INVESTED_PCT = 0.30   # TRADING sleeve: cap on signal-traded capital (trimmed 40->30: backtest showed the churn trails SPY)
-HOLD_PCT         = 0.50   # HOLD sleeve: buy-and-keep core (raised 30->50: most index-like, lowest bleed)
+MAX_INVESTED_PCT = 0.15   # active TRADING sleeve (hybrid: index core takes the bulk now)
+HOLD_PCT         = 0.25   # active HOLD sleeve (keep winners — where the big gains came from)
 HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
@@ -55,21 +55,25 @@ CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
-CRYPTO_PCT       = 0.07   # crypto slice of the slot sleeve (trimmed 0.10->0.07 for the index-core restructure)
+CRYPTO_PCT       = 0.05   # crypto slice of the active sleeve (index core + 45% active + 5% cash)
 CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
 CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
 CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
 CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
                     "LINK/USD", "AVAX/USD", "LTC/USD"]
 
-# ── INDEX-CORE strategy (backtested 2026-06-24: best risk-adjusted mix tested) ───
-# Replaces the old active liquid-momentum sleeves, which the backtest showed trail
-# SPY with deeper drawdowns. Shape: ~80% held index + ~15% slot machines + ~5% cash.
-INDEX_SYMBOL   = "SPY"    # buy-and-hold core: the index that beat the active strategy
-INDEX_PCT      = 0.80     # target ~80% of equity in the core
-SLOT_STOCK_PCT = 0.08     # speculative cheap/micro stock sleeve (the "slot machines")
-SLOT_NAME_PCT  = 0.03     # max 3% of equity per slot name (sub-$2 micros get quartered)
-SLOT_MAX_PX    = 15.00    # slots only buy names priced under this (cheap/speculative)
+# ── HYBRID strategy (backtested 2026-06-24, Devon's design): a 50% buy-and-hold
+# index core (the shock absorber) + the FULL old active day-trader on the rest
+# (~45%, where the big momentum/meme gains live) + ~5% cash. Beats the old active
+# bot alone on both return and drawdown; trails pure index (the cost of trading).
+INDEX_CORE_PCT = 0.50     # held index core, equal-weight across the ETFs below
+INDEX_ETFS     = ["SPY", "QQQ", "IWM"]   # broad market + growth/tech + small caps
+# (legacy index-core-only constants, kept so _run_bot_indexcore still imports)
+INDEX_SYMBOL   = "SPY"
+INDEX_PCT      = 0.80
+SLOT_STOCK_PCT = 0.08
+SLOT_NAME_PCT  = 0.03
+SLOT_MAX_PX    = 15.00
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
 
@@ -567,16 +571,17 @@ def place_sell(sym, qty, live=None):
     return r
 
 
-# ── DEPRECATED: old active liquid-momentum strategy. Backtests showed it trails
-# SPY with deeper drawdowns, so it was retired 2026-06-24 for run_bot() (index core
-# + slot machines) further below. Kept for reference only; NOT called anywhere.
-def _run_bot_legacy():
+# ── LIVE STRATEGY (HYBRID, 2026-06-24): a 50% buy-and-hold index core (SPY/QQQ/IWM)
+# as a shock absorber, plus the FULL active day-trader on the rest (~45%: trade +
+# hold + crypto sleeves, whole-market momentum, memes, micros, brackets) + ~5% cash.
+# The index core is bought/held below; the active sleeves never touch the index ETFs.
+def run_bot():
     open_, et = check_market()
     if not open_:
         print(f"Market closed ({et.strftime('%H:%M ET')}). Done.")
         return
 
-    print(f"=== Alpaca bot run {et.strftime('%Y-%m-%d %H:%M ET')} | {MODE} ===")
+    print(f"=== Alpaca bot run {et.strftime('%Y-%m-%d %H:%M ET')} | {MODE} | HYBRID ===")
     events     = []   # human-readable order outcomes (drives the email)
     trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
 
@@ -601,15 +606,17 @@ def _run_bot_legacy():
     crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}   # DOGEUSD -> DOGE/USD
     crypto_pos  = {s: p for s, p in positions.items() if s in crypto_flat}
     crypto_val  = sum(p["mkt_val"] for p in crypto_pos.values())
+    index_core_val = sum(positions.get(s, {}).get("mkt_val", 0.0) for s in INDEX_ETFS)  # held core, NOT active
     invested    = max(0.0, equity - cash)               # total $ held in positions
-    trade_val   = max(0.0, invested - hold_val - crypto_val)  # signal-traded stocks
+    trade_val   = max(0.0, invested - hold_val - crypto_val - index_core_val)  # active signal-traded stocks
     invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
     hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
     crypto_room = max(0.0, equity * CRYPTO_PCT - crypto_val)       # crypto-sleeve headroom
     spent = trade_spent = hold_spent = cheap_hold_spent = 0.0
     print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=…{acct_tag}")
-    print(f"  Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} (room ${invest_room:,.0f}) | "
-          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} (room ${hold_room:,.0f}) | "
+    print(f"  INDEX core ${index_core_val:,.0f}/{equity*INDEX_CORE_PCT:,.0f} | "
+          f"trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
+          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} | "
           f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f} | holds: {sorted(holds) or '—'}")
     if pending:  print(f"  PENDING orders (skipped this run): {sorted(pending)}")
     if cooldown: print(f"  STOP COOLDOWN ({STOP_COOLDOWN_D}d): {sorted(cooldown)}")
@@ -624,7 +631,7 @@ def _run_bot_legacy():
 
     # Universe — whole-market candidate sweep, then the signal engine votes.
     # (Crypto positions are excluded here; they have their own sleeve below.)
-    universe     = {s for s in positions if s not in crypto_flat} | {"SPY"}
+    universe     = {s for s in positions if s not in crypto_flat and s not in INDEX_ETFS}
     meme_tickers = []
     small_caps   = set()
     movers_today = set()
@@ -723,7 +730,7 @@ def _run_bot_legacy():
     #    stop: a position going nowhere for 5+ days with no signal is dead money.
     buy_dates = last_buy_dates(set(positions) - set(holds))
     for sym, p in list(positions.items()):
-        if sym in holds or sym in pending or sym in crypto_flat: continue
+        if sym in holds or sym in pending or sym in crypto_flat or sym in INDEX_ETFS: continue
         live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
         if not live or cost <= 0 or p["qty"] <= 0: continue
         con = sigs.get(sym, {}).get("consensus", 0)
@@ -780,8 +787,34 @@ def _run_bot_legacy():
                  f"(live ${live:.2f} <= ${floor_:.2f}: {why})"):
             holds.pop(sym); holds_dirty = True
 
-    # BUY — new entries AND adds to held winners, up to the per-name cap.
-    # Cheap/small names size at SMALLCAP_POS_PCT (half) — growthier but blowup-prone.
+    # INDEX CORE (50%): buy-and-hold SPY/QQQ/IWM equal-weight, DCA'd in, paced, and
+    # funded FIRST. This is the shock absorber; the active sleeves never sell it.
+    if not halted and not low_cash:
+        per_tgt = equity * INDEX_CORE_PCT / len(INDEX_ETFS)
+        for etf in INDEX_ETFS:
+            if etf in pending or spent >= spend_cap: continue
+            room = per_tgt - positions.get(etf, {}).get("mkt_val", 0.0)
+            amt  = min(room, spend_cap - spent, cash * 0.95)
+            if room < equity * 0.01 or amt < max(1.0, equity * MIN_ORDER_PCT): continue
+            ilive = yf_live(etf) or alpaca_latest_multi([etf]).get(etf)
+            if not ilive: continue
+            print(f"INDEX-BUY {etf} ${amt:.2f}")
+            try:
+                r = place_buy(etf, amt, ilive)
+                if _ok(r):
+                    cash -= amt; spent += amt
+                    events.append(f"INDEX-BUY {etf} ${amt:.2f} → PLACED ({r['id']})")
+                    trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                        "acct": acct_tag, "symbol": etf, "side": "buy", "index": True,
+                        "notional": round(amt, 2), "live": round(ilive, 2),
+                        "order_id": r["id"], "vix": round(vix, 1)})
+                else:
+                    events.append(f"INDEX-BUY {etf} → REJECTED: {(r or {}).get('message', r)}")
+            except Exception as e:
+                events.append(f"INDEX-BUY {etf} → ERROR: {e}")
+
+    # BUY — active sleeves on the rest (~45%). New entries AND adds to held winners,
+    # up to the per-name cap. Cheap/small names size at SMALLCAP_POS_PCT (half).
     # Sleeve routing: STRONG signals (4+ buy votes AND uptrend) buy into the HOLD
     # sleeve (kept until a stop); everything else is a trading-sleeve buy.
     if not low_cash and not halted:
@@ -984,7 +1017,8 @@ def _run_bot_legacy():
                 f"Plan: {plan['regime']} | risk {plan['risk']} | avoid {sorted(plan['avoid'])}",
                 f"Equity ${equity:.2f} | Cash ${cash:.2f} | "
                 f"dayP&L ${daily_pnl:.2f}",
-                f"Sleeves: trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
+                f"Index core ${index_core_val:,.0f}/{equity*INDEX_CORE_PCT:,.0f} | "
+                f"trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
                 f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} ({len(holds)} holds) | "
                 f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f}", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
@@ -1019,12 +1053,10 @@ def save_slots(s):
         json.dump(s, f, indent=1, sort_keys=True)
 
 
-# ── LIVE STRATEGY: index core + slot machines ───────────────────────────────────
-# ~80% buy-and-hold SPY (the part that wins), ~8% cheap/micro stock "slots" and ~7%
-# crypto (the lottery tickets, hard-stopped), ~5% cash. Old momentum holds are sold
-# off to rotate into the index core. Cash-only, no leverage. Buys are paced and never
-# spend below the 5% cash floor (so unsettled sale proceeds aren't over-deployed).
-def run_bot():
+# ── RETIRED (2026-06-24): pure index-core (80% SPY + slots) strategy. Superseded by
+# the hybrid run_bot() above, Devon wanted the active day-trader back with an index
+# core as a shock absorber. Kept for reference; NOT called.
+def _run_bot_indexcore():
     open_, et = check_market()
     if not open_:
         print(f"Market closed ({et.strftime('%H:%M ET')}). Done.")
