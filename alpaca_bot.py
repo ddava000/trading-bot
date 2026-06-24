@@ -787,31 +787,50 @@ def run_bot():
                  f"(live ${live:.2f} <= ${floor_:.2f}: {why})"):
             holds.pop(sym); holds_dirty = True
 
-    # INDEX CORE (50%): buy-and-hold SPY/QQQ/IWM equal-weight, DCA'd in, paced, and
-    # funded FIRST. This is the shock absorber; the active sleeves never sell it.
+    # INDEX CORE (50%): equal-weight SPY/QQQ/IWM, funded FIRST. Self-rebalancing:
+    # trims any ETF >25% over target (cleans a legacy overweight + keeps the core
+    # balanced long-term), buys toward target when under, DCA'd and paced. The active
+    # sleeves never touch the index ETFs. Left alone on a halt day.
     if not halted and not low_cash:
         per_tgt = equity * INDEX_CORE_PCT / len(INDEX_ETFS)
         for etf in INDEX_ETFS:
-            if etf in pending or spent >= spend_cap: continue
-            room = per_tgt - positions.get(etf, {}).get("mkt_val", 0.0)
-            amt  = min(room, spend_cap - spent, cash * 0.95)
-            if room < equity * 0.01 or amt < max(1.0, equity * MIN_ORDER_PCT): continue
+            if etf in pending: continue
+            p_etf = positions.get(etf, {}); hv = p_etf.get("mkt_val", 0.0); q = p_etf.get("qty", 0.0)
             ilive = yf_live(etf) or alpaca_latest_multi([etf]).get(etf)
             if not ilive: continue
-            print(f"INDEX-BUY {etf} ${amt:.2f}")
-            try:
-                r = place_buy(etf, amt, ilive)
-                if _ok(r):
-                    cash -= amt; spent += amt
-                    events.append(f"INDEX-BUY {etf} ${amt:.2f} → PLACED ({r['id']})")
-                    trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
-                        "acct": acct_tag, "symbol": etf, "side": "buy", "index": True,
-                        "notional": round(amt, 2), "live": round(ilive, 2),
-                        "order_id": r["id"], "vix": round(vix, 1)})
-                else:
-                    events.append(f"INDEX-BUY {etf} → REJECTED: {(r or {}).get('message', r)}")
-            except Exception as e:
-                events.append(f"INDEX-BUY {etf} → ERROR: {e}")
+            if hv > per_tgt * 1.25 and q > 0:                      # OVERWEIGHT -> trim back to target
+                sq = round((hv - per_tgt) / ilive, 6)
+                if sq <= 0: continue
+                print(f"INDEX-TRIM {etf} qty={sq} (rebalance to ${per_tgt:.0f})")
+                try:
+                    r = place_sell(etf, sq, ilive)
+                    if _ok(r):
+                        cash += sq * ilive
+                        events.append(f"INDEX-TRIM {etf} → PLACED ({r['id']})")
+                        trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                            "acct": acct_tag, "symbol": etf, "side": "sell", "index": True,
+                            "qty": sq, "live": round(ilive, 2), "order_id": r["id"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"INDEX-TRIM {etf} → REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"INDEX-TRIM {etf} → ERROR: {e}")
+            elif spent < spend_cap and hv < per_tgt - equity * 0.01:   # UNDERWEIGHT -> buy toward target
+                amt = min(per_tgt - hv, spend_cap - spent, cash * 0.95)
+                if amt < max(1.0, equity * MIN_ORDER_PCT): continue
+                print(f"INDEX-BUY {etf} ${amt:.2f}")
+                try:
+                    r = place_buy(etf, amt, ilive)
+                    if _ok(r):
+                        cash -= amt; spent += amt
+                        events.append(f"INDEX-BUY {etf} ${amt:.2f} → PLACED ({r['id']})")
+                        trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                            "acct": acct_tag, "symbol": etf, "side": "buy", "index": True,
+                            "notional": round(amt, 2), "live": round(ilive, 2),
+                            "order_id": r["id"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"INDEX-BUY {etf} → REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"INDEX-BUY {etf} → ERROR: {e}")
 
     # BUY — active sleeves on the rest (~45%). New entries AND adds to held winners,
     # up to the per-name cap. Cheap/small names size at SMALLCAP_POS_PCT (half).
