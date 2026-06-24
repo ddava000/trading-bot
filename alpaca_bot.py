@@ -55,12 +55,21 @@ CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
-CRYPTO_PCT       = 0.10   # max 10% of equity in crypto total
+CRYPTO_PCT       = 0.07   # crypto slice of the slot sleeve (trimmed 0.10->0.07 for the index-core restructure)
 CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
 CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
 CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
 CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
                     "LINK/USD", "AVAX/USD", "LTC/USD"]
+
+# ── INDEX-CORE strategy (backtested 2026-06-24: best risk-adjusted mix tested) ───
+# Replaces the old active liquid-momentum sleeves, which the backtest showed trail
+# SPY with deeper drawdowns. Shape: ~80% held index + ~15% slot machines + ~5% cash.
+INDEX_SYMBOL   = "SPY"    # buy-and-hold core: the index that beat the active strategy
+INDEX_PCT      = 0.80     # target ~80% of equity in the core
+SLOT_STOCK_PCT = 0.08     # speculative cheap/micro stock sleeve (the "slot machines")
+SLOT_NAME_PCT  = 0.03     # max 3% of equity per slot name (sub-$2 micros get quartered)
+SLOT_MAX_PX    = 15.00    # slots only buy names priced under this (cheap/speculative)
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
 
@@ -558,8 +567,10 @@ def place_sell(sym, qty, live=None):
     return r
 
 
-# ── Main bot ──────────────────────────────────────────────────────────────────
-def run_bot():
+# ── DEPRECATED: old active liquid-momentum strategy. Backtests showed it trails
+# SPY with deeper drawdowns, so it was retired 2026-06-24 for run_bot() (index core
+# + slot machines) further below. Kept for reference only; NOT called anywhere.
+def _run_bot_legacy():
     open_, et = check_market()
     if not open_:
         print(f"Market closed ({et.strftime('%H:%M ET')}). Done.")
@@ -997,6 +1008,248 @@ def run_bot():
     if holds_dirty:
         save_holds(holds)
         print(f"  [holds.json updated — {len(holds)} hold(s)]")
+
+
+# ── Slot-stock ledger: which positions are speculative slots (vs the index core) ─
+def load_slots():
+    try:    return json.load(open("slots.json"))
+    except Exception: return {}
+def save_slots(s):
+    with open("slots.json", "w") as f:
+        json.dump(s, f, indent=1, sort_keys=True)
+
+
+# ── LIVE STRATEGY: index core + slot machines ───────────────────────────────────
+# ~80% buy-and-hold SPY (the part that wins), ~8% cheap/micro stock "slots" and ~7%
+# crypto (the lottery tickets, hard-stopped), ~5% cash. Old momentum holds are sold
+# off to rotate into the index core. Cash-only, no leverage. Buys are paced and never
+# spend below the 5% cash floor (so unsettled sale proceeds aren't over-deployed).
+def run_bot():
+    open_, et = check_market()
+    if not open_:
+        print(f"Market closed ({et.strftime('%H:%M ET')}). Done.")
+        return
+    print(f"=== Alpaca bot run {et.strftime('%Y-%m-%d %H:%M ET')} | {MODE} | INDEX-CORE ===")
+    events, trades_log = [], []
+    cash, equity, daily_pnl = alpaca_account()
+    acct_tag  = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]
+    positions = alpaca_positions()
+    pending   = alpaca_open_orders()
+    plan      = load_plan(et)
+    vix       = yf_vix()
+    cooldown  = recent_stop_outs()
+    slots     = load_slots()
+    slots_dirty = False
+
+    def log_trade(d):
+        d.update({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "vix": round(vix, 1)})
+        trades_log.append(d)
+
+    crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}
+    index_val  = positions.get(INDEX_SYMBOL, {}).get("mkt_val", 0.0)
+    crypto_pos = {s: p for s, p in positions.items() if s in crypto_flat}
+    crypto_val = sum(p["mkt_val"] for p in crypto_pos.values())
+    slot_pos   = {s: p for s, p in positions.items()
+                  if s in slots and s not in crypto_flat and s != INDEX_SYMBOL}
+    slot_val   = sum(p["mkt_val"] for p in slot_pos.values())
+    legacy_pos = {s: p for s, p in positions.items()
+                  if s != INDEX_SYMBOL and s not in crypto_flat and s not in slots}
+    legacy_val = sum(p["mkt_val"] for p in legacy_pos.values())
+
+    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=…{acct_tag}  VIX={vix:.1f}")
+    print(f"  INDEX {INDEX_SYMBOL} ${index_val:,.0f}/{equity*INDEX_PCT:,.0f} | "
+          f"slots ${slot_val:,.0f}/{equity*SLOT_STOCK_PCT:,.0f} | "
+          f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f} | "
+          f"legacy ${legacy_val:,.0f} ({len(legacy_pos)})")
+
+    loss_cap = max(LOSS_CAP_FLOOR, equity * LOSS_CAP_PCT)
+    halted   = daily_pnl <= -loss_cap or vix > 35
+    if halted:
+        print(f"⛔ Buys OFF (dayP&L ${daily_pnl:.0f} or VIX {vix:.0f}). Exits still run.")
+
+    # ===== EXITS (always run, even halted) =====
+    # 1) Legacy liquidation: sell old momentum holds to rotate into the index core.
+    for sym, p in list(legacy_pos.items()):
+        if sym in pending or p["qty"] <= 0: continue
+        live = yf_live(sym) or (p["mkt_val"] / p["qty"] if p["qty"] else 0)
+        if not live: continue
+        print(f"LEGACY-SELL {sym} qty={p['qty']}")
+        try:
+            r = place_sell(sym, p["qty"], live)
+            if _ok(r):
+                events.append(f"LEGACY-SELL {sym} → PLACED ({r['id']})")
+                log_trade({"symbol": sym, "side": "sell", "legacy": True,
+                           "qty": p["qty"], "live": round(live, 4), "order_id": r["id"]})
+            else:
+                events.append(f"LEGACY-SELL {sym} → REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"LEGACY-SELL {sym} → ERROR: {e}")
+
+    # 2) Slot-stock brackets: hard -7% stop / +15% take-profit.
+    for sym, p in list(slot_pos.items()):
+        if sym in pending or p["qty"] <= 0: continue
+        live = yf_live(sym); cost = float(p.get("avg_cost") or 0)
+        if not live or cost <= 0: continue
+        tag = ("STOP-LOSS" if live <= cost*STOP_LOSS_PCT
+               else "TAKE-PROFIT" if live >= cost*TAKE_PROFIT_PCT else None)
+        if not tag: continue
+        print(f"SLOT-{tag} {sym} qty={p['qty']} ({(live/cost-1)*100:+.1f}%)")
+        try:
+            r = place_sell(sym, p["qty"], live)
+            if _ok(r):
+                slots.pop(sym, None); slots_dirty = True
+                events.append(f"SLOT-{tag} {sym} ({(live/cost-1)*100:+.1f}%) → PLACED ({r['id']})")
+                log_trade({"symbol": sym, "side": "sell", "slot": True, "qty": p["qty"],
+                           "live": round(live, 4), "stop_loss": tag == "STOP-LOSS",
+                           "take_profit": tag == "TAKE-PROFIT", "order_id": r["id"]})
+            else:
+                events.append(f"SLOT-{tag} {sym} → REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"SLOT-{tag} {sym} → ERROR: {e}")
+
+    # 3) Crypto signals + brackets (-15% stop / +30% take-profit).
+    clasts = crypto_latest_multi(CRYPTO_UNIVERSE)
+    cbars  = crypto_bars_multi(CRYPTO_UNIVERSE)
+    csigs  = {}
+    for pair in CRYPTO_UNIVERSE:
+        c, v = cbars.get(pair, (None, None)); live = clasts.get(pair)
+        if c and len(c) >= 35 and live:
+            rr = compute_signals(pair, c, v, live, [])
+            if rr: csigs[pair] = rr
+    for flat, p in list(crypto_pos.items()):
+        pair = crypto_flat[flat]; live = clasts.get(pair); cost = float(p.get("avg_cost") or 0)
+        if flat in pending or not live or cost <= 0 or p["qty"] <= 0: continue
+        con = csigs.get(pair, {}).get("consensus", 0)
+        tag = ("CRYPTO-STOP" if live <= cost*CRYPTO_STOP
+               else "CRYPTO-TP" if (live >= cost*CRYPTO_TP and con <= 0) else None)
+        if not tag: continue
+        print(f"{tag} {pair} qty={p['qty']} ({(live/cost-1)*100:+.1f}%)")
+        try:
+            r = place_crypto_sell(pair, p["qty"])
+            if _ok(r):
+                events.append(f"{tag} {pair} ({(live/cost-1)*100:+.1f}%) → PLACED ({r['id']})")
+                log_trade({"symbol": pair, "side": "sell", "crypto": True, "qty": p["qty"],
+                           "live": live, "stop_loss": tag == "CRYPTO-STOP",
+                           "take_profit": tag == "CRYPTO-TP", "order_id": r["id"]})
+            else:
+                events.append(f"{tag} {pair} → REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"{tag} {pair} → ERROR: {e}")
+
+    # ===== BUYS (skip if halted). Budget = min(25%/run pacing, cash above the 5%
+    # floor). 'spent' accrues across index+slots+crypto so we never over-deploy. =====
+    cash_floor = equity * 0.05
+    budget = min(max(0.0, cash) * SPEND_CAP_PCT, max(0.0, cash - cash_floor))
+    spent  = 0.0
+    if not halted and budget >= max(1.0, equity*MIN_ORDER_PCT):
+        # 1) INDEX core top-up toward 80% (priority).
+        index_room = equity*INDEX_PCT - index_val
+        live = yf_live(INDEX_SYMBOL) or alpaca_latest_multi([INDEX_SYMBOL]).get(INDEX_SYMBOL)
+        if index_room > equity*0.01 and live:
+            amt = min(index_room, budget - spent)
+            if amt >= max(1.0, equity*MIN_ORDER_PCT):
+                print(f"INDEX-BUY {INDEX_SYMBOL} ${amt:.2f}")
+                try:
+                    r = place_buy(INDEX_SYMBOL, amt, live)
+                    if _ok(r):
+                        spent += amt
+                        events.append(f"INDEX-BUY {INDEX_SYMBOL} ${amt:.2f} → PLACED ({r['id']})")
+                        log_trade({"symbol": INDEX_SYMBOL, "side": "buy", "index": True,
+                                   "notional": round(amt, 2), "live": round(live, 2), "order_id": r["id"]})
+                    else:
+                        events.append(f"INDEX-BUY {INDEX_SYMBOL} → REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"INDEX-BUY {INDEX_SYMBOL} → ERROR: {e}")
+
+        # 2) SLOT stocks: cheap momentum lottery tickets, capped per-name and per-sleeve.
+        slot_room = equity*SLOT_STOCK_PCT - slot_val
+        if slot_room > equity*0.005 and (budget - spent) >= max(1.0, equity*MIN_ORDER_PCT):
+            uni = set()
+            for s in fetch_smallcaps() + fetch_market_movers() + fetch_day_gainers():
+                if len(uni) < 30: uni.add(s)
+            uni -= set(positions) | pending | cooldown | set(plan["avoid"])
+            uni = list(uni)
+            bars = alpaca_bars_multi(uni); lasts = alpaca_latest_multi(uni)
+            slot_spent = 0.0
+            for sym in uni:
+                if slot_spent >= slot_room or spent >= budget: break
+                c, v = bars.get(sym, (None, None))
+                if not c or len(c) < 35: c, v = yf_ohlcv(sym)
+                live = lasts.get(sym) or yf_live(sym)
+                if not c or len(c) < 35 or not live or live > SLOT_MAX_PX or live < 0.10: continue
+                rr = compute_signals(sym, c, v, live, [])
+                if not rr or rr["consensus"] != 1 or rr["rsi"] > RSI_ENTRY_MAX: continue
+                name_cap = equity * (MICRO_POS_PCT if live < MICRO_PX else SLOT_NAME_PCT)
+                amt = min(name_cap, slot_room - slot_spent, budget - spent)
+                if amt < max(1.0, equity*MIN_ORDER_PCT): continue
+                print(f"SLOT-BUY {sym} ${amt:.2f} @${live:.4g} RSI={rr['rsi']:.0f}")
+                try:
+                    r = place_buy(sym, amt, live)
+                    if _ok(r):
+                        actual = round(float(r["qty"])*live, 2) if (r.get("qty") and not r.get("notional")) else amt
+                        spent += actual; slot_spent += actual
+                        slots[sym] = {"ts": et.strftime("%Y-%m-%dT%H:%M"), "basis": round(live, 4)}
+                        slots_dirty = True
+                        events.append(f"SLOT-BUY {sym} ${actual:.2f} → PLACED ({r['id']})")
+                        log_trade({"symbol": sym, "side": "buy", "slot": True, "notional": round(actual, 2),
+                                   "live": round(live, 4), "rsi": round(rr["rsi"], 1),
+                                   "trend": rr["trend"], "order_id": r["id"]})
+                    else:
+                        events.append(f"SLOT-BUY {sym} → REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"SLOT-BUY {sym} → ERROR: {e}")
+
+        # 3) CRYPTO slots: +1 signal, not held, no blow-off chase, capped per coin/sleeve.
+        crypto_room = equity*CRYPTO_PCT - crypto_val
+        cspent = 0.0
+        for pair, sig in csigs.items():
+            if spent >= budget or cspent >= crypto_room: break
+            flat = pair.replace("/", "")
+            if sig["consensus"] != 1 or flat in crypto_pos or flat in pending: continue
+            if sig["rsi"] > RSI_ENTRY_MAX: continue
+            amt = min(equity*CRYPTO_POS_PCT, crypto_room - cspent, budget - spent)
+            if amt < max(1.0, equity*MIN_ORDER_PCT): continue
+            print(f"CRYPTO-BUY {pair} ${amt:.2f} RSI={sig['rsi']:.0f}")
+            try:
+                r = place_crypto_buy(pair, amt)
+                if _ok(r):
+                    spent += amt; cspent += amt
+                    events.append(f"CRYPTO-BUY {pair} ${amt:.2f} → PLACED ({r['id']})")
+                    log_trade({"symbol": pair, "side": "buy", "crypto": True, "notional": round(amt, 2),
+                               "live": clasts.get(pair), "rsi": round(sig["rsi"], 1), "order_id": r["id"]})
+                else:
+                    events.append(f"CRYPTO-BUY {pair} → REJECTED: {(r or {}).get('message', r)}")
+            except Exception as e:
+                events.append(f"CRYPTO-BUY {pair} → ERROR: {e}")
+
+    # ===== summary / email / persist =====
+    print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
+    cl = [f"{p.split('/')[0]} {s['consensus']:+d}" for p, s in csigs.items() if s["consensus"] != 0]
+    print(f"  CRYPTO signals: {', '.join(cl) if cl else '(all neutral)'}")
+
+    morning = (et.hour == 9 and et.minute >= 45)
+    if events or morning:
+        body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}  [INDEX-CORE]",
+                f"Plan: {plan['regime']} | risk {plan['risk']}",
+                f"Equity ${equity:.2f} | Cash ${cash:.2f} | dayP&L ${daily_pnl:.2f}",
+                f"Index ${index_val:,.0f}/{equity*INDEX_PCT:,.0f} | "
+                f"slots ${slot_val:,.0f}/{equity*SLOT_STOCK_PCT:,.0f} | "
+                f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f} | legacy ${legacy_val:,.0f}", ""]
+        body.append("ORDERS THIS RUN:" if events else "No orders this run.")
+        body += [f"  • {e}" for e in events]
+        if   any("PLACED" in e for e in events):                 subject = f"✅ Alpaca bot ({MODE}) — ORDER PLACED"
+        elif any(("REJECTED" in e or "ERROR" in e) for e in events): subject = f"⚠️ Alpaca bot ({MODE}) — order rejected"
+        else:                                                    subject = f"Alpaca bot ({MODE}) — morning status"
+        send_email(subject, "\n".join(body))
+
+    if trades_log:
+        with open("trade_log.jsonl", "a") as f:
+            for t in trades_log:
+                f.write(json.dumps(t) + "\n")
+        print(f"  [logged {len(trades_log)} trade(s) to trade_log.jsonl]")
+    if slots_dirty:
+        save_slots(slots)
+        print(f"  [slots.json updated — {len(slots)} slot(s)]")
 
 
 if __name__ == "__main__":
