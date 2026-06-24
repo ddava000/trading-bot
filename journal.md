@@ -256,3 +256,9 @@
 - avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
 - notes: Global tech/chip rout persists with AI doubts and rate jitters; VIX 19.5 and PCE inflation data looming this week, Micron just reported. Day P&L -$40.7k — holding risk-off at 0.30, no chasing falling chip/AI names, AMC still diluting via $200M offering.
 - journal: Late Tuesday, day -$40.7k (improved from open lows). Regime unchanged risk-off/0.30; semis remain the epicenter and PCE print is the next key event. Defensive DTE and resilient AAL (+13.5%, fuel-price breakout) the only constructive names. Watching chip stabilization post-Micron and PCE before re-risking — let winners ride, no buying knives.
+
+### 2026-06-24T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL', 'AAPL']
+- notes: Tech attempting a rebound with VIX easing to 19.0 and day P&L +$9.4k, but hawkish jobs data and rate-hike worries cap conviction. Nudging risk to 0.40 from 0.30; still avoiding falling chip/AI names and AMC's $200M dilution.
+- journal: Wednesday open, day +$9.4k — tape stabilizing as Nasdaq futures firm and VIX slips to 19.0. Lifted risk modestly to 0.40 but staying defensive given hawkish rate noise; AAPL near buy zone added to favors. Watching whether the tech rebound holds and the PCE print before further re-risking.
