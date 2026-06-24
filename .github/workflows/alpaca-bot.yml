@@ -77,10 +77,13 @@ jobs:
       - name: Persist trade log + holds ledger
         if: always()
         run: |
-          if [ -n "$(git status --porcelain trade_log.jsonl holds.json slots.json)" ]; then
+          changed=""
+          for f in trade_log.jsonl holds.json slots.json; do
+            if [ -n "$(git status --porcelain -- "$f")" ]; then git add -- "$f"; changed=1; fi
+          done
+          if [ -n "$changed" ]; then
             git config user.name  "alpaca-bot"
             git config user.email "alpaca-bot@users.noreply.github.com"
-            git add --ignore-errors -- trade_log.jsonl holds.json slots.json || true
             git commit -m "trade log $(date -u +%FT%TZ)"
             git push || (git pull --rebase --autostash origin main && git push) || true
           else
