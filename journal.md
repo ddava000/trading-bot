@@ -268,3 +268,9 @@
 - avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL', 'AAPL']
 - notes: Chip sell-off and AI jitters returning with S&P/Nasdaq slipping into red; VIX back up to 19.7 and Micron earnings keep semis fragile. Holding defensive at 0.40 — no chasing chip/AI knives.
 - journal: Wednesday midday, day flat. Early tech rebound faded as chip sell-off resumed ahead of Micron reaction; VIX ticked up to 19.7. Keeping risk-off/0.40, avoiding semis and SPY; watching PCE print and whether tech can stabilize before re-risking.
+
+### 2026-06-24T17:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'AAL']
+- notes: VIX eased to 18.6 and the day is marginally green, but chip sell-off is in its 3rd straight day with AI jitters and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Holding defensive at 0.45 — no chasing semis; GT flagged as an avoid after 'reasons to avoid' coverage and weak action.
+- journal: Wednesday close, day ~flat (+$2). VIX cooled to 18.6 but Nasdaq logged a 3rd down day on chips and oil keeps tumbling. Nudged risk to 0.45; ABSI ripping on hair-loss data + Lilly-backed raise, CUPR/OPTU squeezing — let holdings ride, no buying knives. Watching whether tech stabilizes and the rate-hike narrative ahead of next macro print.
