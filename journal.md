@@ -274,3 +274,9 @@
 - avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'AAL']
 - notes: VIX eased to 18.6 and the day is marginally green, but chip sell-off is in its 3rd straight day with AI jitters and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Holding defensive at 0.45 — no chasing semis; GT flagged as an avoid after 'reasons to avoid' coverage and weak action.
 - journal: Wednesday close, day ~flat (+$2). VIX cooled to 18.6 but Nasdaq logged a 3rd down day on chips and oil keeps tumbling. Nudged risk to 0.45; ABSI ripping on hair-loss data + Lilly-backed raise, CUPR/OPTU squeezing — let holdings ride, no buying knives. Watching whether tech stabilizes and the rate-hike narrative ahead of next macro print.
+
+### 2026-06-24T18:45 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'OPTU']
+- notes: Post-close: VIX steady at 18.6 but Nasdaq logged a 3rd straight down day on resuming chip sell-off and AI jitters, with Micron results on tap and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Staying defensive at 0.45 — no chasing semis, GT still flagged after weak action and 'reasons to avoid' coverage.
+- journal: Wednesday close, day +$2. Tape soft for a 3rd day on chips/AI while oil tumbled to prewar lows and yields retreated; Micron earnings due after the bell keep semis fragile. Holding risk-off/0.45 — ABSI (hair-loss data + Lilly raise), CUPR and OPTU squeezing, let winners ride. Watching Micron reaction and the rate-hike narrative into next macro print before re-risking.
