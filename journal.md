@@ -280,3 +280,9 @@
 - avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'OPTU']
 - notes: Post-close: VIX steady at 18.6 but Nasdaq logged a 3rd straight down day on resuming chip sell-off and AI jitters, with Micron results on tap and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Staying defensive at 0.45 — no chasing semis, GT still flagged after weak action and 'reasons to avoid' coverage.
 - journal: Wednesday close, day +$2. Tape soft for a 3rd day on chips/AI while oil tumbled to prewar lows and yields retreated; Micron earnings due after the bell keep semis fragile. Holding risk-off/0.45 — ABSI (hair-loss data + Lilly raise), CUPR and OPTU squeezing, let winners ride. Watching Micron reaction and the rate-hike narrative into next macro print before re-risking.
+
+### 2026-06-25T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CUPR', 'BRBR', 'AMC', 'CLOV', 'BFLY', 'SLDB', 'SABR', 'WBI'] | favor: ['ABSI', 'OPTU', 'SPY']
+- notes: Sentiment flipped constructive: Micron's strong earnings sparked a tech turnaround, Nasdaq futures +2%, in-line inflation eased rate fears and VIX cooled to 17.9. Lifting from risk-off 0.45 to neutral 0.6 — conditions improving but still measured given a 3-day prior selloff and lingering rate noise; CUPR flagged on weak -7% action.
+- journal: Thursday open, day +$3. Big regime shift vs yesterday: Micron beat reversed the chip selloff (Nasdaq fut +2%), in-line CPI calmed rate worries, VIX down to 17.9 — moving off pure risk-off to neutral/0.6 and dropping GT/SPY from avoid. ABSI and OPTU still leading; CUPR fading so flagged. Watching whether the tech rebound holds and oil/yields into the session.
