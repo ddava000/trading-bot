@@ -94,3 +94,5 @@
 {"ts": "2026-06-25T09:45", "mode": "PAPER", "acct": "RRQ1", "symbol": "QQQ", "side": "buy", "index": true, "notional": 14.91, "live": 717.46, "order_id": "2eddaff1-5ca6-4737-921f-f08bf9242b8d", "vix": 17.9}
 {"ts": "2026-06-25T10:00", "mode": "PAPER", "acct": "RRQ1", "symbol": "QQQ", "side": "buy", "index": true, "notional": 68.56, "live": 707.65, "order_id": "b59e674c-359c-435b-b487-9898dd92056c", "vix": 18.8}
 {"ts": "2026-06-25T10:00", "mode": "PAPER", "acct": "RRQ1", "symbol": "IWM", "side": "buy", "index": true, "notional": 21.91, "live": 297.72, "order_id": "76a764a2-a6c1-49fd-a1fa-35ec69d6308a", "vix": 18.8}
+{"ts": "2026-06-25T10:15", "mode": "PAPER", "acct": "RRQ1", "symbol": "IWM", "side": "buy", "index": true, "notional": 61.38, "live": 299.79, "order_id": "11dc7688-d590-42b2-aa07-2bde2829b393", "vix": 19.7}
+{"ts": "2026-06-25T10:15", "mode": "PAPER", "acct": "RRQ1", "symbol": "FCUV", "side": "buy", "add": false, "smallcap": true, "hold": false, "notional": 5.84, "order_id": "b5a0956a-1f17-408d-93db-1b41fee38969", "live": 5.84, "rsi": 76.6, "trend": "up", "consensus": 1, "delta": 0.3183, "buys": 4, "macd_up": true, "meme": false, "vix": 19.7}
