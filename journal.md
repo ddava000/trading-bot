@@ -292,3 +292,9 @@
 - avoid: ['FCUV', 'PACB', 'MIMI', 'ULCC', 'MULL', 'CUPR', 'BRBR'] | favor: ['MU', 'SNDK', 'AMAT']
 - notes: Market split: memory rally lifting MU/SNDK/AMAT but Apple-led Nasdaq weakness and a hot core PCE (3.4%, highest since Oct '23) keep rate fears alive; VIX edging up to 19 with Mideast oil tension. Trimming to 0.5 with under an hour to close — selective, no chasing the late-day knives.
 - journal: Thursday 15:28, day flat. Micron-driven memory names (MU, SNDK, AMAT) green and leading, but core inflation came in hot (3.4%) and Apple is dragging Nasdaq — tape divided. Nudged from 0.6 to 0.5 into the close given event risk priced and several holdings (FCUV -8%, PACB -6%, MIMI -4%) bleeding. Watching close and whether the rate narrative re-tightens tomorrow.
+
+### 2026-06-25T17:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MIMI', 'PACB', 'BRBR', 'GETY', 'CUPR', 'MULL', 'ULCC'] | favor: ['MU', 'SNDK', 'AMAT']
+- notes: Post-close: tape ended split — memory complex (MU/SNDK/AMAT) strong on Micron's blowout, but Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears alive. VIX 18.9. Holding neutral/0.5; no chasing, flagging the bleeders.
+- journal: Thursday close, day flat. Micron-led semis carried the only real strength while Apple weakness and hot core inflation capped the broader tape; several small holdings still bleeding (MIMI -8%, PACB -6%, BRBR -5%, GETY -4%). Staying neutral/0.5 — watching whether the rate-tightening narrative hardens and if the memory rally broadens or fades next session.
