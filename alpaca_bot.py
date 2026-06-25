@@ -598,7 +598,7 @@ def run_bot():
     # Sleeve accounting: holds (buy-and-keep ledger) vs trading (everything else).
     holds       = load_holds()
     holds_dirty = False
-    stale = [s for s in holds if s not in positions]    # sold manually / stopped out
+    stale = [s for s in holds if s not in positions or s in INDEX_ETFS]  # sold/stopped, or now index-core
     for s in stale: holds.pop(s); holds_dirty = True
     hold_val    = sum(positions[s]["mkt_val"] for s in holds)
     cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds
