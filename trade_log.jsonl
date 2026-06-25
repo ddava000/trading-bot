@@ -90,3 +90,5 @@
 {"symbol": "CUPR", "side": "buy", "slot": true, "notional": 5.57, "live": 5.565, "rsi": 60.4, "trend": "up", "order_id": "208a6804-076a-4eb1-8524-3eaa9c1043b0", "ts": "2026-06-24T14:30", "mode": "PAPER", "acct": "RRQ1", "vix": 19.6}
 {"symbol": "OPTU", "side": "buy", "slot": true, "notional": 1.54, "live": 1.545, "rsi": 72.5, "trend": "up", "order_id": "2996ffd3-496f-440c-9796-c2e1f32d6354", "ts": "2026-06-24T14:30", "mode": "PAPER", "acct": "RRQ1", "vix": 19.6}
 {"symbol": "GT", "side": "buy", "slot": true, "notional": 7.27, "live": 6.36, "rsi": 61.4, "trend": "neutral", "order_id": "9646b2c2-de5c-418d-9c80-149d5e1b5d09", "ts": "2026-06-24T14:45", "mode": "PAPER", "acct": "RRQ1", "vix": 19.2}
+{"ts": "2026-06-25T09:45", "mode": "PAPER", "acct": "RRQ1", "symbol": "SPY", "side": "sell", "index": true, "qty": 0.431684, "live": 734.67, "order_id": "b9a64698-e13c-4264-b003-1a6decc9fffc", "vix": 17.9}
+{"ts": "2026-06-25T09:45", "mode": "PAPER", "acct": "RRQ1", "symbol": "QQQ", "side": "buy", "index": true, "notional": 14.91, "live": 717.46, "order_id": "2eddaff1-5ca6-4737-921f-f08bf9242b8d", "vix": 17.9}
