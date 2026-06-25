@@ -8,16 +8,17 @@
     "GETY",
     "CUPR",
     "MULL",
-    "ULCC"
+    "ULCC",
+    "SNXX"
   ],
   "favor_symbols": [
     "MU",
     "SNDK",
     "AMAT"
   ],
-  "notes": "Post-close: tape ended split \u2014 memory complex (MU/SNDK/AMAT) strong on Micron's blowout, but Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears alive. VIX 18.9. Holding neutral/0.5; no chasing, flagging the bleeders.",
-  "journal_entry": "Thursday close, day flat. Micron-led semis carried the only real strength while Apple weakness and hot core inflation capped the broader tape; several small holdings still bleeding (MIMI -8%, PACB -6%, BRBR -5%, GETY -4%). Staying neutral/0.5 \u2014 watching whether the rate-tightening narrative hardens and if the memory rally broadens or fades next session.",
+  "notes": "Post-close 19:01: tape stayed split \u2014 Micron-led memory (MU/SNDK/AMAT) the lone strength while Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears live. VIX 18.9 with Mideast oil noise. Holding neutral/0.5, no chasing late knives; cash thin at $114.",
+  "journal_entry": "Thursday post-close, day flat (-$1). No regime change from 17:18 check \u2014 memory complex still leading, broad tape soft on hot core inflation and Apple weakness. Several micro holdings bleeding (MIMI -4.6%, MULL -6.4%, PACB -6%, BRBR -4.5%); SNXX +13.5% added to avoid as overextended. Watching whether rate narrative hardens overnight and if the semi strength broadens next session.",
   "date": "2026-06-25",
   "mode": "INTRADAY",
-  "updated_at": "2026-06-25T17:18 ET"
+  "updated_at": "2026-06-25T19:01 ET"
 }
