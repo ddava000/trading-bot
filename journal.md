@@ -286,3 +286,9 @@
 - avoid: ['CUPR', 'BRBR', 'AMC', 'CLOV', 'BFLY', 'SLDB', 'SABR', 'WBI'] | favor: ['ABSI', 'OPTU', 'SPY']
 - notes: Sentiment flipped constructive: Micron's strong earnings sparked a tech turnaround, Nasdaq futures +2%, in-line inflation eased rate fears and VIX cooled to 17.9. Lifting from risk-off 0.45 to neutral 0.6 — conditions improving but still measured given a 3-day prior selloff and lingering rate noise; CUPR flagged on weak -7% action.
 - journal: Thursday open, day +$3. Big regime shift vs yesterday: Micron beat reversed the chip selloff (Nasdaq fut +2%), in-line CPI calmed rate worries, VIX down to 17.9 — moving off pure risk-off to neutral/0.6 and dropping GT/SPY from avoid. ABSI and OPTU still leading; CUPR fading so flagged. Watching whether the tech rebound holds and oil/yields into the session.
+
+### 2026-06-25T15:28 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['FCUV', 'PACB', 'MIMI', 'ULCC', 'MULL', 'CUPR', 'BRBR'] | favor: ['MU', 'SNDK', 'AMAT']
+- notes: Market split: memory rally lifting MU/SNDK/AMAT but Apple-led Nasdaq weakness and a hot core PCE (3.4%, highest since Oct '23) keep rate fears alive; VIX edging up to 19 with Mideast oil tension. Trimming to 0.5 with under an hour to close — selective, no chasing the late-day knives.
+- journal: Thursday 15:28, day flat. Micron-driven memory names (MU, SNDK, AMAT) green and leading, but core inflation came in hot (3.4%) and Apple is dragging Nasdaq — tape divided. Nudged from 0.6 to 0.5 into the close given event risk priced and several holdings (FCUV -8%, PACB -6%, MIMI -4%) bleeding. Watching close and whether the rate narrative re-tightens tomorrow.
