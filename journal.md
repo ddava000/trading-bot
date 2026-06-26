@@ -316,3 +316,9 @@
 - avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS'] | favor: ['AMAT', 'MU', 'SNDK']
 - notes: Midday tape stabilizing — VIX back down to 18.8 from 20.2, tech sell-off easing per Investopedia and AMAT soaring, though S&P still heads for a losing week with defensive rotation and hot 3.4% core PCE keeping rate fears alive. Nudging from 0.4 to 0.45 (neutral) but cash is razor-thin ($47) so new risk is naturally capped.
 - journal: Friday 14:16: lifted from risk-off/0.4 to neutral/0.45 as VIX cooled to 18.8 and the AI/tech knife stopped falling (AMAT soaring, Nasdaq off lows). Still a down week on rate worries; bleeders GETY -9%, ULCC -5.8%, PACB/BRBR/CUPR soft and CNVS +16% overextended added to avoid. Cash near zero — watching into the close for any late fade.
+
+### 2026-06-26T17:08 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'BWIN']
+- notes: Late-Friday close into a losing week — tech/AI sell-off resumed (Nasdaq slid on OpenAI IPO-delay report, chip names adding to losses) and memory leadership reversed with MU -3.5%/SNDK -5%, so I pulled them off favor. VIX calm at 18.4 but hot 3.4% core PCE keeps rate fears live; trimming to 0.4 with cash thin ($76) and weekend gap risk ahead.
+- journal: Friday 17:08 close: cut back to 0.4 from 0.45 — the midday stabilization faded, chips/memory rolled back over (MU/SNDK now bleeders, moved to avoid), and tech selling persisted into the bell on a down week. Watching weekend headlines and whether semis find a floor Monday before re-adding risk.
