@@ -310,3 +310,9 @@
 - avoid: ['MIMI', 'MULL', 'PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC'] | favor: ['MU', 'SNDK']
 - notes: Tech sell-off set to continue Friday — Nasdaq futures down, OpenAI IPO-delay rattling techs, first equity outflow since March feeding a 'risk-off summer' narrative, and VIX up to 20.2. Memory rally is fading (Micron failed to broaden), so trimming to 0.4 and holding only modest favor for MU/SNDK.
 - journal: Friday open: regime cut to risk-off (0.4) from neutral/0.5 — VIX 20.2, Nasdaq futures sliding, OpenAI IPO delay and outflow data point to broad de-risking. Micron-led semi strength stalling; MU -2.6%, SNDK flat. Cash thin ($114), day -$21 already. Watching whether the tech knife keeps falling or stabilizes midday before adding any new risk.
+
+### 2026-06-26T14:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS'] | favor: ['AMAT', 'MU', 'SNDK']
+- notes: Midday tape stabilizing — VIX back down to 18.8 from 20.2, tech sell-off easing per Investopedia and AMAT soaring, though S&P still heads for a losing week with defensive rotation and hot 3.4% core PCE keeping rate fears alive. Nudging from 0.4 to 0.45 (neutral) but cash is razor-thin ($47) so new risk is naturally capped.
+- journal: Friday 14:16: lifted from risk-off/0.4 to neutral/0.45 as VIX cooled to 18.8 and the AI/tech knife stopped falling (AMAT soaring, Nasdaq off lows). Still a down week on rate worries; bleeders GETY -9%, ULCC -5.8%, PACB/BRBR/CUPR soft and CNVS +16% overextended added to avoid. Cash near zero — watching into the close for any late fade.
