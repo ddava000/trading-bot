@@ -654,7 +654,7 @@ def run_bot():
         # every 15 minutes, so a full day deep-analyzes hundreds of distinct names.
         for s in plan["favor"] + wsb + smalls + movers + gainers + screen + actives:
             if len(universe) < 60: universe.add(s)
-    universe = list(universe)
+    universe = list(set(universe) - set(INDEX_ETFS))   # index core owns these; active never trades them (screeners surface SPY/QQQ as most-actives)
     print(f"UNIVERSE ({len(universe)}): {universe}")
     if small_caps & set(universe):
         print(f"  smallcap candidates (half-size): {sorted(small_caps & set(universe))}")
