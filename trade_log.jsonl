@@ -146,3 +146,4 @@
 {"ts": "2026-06-26T10:00", "mode": "PAPER", "acct": "RRQ1", "symbol": "SPY", "side": "buy", "index": true, "notional": 28.21, "live": 731.48, "order_id": "45fc7565-7161-42f8-839b-e45f50e7ba4e", "vix": 20.3}
 {"ts": "2026-06-26T10:15", "mode": "PAPER", "acct": "RRQ1", "symbol": "SPY", "side": "sell", "qty": 0.03854618, "order_id": "6b0a5f6f-e043-49f1-82de-e451b31d6296", "live": 732.98, "vix": 19.6, "rsi": 47.1, "trend": "neutral", "consensus": -1, "sells": 3}
 {"ts": "2026-06-26T10:15", "mode": "PAPER", "acct": "RRQ1", "symbol": "SPY", "side": "buy", "index": true, "notional": 31.21, "live": 733.03, "order_id": "1e804e5d-f76d-4dcf-a4da-3cf0116c5630", "vix": 19.6}
+{"ts": "2026-06-26T10:30", "mode": "PAPER", "acct": "RRQ1", "symbol": "SPY", "side": "buy", "index": true, "notional": 30.48, "live": 733.44, "order_id": "21e53661-1c63-4b7b-9a17-59b6f55ac1ee", "vix": 19.2}
