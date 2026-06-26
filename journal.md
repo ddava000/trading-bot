@@ -304,3 +304,9 @@
 - avoid: ['MIMI', 'PACB', 'BRBR', 'GETY', 'CUPR', 'MULL', 'ULCC', 'SNXX'] | favor: ['MU', 'SNDK', 'AMAT']
 - notes: Post-close 19:01: tape stayed split — Micron-led memory (MU/SNDK/AMAT) the lone strength while Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears live. VIX 18.9 with Mideast oil noise. Holding neutral/0.5, no chasing late knives; cash thin at $114.
 - journal: Thursday post-close, day flat (-$1). No regime change from 17:18 check — memory complex still leading, broad tape soft on hot core inflation and Apple weakness. Several micro holdings bleeding (MIMI -4.6%, MULL -6.4%, PACB -6%, BRBR -4.5%); SNXX +13.5% added to avoid as overextended. Watching whether rate narrative hardens overnight and if the semi strength broadens next session.
+
+### 2026-06-26T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MIMI', 'MULL', 'PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC'] | favor: ['MU', 'SNDK']
+- notes: Tech sell-off set to continue Friday — Nasdaq futures down, OpenAI IPO-delay rattling techs, first equity outflow since March feeding a 'risk-off summer' narrative, and VIX up to 20.2. Memory rally is fading (Micron failed to broaden), so trimming to 0.4 and holding only modest favor for MU/SNDK.
+- journal: Friday open: regime cut to risk-off (0.4) from neutral/0.5 — VIX 20.2, Nasdaq futures sliding, OpenAI IPO delay and outflow data point to broad de-risking. Micron-led semi strength stalling; MU -2.6%, SNDK flat. Cash thin ($114), day -$21 already. Watching whether the tech knife keeps falling or stabilizes midday before adding any new risk.
