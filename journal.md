@@ -346,3 +346,9 @@
 - avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
 - notes: Constructive close to Monday: Dow record on the U.S.-Iran de-escalation, VIX calm at 17.6, AMAT at record highs. But cash is near zero ($51), June payrolls land Friday, and memory/chips (MU, SNDK) keep leaking — holding 0.5 with no reach.
 - journal: Mon 6/29 17:12: held neutral/0.5 into a green record close (VIX 17.6, Iran truce holding). AMAT strong stays favored; MU/SNDK soft and ABCL/FCEL overextended remain no-chase. Cash $51 caps risk; bracing for Friday payrolls and watching whether semis find a floor before adding.
+
+### 2026-06-29T18:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive Monday close: Dow above 52,000 on U.S.-Iran de-escalation, VIX calm at 17.6, AMAT at record highs. Cash near zero ($51) and June payrolls Friday keep me at 0.5 with no reach; memory/chips (MU, SNDK) still leaking and ABCL/FCEL overextended stay no-chase.
+- journal: Mon 6/29 18:17: posture unchanged — neutral/0.5 into a green record close (VIX 17.6, Iran truce holding). AMAT strong stays favored; MU/SNDK soft, ABCL/FCEL overextended remain avoid. Cash $51 caps new risk; bracing for Fed's Warsh and Friday payrolls, watching whether semis floor before adding.
