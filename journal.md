@@ -328,3 +328,9 @@
 - avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'GT']
 - notes: After-hours Friday into the weekend: VIX calm at 18.4 but a losing week with memory/chips (MU -3.1%, SNDK -4.3%) still rolling over and hot 3.4% core PCE keeping rate fears alive. Cash razor-thin ($76) and day -$22, so holding 0.4 with no reach into weekend gap risk.
 - journal: Friday 17:55 post-close: holding neutral/0.4 — semis/memory remained soft into the bell (MU, SNDK, SNDK family still bleeders, kept on avoid), small caps and broad bleeders weak. Watching weekend headlines and whether chips find a floor Monday before re-adding any risk.
+
+### 2026-06-29T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive Monday open: futures higher on a U.S.-Iran truce and VIX calm at 18.4, though oil stays edgy and a big jobs week (June payrolls Friday) looms. Memory/chips (MU -3%, SNDK -3.3%) still leaking so kept on avoid; nudged to 0.5 as tape improves but cash is razor-thin ($76) which naturally caps new risk.
+- journal: Mon 6/29 open: lifted from 0.4 to 0.5 as weekend resolved bullishly (Iran ceasefire, futures green, VIX 18.4) — no immediate landmine today. Chips/memory still soft so MU/SNDK stay on avoid; watching whether semis floor and bracing for payrolls Friday before pushing risk higher.
