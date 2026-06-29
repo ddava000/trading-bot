@@ -2,25 +2,23 @@
   "regime": "neutral",
   "risk_scale": 0.5,
   "avoid_symbols": [
-    "PACB",
-    "CUPR",
-    "GETY",
-    "BRBR",
-    "ULCC",
-    "SNXX",
-    "INTC",
-    "CNVS",
     "MU",
-    "SNDK"
+    "SNDK",
+    "GETY",
+    "PACB",
+    "BRBR",
+    "ABCL",
+    "FCEL",
+    "INTC"
   ],
   "favor_symbols": [
     "AMAT",
     "GT",
     "BWIN"
   ],
-  "notes": "Constructive Monday open: futures higher on a U.S.-Iran truce and VIX calm at 18.4, though oil stays edgy and a big jobs week (June payrolls Friday) looms. Memory/chips (MU -3%, SNDK -3.3%) still leaking so kept on avoid; nudged to 0.5 as tape improves but cash is razor-thin ($76) which naturally caps new risk.",
-  "journal_entry": "Mon 6/29 open: lifted from 0.4 to 0.5 as weekend resolved bullishly (Iran ceasefire, futures green, VIX 18.4) \u2014 no immediate landmine today. Chips/memory still soft so MU/SNDK stay on avoid; watching whether semis floor and bracing for payrolls Friday before pushing risk higher.",
+  "notes": "Constructive late-Monday tape: Dow eyeing a record close on the U.S.-Iran truce, VIX easing to 17.6, AMAT printing record highs. But cash is near zero ($51), payrolls loom Friday, and memory/chips (MU, SNDK) still leak \u2014 holding 0.5 with no reach. Added ABCL/FCEL (+22%/+21%) to avoid as overextended chase risk.",
+  "journal_entry": "Mon 6/29 15:23: held neutral/0.5 into a green close (Dow record, VIX 17.6). AMAT strong at record highs stays on favor; MU/SNDK still soft and now ABCL/FCEL overextended so flagged for no-chase. Cash $51 caps new risk; watching semis for a floor and bracing for Friday payrolls before adding.",
   "date": "2026-06-29",
-  "mode": "MORNING",
-  "updated_at": "2026-06-29T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-06-29T15:23 ET"
 }
