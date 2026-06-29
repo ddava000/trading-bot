@@ -16,9 +16,9 @@
     "GT",
     "BWIN"
   ],
-  "notes": "Constructive late-Monday tape: Dow eyeing a record close on the U.S.-Iran truce, VIX easing to 17.6, AMAT printing record highs. But cash is near zero ($51), payrolls loom Friday, and memory/chips (MU, SNDK) still leak \u2014 holding 0.5 with no reach. Added ABCL/FCEL (+22%/+21%) to avoid as overextended chase risk.",
-  "journal_entry": "Mon 6/29 15:23: held neutral/0.5 into a green close (Dow record, VIX 17.6). AMAT strong at record highs stays on favor; MU/SNDK still soft and now ABCL/FCEL overextended so flagged for no-chase. Cash $51 caps new risk; watching semis for a floor and bracing for Friday payrolls before adding.",
+  "notes": "Constructive close to Monday: Dow record on the U.S.-Iran de-escalation, VIX calm at 17.6, AMAT at record highs. But cash is near zero ($51), June payrolls land Friday, and memory/chips (MU, SNDK) keep leaking \u2014 holding 0.5 with no reach.",
+  "journal_entry": "Mon 6/29 17:12: held neutral/0.5 into a green record close (VIX 17.6, Iran truce holding). AMAT strong stays favored; MU/SNDK soft and ABCL/FCEL overextended remain no-chase. Cash $51 caps risk; bracing for Friday payrolls and watching whether semis find a floor before adding.",
   "date": "2026-06-29",
   "mode": "INTRADAY",
-  "updated_at": "2026-06-29T15:23 ET"
+  "updated_at": "2026-06-29T17:12 ET"
 }
