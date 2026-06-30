@@ -9,17 +9,17 @@
     "BRBR",
     "ABCL",
     "FCEL",
-    "QDEL",
-    "INTC"
+    "INTC",
+    "QDEL"
   ],
   "favor_symbols": [
     "AMAT",
     "GT",
     "BWIN"
   ],
-  "notes": "Constructive quarter-end tape: Dow above 52,000, Nasdaq closing out a ~20% quarter, VIX calm at 17.6. But cash is thin ($51), payrolls land Friday, and chips/memory (MU, SNDK) still leak \u2014 holding 0.5 with no reach into a holiday-shortened week.",
-  "journal_entry": "Tue 6/30 09:00: held neutral/0.5 on a green quarter-end open (VIX 17.6, no landmine today). AMAT at record highs stays favored; MU/SNDK soft and ABCL/FCEL overextended remain no-chase. Cash $51 caps risk; watching Fed's Warsh and bracing for Friday jobs report before adding.",
+  "notes": "Quarter-end tape constructive (Nasdaq +20% qtr, VIX calm at 16.6, day P&L green) but bubble-fear headlines and a Grantham crash warning add caution; cash thin at $53 and payrolls Friday keep me at 0.5 with no reach.",
+  "journal_entry": "Tue 6/30 14:25: VIX eased to 16.6, holding neutral/0.5 into a green quarter-end afternoon. AMAT record-high stays favored; MU/SNDK soft, ABCL/FCEL overextended remain no-chase. Watching bubble-fear chatter and bracing for Friday jobs; cash $53 still caps any add.",
   "date": "2026-06-30",
-  "mode": "MORNING",
-  "updated_at": "2026-06-30T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-06-30T14:25 ET"
 }
