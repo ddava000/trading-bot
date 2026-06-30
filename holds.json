@@ -2,14 +2,14 @@
  "AMAT": {
   "basis": 651.97,
   "notional": 12.1,
-  "peak": 690.555,
-  "peak_saved": 690.555,
+  "peak": 725.85,
+  "peak_saved": 725.85,
   "ts": "2026-06-25T15:00"
  },
  "GETY": {
   "basis": 0.9998,
   "notional": 7.0,
-  "peak": 0.9437,
+  "peak": 0.967,
   "ts": "2026-06-25T15:00"
  },
  "MU": {
