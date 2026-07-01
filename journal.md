@@ -382,3 +382,9 @@
 - avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
 - notes: New quarter opens after record-setting first half (VIX calm at 16.9) but bubble-fear chatter is building and the June jobs report lands Thursday in this holiday-shortened week; cash thin at $53 keeps me at 0.5 with no room to reach.
 - journal: Wed 7/1 09:00: rolled into Q3 holding neutral/0.5, VIX 16.9. AMAT record-high stays favored; MU/SNDK soft, GETY hit by terminated Shutterstock merger and note redemption, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for Thursday's early payrolls and watching whether the tech-bubble narrative cracks the tape.
+
+### 2026-07-01T15:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'AMAT', 'INTC'] | favor: ['GT', 'BWIN', 'SPY']
+- notes: VIX calm at 16.4 and Dow at fresh record, but chipmakers are dragging Nasdaq and jobs report lands tomorrow in a holiday-shortened week; cash at $32 leaves essentially no room to add, so I hold 0.5.
+- journal: Wed 7/1 15:18: neutral/0.5, VIX 16.4. Dow record but chips (MU -9.5%, SNDK, AMAT) soft so pulling AMAT off favor into avoid; GT/BWIN steady. GETY still cratering (-23%) on terminated Shutterstock merger. Cash $32 caps any add; bracing for Thursday's early payrolls print.
