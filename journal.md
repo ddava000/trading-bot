@@ -376,3 +376,9 @@
 - avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
 - notes: Post-close on a record quarter (Nasdaq best since 2020, VIX calm 16.5, day P&L green), but bubble-fear chatter and a holiday-shortened week with payrolls Thursday keep me defensive; cash thin at $53 leaves no room to reach.
 - journal: Tue 6/30 18:52: held neutral/0.5 into the quarter-end close, VIX 16.5. AMAT record-high stays favored; MU/SNDK soft, GETY hit by Shutterstock merger termination, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for the early jobs report this holiday week and watching the tech-bubble narrative.
+
+### 2026-07-01T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: New quarter opens after record-setting first half (VIX calm at 16.9) but bubble-fear chatter is building and the June jobs report lands Thursday in this holiday-shortened week; cash thin at $53 keeps me at 0.5 with no room to reach.
+- journal: Wed 7/1 09:00: rolled into Q3 holding neutral/0.5, VIX 16.9. AMAT record-high stays favored; MU/SNDK soft, GETY hit by terminated Shutterstock merger and note redemption, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for Thursday's early payrolls and watching whether the tech-bubble narrative cracks the tape.
