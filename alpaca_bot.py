@@ -52,6 +52,10 @@ CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin nam
 STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
 TIME_STOP_DAYS   = 5      # trading position going nowhere for 5+ days with no signal = exit
 CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (concentration cap)
+CORR_LOOKBACK    = 60     # trading days of returns for the theme-concentration check
+CORR_MAX         = 0.60   # two names above this move as ONE trade (semis pairwise ran 0.71-0.80;
+                          # cross-sector pairs -0.34..0.20 — calibrated 2026-07-02)
+HOLD_CLUSTER_MAX = 2      # max holds per correlated theme (wk1: AMAT+MU+SNDK = 100% semis sank the week)
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
@@ -150,6 +154,19 @@ def calc_ema_series(prices, n):
     v = sum(prices[:n])/n; out.append(v)
     for p in prices[n:]: v = p*k + v*(1-k); out.append(v)
     return out
+
+def _pair_corr(a, b, n=CORR_LOOKBACK):
+    """Pearson correlation of the last n daily returns of two closes series.
+    Series come from the same Alpaca batch so days align for liquid names; if
+    either is too short to judge, return 0 (fail open — don't block on no data)."""
+    m = min(len(a), len(b), n + 1)
+    if m < 40: return 0.0
+    ra = [a[i]/a[i-1] - 1 for i in range(len(a)-m+1, len(a))]
+    rb = [b[i]/b[i-1] - 1 for i in range(len(b)-m+1, len(b))]
+    k  = len(ra); ma = sum(ra)/k; mb = sum(rb)/k
+    cov = sum((x-ma)*(y-mb) for x, y in zip(ra, rb))
+    va  = sum((x-ma)**2 for x in ra); vb = sum((y-mb)**2 for y in rb)
+    return cov / ((va*vb) ** 0.5) if va > 0 and vb > 0 else 0.0
 
 def compute_signals(sym, closes, vols, live, meme_tickers):
     if len(closes) < 35: return None  # MACD slow EMA needs ≥26 bars + 9 for signal line
@@ -403,6 +420,27 @@ def alpaca_account():
     leq  = float(a.get("last_equity") or eq)
     return cash, eq, eq - leq
 
+def alpaca_today_sell_proceeds(et):
+    """T+1 settlement guard: stock-sale proceeds from TODAY are not settled cash
+    yet — buying with them and then selling that buy risks a good-faith violation
+    in a live CASH account. Sums today's stock SELL fills (crypto settles ~instantly,
+    excluded) so buys can be capped to settled cash. Paper doesn't enforce settlement,
+    but running the guard there validates it before go-live. Fail-open on API error:
+    treat all cash as settled (paper-safe; the log line makes it loud)."""
+    try:
+        midnight = et.replace(hour=0, minute=0, second=0, microsecond=0)
+        acts = alpaca_get(f"/v2/account/activities/FILL?after={midnight.isoformat()}&page_size=100") or []
+        crypto_flat = {p.replace("/", "") for p in CRYPTO_UNIVERSE}
+        total = 0.0
+        for a in acts:
+            sym = str(a.get("symbol") or "").replace("/", "")
+            if a.get("side") == "sell" and sym not in crypto_flat:
+                total += float(a.get("price") or 0) * float(a.get("qty") or 0)
+        return total
+    except Exception as e:
+        print(f"  [settlement check failed ({e}) — treating all cash as settled]")
+        return 0.0
+
 def alpaca_open_orders():
     """Symbols with a pending (unfilled) order — skipped this run so a lingering
     limit order can't double-buy or double-sell."""
@@ -587,8 +625,12 @@ def run_bot():
 
     cash, equity, daily_pnl = alpaca_account()
     acct_tag    = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]  # tags each trade so an account swap can't silently corrupt the log/review
+    unsettled   = alpaca_today_sell_proceeds(et)        # T+1: today's sale proceeds
+    settled     = max(0.0, cash - unsettled)            # what buys may actually spend
+    if unsettled > 0:
+        print(f"  SETTLEMENT: ${unsettled:.2f} of today's sale proceeds unsettled (T+1) — buys capped to ${settled:.2f}")
     max_pos     = equity * MAX_POS_PCT
-    spend_cap   = max(0.0, cash) * SPEND_CAP_PCT        # ≤25% of CASH per run (no margin)
+    spend_cap   = settled * SPEND_CAP_PCT               # ≤25% of SETTLED cash per run (no margin, no GFVs)
     low_cash    = cash < 5.00
     positions   = alpaca_positions()
     plan        = load_plan(et)
@@ -669,8 +711,8 @@ def run_bot():
     # Market data — Alpaca official batch API first (2 calls for the whole
     # universe, no scraping-block roulette); Yahoo only as per-symbol fallback
     # for IEX coverage gaps. Exits depend on this data, so reliability is king.
-    bars  = alpaca_bars_multi(universe)
-    lasts = alpaca_latest_multi(universe)
+    bars  = alpaca_bars_multi(universe + ["SPY"])   # +SPY for the regime check ONLY (not tradable —
+    lasts = alpaca_latest_multi(universe)           # the market dict below is built from universe)
     market, fails = {}, 0
     for sym in universe:
         c, v = bars.get(sym, (None, None))
@@ -686,7 +728,10 @@ def run_bot():
 
     # Regime filter (practitioner staple): SPY under its 50-day SMA = weak tape —
     # no NEW hold-sleeve entries (multi-day risk needs a supportive market).
-    spy_c   = market.get("SPY", {}).get("closes") or []
+    # SPY bars come from the bars batch, NOT market: the churn fix removed SPY from
+    # the universe, which silently left this reading an empty list — permanent
+    # risk-off, new holds wrongly disabled 6/26-7/02. Fixed 2026-07-02.
+    spy_c   = bars.get("SPY", (None, None))[0] or yf_ohlcv("SPY")[0] or []
     risk_on = len(spy_c) >= 50 and spy_c[-1] > sum(spy_c[-50:]) / 50
     print(f"  REGIME: {'risk-on (SPY>SMA50)' if risk_on else 'risk-off (SPY<SMA50) — new holds disabled'}")
 
@@ -715,6 +760,7 @@ def run_bot():
                 if tag == "TAKE-PROFIT": entry["take_profit"] = True
                 if tag == "HOLD-STOP":   entry["hold_stop"]   = True
                 if tag == "TIME-STOP":   entry["time_stop"]   = True
+                if tag == "DIVERSIFY":   entry["diversify"]   = True
                 if sig: entry.update({"rsi": round(sig["rsi"], 1), "trend": sig["trend"],
                                       "consensus": sig["consensus"], "sells": sig.get("sells")})
                 trades_log.append(entry)
@@ -787,6 +833,41 @@ def run_bot():
                  f"(live ${live:.2f} <= ${floor_:.2f}: {why})"):
             holds.pop(sym); holds_dirty = True
 
+    # 3b) DIVERSIFY (2026-07-02): the hold book must never become one trade.
+    # Week-1 failure: AMAT+MU+SNDK — 100% semis — sank the week together when the
+    # sector rolled over. Holds whose 60d returns move as one (corr > CORR_MAX)
+    # form a theme cluster; clusters are trimmed to HOLD_CLUSTER_MAX members,
+    # weakest (lowest gain vs basis) sold first. Runs every cycle, so the book
+    # self-heals if a theme concentrates again.
+    hold_syms = [s for s in holds if s in positions and s not in pending
+                 and s not in sold_now and market.get(s, {}).get("closes")]
+    peers = {s: set() for s in hold_syms}
+    for i in range(len(hold_syms)):
+        for j in range(i + 1, len(hold_syms)):
+            a, b = hold_syms[i], hold_syms[j]
+            if _pair_corr(market[a]["closes"], market[b]["closes"]) > CORR_MAX:
+                peers[a].add(b); peers[b].add(a)
+    seen = set()
+    for s in hold_syms:
+        if s in seen or not peers[s]: continue
+        comp, stack = set(), [s]                      # connected component = one theme
+        while stack:
+            x = stack.pop()
+            if x in comp: continue
+            comp.add(x); stack.extend(peers[x] - comp)
+        seen |= comp
+        if len(comp) <= HOLD_CLUSTER_MAX: continue
+        def _gain(sym_):
+            b_ = (float(positions[sym_].get("avg_cost") or 0)
+                  or float(holds[sym_].get("basis") or 0))
+            return market[sym_]["live"] / b_ if b_ > 0 else 0.0
+        ranked = sorted(comp, key=_gain, reverse=True)
+        for sym in ranked[HOLD_CLUSTER_MAX:]:
+            if _exit(sym, positions[sym]["qty"], market[sym]["live"], "DIVERSIFY",
+                     f"({len(comp)} holds move as one theme {sorted(comp)} — max {HOLD_CLUSTER_MAX})",
+                     sigs.get(sym)):
+                holds.pop(sym); holds_dirty = True
+
     # INDEX CORE (50%): equal-weight SPY/QQQ/IWM, funded FIRST. Self-rebalancing:
     # trims any ETF >25% over target (cleans a legacy overweight + keeps the core
     # balanced long-term), buys toward target when under, DCA'd and paced. The active
@@ -815,13 +896,13 @@ def run_bot():
                 except Exception as e:
                     events.append(f"INDEX-TRIM {etf} → ERROR: {e}")
             elif spent < spend_cap and hv < per_tgt - equity * 0.01:   # UNDERWEIGHT -> buy toward target
-                amt = min(per_tgt - hv, spend_cap - spent, cash * 0.95)
+                amt = min(per_tgt - hv, spend_cap - spent, settled * 0.95)  # settled cash only (T+1 guard)
                 if amt < max(1.0, equity * MIN_ORDER_PCT): continue
                 print(f"INDEX-BUY {etf} ${amt:.2f}")
                 try:
                     r = place_buy(etf, amt, ilive)
                     if _ok(r):
-                        cash -= amt; spent += amt
+                        cash -= amt; spent += amt; settled = max(0.0, settled - amt)
                         events.append(f"INDEX-BUY {etf} ${amt:.2f} → PLACED ({r['id']})")
                         trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
                             "acct": acct_tag, "symbol": etf, "side": "buy", "index": True,
@@ -844,6 +925,15 @@ def run_bot():
                 print(f"  SKIP {sym} (stop-loss cooldown)"); continue
             if sym in plan["avoid"]:
                 print(f"  SKIP {sym} (plan avoid-list)"); continue
+            # Diversification guard: never buy (new OR add) into a theme the hold
+            # book already owns HOLD_CLUSTER_MAX times over — this is what let the
+            # 7/1 AMAT add pile a 3rd semi onto an all-semi book.
+            corr_peers = [h for h in holds
+                          if h != sym and h in positions and market.get(h, {}).get("closes")
+                          and _pair_corr(market[sym]["closes"], market[h]["closes"]) > CORR_MAX]
+            if len(corr_peers) >= HOLD_CLUSTER_MAX:
+                print(f"  SKIP {sym} (moves with holds {sorted(corr_peers)} — theme at max {HOLD_CLUSTER_MAX})")
+                continue
             if spent >= spend_cap: break                      # per-run pacing cap reached
             if (invest_room - trade_spent) < 1.00 and (hold_room - hold_spent) < 1.00:
                 break                                         # both sleeves full
@@ -887,8 +977,8 @@ def run_bot():
                                      SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
             room_in_name = name_cap - held_value
             if room_in_name < 1.00: continue
-            amount = min(name_cap * vix_scale * plan["risk"], room_in_name, cash * 0.95,
-                         spend_cap - spent, sleeve_room)
+            amount = min(name_cap * vix_scale * plan["risk"], room_in_name, settled * 0.95,
+                         spend_cap - spent, sleeve_room)      # settled cash only (T+1 guard)
             if amount < max(1.00, equity * MIN_ORDER_PCT): continue   # no dust orders
             if held_value > 0 and amount < name_cap * 0.20:
                 continue   # near its cap — skip dribble top-ups every run
@@ -904,7 +994,7 @@ def run_bot():
                     if r.get("qty") and not r.get("notional"):
                         actual = round(float(r["qty"]) * live, 2)
                     print(f"  → placed {r['id']} (${actual:.2f})")
-                    cash -= actual; spent += actual
+                    cash -= actual; spent += actual; settled = max(0.0, settled - actual)
                     if use_hold:
                         hold_spent += actual
                         if live < CHEAP_PX: cheap_hold_spent += actual
@@ -987,14 +1077,14 @@ def run_bot():
                 if sig["rsi"] > RSI_ENTRY_MAX:
                     print(f"  SKIP {pair} (RSI {sig['rsi']:.0f} — blow-off chase guard)"); continue
                 room = crypto_room - crypto_spent
-                amount = min(equity * CRYPTO_POS_PCT, room, cash * 0.95, spend_cap - spent)
+                amount = min(equity * CRYPTO_POS_PCT, room, settled * 0.95, spend_cap - spent)  # settled cash only
                 if amount < max(1.00, equity * MIN_ORDER_PCT): continue
                 print(f"CRYPTO-BUY {pair} ${amount:.2f} RSI={sig['rsi']:.1f}")
                 try:
                     r = place_crypto_buy(pair, amount)
                     if _ok(r):
                         print(f"  → placed {r['id']}")
-                        cash -= amount; spent += amount; crypto_spent += amount
+                        cash -= amount; spent += amount; crypto_spent += amount; settled = max(0.0, settled - amount)
                         events.append(f"CRYPTO-BUY {pair} ${amount:.2f} → PLACED ({r['id']})")
                         trades_log.append({
                             "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
