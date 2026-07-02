@@ -400,3 +400,9 @@
 - avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'AMAT', 'INTC'] | favor: ['GT', 'BWIN', 'SPY']
 - notes: VIX calm at 16.6 with the Dow near a record, but chips keep dragging Nasdaq lower and the June jobs report drops early tomorrow in this holiday-shortened week; cash at $32 leaves no room to add, so I hold 0.5.
 - journal: Wed 7/1 18:46: neutral/0.5, VIX 16.6, day P&L -$16. No material change into the close — chips (MU -11%, SNDK, AMAT) still soft and parked in avoid, GETY still cratering on the terminated Shutterstock merger. Cash $32 caps adds; braced for Thursday's early payrolls print before the July 4 weekend.
+
+### 2026-07-02T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'AMAT', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: June payrolls came in weaker than expected and semis keep sinking to open Q3, but VIX is calm at 16.0; with only $32 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.
+- journal: Thu 7/2 09:00: neutral/0.5, VIX 16.0, day P&L +$3. Jobs report landed soft (growth slowed more than expected) and chips (MU, SNDK, AMAT) lead the tape lower again; AMAT explicitly falling on news so stays parked in avoid, GETY still imploding on terminated merger/note redemption. Cash $32 caps any adds; watching whether the weak-payrolls read stokes rate-cut hopes or a growth scare into the July 4 close.
