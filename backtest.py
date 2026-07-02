@@ -51,7 +51,7 @@ for day,D in enumerate(cal):
             if rr: s[sym]=rr
     day_sig[D]=s
 
-def simulate(mode, htrail):
+def simulate(mode, htrail, exit_rule="ratchet"):
     cash=START; pos={}; curve=[]
     for day,D in enumerate(cal):
         if day<55: curve.append(START); continue
@@ -63,7 +63,20 @@ def simulate(mode, htrail):
             live=price[s]; p=pos[s]; cost=p["cost"]; con=sig.get(s,{}).get("consensus",0); reason=None
             if mode=="allhold" or p["sleeve"]=="hold":
                 p["peak"]=max(p["peak"],live)
-                if live<=max(cost*HSTOP,p["peak"]*htrail): reason=1
+                pg=p["peak"]/cost-1                                      # peak gain so far
+                if exit_rule=="scaleout":
+                    osh=p.get("osh",p["sh"]); g=live/cost-1
+                    if p.get("tier",0)<1 and g>=0.50 and p["sh"]>1e-9:   # +50%: trim 1/3 of original
+                        ss=min(osh/3,p["sh"]); cash+=ss*live; p["sh"]-=ss; p["tier"]=1
+                    if p.get("tier",0)<2 and g>=1.00 and p["sh"]>1e-9:   # +100%: trim another 1/3
+                        ss=min(osh/3,p["sh"]); cash+=ss*live; p["sh"]-=ss; p["tier"]=2
+                    if p["sh"]<=1e-9: del pos[s]; continue
+                    if live<=max(cost*HSTOP,p["peak"]*htrail): reason=1  # rest rides the ratchet
+                elif exit_rule=="accel":                                 # tighten trail only for big winners
+                    ht=htrail if pg<0.5 else (0.70 if pg<1.0 else 0.78)
+                    if live<=max(cost*HSTOP,p["peak"]*ht): reason=1
+                else:
+                    if live<=max(cost*HSTOP,p["peak"]*htrail): reason=1
             else:
                 if live<=cost*STOP or (live>=cost*TP and con<=0) or con==-1: reason=1
             if reason: cash+=p["sh"]*live; del pos[s]
@@ -80,7 +93,7 @@ def simulate(mode, htrail):
                 elif inv-inv_h<equity*TRADE_CAP:     sleeve,room="trade",min(equity*MAX_POS,equity*TRADE_CAP-(inv-inv_h),cash*0.98)
                 else: continue
             if room<equity*0.01: continue
-            sh=room/price[s]; cash-=sh*price[s]; pos[s]={"sh":sh,"cost":price[s],"sleeve":sleeve,"peak":price[s]}
+            sh=room/price[s]; cash-=sh*price[s]; pos[s]={"sh":sh,"cost":price[s],"sleeve":sleeve,"peak":price[s],"osh":sh,"tier":0}
             inv+=room
             if sleeve=="hold": inv_h+=room
     return curve
@@ -91,27 +104,14 @@ def stats(curve):
     pk=-1e9; dd=0
     for e in curve: pk=max(pk,e); dd=min(dd,e/pk-1)
     return r,cg,dd
-active_full=simulate("active",0.60)            # old-bot proxy (current ratchet; tighter one flunked)
-adict=dict(zip(cal,active_full))
-qqq=fetch("QQQ"); iwm=fetch("IWM")
-days=[D for D in cal[55:] if D in bench and D in qqq and D in iwm]
-def norm(get): base=get(days[0]); return [get(D)/base*START for D in days]
-spy_c=norm(lambda D:bench[D][0]); qqq_c=norm(lambda D:qqq[D][0])
-iwm_c=norm(lambda D:iwm[D][0]);   act_c=norm(lambda D:adict[D])
-core  =[(spy_c[i]+qqq_c[i]+iwm_c[i])/3 for i in range(len(days))]      # equal SPY/QQQ/IWM
-hybrid=[0.50*core[i] + 0.45*act_c[i] + 0.05*START for i in range(len(days))]
-yrs2=(datetime.strptime(days[-1],"%Y-%m-%d")-datetime.strptime(days[0],"%Y-%m-%d")).days/365.25
-def stat2(cv):
-    r=cv[-1]/START-1; cg=(1+r)**(1/yrs2)-1; pk=-1e9; dd=0
-    for e in cv: pk=max(pk,e); dd=min(dd,e/pk-1)
-    return r,cg,dd
 def line(nm,cv):
-    r,cg,dd=stat2(cv); print(f"  {nm:<40} total {r*100:>+7.1f}%  CAGR {cg*100:>+6.1f}%  maxDD {dd*100:>+7.1f}%  ret/risk {cg/abs(dd):.2f}")
-print("\n"+"="*90)
-print(f"HYBRID: 50% index core (SPY/QQQ/IWM) + 45% old active bot + 5% cash  |  {days[0]} -> {days[-1]} ({yrs2:.1f}y)")
-print("  active = old-bot proxy on 40 liquid names (real bot adds untestable crypto/micro upside ON TOP).")
-print("="*90)
-line("SPY only (reference)", spy_c)
-line("Index core: equal SPY/QQQ/IWM", core)
-line("Old active bot alone (~full)", act_c)
-line(">>> HYBRID 50 core / 45 active / 5 cash", hybrid)
+    r,cg,dd=stats(cv); print(f"  {nm:<36} total {r*100:>+7.1f}%  CAGR {cg*100:>+6.1f}%  maxDD {dd*100:>+7.1f}%  ret/risk {cg/abs(dd):.2f}")
+RULES=[("current 40% ratchet","ratchet"),("scale-out (1/3 @+50, 1/3 @+100)","scaleout"),("accelerating ratchet","accel")]
+print("\n"+"="*86)
+print(f"EXIT-RULE TEST: capturing more of parabolic winners (the MTEN problem)  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
+print("  NOTE: tested on 40 LIQUID names; the real MTEN-style pops live in microcaps the backtest can't include.")
+print("="*86)
+print("-- ACTIVE strategy (the live hold sleeve) --")
+for nm,er in RULES: line(nm, simulate("active",0.60,er))
+print("-- ALL-HOLD (everything held = maximum exit-rule sensitivity) --")
+for nm,er in RULES: line(nm, simulate("allhold",0.60,er))

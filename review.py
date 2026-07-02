@@ -7,7 +7,7 @@ Reuses config/helpers from alpaca_bot.py. Run weekly via alpaca-review.yml.
 """
 
 import os, json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 import alpaca_bot as bot   # config, send_email, alpaca_get, yf_ohlcv, MODE
 
 
@@ -17,7 +17,7 @@ def _f(x, d=0.0):
 
 
 def main():
-    et = datetime.now(timezone.utc) - timedelta(hours=4)
+    et = datetime.now(bot.ET_TZ)   # DST-correct ET (hardcoded UTC-4 breaks every November)
 
     # ── Account + weekly equity change ────────────────────────────────────────
     acct   = bot.alpaca_get("/v2/account")
@@ -93,8 +93,7 @@ def main():
         L.append("    (RSI band, trend, meme vs not) actually produced winners.")
 
     if bot.MODE == "PAPER":
-        L.append(""); L.append("(Paper account — Alpaca starts at $100k, so sizes look large; "
-                                "scales down when live.)")
+        L.append(""); L.append("(Paper account — validation run, not real money.)")
 
     report = "\n".join(L)
     print(report)

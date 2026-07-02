@@ -78,7 +78,7 @@ jobs:
         if: always()
         run: |
           changed=""
-          for f in trade_log.jsonl holds.json slots.json; do
+          for f in trade_log.jsonl holds.json; do
             if [ -n "$(git status --porcelain -- "$f")" ]; then git add -- "$f"; changed=1; fi
           done
           if [ -n "$changed" ]; then
