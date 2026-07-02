@@ -418,3 +418,9 @@
 - avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
 - notes: End-of-session read: VIX calm at 16.1 and the Dow closed at a record, but the rotation persists as chips/memory (MU -16.5%, AMAT -8.5%) keep dragging Nasdaq; with only $68 cash there's minimal room to add, so I stay defensive at 0.5 into the July 4 weekend.
 - journal: Thu 7/2 16:37: neutral/0.5, VIX 16.1, day P&L -$15. Little changed into the close \\u2014 rotation trade intact (Dow record, chips red); MU still the worst position and stays parked in avoid alongside AMAT despite its PT-hike record high. Cash $68 caps adds; watching for any post-holiday shift when markets reopen and whether soft payrolls tilts toward rate-cut hopes or growth scare.
+
+### 2026-07-02T17:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: After-hours read into the July 4 close: VIX calm at 16.1 and broad tape constructive (Dow record), but chip/memory rotation persists (MU -15.9%, AMAT -8.6%) and cash is only $68, so I hold defensive 0.5 with no room to add.
+- journal: Thu 7/2 17:49: neutral/0.5, VIX 16.1, day P&L -$15. Nothing materially changed since the close — rotation intact, MU/AMAT still the drags and parked in avoid. Markets closed early for July 4; watching for post-holiday reopen and whether soft payrolls tilts to rate-cut hopes vs growth scare.
