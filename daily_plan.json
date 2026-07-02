@@ -3,8 +3,8 @@
   "risk_scale": 0.5,
   "avoid_symbols": [
     "MU",
-    "SNDK",
     "AMAT",
+    "SNDK",
     "PACB",
     "BRBR",
     "ABCL",
@@ -17,9 +17,9 @@
     "BWIN",
     "WEN"
   ],
-  "notes": "Soft June payrolls (+57k) drove a rotation trade: Dow at a record but Nasdaq/chips (SNDK, MU) keep slumping, and VIX ticked up to 17.1; with only $37 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.",
-  "journal_entry": "Thu 7/2 14:19: neutral/0.5, VIX 17.1, day P&L -$18. Rotation trade in force \u2014 Dow record while chips lag (SNDK, MU deep red); AMAT actually hit a record high on PT hikes but I keep it in avoid given my losing position and sector weakness. Cash $37 caps adds; watching the July 4 early close and whether weak-jobs stokes rate-cut hopes vs growth scare.",
+  "notes": "End-of-session read: VIX calm at 16.1 and the Dow closed at a record, but the rotation persists as chips/memory (MU -16.5%, AMAT -8.5%) keep dragging Nasdaq; with only $68 cash there's minimal room to add, so I stay defensive at 0.5 into the July 4 weekend.",
+  "journal_entry": "Thu 7/2 16:37: neutral/0.5, VIX 16.1, day P&L -$15. Little changed into the close \\\\u2014 rotation trade intact (Dow record, chips red); MU still the worst position and stays parked in avoid alongside AMAT despite its PT-hike record high. Cash $68 caps adds; watching for any post-holiday shift when markets reopen and whether soft payrolls tilts toward rate-cut hopes or growth scare.",
   "date": "2026-07-02",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-02T14:19 ET"
+  "updated_at": "2026-07-02T16:37 ET"
 }
