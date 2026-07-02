@@ -406,3 +406,9 @@
 - avoid: ['MU', 'SNDK', 'AMAT', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
 - notes: June payrolls came in weaker than expected and semis keep sinking to open Q3, but VIX is calm at 16.0; with only $32 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.
 - journal: Thu 7/2 09:00: neutral/0.5, VIX 16.0, day P&L +$3. Jobs report landed soft (growth slowed more than expected) and chips (MU, SNDK, AMAT) lead the tape lower again; AMAT explicitly falling on news so stays parked in avoid, GETY still imploding on terminated merger/note redemption. Cash $32 caps any adds; watching whether the weak-payrolls read stokes rate-cut hopes or a growth scare into the July 4 close.
+
+### 2026-07-02T14:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'AMAT', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: Soft June payrolls (+57k) drove a rotation trade: Dow at a record but Nasdaq/chips (SNDK, MU) keep slumping, and VIX ticked up to 17.1; with only $37 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.
+- journal: Thu 7/2 14:19: neutral/0.5, VIX 17.1, day P&L -$18. Rotation trade in force — Dow record while chips lag (SNDK, MU deep red); AMAT actually hit a record high on PT hikes but I keep it in avoid given my losing position and sector weakness. Cash $37 caps adds; watching the July 4 early close and whether weak-jobs stokes rate-cut hopes vs growth scare.
