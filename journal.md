@@ -442,3 +442,9 @@
 - avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
 - notes: VIX calm at 15.8 and Dow at a record, but chip/memory rotation keeps dragging (MU -16.3%, AMAT -9.1%, plus Burry-short chatter on AMAT/SOXX) and cash is only $67 in a thin pre-holiday close, so hold defensive 0.5 with minimal room to add.
 - journal: Fri 7/3 16:06: neutral/0.5, VIX 15.8, day P&L flat. Nothing new into the holiday close \u chip rotation intact, MU/AMAT parked in avoid; watching Mon reopen and next week's econ data (Jul 6-10) for rate-cut hopes vs growth scare.
+
+### 2026-07-03T17:43 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 15.8 with Dow at a record, but chip/memory rotation keeps dragging (MU -16.3%, AMAT -9.1%, Burry-short chatter on AMAT/SOXX) and cash is only $67 into the July 4 holiday close, so hold defensive 0.5 with minimal room to add.
+- journal: Fri 7/3 17:43: neutral/0.5, VIX 15.8, day P&L flat. Nothing new after the holiday close /AM/AMAT still the worst drags and parked in avoid; watching Mon reopen and next week's econ data (Jul 6-10) for rate-cut hopes vs growth scare.
