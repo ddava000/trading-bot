@@ -35,7 +35,7 @@ jobs:
       actions: write    # allow dispatching brief.yml when the plan is stale
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # GitHub's native cron (brief.yml) regularly fires hours late or not at all
       # (skipped entirely on 2026-06-10). cron-job.org triggers THIS workflow

@@ -23,7 +23,7 @@ jobs:
       contents: write   # the audit commits + pushes its upgrades
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0   # full history so the audit can read the week's commits
 
