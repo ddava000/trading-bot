@@ -16,9 +16,9 @@
     "AMD",
     "QQQ"
   ],
-  "notes": "VIX easing to 15.7 with Nasdaq/Dow at records and chips rebounding (AMD firm on Goldman upgrade), tech jitters fading, but AMAT still -10% and cash is only $66, so I nudge risk to 0.6 while keeping the chip/memory laggards and low-conviction names parked in avoid.",
-  "journal_entry": "Mon 7/6 15:12: neutral/0.6 (up from 0.5), VIX 15.7, day P&L +5. Tape constructive into the close, chips bouncing (AMD/Goldman), QQQ/SPY green; still avoiding AMAT/MU rotation drags and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data.",
+  "notes": "VIX calm at 15.6 with Dow closing above 53k and Nasdaq/S&P higher on the revived chip trade, but AMAT still -10% and cash is thin at $66, so I hold risk at 0.6 and keep the chip/memory laggards and low-conviction names parked in avoid.",
+  "journal_entry": "Mon 7/6 17:14: neutral/0.6, VIX 15.6, day P&L +3. Records held into the close on AI/chip optimism; AMAT/MU rotation drags still parked in avoid and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.",
   "date": "2026-07-06",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-06T15:12 ET"
+  "updated_at": "2026-07-06T17:14 ET"
 }
