@@ -1,6 +1,6 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.5,
+  "risk_scale": 0.6,
   "avoid_symbols": [
     "MU",
     "AMAT",
@@ -13,12 +13,12 @@
   ],
   "favor_symbols": [
     "GT",
-    "BWIN",
-    "WEN"
+    "AMD",
+    "QQQ"
   ],
-  "notes": "VIX calm at 16.4 with futures extending gains after a record week and soft June payrolls (57k) chilling hike odds, but chip/memory rotation still drags (MU -13.3%, AMAT falling again) and cash is just $67, so hold defensive 0.5 with little room to add.",
-  "journal_entry": "Mon 7/6 09:00: neutral/0.5, VIX 16.4, day P&L +5. Post-holiday reopen firm on soft-jobs/rate-cut hopes; MU/AMAT still worst drags and parked in avoid. Watching busy tech-earnings week and Jul 6-10 econ data, plus MarketWatch 'momentum unwind' warning.",
+  "notes": "VIX easing to 15.7 with Nasdaq/Dow at records and chips rebounding (AMD firm on Goldman upgrade), tech jitters fading, but AMAT still -10% and cash is only $66, so I nudge risk to 0.6 while keeping the chip/memory laggards and low-conviction names parked in avoid.",
+  "journal_entry": "Mon 7/6 15:12: neutral/0.6 (up from 0.5), VIX 15.7, day P&L +5. Tape constructive into the close, chips bouncing (AMD/Goldman), QQQ/SPY green; still avoiding AMAT/MU rotation drags and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data.",
   "date": "2026-07-06",
-  "mode": "MORNING",
-  "updated_at": "2026-07-06T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-06T15:12 ET"
 }
