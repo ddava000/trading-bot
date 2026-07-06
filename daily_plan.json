@@ -9,16 +9,17 @@
     "BRBR",
     "ABCL",
     "FCEL",
-    "INTC"
+    "INTC",
+    "BWIN"
   ],
   "favor_symbols": [
     "GT",
     "AMD",
     "QQQ"
   ],
-  "notes": "VIX calm at 15.6 with Dow closing above 53k and Nasdaq/S&P higher on the revived chip trade, but AMAT still -10% and cash is thin at $66, so I hold risk at 0.6 and keep the chip/memory laggards and low-conviction names parked in avoid.",
-  "journal_entry": "Mon 7/6 17:14: neutral/0.6, VIX 15.6, day P&L +3. Records held into the close on AI/chip optimism; AMAT/MU rotation drags still parked in avoid and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.",
+  "notes": "VIX calm at 15.6 with Dow closing above 53k on revived AI/chip optimism and soft June jobs (57k) chilling hike odds, but AMAT still -10% and cash is thin at $66, so I hold posture at 0.6 and keep chip/memory laggards plus BWIN (go-private rumor, event risk) parked in avoid.",
+  "journal_entry": "Mon 7/6 18:43: neutral/0.6, VIX 15.6, day P&L +3. Records held on AI/chip trade; added BWIN to avoid on go-private rumor event risk. Thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.",
   "date": "2026-07-06",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-06T17:14 ET"
+  "updated_at": "2026-07-06T18:43 ET"
 }
