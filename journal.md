@@ -478,3 +478,9 @@
 - avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['GT', 'SPY', 'WEN']
 - notes: VIX still calm at 15.8 but a Samsung-driven global chip sell-off is hitting semis (AMAT down again, AMD in focus) and oil is climbing, so I trim risk to 0.5 and park all chip/memory names plus low-conviction laggards in avoid; thin $66 cash leaves little room to add anyway.
 - journal: Tue 7/7 09:00: neutral/0.5 (down from 0.6), VIX 15.8, day P&L -1. Chip trade reversed overnight on Samsung results — added AMD to avoid alongside AMAT/MU semis; oil rising, jobs soft (57k). Watching whether the chip weakness bleeds into QQQ/SPY and the Jul 6-10 econ data.
+
+### 2026-07-07T11:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'GT', 'WEN']
+- notes: VIX ticked up to 16.4 amid a Samsung/DeepSeek-driven chip sell-off, though tech jitters are easing intraday; with day P&L deeply red (-403) and only $66 cash, I cut risk to 0.4 and keep all semis/memory laggards plus event-risk BWIN parked in avoid.
+- journal: Tue 7/7 11:22: neutral/0.4 (down from 0.5), VIX 16.4, day P&L -403 — real drawdown so I'm dialing back further. Chip weakness persisting but not bleeding hard into SPY/QQQ yet; watching whether the tape stabilizes and the Jul 6-10 econ data (Fed's Warsh) for any shift.
