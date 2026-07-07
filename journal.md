@@ -484,3 +484,9 @@
 - avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'GT', 'WEN']
 - notes: VIX ticked up to 16.4 amid a Samsung/DeepSeek-driven chip sell-off, though tech jitters are easing intraday; with day P&L deeply red (-403) and only $66 cash, I cut risk to 0.4 and keep all semis/memory laggards plus event-risk BWIN parked in avoid.
 - journal: Tue 7/7 11:22: neutral/0.4 (down from 0.5), VIX 16.4, day P&L -403 — real drawdown so I'm dialing back further. Chip weakness persisting but not bleeding hard into SPY/QQQ yet; watching whether the tape stabilizes and the Jul 6-10 econ data (Fed's Warsh) for any shift.
+
+### 2026-07-07T13:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'QQQ', 'GT']
+- notes: VIX eased back to 15.7 and day P&L recovered to -12 from the -403 midday low, with SPY +2% and QQQ green showing the chip rout is staying contained; I nudge risk up to 0.5 while keeping semis, laggards, and event-risk BWIN parked in avoid. Cash a bit healthier at $115 but still tight for adds.
+- journal: Tue 7/7 13:32: neutral/0.5 (up from 0.4), VIX 15.7, day P&L -12 — big intraday recovery, tape stabilizing and chip weakness not bleeding into SPY/QQQ. Nudged risk back up; still avoiding all semis and event-risk BWIN. Watching Jul 6-10 econ data and Fed's Warsh.
