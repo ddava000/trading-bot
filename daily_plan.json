@@ -1,25 +1,26 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.6,
+  "risk_scale": 0.5,
   "avoid_symbols": [
-    "MU",
     "AMAT",
+    "AMD",
+    "MU",
     "SNDK",
+    "INTC",
     "PACB",
     "BRBR",
     "ABCL",
     "FCEL",
-    "INTC",
     "BWIN"
   ],
   "favor_symbols": [
     "GT",
-    "AMD",
-    "QQQ"
+    "SPY",
+    "WEN"
   ],
-  "notes": "VIX calm at 15.6 with Dow closing above 53k on revived AI/chip optimism and soft June jobs (57k) chilling hike odds, but AMAT still -10% and cash is thin at $66, so I hold posture at 0.6 and keep chip/memory laggards plus BWIN (go-private rumor, event risk) parked in avoid.",
-  "journal_entry": "Mon 7/6 18:43: neutral/0.6, VIX 15.6, day P&L +3. Records held on AI/chip trade; added BWIN to avoid on go-private rumor event risk. Thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.",
-  "date": "2026-07-06",
-  "mode": "INTRADAY",
-  "updated_at": "2026-07-06T18:43 ET"
+  "notes": "VIX still calm at 15.8 but a Samsung-driven global chip sell-off is hitting semis (AMAT down again, AMD in focus) and oil is climbing, so I trim risk to 0.5 and park all chip/memory names plus low-conviction laggards in avoid; thin $66 cash leaves little room to add anyway.",
+  "journal_entry": "Tue 7/7 09:00: neutral/0.5 (down from 0.6), VIX 15.8, day P&L -1. Chip trade reversed overnight on Samsung results \u2014 added AMD to avoid alongside AMAT/MU semis; oil rising, jobs soft (57k). Watching whether the chip weakness bleeds into QQQ/SPY and the Jul 6-10 econ data.",
+  "date": "2026-07-07",
+  "mode": "MORNING",
+  "updated_at": "2026-07-07T09:00 ET"
 }
