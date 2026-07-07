@@ -455,6 +455,21 @@ def alpaca_positions():
                                 "mkt_val": float(p.get("market_value") or 0)}
     return pos
 
+def alpaca_position_gone(sym):
+    """Positively confirm a symbol is no longer held (explicit 404 or zero qty)
+    with a direct per-symbol read. On ANY doubt (network error, odd payload),
+    report NOT gone — a hold must never be dropped on a data hiccup.
+    (2026-07-07: one transient empty-positions snapshot purged the whole holds
+    ledger; the names, reclassified as trade-sleeve, stopped out at -7% instead
+    of riding their -25% hold stops.)"""
+    try:
+        p = alpaca_get(f"/v2/positions/{sym}")
+        if isinstance(p, dict) and p.get("code"):     # Alpaca 404 body: {"code": 40410000, ...}
+            return True
+        return float((p or {}).get("qty") or 0) <= 0
+    except Exception:
+        return False
+
 
 def load_holds():
     """The buy-and-hold ledger (holds.json, committed back to the repo like the
@@ -635,7 +650,16 @@ def run_bot():
     # Sleeve accounting: holds (buy-and-keep ledger) vs trading (everything else).
     holds       = load_holds()
     holds_dirty = False
-    stale = [s for s in holds if s not in positions or s in INDEX_ETFS]  # sold/stopped, or now index-core
+    # SNAPSHOT SANITY (2026-07-07): if the broker says we hold NOTHING while the
+    # ledger says we should, the snapshot is corrupt (a real Alpaca blip returned
+    # empty positions + equity==cash once) — skip the run rather than trade on it.
+    if holds and not positions:
+        print("⚠ positions came back EMPTY but the holds ledger is non-empty — corrupt snapshot, skipping this run.")
+        return
+    # Prune a hold only on positive confirmation it's gone (per-symbol 404), never
+    # on its mere absence from one batch positions read.
+    stale = [s for s in holds if s in INDEX_ETFS
+             or (s not in positions and alpaca_position_gone(s))]
     for s in stale: holds.pop(s); holds_dirty = True
     hold_val    = sum(positions[s]["mkt_val"] for s in holds)
     cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds
