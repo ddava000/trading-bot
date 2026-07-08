@@ -514,3 +514,9 @@
 - avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM'] | favor: ['SPY', 'GT', 'DTE']
 - notes: Iran ceasefire collapse with oil topping $75, Dow -700 and semis/AI names bleeding, and FOMC minutes still due this afternoon; VIX 17.3. Event-heavy risk-off day so I hold sizing at 0.3, park high-beta tech, semis, crypto and news/laggard names, and lean on defensive favors DTE and SPY.
 - journal: Wed 7/8 12:57: hold risk-off/0.3, VIX 17.6->17.3, day P&L -8 (well-contained). Fed minutes this afternoon remains the key event; SPY still oddly green +1.3% but broad tape heavy on Iran/oil. Added IRDM (down 5%) to avoid. Watching minutes reaction and whether oil spike bleeds into indexes into the close.
+
+### 2026-07-08T15:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM', 'WEN'] | favor: ['SPY', 'GT', 'DTE']
+- notes: Iran tensions and oil above $75 keep the tape heavy with semis/AI names bleeding, though VIX has eased to 16.8 and day P&L is well-contained at -7; final hour with FOMC minutes largely digested. Hold defensive at 0.35, park high-beta tech, semis, crypto and laggards, lean on SPY/GT/DTE.
+- journal: Wed 7/8 15:00: hold risk-off, nudged 0.3->0.35 as VIX eased 17.3->16.8 and losses stayed tiny (-7). Fed minutes now mostly priced; SPY still green +1.5% despite oil/Iran drag. Watching into the close for any late oil-driven fade; added WEN to avoid on weakness.
