@@ -67,7 +67,7 @@ def main():
     buy_rsis  = [t["rsi"] for t in log_buys if "rsi" in t]
 
     # ── Build report ──────────────────────────────────────────────────────────
-    L = [f"📊 WEEKLY REVIEW — Alpaca bot ({bot.MODE})", f"Week ending {et.strftime('%Y-%m-%d')}", ""]
+    L = [f"WEEKLY REVIEW - Alpaca bot ({bot.MODE})", f"Week ending {et.strftime('%Y-%m-%d')}", ""]
     L.append(f"Equity: ${equity:,.2f}   (cash ${cash:,.2f})")
     L.append(f"This week: {wk_chg:+,.2f}  ({wk_pct:+.2f}%)")
     if spy_pct is not None:
@@ -97,7 +97,7 @@ def main():
 
     report = "\n".join(L)
     print(report)
-    bot.send_email(f"📊 Weekly Review — Alpaca bot ({bot.MODE}) — {et.strftime('%b %d')}", report)
+    bot.send_email(f"Weekly Review - Alpaca bot ({bot.MODE}) - {et.strftime('%b %d')}", report)
 
 
 if __name__ == "__main__":

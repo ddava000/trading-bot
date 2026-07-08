@@ -48,7 +48,11 @@ STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (over
 TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (≈2:1 R:R)
 RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
 HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
-MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity (min $1)
+MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity...
+MIN_ORDER_ABS    = 5.00   # ...and never under $5 flat. A crumb order can't move the
+                          # needle but still spams a rejection email when a nearly-full
+                          # sleeve leaves $1-2 and it lands on a whole-share-only name
+                          # (6x "not fractionable; $1.03 buys <1 share" on 2026-07-08).
 SMALL_PX         = 15.00  # live price under this sizes at the smallcap (half) cap
 CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders — thin names fill 5-20x worse at market
 STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
@@ -916,7 +920,7 @@ def run_bot():
                     events.append(f"INDEX-TRIM {etf} → ERROR: {e}")
             elif spent < spend_cap and hv < per_tgt - equity * 0.01:   # UNDERWEIGHT -> buy toward target
                 amt = min(per_tgt - hv, spend_cap - spent, settled * 0.95)  # settled cash only (T+1 guard)
-                if amt < max(1.0, equity * MIN_ORDER_PCT): continue
+                if amt < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue
                 print(f"INDEX-BUY {etf} ${amt:.2f}")
                 try:
                     r = place_buy(etf, amt, ilive)
@@ -998,9 +1002,15 @@ def run_bot():
             if room_in_name < 1.00: continue
             amount = min(name_cap * vix_scale * plan["risk"], room_in_name, settled * 0.95,
                          spend_cap - spent, sleeve_room)      # settled cash only (T+1 guard)
-            if amount < max(1.00, equity * MIN_ORDER_PCT): continue   # no dust orders
+            if amount < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue   # no dust orders
             if held_value > 0 and amount < name_cap * 0.20:
                 continue   # near its cap — skip dribble top-ups every run
+            # Whole-share-only names the budget can't cover are a predictable skip,
+            # not a broker rejection — don't attempt them (each attempt emailed a
+            # "not fractionable" rejection alert).
+            if alpaca_asset(sym).get("fractionable") is False and amount < live:
+                print(f"  SKIP {sym} (whole-share only; ${amount:.2f} < 1 share @ ${live:.2f})")
+                continue
             verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
                     else ("ADD" if held_value > 0 else "BUY"))
             print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
@@ -1097,7 +1107,7 @@ def run_bot():
                     print(f"  SKIP {pair} (RSI {sig['rsi']:.0f} — blow-off chase guard)"); continue
                 room = crypto_room - crypto_spent
                 amount = min(equity * CRYPTO_POS_PCT, room, settled * 0.95, spend_cap - spent)  # settled cash only
-                if amount < max(1.00, equity * MIN_ORDER_PCT): continue
+                if amount < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue
                 print(f"CRYPTO-BUY {pair} ${amount:.2f} RSI={sig['rsi']:.1f}")
                 try:
                     r = place_crypto_buy(pair, amount)
@@ -1153,11 +1163,11 @@ def run_bot():
         body += [f"  • {e}" for e in events]
         body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
         if any("PLACED" in e for e in events):
-            subject = f"✅ Alpaca bot ({MODE}) — ORDER PLACED"
+            subject = f"Alpaca bot ({MODE}) - ORDER PLACED"
         elif any(("REJECTED" in e or "ERROR" in e) for e in events):
-            subject = f"⚠️ Alpaca bot ({MODE}) — order rejected"
+            subject = f"Alpaca bot ({MODE}) - order rejected"
         else:
-            subject = f"Alpaca bot ({MODE}) — morning status"
+            subject = f"Alpaca bot ({MODE}) - morning status"
         send_email(subject, "\n".join(body))
 
     # Persist structured trade context for the weekly review / pattern analysis.
@@ -1175,7 +1185,7 @@ def run_bot():
 if __name__ == "__main__":
     # Manual test: `gh workflow run alpaca-bot.yml -f email_test=true`
     if os.environ.get("EMAIL_TEST", "").lower() == "true":
-        send_email(f"📧 Alpaca bot ({MODE}) — email test OK",
+        send_email(f"Alpaca bot ({MODE}) - email test OK",
                    "Cloud email alerts are working for the Alpaca bot.")
         raise SystemExit(0)
 
@@ -1204,7 +1214,7 @@ if __name__ == "__main__":
         try:
             _, _et = check_market()
             if _et.hour == 9 and _et.minute >= 45:
-                send_email(f"❌ Alpaca bot ({MODE}) — CRASHED at open", tb[-3000:])
+                send_email(f"Alpaca bot ({MODE}) - CRASHED at open", tb[-3000:])
         except Exception:
             pass
         raise
