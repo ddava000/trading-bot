@@ -496,3 +496,9 @@
 - avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'QQQ', 'GT']
 - notes: VIX steady at 16.3 with the chip sell-off staying contained and SPY holding +1.7% into the close; day P&L back to -15 from the -403 midday low, so I hold risk at 0.5 while keeping semis, laggards, and event-risk names parked. Late-session with only $102 cash leaves little room for new adds.
 - journal: Tue 7/7 15:28: neutral/0.5, VIX 16.3, day P&L -15 — tape stable into the close, chip weakness not bleeding into indexes. Steady posture; still avoiding semis, PACB/BRBR/ABCL laggards and event-risk BWIN. Watching Jul 6-10 econ data and Fed's Warsh into tomorrow.
+
+### 2026-07-08T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['FCEL', 'BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'QQQ', 'IWM'] | favor: ['SPY', 'GT', 'WEN']
+- notes: Geopolitics turned ugly overnight — Trump says Iran ceasefire 'over', Dow futures -700, oil surging and semis selling off, with Fed minutes due today; VIX up to 17.4. This is a clear risk-off open so I cut sizing to 0.3, park FCEL (after-hours plunge), event/news names and high-beta tech, and keep only defensive favors.
+- journal: Wed 7/8 09:00: shifted neutral/0.5 -> risk-off/0.3, VIX 16.3->17.4. Ceasefire collapse + 700pt futures drop + oil spike + Fed minutes = defensive posture. FCEL plunged after-hours, added to avoid. Watching whether the gap-down stabilizes intraday and the Fed minutes reaction.
