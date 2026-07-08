@@ -2,7 +2,6 @@
   "regime": "risk-off",
   "risk_scale": 0.3,
   "avoid_symbols": [
-    "FCEL",
     "BRBR",
     "BWIN",
     "ABCL",
@@ -10,17 +9,19 @@
     "TSLA",
     "META",
     "NET",
-    "QQQ",
-    "IWM"
+    "MU",
+    "IWM",
+    "ETHUSD",
+    "SOLUSD"
   ],
   "favor_symbols": [
     "SPY",
     "GT",
-    "WEN"
+    "DTE"
   ],
-  "notes": "Geopolitics turned ugly overnight \u2014 Trump says Iran ceasefire 'over', Dow futures -700, oil surging and semis selling off, with Fed minutes due today; VIX up to 17.4. This is a clear risk-off open so I cut sizing to 0.3, park FCEL (after-hours plunge), event/news names and high-beta tech, and keep only defensive favors.",
-  "journal_entry": "Wed 7/8 09:00: shifted neutral/0.5 -> risk-off/0.3, VIX 16.3->17.4. Ceasefire collapse + 700pt futures drop + oil spike + Fed minutes = defensive posture. FCEL plunged after-hours, added to avoid. Watching whether the gap-down stabilizes intraday and the Fed minutes reaction.",
+  "notes": "Iran ceasefire collapse, oil surging and Dow off 400-650pts with semis (Micron/Sandisk) still bleeding, plus FOMC minutes landing this afternoon; VIX 17.6. Clear event-heavy risk-off day so I hold sizing at 0.3, park high-beta tech, semis, crypto and news/laggard names, and keep only defensive favors like DTE (near 52w high) and SPY.",
+  "journal_entry": "Wed 7/8 10:45: hold risk-off/0.3, VIX 17.4->17.6, day P&L only -8 (better than yesterday's -400 scare). SPY oddly green +1% but tape still heavy on Iran/oil; Fed minutes this afternoon is the key event. Dropped FCEL/QQQ from avoid, added MU/crypto. Watching minutes reaction and whether oil spike bleeds into indexes.",
   "date": "2026-07-08",
-  "mode": "MORNING",
-  "updated_at": "2026-07-08T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-08T10:45 ET"
 }
