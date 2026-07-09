@@ -532,3 +532,9 @@
 - avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
 - notes: VIX easing to 16.2 with SPY +2.1%/QQQ +1.7% and day P&L green; tape is constructive but Iran ceasefire headlines remain two-sided and CPI/bank earnings loom, so I lift to neutral 0.5 while parking crypto, high-beta laggards (TSLA, META) and news-driven biotechs (ABCL +9% on clinical anticipation is too whippy to chase).
 - journal: Thu 7/9 11:39: upgraded risk-off->neutral, 0.4->0.5 as VIX slid 16.8->16.2 and indexes turned solidly green (SPY +2.1%). MU still leading semis higher, kept in favors. Watching CPI/bank earnings this week and any Iran headline reversal; ABCL added to avoid on parabolic clinical-data run.
+
+### 2026-07-09T13:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
+- notes: VIX steady at 16.0 with SPY +2.3%/QQQ +2.1% and day P&L green, tape is constructive; but Iran ceasefire headlines are two-sided and CPI/bank earnings loom, so I hold neutral 0.5 while parking crypto, high-beta laggards and parabolic biotechs (ABCL still whippy).
+- journal: Thu 7/9 13:29: hold neutral 0.5, VIX flat 16.2->16.0 and indexes holding solid gains (SPY +2.3%). MU/semis still leading, kept in favors. Watching CPI/bank earnings this week and any Iran ceasefire reversal into the close.
