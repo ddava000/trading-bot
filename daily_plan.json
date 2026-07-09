@@ -1,6 +1,6 @@
 {
-  "regime": "risk-off",
-  "risk_scale": 0.4,
+  "regime": "neutral",
+  "risk_scale": 0.5,
   "avoid_symbols": [
     "BRBR",
     "BWIN",
@@ -8,22 +8,20 @@
     "ANAB",
     "TSLA",
     "META",
-    "NET",
-    "IWM",
     "ETHUSD",
     "SOLUSD",
     "IRDM",
-    "WEN"
+    "NET"
   ],
   "favor_symbols": [
     "SPY",
     "QQQ",
-    "DTE",
-    "MU"
+    "MU",
+    "DTE"
   ],
-  "notes": "US-Iran tensions and rising oil keep the tape two-sided with Nasdaq up on semis (Micron rallying) but Dow/S&P retreating; VIX calm at 16.8 and day P&L flat. Still event-heavy with jobs report, CPI and bank earnings ahead, so hold defensive at 0.4, park high-beta laggards/crypto, lean on SPY/QQQ and defensive DTE.",
-  "journal_entry": "Thu 7/9 09:05: hold risk-off, nudged 0.35->0.4 as VIX steady 16.8 and futures inch higher; Micron/semis now rallying so pulled MU off avoid into favors. Iran headline risk persists and jobs/CPI loom this week. Watching whether oil spike bleeds into indexes and META's -6.8% slide.",
+  "notes": "VIX easing to 16.2 with SPY +2.1%/QQQ +1.7% and day P&L green; tape is constructive but Iran ceasefire headlines remain two-sided and CPI/bank earnings loom, so I lift to neutral 0.5 while parking crypto, high-beta laggards (TSLA, META) and news-driven biotechs (ABCL +9% on clinical anticipation is too whippy to chase).",
+  "journal_entry": "Thu 7/9 11:39: upgraded risk-off->neutral, 0.4->0.5 as VIX slid 16.8->16.2 and indexes turned solidly green (SPY +2.1%). MU still leading semis higher, kept in favors. Watching CPI/bank earnings this week and any Iran headline reversal; ABCL added to avoid on parabolic clinical-data run.",
   "date": "2026-07-09",
-  "mode": "MORNING",
-  "updated_at": "2026-07-09T09:05 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-09T11:39 ET"
 }
