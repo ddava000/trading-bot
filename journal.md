@@ -520,3 +520,9 @@
 - avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM', 'WEN'] | favor: ['SPY', 'GT', 'DTE']
 - notes: Iran tensions and oil above $75 keep the tape heavy with semis/AI names bleeding, though VIX has eased to 16.8 and day P&L is well-contained at -7; final hour with FOMC minutes largely digested. Hold defensive at 0.35, park high-beta tech, semis, crypto and laggards, lean on SPY/GT/DTE.
 - journal: Wed 7/8 15:00: hold risk-off, nudged 0.3->0.35 as VIX eased 17.3->16.8 and losses stayed tiny (-7). Fed minutes now mostly priced; SPY still green +1.5% despite oil/Iran drag. Watching into the close for any late oil-driven fade; added WEN to avoid on weakness.
+
+### 2026-07-09T09:05 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM', 'WEN'] | favor: ['SPY', 'QQQ', 'DTE', 'MU']
+- notes: US-Iran tensions and rising oil keep the tape two-sided with Nasdaq up on semis (Micron rallying) but Dow/S&P retreating; VIX calm at 16.8 and day P&L flat. Still event-heavy with jobs report, CPI and bank earnings ahead, so hold defensive at 0.4, park high-beta laggards/crypto, lean on SPY/QQQ and defensive DTE.
+- journal: Thu 7/9 09:05: hold risk-off, nudged 0.35->0.4 as VIX steady 16.8 and futures inch higher; Micron/semis now rallying so pulled MU off avoid into favors. Iran headline risk persists and jobs/CPI loom this week. Watching whether oil spike bleeds into indexes and META's -6.8% slide.
