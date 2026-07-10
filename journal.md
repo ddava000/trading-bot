@@ -556,3 +556,9 @@
 - avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE'] | favor: ['SPY', 'QQQ', 'MU']
 - notes: VIX easing to 15.6 with indexes green (SPY +2.3%/QQQ +1.6%) and day P&L flat; the stacked macro morning (CPI/FOMC minutes/bank earnings) seems to have passed without a shock, so I nudge back to 0.5. Still parking crypto, high-beta laggards (IRDM, ANAB, TSLA), whippy names and DTE.
 - journal: Fri 7/10 11:08: bumped 0.45->0.5 as VIX ticked down to 15.6 and tape held constructive post-CPI with no visible shock. Semis/MU steady; watching for any late oil/Iran headline or bank-earnings follow-through into the afternoon.
+
+### 2026-07-10T13:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE', 'VOD'] | favor: ['SPY', 'QQQ', 'MU', 'META']
+- notes: VIX easing further to 15.3 with indexes solidly green (SPY +2.6%/QQQ +2.2%) heading into a winning week; the stacked macro morning passed without shock. Holding 0.5 rather than reaching, since Iran-strike/oil headlines and next week's CPI/earnings still lurk and it's a Friday afternoon.
+- journal: Fri 7/10 13:18: hold neutral 0.5, VIX drifting down 15.6->15.3 and tape constructive (META +6.6%, semis firm). No fresh shock from Iran/CPI; keeping crypto, high-beta laggards and DTE parked. Watching for a late oil/Iran headline into the close and any bank-earnings follow-through.
