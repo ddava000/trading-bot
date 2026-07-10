@@ -544,3 +544,9 @@
 - avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
 - notes: VIX steady at 16.1 with SPY +2.2%/QQQ +1.9% and day P&L green; tape constructive but Iran ceasefire headlines flip-flopping and CPI/bank earnings loom, so I hold neutral 0.5 into the close while parking crypto, high-beta laggards and whippy biotechs (ABCL +9.6% too parabolic).
 - journal: Thu 7/9 15:16: hold neutral 0.5, VIX flat ~16.0-16.1 and indexes still solidly green (SPY +2.2%). Under an hour to close so no reason to add risk; MU/semis leading, kept in favors. Watching CPI/bank earnings and any late Iran-driven oil fade into the bell.
+
+### 2026-07-10T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE'] | favor: ['SPY', 'QQQ', 'MU']
+- notes: VIX still calm at 15.8 but event risk stacked today — CPI/inflation report, FOMC minutes and bank earnings kicking off, plus a second day of US strikes on Iran lifting oil and leaving futures mixed. I trim to 0.45 and stay defensive, parking crypto, high-beta laggards and whippy biotechs; DTE added to avoid after index removal/valuation questions.
+- journal: Fri 7/10 09:00: nudged 0.5->0.45. VIX flat ~15.8 but a heavy macro day (CPI, FOMC minutes, bank earnings) collides with a second day of US-Iran strikes and rising oil; futures mixed, chips retreating from rally. Added DTE to avoid on index-removal news. Watching CPI print reaction and whether oil spike bleeds into indexes.
