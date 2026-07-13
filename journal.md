@@ -574,3 +574,9 @@
 - avoid: ['MU', 'SNDK', 'NET', 'META', 'TSLA', 'IRDM', 'ANAB', 'ETHUSD', 'SOLUSD', 'BRBR', 'BWIN', 'DTE', 'VOD', 'JXN'] | favor: ['SPY', 'QQQ']
 - notes: Weekend brought a chip-led selloff (SK Hynix -10%, AI jitters), Iran saying Hormuz is closed with oil rising, and futures pointing lower into a CPI + Warsh testimony + bank-earnings week; VIX up to 16.5. Cutting to 0.35 and parking all semis/high-beta/crypto until the tape stabilizes.
 - journal: Mon 7/13 09:00: dropped 0.5->0.35 and flipped risk-off. Weekend chip rout (SK Hynix -10%) plus Iran/Hormuz oil spike and CPI/Warsh this week broke Friday's calm; added MU/SNDK/META to avoids. Watching CPI print and whether semis stabilize before dialing back up.
+
+### 2026-07-13T11:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Despite morning chip/Iran jitters, the tape has recovered nicely — SPY +2.4%, QQQ +1.2%, META +1.7% and VIX easing to 16.2 with day P&L roughly flat. Nudging up 0.35->0.45 but staying below normal with CPI, Warsh testimony and bank earnings still ahead this week; keeping crypto, whippy high-beta and the CNMD takeover-rumor pop parked.
+- journal: Mon 7/13 11:18: lifted 0.35->0.45, back to neutral. Feared weekend chip rout/Iran didn't stick — indexes green, VIX 16.5->16.2, semis stabilizing so dropped MU/SNDK from avoids. Added CNMD (PE takeover rumor spike). Still watching CPI print and bank earnings before reaching further.
