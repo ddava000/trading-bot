@@ -197,7 +197,7 @@ def main():
             f"Avoid: {plan['avoid_symbols']}\nFavor: {plan['favor_symbols']}\n\n"
             f"Notes: {plan['notes']}\n\nJournal: {plan['journal_entry']}\n")
     print(body)
-    bot.send_email(f"🧠 {mode} brief ({bot.MODE}) — {plan['regime']} / risk {plan['risk_scale']}", body)
+    bot.send_email(f"{mode} brief ({bot.MODE}) - {plan['regime']} / risk {plan['risk_scale']}", body)
 
 
 if __name__ == "__main__":
