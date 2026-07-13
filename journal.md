@@ -580,3 +580,9 @@
 - avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
 - notes: Despite morning chip/Iran jitters, the tape has recovered nicely — SPY +2.4%, QQQ +1.2%, META +1.7% and VIX easing to 16.2 with day P&L roughly flat. Nudging up 0.35->0.45 but staying below normal with CPI, Warsh testimony and bank earnings still ahead this week; keeping crypto, whippy high-beta and the CNMD takeover-rumor pop parked.
 - journal: Mon 7/13 11:18: lifted 0.35->0.45, back to neutral. Feared weekend chip rout/Iran didn't stick — indexes green, VIX 16.5->16.2, semis stabilizing so dropped MU/SNDK from avoids. Added CNMD (PE takeover rumor spike). Still watching CPI print and bank earnings before reaching further.
+
+### 2026-07-13T13:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Tape steady midday — SPY +2.1%, QQQ +0.5%, META +1.9% with VIX little-changed at 16.6, but small-caps lag (IWM -2.0%) and TSLA is bleeding -5.8%. Holding 0.45 neutral, keeping crypto, high-beta laggards, the CNMD rumor pop and IWM parked ahead of CPI, Warsh testimony and bank earnings still to come this week.
+- journal: Mon 7/13 13:30: holding neutral 0.45, no material change since 11:18. Large-caps green but IWM weak and TSLA -5.8% — keeping those and crypto/high-beta parked. Watching CPI print and bank-earnings kickoff before adjusting posture.
