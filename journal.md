@@ -568,3 +568,9 @@
 - avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE', 'VOD'] | favor: ['SPY', 'QQQ', 'MU', 'META']
 - notes: VIX steady at 15.3 with indexes holding solidly green into a winning week (SPY +2.8%, QQQ +2.3%, META +3.2%); the stacked macro day passed without shock. Holding 0.5 with less than an hour to the close on a Friday — no reason to reach with Iran/oil and next week's CPI/earnings still ahead.
 - journal: Fri 7/10 15:11: hold neutral 0.5 into the final hour. Tape constructive and calm, VIX 15.3, day P&L flat/green; keeping crypto, high-beta laggards (IRDM, TSLA, ANAB), whippy names and DTE parked. Watching for any late Iran/oil headline into the bell; carry these avoids into Monday's CPI/earnings gauntlet.
+
+### 2026-07-13T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MU', 'SNDK', 'NET', 'META', 'TSLA', 'IRDM', 'ANAB', 'ETHUSD', 'SOLUSD', 'BRBR', 'BWIN', 'DTE', 'VOD', 'JXN'] | favor: ['SPY', 'QQQ']
+- notes: Weekend brought a chip-led selloff (SK Hynix -10%, AI jitters), Iran saying Hormuz is closed with oil rising, and futures pointing lower into a CPI + Warsh testimony + bank-earnings week; VIX up to 16.5. Cutting to 0.35 and parking all semis/high-beta/crypto until the tape stabilizes.
+- journal: Mon 7/13 09:00: dropped 0.5->0.35 and flipped risk-off. Weekend chip rout (SK Hynix -10%) plus Iran/Hormuz oil spike and CPI/Warsh this week broke Friday's calm; added MU/SNDK/META to avoids. Watching CPI print and whether semis stabilize before dialing back up.
