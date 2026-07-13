@@ -586,3 +586,9 @@
 - avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
 - notes: Tape steady midday — SPY +2.1%, QQQ +0.5%, META +1.9% with VIX little-changed at 16.6, but small-caps lag (IWM -2.0%) and TSLA is bleeding -5.8%. Holding 0.45 neutral, keeping crypto, high-beta laggards, the CNMD rumor pop and IWM parked ahead of CPI, Warsh testimony and bank earnings still to come this week.
 - journal: Mon 7/13 13:30: holding neutral 0.45, no material change since 11:18. Large-caps green but IWM weak and TSLA -5.8% — keeping those and crypto/high-beta parked. Watching CPI print and bank-earnings kickoff before adjusting posture.
+
+### 2026-07-13T15:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Late-day tape holding with SPY +2.1% and QQQ +0.4%, but Iran/Hormuz tensions re-escalated (ceasefire collapsed, oil jumping) and VIX ticked up 16.6->17.0. Trimming to 0.40 into the close ahead of this week's CPI, Warsh testimony and bank-earnings gauntlet; keeping crypto, TSLA (-6%), whippy high-beta, the CNMD rumor pop and lagging IWM parked.
+- journal: Mon 7/13 15:07: nudged 0.45->0.40, still neutral. Iran blockade headlines returned and VIX crept 16.6->17.0 while indexes stayed green; TSLA now -6%. Carrying same avoids into tomorrow's CPI print and bank earnings before adjusting.
