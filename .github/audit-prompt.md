@@ -17,7 +17,7 @@ STEP 2 — SCORE THE WEEK
 
 STEP 3 — AUDIT vs DESIGN PHILOSOPHY (invariants; NEVER loosen without overwhelming evidence — recommend instead)
 - Cash-only, NO leverage, NO shorting, NO options; crypto is SPOT long-only.
-- Three sleeves (max 80% deployed, 20% cash floor): TRADING 40% (-7% stop / +15% TP / 5-day time-stop), HOLD 30% (entries: 4+ buy votes, uptrend, RSI<=70, non-mover, SPY>SMA50; exits only -25% basis stop or 40%-from-peak ratchet), CRYPTO 10% (BTC/ETH/SOL/DOGE/SHIB/LINK/AVAX/LTC; 4%/coin; -15% stop / +30% TP).
+- HYBRID strategy (backtested 2026-06-24, ~95% deployed / ~5% cash): INDEX CORE 50% (buy-and-hold SPY/QQQ/IWM equal-weight, the shock absorber) + TRADING 15% (-7% stop / +15% TP / 5-day time-stop) + HOLD 25% (entries: 4+ buy votes, uptrend, RSI<=70, non-mover, SPY>SMA50; exits only -25% basis stop or 40%-from-peak ratchet, plus a DIVERSIFY trim capping correlated-theme clusters at 2 names) + CRYPTO 5% (BTC/ETH/SOL/DOGE/SHIB/LINK/AVAX/LTC; 4%/coin; -15% stop / +30% TP). Check alpaca_bot.py's Config block comments for the current numbers before flagging a mismatch — the split has changed before and code is the source of truth.
 - Per-name caps 10% (5% under $15); sub-$5 names <= half the hold sleeve; stock screener floor $0.10 with >=500k sh/day and >=$5M/day.
 - Never average down (adds need live >= basis+2%); no entries at RSI>78; 3-day stop cooldown; daily -10% loss halt blocks buys but never exits; VIX>35 halt; marketable limits under $5; crypto tif=gtc.
 Did the week's data show a rule misfiring (stops too tight and recovering after exit? time-stop churn? ratchet giving back too much? crypto stop churning on normal vol)? Do research findings suggest a missing guard?
@@ -30,5 +30,6 @@ STEP 4 — IMPLEMENT (conservatively)
 
 STEP 5 — REPORT (this is the deliverable; never skip it)
 Email Devon the summary (GMAIL_APP_PASSWORD is set; alpaca_bot imports need dummy broker keys):
-  ALPACA_API_KEY=x ALPACA_SECRET_KEY=x python3 -c "import alpaca_bot; alpaca_bot.send_email('📋 Weekly bot audit — <date>', '''<plain-English summary>''')"
+  ALPACA_API_KEY=x ALPACA_SECRET_KEY=x python3 -c "import alpaca_bot; alpaca_bot.send_email('Weekly bot audit - <date>', '''<plain-English summary>''')"
+  Subject line: plain ASCII only, no emojis, hyphens not em dashes (Devon prints these to PDF and the subject becomes the filename; non-ASCII chars error out — see commit 38bfade).
 Summary must cover: (a) week's performance vs SPY, (b) research findings that mattered, (c) exactly what changed and why (commit SHAs), (d) recommendations deferred to Devon. Plain English, decision-ready, no jargon.
