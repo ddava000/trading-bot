@@ -598,3 +598,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
 - notes: CPI print plus Warsh testimony land today with rate-hike bets rising and AI/chip angst back on the Nasdaq; VIX still calm at 16.7 but event risk is front-and-center. Trimming to 0.35 into the data and adding AAPL to avoids on its downgrade (iPhone weakness).
 - journal: Tue 7/14 09:00: cut 0.40->0.35 ahead of the June CPI print and Warsh House testimony — both today. Added AAPL to avoids (Barron's downgrade, iPhone weakness). Watching CPI reaction and whether chips stabilize before dialing risk back up.
+
+### 2026-07-14T10:21 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: June CPI landed soft and futures/indexes are green (SPY +2.1%, QQQ +1.0%) with VIX calm at 16.6 — the main event risk cleared benign, so nudging back to 0.45. Keeping AAPL (downgrade), TSLA (-4.5%), CNMD rumor pop, crypto and lagging IWM parked while Warsh testimony finishes.
+- journal: Tue 7/14 10:21: CPI came in light and tape green, so lifted 0.35->0.45 as event risk resolved constructively. Trimmed BRBR/VOD/NET off avoids as they firm; still watching Warsh testimony and whether IWM/TSLA weakness spreads.
