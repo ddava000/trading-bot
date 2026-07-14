@@ -604,3 +604,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
 - notes: June CPI landed soft and futures/indexes are green (SPY +2.1%, QQQ +1.0%) with VIX calm at 16.6 — the main event risk cleared benign, so nudging back to 0.45. Keeping AAPL (downgrade), TSLA (-4.5%), CNMD rumor pop, crypto and lagging IWM parked while Warsh testimony finishes.
 - journal: Tue 7/14 10:21: CPI came in light and tape green, so lifted 0.35->0.45 as event risk resolved constructively. Trimmed BRBR/VOD/NET off avoids as they firm; still watching Warsh testimony and whether IWM/TSLA weakness spreads.
+
+### 2026-07-14T12:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['SPY', 'QQQ', 'META', 'NET']
+- notes: Soft CPI held and the tape is broadly green (SPY +2.3%, QQQ +1.6%, META/NET leading) with VIX calm at 16.7, so nudging to 0.50; only offset is Iran/Hormuz fire exchange lifting oil, keeping a defensive cap. Parking AAPL (downgrade), TSLA (-4.7%), CNMD/ANAB, crypto and lagging IWM (-1.5%).
+- journal: Tue 7/14 12:45: lifted 0.45->0.50 as CPI-driven rally holds and VIX stays calm; large-caps and NET strong. Watching Iran/oil headlines and IWM/TSLA weakness before pushing risk higher.
