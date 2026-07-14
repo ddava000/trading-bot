@@ -610,3 +610,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['SPY', 'QQQ', 'META', 'NET']
 - notes: Soft CPI held and the tape is broadly green (SPY +2.3%, QQQ +1.6%, META/NET leading) with VIX calm at 16.7, so nudging to 0.50; only offset is Iran/Hormuz fire exchange lifting oil, keeping a defensive cap. Parking AAPL (downgrade), TSLA (-4.7%), CNMD/ANAB, crypto and lagging IWM (-1.5%).
 - journal: Tue 7/14 12:45: lifted 0.45->0.50 as CPI-driven rally holds and VIX stays calm; large-caps and NET strong. Watching Iran/oil headlines and IWM/TSLA weakness before pushing risk higher.
+
+### 2026-07-14T14:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['SPY', 'QQQ', 'META', 'NET']
+- notes: CPI-driven rally is holding into the afternoon with SPY +2.4%/QQQ +1.6% and VIX easing to 16.4; keeping 0.50 rather than reaching since it's late-day and Iran/Hormuz oil headlines remain a background risk. Parking AAPL (downgrade), TSLA (-4.9%), CNMD/ANAB, crypto and lagging IWM (-1.6%).
+- journal: Tue 7/14 14:56: holding 0.50 neutral into the close; tape stayed green all session and VIX drifted 16.7->16.4. No new landmines — same avoids. Watching for any late fade or fresh Hormuz/oil escalation before tomorrow's open.
