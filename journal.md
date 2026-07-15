@@ -628,3 +628,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'MU'] | favor: ['QQQ', 'SPY', 'META', 'NET', 'REZI']
 - notes: Tape constructive with SPY +2.8%/QQQ +1.5% and VIX calm at 16.0; keeping 0.50 rather than reaching given oil spike on Iran/Hormuz, Warsh testimony today, and a packed earnings/data week. MU turned negative (-3.1%) so parking it alongside AAPL downgrade, TSLA weakness, CNMD/ANAB, crypto and lagging IWM.
 - journal: Wed 7/15 10:17: holding 0.50 neutral; large-caps green (SPY/QQQ/META/NET/REZI firm) but MU faded -3.1% so added to avoids. VIX steady 16.0. Watching Warsh testimony, Iran/oil headlines, and whether IWM/small-caps keep lagging.
+
+### 2026-07-15T12:51 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'QQQ'] | favor: ['SPY', 'META', 'REZI', 'JXN']
+- notes: Tape has softened intraday — Nasdaq turned lower on chip/tech weakness while S&P holds up (SPY +2.3%), and VIX ticked to 16.5; trimming to 0.45 given tech rollover, Warsh testimony and a packed CPI/jobs/earnings week. Parking tech-heavy QQQ/NET alongside AAPL, TSLA, ANAB (-17%), CNMD, crypto and lagging IWM.
+- journal: Wed 7/15 12:51: nudged 0.50->0.45 as chips faded and Nasdaq turned lower midday while broad SPY stayed green; VIX up slightly 16.0->16.5. Added QQQ/NET to avoids on tech weakness; ANAB deep red -17%. Watching whether tech stabilizes and any Warsh/oil headlines.
