@@ -63,6 +63,25 @@ CORR_MAX         = 0.60   # two names above this move as ONE trade (semis pairwi
                           # cross-sector pairs -0.34..0.20 — calibrated 2026-07-02)
 HOLD_CLUSTER_MAX = 2      # max holds per correlated theme (wk1: AMAT+MU+SNDK = 100% semis sank the week)
 
+# Fast protective loop + news tripwire (2026-07-15, Devon: "as adamant as possible
+# without costing me more than it makes me"). Each 15-min trigger now runs ONE job:
+# full strategy cycle once, then a cheap exit-only pass every ~60s until the next
+# window takes over — hard stops and danger headlines react in ~1 minute, while
+# buys/TPs stay on the 15-min clock (signals are daily-bar; faster buying would be
+# churn, not edge). All of it $0: public-repo Actions minutes + Alpaca's news API
+# (Benzinga) included with our keys. Claude stays on its 3x/day brief schedule.
+LOOP_WINDOW_MIN  = 12.5   # keep fast-passing this long, then end the job (persists log)
+EXIT_PASS_SEC    = 60     # seconds between protective passes
+NEWS_BLOCK_MIN   = 720    # a danger headline within this window blocks BUYING the name
+NEWS_ALERT_MIN   = 16     # only articles this fresh alert/exit (dedup across passes)
+EARNINGS_BLOCK_D = 2      # no NEW entries in names reporting earnings within this many days
+DANGER_WORDS = ["bankrupt", "chapter 11", "fraud", "sec investigation", "sec probe",
+                "subpoena", "delist", "going concern", "share offering",
+                "public offering", "dilut", "halted", "trading halt", "fda reject",
+                "complete response letter", "recall", "short report", "short seller",
+                "restatement", "cuts guidance", "withdraws guidance", "resigns",
+                "default", "investigation"]
+
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
 CRYPTO_PCT       = 0.05   # crypto slice of the active sleeve (index core + 45% active + 5% cash)
@@ -474,6 +493,59 @@ def alpaca_position_gone(sym):
     except Exception:
         return False
 
+def alpaca_news(symbols, minutes, limit=50):
+    """Headlines for symbols from Alpaca's news API (Benzinga; included with our
+    keys, no extra cost). Returns [(symbols, text, created_at)] newest-first.
+    Fail-open: [] on any error — news can sharpen decisions, never break them."""
+    if not symbols:
+        return []
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        d = alpaca_data_get(f"/v1beta1/news?symbols={','.join(sorted(symbols))}"
+                            f"&start={start}&limit={limit}&sort=desc")
+        out = []
+        for a in (d.get("news") or []):
+            txt = f"{a.get('headline') or ''} {a.get('summary') or ''}".strip()
+            out.append((a.get("symbols") or [], txt, a.get("created_at") or ""))
+        return out
+    except Exception:
+        return []
+
+def news_flags(symbols, minutes):
+    """The tripwire: {sym: headline_snippet} for names carrying a DANGER_WORDS
+    headline inside the window. Deterministic keywords — no LLM, $0, every pass."""
+    flags = {}
+    for syms, txt, _created in alpaca_news(set(symbols), minutes):
+        low = txt.lower()
+        if any(w in low for w in DANGER_WORDS):
+            for s in syms:
+                if s in symbols and s not in flags:
+                    flags[s] = txt[:140]
+    return flags
+
+_EARN_CACHE = {}
+def earnings_within(sym, days=EARNINGS_BLOCK_D):
+    """True if sym reports earnings within `days`. Yahoo calendarEvents, cached per
+    run, fail-OPEN on any error/429 — it's a landmine guard, not a gate."""
+    if sym in _EARN_CACHE:
+        return _EARN_CACHE[sym]
+    hit = False
+    try:
+        d = requests.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
+                         "?modules=calendarEvents", headers=YF_HEADERS, timeout=8).json()
+        res = ((d.get("quoteSummary") or {}).get("result") or [{}])[0]
+        eds = ((res.get("calendarEvents") or {}).get("earnings") or {}).get("earningsDate") or []
+        now = datetime.now(timezone.utc).timestamp()
+        for e in eds:
+            ts = e.get("raw") if isinstance(e, dict) else None
+            if ts and 0 <= ts - now <= days * 86400:
+                hit = True
+                break
+    except Exception:
+        hit = False
+    _EARN_CACHE[sym] = hit
+    return hit
+
 
 def load_holds():
     """The buy-and-hold ledger (holds.json, committed back to the repo like the
@@ -764,6 +836,14 @@ def run_bot():
         rr = compute_signals(sym, d["closes"], d["volumes"], d["live"], meme_tickers)
         if rr: sigs[sym] = rr
 
+    # NEWS TRIPWIRE — danger headlines on held names + buy candidates. Blocks buys
+    # (12h window), exits trade-sleeve positions, alerts on holds. $0, no LLM.
+    watch = {s for s in positions if s not in crypto_flat and s not in INDEX_ETFS}
+    watch |= {s for s, g in sigs.items() if g["consensus"] == 1}
+    news_bad = news_flags(watch, NEWS_BLOCK_MIN)
+    if news_bad:
+        print(f"  NEWS TRIPWIRE: {', '.join(f'{s} [{h[:60]}]' for s, h in news_bad.items())}")
+
     sold_now = set()   # exits this run — never re-buy the same name the same run
 
     def _exit(sym, qty, live, tag, extra, sig=None):
@@ -784,6 +864,7 @@ def run_bot():
                 if tag == "HOLD-STOP":   entry["hold_stop"]   = True
                 if tag == "TIME-STOP":   entry["time_stop"]   = True
                 if tag == "DIVERSIFY":   entry["diversify"]   = True
+                if tag == "NEWS-EXIT":   entry["news_exit"]   = True
                 if sig: entry.update({"rsi": round(sig["rsi"], 1), "trend": sig["trend"],
                                       "consensus": sig["consensus"], "sells": sig.get("sells")})
                 trades_log.append(entry)
@@ -831,6 +912,23 @@ def run_bot():
         qty = positions[sym]["qty"]
         if qty <= 0: continue
         _exit(sym, qty, market[sym]["live"], "SELL", f"RSI={sig['rsi']:.1f}", sig)
+
+    # 2b) NEWS exits: a danger headline on a TRADE position is an immediate exit.
+    #     Holds get an ALERT EMAIL only — wide stops + crude keywords shouldn't
+    #     dump a keeper; Devon decides.
+    for sym, headline in news_bad.items():
+        if sym in holds:
+            continue
+        if sym not in positions or sym in sold_now or sym in pending: continue
+        if positions[sym]["qty"] <= 0 or sym not in market: continue
+        _exit(sym, positions[sym]["qty"], market[sym]["live"], "NEWS-EXIT",
+              f"({headline[:80]})", sigs.get(sym))
+    fresh_bad = news_flags({s for s in news_bad if s in holds}, NEWS_ALERT_MIN)
+    for sym, headline in fresh_bad.items():
+        send_email(f"Alpaca bot ({MODE}) - NEWS ALERT: {sym}",
+                   f"Danger headline on HOLD {sym}:\n{headline}\n\n"
+                   "The bot does not auto-sell holds on keyword matches - review manually.\n"
+                   f"{et.strftime('%Y-%m-%d %H:%M ET')}")
 
     # 3) HOLD stops: exit a hold at -25% from basis (thesis broken), OR once well
     #    in profit, if it gives back 40% from its peak (ratchet — a +200% winner
@@ -957,6 +1055,8 @@ def run_bot():
             if len(corr_peers) >= HOLD_CLUSTER_MAX:
                 print(f"  SKIP {sym} (moves with holds {sorted(corr_peers)} — theme at max {HOLD_CLUSTER_MAX})")
                 continue
+            if sym in news_bad:
+                print(f"  SKIP {sym} (danger news: {news_bad[sym][:60]})"); continue
             if spent >= spend_cap: break                      # per-run pacing cap reached
             if (invest_room - trade_spent) < 1.00 and (hold_room - hold_spent) < 1.00:
                 break                                         # both sleeves full
@@ -1010,6 +1110,11 @@ def run_bot():
             # "not fractionable" rejection alert).
             if alpaca_asset(sym).get("fractionable") is False and amount < live:
                 print(f"  SKIP {sym} (whole-share only; ${amount:.2f} < 1 share @ ${live:.2f})")
+                continue
+            # Earnings landmine guard: momentum entries into an imminent report are
+            # a coin flip on the gap — checked last so only real orders spend a call.
+            if earnings_within(sym):
+                print(f"  SKIP {sym} (reports earnings within {EARNINGS_BLOCK_D}d)")
                 continue
             verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
                     else ("ADD" if held_value > 0 else "BUY"))
@@ -1182,6 +1287,90 @@ def run_bot():
         print(f"  [holds.json updated — {len(holds)} hold(s)]")
 
 
+def exit_pass(et, alerted):
+    """Fast protective pass between full cycles (~every EXIT_PASS_SEC): HARD exits
+    only — trade-sleeve stop-loss, hold basis-stop/ratchet floor, crypto stop —
+    plus the news tripwire on held names. No buys, no take-profits, no signal
+    computation (those stay on the 15-min full cycle; signals are daily-bar and
+    barely move minute to minute). ~4-5 API calls per pass. Returns True if it
+    placed any order — the job then ends early so the workflow persists the log."""
+    holds     = load_holds()
+    positions = alpaca_positions()
+    if holds and not positions:
+        print(f"  [{et.strftime('%H:%M')} fast pass: EMPTY positions vs non-empty ledger — corrupt snapshot, skip]")
+        return False
+    pending     = alpaca_open_orders()
+    acct        = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]
+    crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}
+    stocks      = [s for s in positions if s not in crypto_flat and s not in INDEX_ETFS]
+    lasts       = alpaca_latest_multi(stocks) if stocks else {}
+    clasts      = crypto_latest_multi([crypto_flat[s] for s in positions if s in crypto_flat]) or {}
+    placed = False
+    holds_dirty = False
+
+    def _sell(sym, qty, live, tag, extra):
+        nonlocal placed
+        print(f"{tag} {sym} qty={qty} {extra} [fast pass {et.strftime('%H:%M')}]")
+        is_crypto = sym in crypto_flat
+        r = place_crypto_sell(crypto_flat[sym], qty) if is_crypto else place_sell(sym, qty, live)
+        if _ok(r):
+            placed = True
+            entry = {"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct,
+                     "symbol": crypto_flat[sym] if is_crypto else sym, "side": "sell",
+                     "qty": qty, "order_id": r["id"], "live": live, "fast_pass": True}
+            key = {"STOP-LOSS": "stop_loss", "HOLD-STOP": "hold_stop",
+                   "CRYPTO-STOP": "stop_loss", "NEWS-EXIT": "news_exit"}[tag]
+            entry[key] = True
+            if is_crypto: entry["crypto"] = True
+            with open("trade_log.jsonl", "a") as f:
+                f.write(json.dumps(entry) + "\n")
+            send_email(f"Alpaca bot ({MODE}) - ORDER PLACED (fast pass)",
+                       f"{tag} {sym} qty={qty} {extra}\n{et.strftime('%Y-%m-%d %H:%M ET')}")
+        else:
+            print(f"    [fast-pass sell rejected: {(r or {}).get('message', r)}]")
+        return _ok(r)
+
+    for sym, p in list(positions.items()):
+        if sym in pending or sym in INDEX_ETFS: continue
+        qty = p.get("qty") or 0
+        cost = float(p.get("avg_cost") or 0)
+        if qty <= 0 or cost <= 0: continue
+        if sym in crypto_flat:
+            live = clasts.get(crypto_flat[sym])
+            if live and live <= cost * CRYPTO_STOP:
+                _sell(sym, qty, live, "CRYPTO-STOP", f"({(live/cost-1)*100:+.1f}% from ${cost:.6g})")
+            continue
+        live = lasts.get(sym)
+        if not live: continue
+        if sym in holds:
+            h = holds[sym]
+            basis  = cost or float(h.get("basis") or 0)
+            peak   = max(float(h.get("peak") or 0), live)
+            floor_ = max(basis * HOLD_STOP, peak * HOLD_TRAIL)
+            if live <= floor_:
+                if _sell(sym, qty, live, "HOLD-STOP", f"(live ${live:.2f} <= ${floor_:.2f})"):
+                    holds.pop(sym); holds_dirty = True
+        elif live <= cost * STOP_LOSS_PCT:
+            _sell(sym, qty, live, "STOP-LOSS", f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})")
+
+    # Tripwire: fresh danger headlines — exit trade positions, alert on holds.
+    bad = news_flags(set(stocks), NEWS_ALERT_MIN)
+    for sym, headline in bad.items():
+        key = sym + headline[:40]
+        if key in alerted: continue
+        alerted.add(key)
+        if sym in holds:
+            send_email(f"Alpaca bot ({MODE}) - NEWS ALERT: {sym}",
+                       f"Danger headline on HOLD {sym}:\n{headline}\n\n"
+                       "The bot does not auto-sell holds on keyword matches - review manually.")
+        elif sym in positions and sym not in pending and positions[sym]["qty"] > 0 and lasts.get(sym):
+            _sell(sym, positions[sym]["qty"], lasts[sym], "NEWS-EXIT", f"({headline[:80]})")
+
+    if holds_dirty:
+        save_holds(holds)
+    return placed
+
+
 if __name__ == "__main__":
     # Manual test: `gh workflow run alpaca-bot.yml -f email_test=true`
     if os.environ.get("EMAIL_TEST", "").lower() == "true":
@@ -1207,6 +1396,28 @@ if __name__ == "__main__":
 
     try:
         run_bot()
+        # Fast protective loop: keep this job alive until the next 15-min trigger,
+        # checking hard stops + danger news every ~EXIT_PASS_SEC. Free (public-repo
+        # minutes); ends early after any fast-pass order so the log persists.
+        if check_market()[0]:
+            import time as _time
+            deadline = _time.time() + LOOP_WINDOW_MIN * 60
+            alerted  = set()
+            passes = acted = 0
+            while _time.time() < deadline:
+                _time.sleep(EXIT_PASS_SEC)
+                open_, _et = check_market()
+                if not open_:
+                    print("  [fast loop: market closed — done]"); break
+                passes += 1
+                try:
+                    if exit_pass(_et, alerted):
+                        acted = 1
+                        print("  [fast pass placed orders — ending job so the log persists now]")
+                        break
+                except Exception as _e:
+                    print(f"  [fast pass error (loop continues): {_e}]")
+            print(f"  [fast loop done: {passes} pass(es), orders={'yes' if acted else 'no'}]")
     except Exception:
         import traceback
         tb = traceback.format_exc()

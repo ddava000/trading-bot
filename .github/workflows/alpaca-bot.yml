@@ -29,7 +29,7 @@ concurrency:
 jobs:
   trade:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 18   # full cycle + ~12.5 min fast protective loop (60s exit passes)
     permissions:
       contents: write   # allow committing trade_log.jsonl back to the repo
       actions: write    # allow dispatching brief.yml when the plan is stale

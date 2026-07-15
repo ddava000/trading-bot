@@ -119,6 +119,11 @@ def gather_context(et, mode):
         if hs:
             lines.append(f"-- {sym} --")
             lines += [f"  • {h}" for h in hs]
+        try:
+            if bot.earnings_within(sym, 7):
+                lines.append(f"  NOTE: {sym} reports earnings within ~7 days — weigh for the avoid list")
+        except Exception:
+            pass
 
     # Memory: prior plan + recent journal
     if os.path.exists("daily_plan.json"):
