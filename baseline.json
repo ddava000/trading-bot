@@ -1,0 +1,21 @@
+{
+ "set": "2026-07-15T10:15 ET",
+ "commit": "e49485d",
+ "note": "Adamant-mode deployment baseline: 60s protective loop + news tripwire + earnings guard. Measure the climb from here.",
+ "equity": 455.67,
+ "spy_ref": 754.74,
+ "holds": [
+  "AAPL",
+  "ANAB",
+  "META",
+  "REZI",
+  "TSLA"
+ ],
+ "sleeves": {
+  "index_core": 249,
+  "trade": 62,
+  "hold": 86,
+  "crypto": 23,
+  "cash": 36
+ }
+}
