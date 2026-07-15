@@ -622,3 +622,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['QQQ', 'SPY', 'META', 'NET', 'MU']
 - notes: VIX calm at 16.2 and semis leading futures higher after yesterday's soft-CPI rally held; keeping 0.50 rather than reaching because oil is spiking on Iran/Hormuz headlines and a packed earnings/data week (jobs, Warsh) keeps event risk elevated. Parking AAPL (downgrade), TSLA/ANAB weakness, CNMD, crypto and lagging IWM.
 - journal: Wed 7/15 09:00: holding 0.50 neutral into the open; Tuesday's rally carried through and VIX eased 16.4->16.2 with chips bid, but oil spike and busy data/earnings week cap risk. Same avoids; watching Iran/oil escalation and whether IWM/small-caps stop lagging.
+
+### 2026-07-15T10:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'MU'] | favor: ['QQQ', 'SPY', 'META', 'NET', 'REZI']
+- notes: Tape constructive with SPY +2.8%/QQQ +1.5% and VIX calm at 16.0; keeping 0.50 rather than reaching given oil spike on Iran/Hormuz, Warsh testimony today, and a packed earnings/data week. MU turned negative (-3.1%) so parking it alongside AAPL downgrade, TSLA weakness, CNMD/ANAB, crypto and lagging IWM.
+- journal: Wed 7/15 10:17: holding 0.50 neutral; large-caps green (SPY/QQQ/META/NET/REZI firm) but MU faded -3.1% so added to avoids. VIX steady 16.0. Watching Warsh testimony, Iran/oil headlines, and whether IWM/small-caps keep lagging.
