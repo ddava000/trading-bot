@@ -634,3 +634,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'QQQ'] | favor: ['SPY', 'META', 'REZI', 'JXN']
 - notes: Tape has softened intraday — Nasdaq turned lower on chip/tech weakness while S&P holds up (SPY +2.3%), and VIX ticked to 16.5; trimming to 0.45 given tech rollover, Warsh testimony and a packed CPI/jobs/earnings week. Parking tech-heavy QQQ/NET alongside AAPL, TSLA, ANAB (-17%), CNMD, crypto and lagging IWM.
 - journal: Wed 7/15 12:51: nudged 0.50->0.45 as chips faded and Nasdaq turned lower midday while broad SPY stayed green; VIX up slightly 16.0->16.5. Added QQQ/NET to avoids on tech weakness; ANAB deep red -17%. Watching whether tech stabilizes and any Warsh/oil headlines.
+
+### 2026-07-15T14:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET'] | favor: ['SPY', 'META', 'QQQ', 'REZI']
+- notes: VIX eased back to 15.7 and the tape firmed into the afternoon — SPY +2.6%, QQQ back green +1.0%, META +3.9% as chips stabilized; nudging back to 0.50 but staying cautious with Warsh testimony and a packed data/earnings week. Still parking AAPL (extended/downgrade), TSLA/ANAB (-15%) weakness, CNMD, crypto and lagging IWM.
+- journal: Wed 7/15 14:49: bumped 0.45->0.50 as VIX slipped 16.5->15.7 and tech recovered (QQQ back green, chips bounced); moved QQQ back to favor, kept NET parked. No new landmines. Watching for a late-day fade and any Warsh/oil headline into the close.
