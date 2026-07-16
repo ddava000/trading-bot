@@ -652,3 +652,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
 - notes: Mixed tape — semis sliding and Treasury yields rising pressure Nasdaq while SPY/Dow hold up; VIX steady at 16.0 with Warsh testimony live and retail-sales/jobless data in play. Holding 0.45 neutral into a choppy open; most positions green but chip weakness keeps me cautious.
 - journal: Thu 7/16 10:29: held 0.45 neutral, VIX flat 16.0. Semis leading futures lower again and yields up, but book is mostly green (REZI +10.5%, META +4.3%, SPY +2.7%). Still parking extended AAPL, weak TSLA (-5.5%)/ANAB (-17%), CNMD, crypto, lagging IWM and CVI. Watching Warsh testimony and whether chips stabilize.
+
+### 2026-07-16T12:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: Broad tape firm — SPY +2.4%, AAPL at record high, book mostly green with only semis dragging Nasdaq; VIX steady 16.3 with Warsh testimony live. Nudging to 0.5 neutral but keeping laggards and event names parked.
+- journal: Thu 7/16 12:49: bumped 0.45->0.50 as tape held up (SPY +2.4%, REZI +8.4%, META +3.5%) despite chip weakness; VIX flat 16.3. Still parking extended AAPL, weak TSLA(-6.9%)/ANAB(-19%), CNMD, crypto, lagging IWM, CVI. Watching semis and any late Warsh headline.
