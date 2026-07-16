@@ -640,3 +640,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET'] | favor: ['SPY', 'META', 'QQQ', 'REZI']
 - notes: VIX eased back to 15.7 and the tape firmed into the afternoon — SPY +2.6%, QQQ back green +1.0%, META +3.9% as chips stabilized; nudging back to 0.50 but staying cautious with Warsh testimony and a packed data/earnings week. Still parking AAPL (extended/downgrade), TSLA/ANAB (-15%) weakness, CNMD, crypto and lagging IWM.
 - journal: Wed 7/15 14:49: bumped 0.45->0.50 as VIX slipped 16.5->15.7 and tech recovered (QQQ back green, chips bounced); moved QQQ back to favor, kept NET parked. No new landmines. Watching for a late-day fade and any Warsh/oil headline into the close.
+
+### 2026-07-16T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: S&P futures edge lower with semis leading down and Warsh testimony plus retail-sales data on tap; VIX steady at 16.4. Trimming to 0.45 into an uncertain open — parking AAPL (extended at record high), TSLA (-6%), ANAB (-17.5%), CNMD, crypto, lagging IWM, and CVI ahead of its 7/30 call.
+- journal: Thu 7/16 09:00: new session, held 0.45 neutral. Semis soft and futures lower after softer CPI helped megacaps yesterday; retail sales + Warsh in focus. Added CVI (earnings 7/30) to avoids; watching whether chips stabilize and if IWM stops lagging.
