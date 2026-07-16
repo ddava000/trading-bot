@@ -658,3 +658,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
 - notes: Broad tape firm — SPY +2.4%, AAPL at record high, book mostly green with only semis dragging Nasdaq; VIX steady 16.3 with Warsh testimony live. Nudging to 0.5 neutral but keeping laggards and event names parked.
 - journal: Thu 7/16 12:49: bumped 0.45->0.50 as tape held up (SPY +2.4%, REZI +8.4%, META +3.5%) despite chip weakness; VIX flat 16.3. Still parking extended AAPL, weak TSLA(-6.9%)/ANAB(-19%), CNMD, crypto, lagging IWM, CVI. Watching semis and any late Warsh headline.
+
+### 2026-07-16T14:51 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: Tape steady into the last hour — SPY +2.2%, book mostly green, only semis (TSMC/SK Hynix) dragging Nasdaq; VIX slightly up to 16.6 with Warsh testimony live. Holding 0.5 neutral and keeping extended/weak/event names parked.
+- journal: Thu 7/16 14:51: held 0.50 neutral, VIX ticked 16.3->16.6. Chip weakness persists but breadth firm (SPY/ABT/REZI/META green); TSLA still weak (-6.4%), ANAB -19.9%. No new landmines. Watching for a late-day fade into the close.
