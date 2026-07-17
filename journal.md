@@ -682,3 +682,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: Chip rout persists into midday (semis in bear market, Netflix plunge dragging Nasdaq) but VIX has eased to 18.2 and broad tape stabilizing — SPY +1.5%, ABT/JXN/REZI/VOD/CVI green. Holding risk-off at 0.4; tech/semis and crypto still weak (TSLA -8.1%, ANAB -15.2%) with CPI/Fed/Iran event risk ahead.
 - journal: Fri 7/17 12:40: nudged 0.35->0.4 as VIX slipped 18.5->18.2 and book steadied (REZI +12%, CVI +4.6%, SPY/ABT/JXN/VOD green). Semis still in bear market, TSLA/ANAB the laggards; parking tech/crypto/AAPL. Watching for a late-Friday fade and weekend Iran/CPI headlines.
+
+### 2026-07-17T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip sell-off persists into the afternoon (Nasdaq -1%+ on China AI news, Netflix whiff) with VIX back at 18.5 and tech/semis/crypto weak (TSLA -8.7%, ANAB -13.9%). Holding risk-off at 0.4 — defensives (REZI +8.6%, CVI +6.8%, VOD/ABT/JXN green) leading, but weekend Iran/CPI/Fed event risk argues against reaching.
+- journal: Fri 7/17 14:47: staying 0.4 risk-off, VIX ticked back to 18.5 from 18.2. Book steady (REZI +8.6%, CVI +6.8%, SPY/ABT/JXN/VOD green) but semis/tech still soft and it's late Friday. Parking tech/crypto/AAPL/TSLA/ANAB; watching for close-out fade and weekend headline risk (Iran, CPI, Fed next week).
