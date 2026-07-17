@@ -664,3 +664,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
 - notes: Tape steady into the last hour — SPY +2.2%, book mostly green, only semis (TSMC/SK Hynix) dragging Nasdaq; VIX slightly up to 16.6 with Warsh testimony live. Holding 0.5 neutral and keeping extended/weak/event names parked.
 - journal: Thu 7/16 14:51: held 0.50 neutral, VIX ticked 16.3->16.6. Chip weakness persists but breadth firm (SPY/ABT/REZI/META green); TSLA still weak (-6.4%), ANAB -19.9%. No new landmines. Watching for a late-day fade into the close.
+
+### 2026-07-17T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'CVI', 'META'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip rout deepening (Nasdaq futures -1.5%) after Netflix whiff, plus hot PCE at a 3-year high and tariff/Iran jitters; VIX jumped to 18.5. Cutting to 0.35 risk-off — tech/semis and crypto under pressure, only defensives (ABT, VOD, REZI) holding up.
+- journal: Fri 7/17 09:00: dropped to 0.35 risk-off (from 0.5 neutral) as VIX spiked 16.6->18.5. Chip sell-off + Netflix miss hammering Nasdaq, hot PCE inflation and tariff headlines add macro risk. Added META/QQQ to avoids given tech weakness; leaning into defensives ABT/VOD/REZI/JXN/SPY. Watching whether semis stabilize and if breadth breaks down further.
