@@ -1,6 +1,6 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.35,
+  "risk_scale": 0.4,
   "avoid_symbols": [
     "AAPL",
     "CNMD",
@@ -21,9 +21,9 @@
     "REZI",
     "VOD"
   ],
-  "notes": "Chip sell-off intensifying (Nasdaq futures down, Netflix -11%) on new Chinese AI model, plus hot PCE at a 3-year high and Fed/CPI/Iran event risk; VIX at 18.5. Staying risk-off at 0.35 \u2014 tech/semis and crypto weak (TSLA -8.5%, ANAB -17.4%), only defensives (ABT, REZI, VOD, JXN) holding.",
-  "journal_entry": "Fri 7/17 10:09: holding 0.35 risk-off, VIX steady 18.5. Chip rout ongoing, META/QQQ/IWM red but book overall stabilizing (REZI +10.8%, CVI +5.5%, VOD +5.5%). Parking AAPL (Q3 report this month), weak TSLA/ANAB/CNMD, crypto, tech. Watching if semis find a floor or breadth cracks further.",
+  "notes": "Chip rout persists into midday (semis in bear market, Netflix plunge dragging Nasdaq) but VIX has eased to 18.2 and broad tape stabilizing \u2014 SPY +1.5%, ABT/JXN/REZI/VOD/CVI green. Holding risk-off at 0.4; tech/semis and crypto still weak (TSLA -8.1%, ANAB -15.2%) with CPI/Fed/Iran event risk ahead.",
+  "journal_entry": "Fri 7/17 12:40: nudged 0.35->0.4 as VIX slipped 18.5->18.2 and book steadied (REZI +12%, CVI +4.6%, SPY/ABT/JXN/VOD green). Semis still in bear market, TSLA/ANAB the laggards; parking tech/crypto/AAPL. Watching for a late-Friday fade and weekend Iran/CPI headlines.",
   "date": "2026-07-17",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-17T10:09 ET"
+  "updated_at": "2026-07-17T12:40 ET"
 }
