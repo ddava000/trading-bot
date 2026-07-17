@@ -670,3 +670,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'CVI', 'META'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: Chip rout deepening (Nasdaq futures -1.5%) after Netflix whiff, plus hot PCE at a 3-year high and tariff/Iran jitters; VIX jumped to 18.5. Cutting to 0.35 risk-off — tech/semis and crypto under pressure, only defensives (ABT, VOD, REZI) holding up.
 - journal: Fri 7/17 09:00: dropped to 0.35 risk-off (from 0.5 neutral) as VIX spiked 16.6->18.5. Chip sell-off + Netflix miss hammering Nasdaq, hot PCE inflation and tariff headlines add macro risk. Added META/QQQ to avoids given tech weakness; leaning into defensives ABT/VOD/REZI/JXN/SPY. Watching whether semis stabilize and if breadth breaks down further.
+
+### 2026-07-17T10:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip sell-off intensifying (Nasdaq futures down, Netflix -11%) on new Chinese AI model, plus hot PCE at a 3-year high and Fed/CPI/Iran event risk; VIX at 18.5. Staying risk-off at 0.35 — tech/semis and crypto weak (TSLA -8.5%, ANAB -17.4%), only defensives (ABT, REZI, VOD, JXN) holding.
+- journal: Fri 7/17 10:09: holding 0.35 risk-off, VIX steady 18.5. Chip rout ongoing, META/QQQ/IWM red but book overall stabilizing (REZI +10.8%, CVI +5.5%, VOD +5.5%). Parking AAPL (Q3 report this month), weak TSLA/ANAB/CNMD, crypto, tech. Watching if semis find a floor or breadth cracks further.
