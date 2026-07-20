@@ -688,3 +688,9 @@
 - avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: Chip sell-off persists into the afternoon (Nasdaq -1%+ on China AI news, Netflix whiff) with VIX back at 18.5 and tech/semis/crypto weak (TSLA -8.7%, ANAB -13.9%). Holding risk-off at 0.4 — defensives (REZI +8.6%, CVI +6.8%, VOD/ABT/JXN green) leading, but weekend Iran/CPI/Fed event risk argues against reaching.
 - journal: Fri 7/17 14:47: staying 0.4 risk-off, VIX ticked back to 18.5 from 18.2. Book steady (REZI +8.6%, CVI +6.8%, SPY/ABT/JXN/VOD green) but semis/tech still soft and it's late Friday. Parking tech/crypto/AAPL/TSLA/ANAB; watching for close-out fade and weekend headline risk (Iran, CPI, Fed next week).
+
+### 2026-07-20T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD', 'CVI']
+- notes: Futures up on Iran de-escalation and lower oil, VIX eased to 18.2 and last week's chip rout stabilizing — nudging from risk-off to neutral at 0.5. But Big Tech earnings dominate this week (AAPL/META within days) plus jobs/Fed-speak data, so keeping sizing modest and parking event-risk names.
+- journal: Mon 7/20 09:00: upgraded risk-off->neutral, 0.4->0.5 as Iran talks calm the tape, oil falls, VIX steady 18.2 and book firm (REZI +6.3%, CVI +6.6%, JXN/VOD/ABT/SPY green). Still parking AAPL/META (Big Tech earnings imminent), weak TSLA/ANAB, tech/crypto. Watching earnings landmines and this week's econ data.
