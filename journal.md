@@ -730,3 +730,9 @@
 - avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: VIX eased to 17.1 and the tape is broadly green (SPY +2.0%, chips leading, Dow +500), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil above $91 keep me at neutral 0.5. Parking earnings/event-risk names plus CVI (7/30 call) and TSLA (-8.7% today).
 - journal: Tue 7/21 12:55: holding neutral 0.5, VIX ticked down 17.6->17.1, chip-led rally intact with SPY/REZI/CVI firm. TSLA still weak at -8.7%, oil >$91 on Iran strikes. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-21T14:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%, Dow +400), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil above $91 keep me at neutral 0.5. Parking earnings/event-risk names plus CVI (7/30 call) and TSLA (-9.4% today, deepening landmine).
+- journal: Tue 7/21 14:59: holding neutral 0.5 into the close, VIX flat 17.0, chip rally intact and defensives firm. TSLA sank further to -9.4% today. Watching AAPL/META earnings, jobs report and Fed-speak this week.
