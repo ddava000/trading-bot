@@ -5,7 +5,6 @@
     "AAPL",
     "META",
     "TSLA",
-    "ANAB",
     "CNMD",
     "NET",
     "ETHUSD",
@@ -20,9 +19,9 @@
     "REZI",
     "VOD"
   ],
-  "notes": "VIX eased to 17.9 and futures firm on a chip-led bounce, but Big Tech earnings (AAPL/META imminent) plus this week's jobs data and Fed's Warsh keep me at neutral 0.5; Dimon's caution reinforces defensiveness. Parking event-risk/earnings names and CVI (7/30 call); ANAB -25.2% and TSLA -11.1% remain the book's landmines.",
-  "journal_entry": "Tue 7/21 09:00: opening neutral 0.5, VIX 18.4->17.9, futures higher on chip revival but Big Tech earnings week live. AAPL dropped on news; ANAB deepened to -25.2%. Watching AAPL/META earnings, jobs report and Fed-speak this week.",
+  "notes": "VIX steady at 17.6 and the tape is constructive (SPY +1.7%, chips leading), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil spike above $90 keep me neutral at 0.5; Dimon's caution reinforces defensiveness. Parking earnings/event-risk names and CVI (7/30 call).",
+  "journal_entry": "Tue 7/21 10:30: holding neutral 0.5, VIX flat 17.6, chip-led rally lifting SPY/QQQ. TSLA slid to -8.3% today (fresh landmine), oil >$90 on Iran strikes. Watching AAPL/META earnings, jobs report and Fed-speak this week.",
   "date": "2026-07-21",
-  "mode": "MORNING",
-  "updated_at": "2026-07-21T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-21T10:30 ET"
 }
