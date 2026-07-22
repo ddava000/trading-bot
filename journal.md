@@ -736,3 +736,9 @@
 - avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%, Dow +400), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil above $91 keep me at neutral 0.5. Parking earnings/event-risk names plus CVI (7/30 call) and TSLA (-9.4% today, deepening landmine).
 - journal: Tue 7/21 14:59: holding neutral 0.5 into the close, VIX flat 17.0, chip rally intact and defensives firm. TSLA sank further to -9.4% today. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX 17.5 with futures slipping and Iran war still in focus; CVI reports earnings TODAY (moved to top of avoid) and Big Tech (AAPL/META) earnings plus this week's jobs data keep me at neutral 0.5. TSLA has deepened to -10.1%, a persistent landmine.
+- journal: Wed 7/22 09:00: holding neutral 0.5, VIX ticked up 17.0->17.5, futures lower on Iran war and earnings jitters. CVI reports today so firmly parked; TSLA landmine deepened to -10.1%. Watching AAPL/META earnings and jobs data this week.
