@@ -754,3 +754,9 @@
 - avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'PLTK', 'LCID', 'ETHUSD', 'SOLUSD', 'NET', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
 - notes: VIX eased to 16.8 with a constructive chip-led tape (SPY +2.1%), but Big Tech (AAPL/META) earnings, this week's jobs data and rising oil keep me at neutral 0.5. TSLA remains a deep landmine (-9.6%), LCID/PLTK/META soft, and CVI/CNMD carry event risk.
 - journal: Wed 7/22 12:55: holding neutral 0.5, VIX ticked down 17.0->16.8, tape firm with SPY +2.1% and CVI now reporting next week (still parked). TSLA -9.6% and LCID -5.3% remain landmines. Watching AAPL/META earnings, jobs data and oil.
+
+### 2026-07-22T14:52 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'PLTK', 'LCID', 'ETHUSD', 'SOLUSD', 'NET', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%), but Big Tech (AAPL/META) earnings, this week's jobs data and rising oil keep me at neutral 0.5. TSLA is a deep landmine (-10.1%), PLTK -7.9% and LCID -5.8% soft, and CVI/CNMD carry event risk.
+- journal: Wed 7/22 14:52: holding neutral 0.5 into the close, VIX flat 17.0, tape firm SPY +1.9% but breadth 'weird' per WSJ. TSLA landmine deepened to -10.1%, PLTK/LCID weak. Watching AAPL/META earnings and this week's jobs data.
