@@ -197,7 +197,13 @@ def apply_fills(led, orders, placed, prices):
                 if cur["qty"] <= 1e-9:
                     pos.pop(sym, None); led["holds"].pop(sym, None)
     led["positions"] = [p for p in pos.values() if p["qty"] > 1e-9]
-    led["orders_today"] = led.get("orders_today", 0) + len(orders)
+    # The cap is a circuit breaker on REAL submissions, so simulated orders must
+    # not consume it. Dry cycles never reach the broker, and reconcile() resets
+    # positions to the broker's (empty) truth every cycle, so a dry run re-decides
+    # the same buys forever. At ~7/cycle that burns the 40/day budget in about an
+    # hour, after which cycle() goes quiet in a way that reads as "found nothing".
+    if not DRY:
+        led["orders_today"] = led.get("orders_today", 0) + len(orders)
 
 
 def track_peaks(led, prices):
