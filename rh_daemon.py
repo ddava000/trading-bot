@@ -83,6 +83,14 @@ CFG = _load(CONFIG_F, {})
 ACCOUNT    = CFG.get("account", "")
 CLAUDE_BIN = CFG.get("claude", "claude")
 
+# Reuse alpaca_bot.send_email rather than reimplementing SMTP here, so the laptop
+# and the cloud bot mail through one code path. The cloud gets its password from a
+# GitHub secret; this laptop has no secrets store, so it comes from rh_config.json,
+# which is gitignored and never leaves the machine. Unset just means no mail:
+# send_email already no-ops without a password and never raises.
+if CFG.get("gmail_app_password"):
+    bot.GMAIL_APP_PW = CFG["gmail_app_password"]
+
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
 # The Robinhood connector is a claude.ai MCP server, so its tools are DEFERRED:
@@ -301,6 +309,37 @@ def _push_status(reason):
         return False
 
 
+def email_trades(res, placed, led):
+    """Tell Devon what the laptop bot just did. No subject-line emoji: he prints
+    these to PDF and the subject becomes the filename."""
+    orders = res.get("orders") or []
+    if not orders:
+        return
+    ok = sum(1 for p in placed if p.get("status") == "ok")
+    bad = [p for p in placed if p.get("status") != "ok"]
+    lines = [f"Robinhood laptop bot ({'DRY' if DRY else 'LIVE'})",
+             f"{now_et().strftime('%Y-%m-%d %H:%M ET')}", "",
+             f"{ok}/{len(orders)} order(s) accepted.", ""]
+    for o in orders:
+        st = next((p.get("status") for p in placed
+                   if p.get("symbol") == o["symbol"] and p.get("action") == o["action"]),
+                  "dry" if DRY else "unknown")
+        amt = o.get("notional")
+        size = f"${amt:.2f}" if amt else f"{o.get('qty')} sh"
+        lines.append(f"  [{st:8}] {o['action'].upper():4} {o['symbol']:6} {size:>9}  {o['reason']}")
+    if bad:
+        lines += ["", "NOT ACCEPTED:"] + [f"  {p.get('symbol')}: {p.get('detail') or p.get('status')}"
+                                          for p in bad]
+    snap = res.get("snapshot") or {}
+    lines += ["", f"equity ${snap.get('equity', 0):.2f} | cash ${led.get('cash', 0):.2f} "
+                  f"| orders today {led.get('orders_today', 0)}/{MAX_ORDERS_DAY}",
+              f"positions: {', '.join(p['symbol'] for p in led['positions']) or 'none'}",
+              "", "Stop it: create a file named rh_HALT in the repo folder."]
+    subject = (f"RH laptop bot: {ok}/{len(orders)} order(s) "
+               f"{'placed' if not DRY else 'simulated'}")
+    bot.send_email(subject, "\n".join(lines))
+
+
 def persist(led, res, placed):
     """Write the ledger locally; commit the shareable log/status for monitoring."""
     global _last_push_at, _last_push_material
@@ -400,6 +439,7 @@ def cycle(led, fast):
             # Truth up after every trade. The orders are already away, so a
             # corrupt snapshot here means keep the local ledger, not skip.
             adopt_truth(led, reconcile())
+            email_trades(res, placed, led)      # after reconcile: report real state
     for n in res.get("notes", []):
         log(f"  note: {n}")
     persist(led, res, placed)
