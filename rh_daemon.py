@@ -48,6 +48,39 @@ _last_push_at, _last_push_material = 0.0, None
 DRY = "--dry" in sys.argv
 
 
+_singleton_handle = None
+
+
+def acquire_singleton():
+    """Guarantee ONE daemon, via a Windows named mutex the OS frees on exit.
+
+    On 2026-07-23 three live daemons ran at once against the same account. Cause:
+    os.execv on Windows SPAWNS a new process instead of replacing the current one
+    (unlike Unix), and each code-sync restart after a push stacked another copy
+    that Task Scheduler's MultipleInstances tracking never saw. A shared ledger
+    with three writers is a real way to double-place orders.
+
+    A named mutex is the canonical Windows singleton: held for the process
+    lifetime, released automatically even on a hard kill, so there is no stale
+    lock to clean up. Fails OPEN on any error: better to run than to refuse to
+    trade over a bug in the guard itself.
+    """
+    global _singleton_handle
+    if sys.platform != "win32":
+        return True
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        h = k32.CreateMutexW(None, False, "rh_trading_bot_singleton")
+        ERROR_ALREADY_EXISTS = 183
+        if k32.GetLastError() == ERROR_ALREADY_EXISTS:
+            return False
+        _singleton_handle = h        # keep the handle for the process lifetime
+        return True
+    except Exception:
+        return True
+
+
 def now_et():
     """Always ET, never local time.
 
@@ -504,6 +537,9 @@ def _detach_from_console():
 
 
 def main():
+    if not acquire_singleton():
+        log("another rh_daemon is already running — this instance is exiting")
+        return 0
     if _detach_from_console():
         log("running detached: console Ctrl+C ignored, use rh_HALT to stop")
     if not ACCOUNT:
@@ -552,12 +588,19 @@ def main():
             full = (time.time() - last_full) >= FULL_CYCLE_SEC
             if full and sync_code():
                 save_ledger(led)          # ledger is the source of truth across restarts
+                # Do NOT execv on Windows: it spawns rather than replaces, which is
+                # how three daemons ended up running at once. Exit non-zero and let
+                # Task Scheduler restart exactly one managed instance. The singleton
+                # mutex backs this up if a restart ever races.
+                if sys.platform == "win32":
+                    log("updated code pulled — exiting 42 for a clean task restart")
+                    return 42
                 log("restarting into updated code")
                 try:
                     os.execv(sys.executable, [sys.executable] + sys.argv)
-                except Exception as e:        # execv is unreliable on some Windows setups;
+                except Exception as e:
                     log(f"execv failed ({e}) - exiting 42 so the scheduled task restarts us")
-                    return 42                 # non-zero => Task Scheduler auto-restart fires
+                    return 42
             res = cycle(led, fast=not full)
             if full:
                 last_full = time.time()
