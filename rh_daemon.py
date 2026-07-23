@@ -446,7 +446,32 @@ def cycle(led, fast):
     return res
 
 
+def _detach_from_console():
+    """Survive the console that launched us going away.
+
+    The scheduled task runs with LogonType Interactive, so it attaches to whatever
+    console started it. Closing that window delivers CTRL_C to the whole group and
+    kills the daemon: observed twice on 2026-07-23, exit 0xC000013A
+    (STATUS_CONTROL_C_EXIT), leaving seven live positions with no protective pass.
+
+    Only ignored when stdout is NOT a terminal, i.e. when running under the task
+    with output redirected to rh_daemon.log. Run it by hand in a real terminal and
+    Ctrl+C still works. Stop-ScheduledTask terminates rather than signalling, so
+    the task remains stoppable, and rh_HALT is the real kill switch regardless.
+    """
+    try:
+        if not sys.stdout.isatty():
+            import signal
+            signal.signal(signal.SIGINT, signal.SIG_IGN)
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def main():
+    if _detach_from_console():
+        log("running detached: console Ctrl+C ignored, use rh_HALT to stop")
     if not ACCOUNT:
         log(f"No account configured. Create {CONFIG_F}: "
             '{"account": "<robinhood agentic account number>", "claude": "claude"}')
