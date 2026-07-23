@@ -181,8 +181,12 @@ else { Ok "smoke test complete - no orders were placed" }
 
 Step "7/7  Registering the always-on task"
 $taskName = "rh-trading-bot"
+# --dry is deliberate. The closing banner promises the bot ships NOT trading,
+# but DRY is set only by sys.argv, so a task registered without the flag went
+# live at the next logon with nobody having chosen to go live. Removing --dry
+# here is the single, explicit act that arms real trading.
 $action = New-ScheduledTaskAction -Execute "cmd.exe" `
-    -Argument "/c `"`"$py`" rh_daemon.py >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
+    -Argument "/c `"`"$py`" rh_daemon.py --dry >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -MultipleInstances IgnoreNew
