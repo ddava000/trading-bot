@@ -13,14 +13,14 @@
   "SPY",
   "WEX"
  ],
- "hold": 14.96,
+ "hold": 14.97,
  "holds": [
   "IMAX",
   "LMT",
   "NVCR",
   "WEX"
  ],
- "index": 29.86,
+ "index": 29.85,
  "orders_today": 9,
  "positions": {
   "ALLE": 0.019017,
@@ -37,6 +37,6 @@
  "regime": "risk-off",
  "risk": 0.3,
  "settled": 4.32,
- "trade": 10.57,
+ "trade": 10.58,
  "ts": "2026-07-23T15:45"
 }
