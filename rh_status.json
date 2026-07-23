@@ -1,31 +1,22 @@
 {
  "dry": true,
- "equity": 59.94,
- "held": [
-  "ALLE",
-  "IWM",
-  "NVCR",
-  "QQQ",
-  "SPY",
-  "TMO"
- ],
- "hold": 11.97,
+ "equity": 59.92,
+ "held": [],
+ "hold": 5.99,
  "holds": [
-  "DGX",
   "NVCR"
  ],
- "index": 30.01,
+ "index": 0,
  "orders_today": 0,
  "positions": {
-  "ALLE": 0.038,
-  "DGX": 0.026687,
-  "IWM": 0.034309,
-  "NVCR": 0.307811,
-  "QQQ": 0.014448,
-  "SPY": 0.013541,
-  "TMO": 0.005192
+  "ALLE": 0.03804,
+  "IWM": 0.034242,
+  "NVCR": 0.309561,
+  "QQQ": 0.014389,
+  "SPY": 0.013513,
+  "TMO": 0.00524
  },
- "settled": 14.97,
- "trade": 8.98,
- "ts": "2026-07-23T12:11"
+ "settled": 59.92,
+ "trade": 8.99,
+ "ts": "2026-07-23T12:37"
 }
