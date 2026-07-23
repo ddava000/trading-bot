@@ -123,6 +123,18 @@ def decide(state, fast=False):
 
     budget = min(settled * 0.95, settled)             # settled cash only
 
+    # ── RESEARCH PLAN: the cloud brief reaches this laptop through git ────────
+    # brief.py writes daily_plan.json and commits it; rh_daemon pulls it every
+    # full cycle. load_plan is alpaca_bot's, not a copy, so the two bots read the
+    # same file the same way: risk clamped to [0,1], a stale or missing plan
+    # falling back to neutral. Applied EXACTLY where the cloud applies it, to
+    # active entries only. The index core is deliberately untouched, matching
+    # alpaca_bot, which gates the core on halt and low cash but never on the plan.
+    plan = bot.load_plan(datetime.now(bot.ET_TZ))
+    if plan["risk"] < 1.0 or plan["avoid"]:
+        notes.append(f"plan: {plan['regime']} risk {plan['risk']} "
+                     f"avoid {sorted(plan['avoid']) or 'none'}")
+
     # ── INDEX CORE: equal-weight SPY/QQQ/IWM toward 50%, funded FIRST ─────────
     per_tgt = equity * bot.INDEX_CORE_PCT / len(bot.INDEX_ETFS)
     for etf in bot.INDEX_ETFS:
@@ -155,6 +167,8 @@ def decide(state, fast=False):
             if sig["rsi"] > bot.RSI_ENTRY_MAX:                    continue
             if sym in block:
                 notes.append(f"{sym}: blocked — danger news"); continue
+            if sym in plan["avoid"]:
+                notes.append(f"{sym}: skipped — plan avoid-list"); continue
             cands.append((sig["buys"], sym, live, sig, closes))
         cands.sort(key=lambda r: -r[0])
 
@@ -177,7 +191,10 @@ def decide(state, fast=False):
             sleeve  = "HOLD" if strong else "TRADE"
             room    = (equity * bot.HOLD_PCT - hold_val) if strong else \
                       (equity * bot.MAX_INVESTED_PCT - trade_val)
-            amount  = min(equity * bot.MAX_POS_PCT, room, budget)
+            # plan["risk"] scales the per-name cap, same as the cloud's
+            # name_cap * plan["risk"]. It can only size DOWN: load_plan clamps to
+            # [0,1], so research can never push past the bot's own hard rails.
+            amount  = min(equity * bot.MAX_POS_PCT * plan["risk"], room, budget)
             if amount < MIN_ORDER:
                 continue
             orders.append({"action": "buy", "symbol": sym, "notional": round(amount, 2),
@@ -193,12 +210,23 @@ def decide(state, fast=False):
     return {"orders": orders, "notes": notes, "fast": False,
             "snapshot": {"equity": round(equity, 2), "settled": round(settled, 2),
                          "index": round(index_val, 2), "hold": round(hold_val, 2),
-                         "trade": round(trade_val, 2), "held": sorted(held)}}
+                         "trade": round(trade_val, 2), "held": sorted(held),
+                         # regime/risk mirror the cloud's status.json field names,
+                         # so one monitoring prompt can read both bots.
+                         "regime": plan["regime"], "risk": plan["risk"]}}
 
 
 def _selftest():
     import random
     random.seed(11)
+
+    # Pin the plan to neutral. This selftest is the code-sync gate: rh_daemon runs
+    # it on freshly pulled code and hard-resets when it fails. Letting it read the
+    # live daily_plan.json would make the gate depend on today's research, so a
+    # risk-off day whose avoid-list happened to name a fixture symbol would reject
+    # perfectly good code and roll the laptop back. Rails get tested, not weather.
+    bot.load_plan = lambda et: {"regime": "neutral", "risk": 1.0,
+                                "avoid": set(), "favor": [], "notes": "selftest"}
     flat  = [10.0 + random.gauss(0, 0.05) for _ in range(60)]
     theme = [random.gauss(0, 0.02) for _ in range(60)]
 
