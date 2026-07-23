@@ -200,6 +200,41 @@ def persist(led, res, placed):
         log(f"git persist skipped: {e}")
 
 
+# ── Code sync: inherit cloud-bot improvements, but verify before trusting ───
+def sync_code():
+    """Pull upstream changes and prove they work before running on them.
+
+    rh_bot.py imports its rails straight from alpaca_bot, so a strategy fix made
+    to the cloud bot reaches this laptop through git and nothing else. Without
+    this the daemon would run whatever code it started with, forever.
+
+    A bad upstream push must never break trading here, so new code has to pass
+    rh_bot's selftest; if it fails we hard-reset to the commit we were already
+    running and keep trading on known-good code. Returns True when the process
+    should restart to load the new modules (Python caches imports)."""
+    try:
+        def git(*a, t=90):
+            return subprocess.run(["git", *a], capture_output=True, text=True, timeout=t)
+        before = git("rev-parse", "HEAD").stdout.strip()
+        git("pull", "--rebase", "--autostash", "--quiet")
+        after = git("rev-parse", "HEAD").stdout.strip()
+        if not after or after == before:
+            return False
+        log(f"upstream code changed {before[:7]} -> {after[:7]} - verifying before use")
+        chk = subprocess.run([sys.executable, "rh_bot.py", "--selftest"],
+                             capture_output=True, text=True, timeout=180)
+        if chk.returncode != 0:
+            log("!! NEW CODE FAILED SELFTEST - rolling back, staying on known-good code")
+            log((chk.stdout or "")[-400:] + (chk.stderr or "")[-400:])
+            git("reset", "--hard", before)
+            return False
+        log("new code passed selftest - restarting to load it")
+        return True
+    except Exception as e:
+        log(f"code sync skipped ({e}) - continuing on current code")
+        return False
+
+
 # ── Main loop ───────────────────────────────────────────────────────────────
 def cycle(led, fast):
     prices = {}
@@ -271,6 +306,14 @@ def main():
                                          "avg_cost": float(p.get("avg_cost") or 0)}
                                         for p in truth["positions"] if float(p["qty"]) > 0]
             full = (time.time() - last_full) >= FULL_CYCLE_SEC
+            if full and sync_code():
+                _save(LEDGER_F, led)          # ledger is the source of truth across restarts
+                log("restarting into updated code")
+                try:
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                except Exception as e:        # execv is unreliable on some Windows setups;
+                    log(f"execv failed ({e}) - exiting 42 so the scheduled task restarts us")
+                    return 42                 # non-zero => Task Scheduler auto-restart fires
             res = cycle(led, fast=not full)
             if full:
                 last_full = time.time()
