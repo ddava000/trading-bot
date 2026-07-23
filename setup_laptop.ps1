@@ -93,7 +93,9 @@ if (Test-Path (Join-Path $RepoDir ".git")) {
     Ok "cloned to $RepoDir"
 }
 Set-Location $RepoDir
-& $py -m pip install --quiet --upgrade requests
+# tzdata is required on Windows: unlike Linux/CI, Windows ships no system IANA
+# tz database, so ZoneInfo("America/New_York") in alpaca_bot dies without it.
+& $py -m pip install --quiet --upgrade requests tzdata
 if ($LASTEXITCODE -ne 0) { Warn "pip install had trouble - continuing, the smoke test will catch it" }
 else { Ok "python deps ready" }
 
@@ -164,8 +166,12 @@ else { Ok "push works - remote monitoring live" }
 
 Step "6/7  Writing config and smoke-testing (DRY - places nothing)"
 if (-not $Account) { $Account = Read-Host "  Robinhood AGENTIC account number" }
-@{ account = $Account.Trim(); claude = $claude } | ConvertTo-Json |
-    Out-File -Encoding utf8 rh_config.json
+# WriteAllText with an explicit no-BOM encoder, NOT Out-File -Encoding utf8:
+# PS 5.1's "utf8" means utf8-WITH-BOM, and the BOM makes Python's json.load fail.
+$cfgJson = @{ account = $Account.Trim(); claude = $claude } | ConvertTo-Json
+[System.IO.File]::WriteAllText(
+    (Join-Path $RepoDir "rh_config.json"), $cfgJson,
+    (New-Object System.Text.UTF8Encoding $false))
 Ok "rh_config.json written (gitignored - never leaves this laptop)"
 & $py rh_bot.py --selftest
 if ($LASTEXITCODE -ne 0) { Die "strategy selftest FAILED - stopping before anything can trade." }
@@ -177,14 +183,48 @@ Step "7/7  Registering the always-on task"
 $taskName = "rh-trading-bot"
 $action = New-ScheduledTaskAction -Execute "cmd.exe" `
     -Argument "/c `"`"$py`" rh_daemon.py >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
-$triggers = @((New-ScheduledTaskTrigger -AtLogOn), (New-ScheduledTaskTrigger -AtStartup))
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -MultipleInstances IgnoreNew
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
-Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $triggers `
-    -Settings $settings -Description "Robinhood laptop trading bot (always on)" | Out-Null
-Ok "task '$taskName' registered - starts at logon and boot, restarts if it dies"
+
+# -AtStartup needs admin (it runs before any user logs on); -AtLogOn does not.
+# Try boot+logon first, fall back to logon-only so an unelevated run still works.
+$isAdmin = ([Security.Principal.WindowsPrincipal] `
+    [Security.Principal.WindowsIdentity]::GetCurrent()
+    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+$registered = $false
+if ($isAdmin) {
+    try {
+        Register-ScheduledTask -TaskName $taskName -Action $action `
+            -Trigger @((New-ScheduledTaskTrigger -AtLogOn), (New-ScheduledTaskTrigger -AtStartup)) `
+            -Settings $settings -Description "Robinhood laptop trading bot (always on)" `
+            -ErrorAction Stop | Out-Null
+        $registered = $true
+        Ok "task '$taskName' registered - starts at logon AND boot, restarts if it dies"
+    } catch {
+        Warn "boot-trigger registration failed ($($_.Exception.Message)) - trying logon-only"
+    }
+}
+if (-not $registered) {
+    try {
+        Register-ScheduledTask -TaskName $taskName -Action $action `
+            -Trigger (New-ScheduledTaskTrigger -AtLogOn) `
+            -Settings $settings -Description "Robinhood laptop trading bot (logon)" `
+            -ErrorAction Stop | Out-Null
+        $registered = $true
+        Ok "task '$taskName' registered - starts AT LOGON, restarts if it dies"
+        if (-not $isAdmin) {
+            Warn "NOT registered for boot (needs admin). The bot starts when you log in."
+            Warn "For boot-start too, re-run this script in an ELEVATED PowerShell."
+        }
+    } catch {
+        Warn "could not register the scheduled task: $($_.Exception.Message)"
+        Warn "THE BOT WILL NOT AUTO-START. Re-run this script in an elevated PowerShell,"
+        Warn "or start it by hand:  $py rh_daemon.py"
+    }
+}
 
 Write-Host @"
 

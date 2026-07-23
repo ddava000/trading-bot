@@ -49,14 +49,19 @@ def log(msg):
 
 
 def _load(path, default):
+    # utf-8-sig, not utf-8: PowerShell 5.1 writes JSON with a BOM, and a bare
+    # json.load chokes on it, which used to look identical to a missing file.
     try:
-        with open(path) as f: return json.load(f)
-    except Exception:
+        with open(path, encoding="utf-8-sig") as f: return json.load(f)
+    except FileNotFoundError:
+        return default
+    except Exception as e:
+        log(f"WARNING: {path} exists but could not be parsed ({e}), using default")
         return default
 
 
 def _save(path, obj):
-    with open(path, "w") as f: json.dump(obj, f, indent=1, sort_keys=True)
+    with open(path, "w", encoding="utf-8") as f: json.dump(obj, f, indent=1, sort_keys=True)
 
 
 CFG = _load(CONFIG_F, {})
@@ -65,15 +70,50 @@ CLAUDE_BIN = CFG.get("claude", "claude")
 
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
+# The Robinhood connector is a claude.ai MCP server, so its tools are DEFERRED:
+# they are not in the headless model's tool list until ToolSearch loads them.
+# Without the preamble the agent reports "no trading tools available" and
+# cheerfully returns an empty plan — which reads exactly like a flat market.
+RH_SERVER = "mcp__claude_ai_Robinhood"
+
+# ToolSearch's select: takes EXACT tool names. Passing the bare server prefix
+# matched only about one run in three, so name every tool the daemon uses.
+# place_option_order is deliberately absent: the allowlist is where the
+# "equities only, never options" rail is actually enforced, not the prompt.
+RH_TOOLS = [f"{RH_SERVER}__{t}" for t in (
+    "get_portfolio", "get_equity_positions", "get_equity_quotes",
+    "place_equity_order", "cancel_equity_order", "get_equity_orders",
+)]
+RH_PREAMBLE = (
+    "FIRST, before anything else, call ToolSearch with this exact query to load "
+    "the Robinhood tools (they are deferred and uncallable until you do):\n"
+    f"select:{','.join(RH_TOOLS)}\n"
+    "If ToolSearch returns no Robinhood tools, output {\"error\":\"no_tools\"} "
+    "and stop. Never guess, estimate, or fabricate account or market data.\n\n"
+)
+# ToolSearch must itself be allowed, or the agent cannot load anything.
+RH_ALLOWED = " ".join(["ToolSearch"] + RH_TOOLS)
+
+
 def agent(prompt):
     """Run a headless Claude turn and return the JSON object it printed."""
     try:
-        r = subprocess.run([CLAUDE_BIN, "-p", prompt], capture_output=True,
+        r = subprocess.run([CLAUDE_BIN, "-p", RH_PREAMBLE + prompt,
+                            "--allowedTools", RH_ALLOWED],
+                           capture_output=True,
                            text=True, timeout=AGENT_TIMEOUT)
         out = (r.stdout or "").strip()
         i, j = out.find("{"), out.rfind("}")
         if i >= 0 and j > i:
-            return json.loads(out[i:j + 1])
+            res = json.loads(out[i:j + 1])
+            # Loud, because a silent None here reads downstream as "flat market"
+            # rather than "the bridge is broken", which is how a dead bridge
+            # spent a whole session looking like a calm day.
+            if isinstance(res, dict) and res.get("error") == "no_tools":
+                log("agent could NOT load the Robinhood MCP tools, skipping "
+                    "this pass rather than acting on missing data")
+                return None
+            return res
         log(f"agent returned no JSON: {out[:200]}")
     except Exception as e:
         log(f"agent call failed: {e}")
