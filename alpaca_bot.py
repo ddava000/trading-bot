@@ -436,7 +436,19 @@ def alpaca_account():
     a = alpaca_get("/v2/account")
     cash = float(a.get("cash") or 0)
     eq   = float(a["equity"])
-    leq  = float(a.get("last_equity") or eq)
+    # last_equity must be validated, not just defaulted. Alpaca returned the STRING
+    # "0" all day on 2026-07-23; "0" is truthy, so `float(x or eq)` produced leq=0
+    # and dayP&L = the entire account value. That reads as a huge GAIN, which can
+    # never trip the daily loss cap — the circuit breaker was silently disabled.
+    # A garbage value now means "unknown", i.e. dayP&L 0, and says so loudly.
+    try:
+        leq = float(a.get("last_equity"))
+    except (TypeError, ValueError):
+        leq = 0.0
+    if leq <= 0:
+        print(f"  [WARN last_equity={a.get('last_equity')!r} unusable — "
+              f"dayP&L reported as 0; daily loss cap is blind this run]")
+        leq = eq
     return cash, eq, eq - leq
 
 def alpaca_today_sell_proceeds(et):
