@@ -201,11 +201,24 @@ $isAdmin = ([Security.Principal.WindowsPrincipal] `
     [Security.Principal.WindowsIdentity]::GetCurrent()
     ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
+# Watchdog. RestartCount only covers the task FAILING; a daemon killed with Ctrl+C
+# or a closed console exits cleanly, leaves the task "Ready", and nothing brings it
+# back. That happened on 2026-07-23 with seven live positions and no protective pass
+# running for seventeen minutes. This trigger re-fires every 5 minutes forever, and
+# MultipleInstances IgnoreNew makes each fire a no-op while the bot is already up,
+# so it costs nothing and only acts when the daemon is actually gone.
+function New-WatchdogTrigger {
+    $t = New-ScheduledTaskTrigger -Once -At (Get-Date).Date `
+        -RepetitionInterval (New-TimeSpan -Minutes 5)
+    return $t
+}
+
 $registered = $false
 if ($isAdmin) {
     try {
         Register-ScheduledTask -TaskName $taskName -Action $action `
-            -Trigger @((New-ScheduledTaskTrigger -AtLogOn), (New-ScheduledTaskTrigger -AtStartup)) `
+            -Trigger @((New-ScheduledTaskTrigger -AtLogOn), (New-ScheduledTaskTrigger -AtStartup),
+                       (New-WatchdogTrigger)) `
             -Settings $settings -Description "Robinhood laptop trading bot (always on)" `
             -ErrorAction Stop | Out-Null
         $registered = $true
@@ -217,7 +230,7 @@ if ($isAdmin) {
 if (-not $registered) {
     try {
         Register-ScheduledTask -TaskName $taskName -Action $action `
-            -Trigger (New-ScheduledTaskTrigger -AtLogOn) `
+            -Trigger @((New-ScheduledTaskTrigger -AtLogOn), (New-WatchdogTrigger)) `
             -Settings $settings -Description "Robinhood laptop trading bot (logon)" `
             -ErrorAction Stop | Out-Null
         $registered = $true
