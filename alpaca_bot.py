@@ -1298,6 +1298,42 @@ def run_bot():
         save_holds(holds)
         print(f"  [holds.json updated — {len(holds)} hold(s)]")
 
+    # ── Status snapshot for remote monitoring ────────────────────────────────
+    # Everything this run printed lives inside a GitHub Actions log, which a
+    # phone cannot fetch. Publishing the numbers as a committed file makes the
+    # bot readable from anywhere the repo is (it is public), and mirrors what
+    # the Robinhood laptop already writes to rh_status.json.
+    try:
+        hold_pct = {}
+        for s, h in holds.items():
+            lv = market.get(s, {}).get("live")
+            b  = float(positions.get(s, {}).get("avg_cost") or h.get("basis") or 0)
+            if lv and b > 0:
+                hold_pct[s] = round((lv / b - 1) * 100, 1)
+        status = {
+            "bot": "alpaca-cloud", "mode": MODE, "acct": acct_tag,
+            "ts": et.strftime("%Y-%m-%dT%H:%M ET"),
+            "equity": round(equity, 2), "cash": round(cash, 2),
+            "day_pnl": round(daily_pnl, 2),
+            "sleeves": {"index": round(index_core_val, 2), "trade": round(trade_val, 2),
+                        "hold": round(hold_val, 2), "crypto": round(crypto_val, 2)},
+            "holds_pct_vs_basis": hold_pct,
+            "regime": "risk-on" if risk_on else "risk-off",
+            "vix": round(vix, 1), "halted": halted,
+            "orders_this_run": len(trades_log),
+        }
+        try:
+            base = json.load(open("baseline.json"))
+            if float(base.get("equity") or 0) > 0:
+                status["baseline"] = {"equity": base["equity"], "set": base.get("set")}
+                status["vs_baseline_pct"] = round((equity / float(base["equity"]) - 1) * 100, 2)
+        except Exception:
+            pass
+        with open("status.json", "w") as f:
+            json.dump(status, f, indent=1, sort_keys=True)
+    except Exception as e:
+        print(f"  [status snapshot skipped: {e}]")
+
 
 def exit_pass(et, alerted):
     """Fast protective pass between full cycles (~every EXIT_PASS_SEC): HARD exits
