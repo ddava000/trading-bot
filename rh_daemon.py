@@ -40,12 +40,27 @@ FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
 MAX_ORDERS_DAY = 40      # circuit breaker: a runaway loop can't machine-gun orders
 AGENT_TIMEOUT  = 240
+PUSH_HEARTBEAT_SEC = 900 # liveness ping when nothing changed, so a quiet laptop
+                         # and a dead one don't look the same to whoever watches
+
+_last_push_at, _last_push_material = 0.0, None
 
 DRY = "--dry" in sys.argv
 
 
+def now_et():
+    """Always ET, never local time.
+
+    This laptop runs on US Central. Stamping rh_status.json with local time made
+    remote monitoring read a file committed one minute ago as an hour stale and
+    report the bot dead. The cloud bot stamps ET, so this matches it exactly,
+    including the format, because that side compares these as strings.
+    """
+    return datetime.now(bot.ET_TZ)
+
+
 def log(msg):
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}", flush=True)
+    print(f"[{now_et().strftime('%Y-%m-%d %H:%M:%S')} ET] {msg}", flush=True)
 
 
 def _load(path, default):
@@ -201,7 +216,8 @@ def roll_day(led, today):
 def apply_fills(led, orders, placed, prices):
     """Update the local ledger from what actually got placed."""
     ok = {(p.get("symbol"), p.get("action")) for p in placed if p.get("status") == "ok"}
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = now_et().strftime("%Y-%m-%d")     # ET: roll_day stamps the ET date too,
+                                              # and last_buy feeds the time stop
     pos = {p["symbol"]: p for p in led["positions"]}
     for o in orders:
         sym, act = o["symbol"], o["action"]
@@ -249,36 +265,73 @@ def track_peaks(led, prices):
             h["peak"] = round(px, 4)
 
 
+def _material(snap):
+    """The parts of a snapshot worth pushing over.
+
+    Deliberately excludes equity/index/hold/trade and ts: those are price-derived
+    and move every single pass, which is why the old code committed once a minute.
+    Positions, holds and the order count only change when something real happened.
+    """
+    return {"positions": snap.get("positions"), "holds": snap.get("holds"),
+            "orders_today": snap.get("orders_today"), "dry": snap.get("dry")}
+
+
+def _push_status(reason):
+    """Commit and push the monitoring files. Bounded so a stall cannot eat passes.
+
+    This runs INSIDE the trading loop, so every second spent here is a second the
+    exit rails are not checking prices. Timeouts total ~140s worst case instead of
+    the old ~390s, and it now runs a couple of dozen times a day rather than ~370.
+    """
+    try:
+        subprocess.run(["git", "add", STATUS_F, LOG_F], capture_output=True, timeout=15)
+        if subprocess.run(["git", "diff", "--cached", "--quiet"],
+                          capture_output=True, timeout=15).returncode == 0:
+            return False                      # nothing staged, nothing to say
+        subprocess.run(["git", "commit", "-m",
+                        f"rh bot {now_et().strftime('%Y-%m-%dT%H:%M')} ET ({reason})"],
+                       capture_output=True, timeout=20)
+        if subprocess.run(["git", "push"], capture_output=True, timeout=30).returncode != 0:
+            subprocess.run(["git", "pull", "--rebase", "--autostash"],
+                           capture_output=True, timeout=30)
+            subprocess.run(["git", "push"], capture_output=True, timeout=30)
+        return True
+    except Exception as e:
+        log(f"git persist skipped: {e}")
+        return False
+
+
 def persist(led, res, placed):
     """Write the ledger locally; commit the shareable log/status for monitoring."""
+    global _last_push_at, _last_push_material
     _save(LEDGER_F, led)
     snap = dict(res.get("snapshot") or {})
-    snap.update({"ts": datetime.now().strftime("%Y-%m-%dT%H:%M"),
+    snap.update({"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
                  "holds": sorted(led.get("holds") or {}),
                  "orders_today": led.get("orders_today", 0), "dry": DRY})
-    _save(STATUS_F, snap)
+    _save(STATUS_F, snap)                     # local write every pass: free, instant
+    traded = False
     if placed or res.get("orders"):
+        traded = True
         with open(LOG_F, "a") as f:
             for o in res["orders"]:
                 st = next((p.get("status") for p in placed
                            if p.get("symbol") == o["symbol"] and p.get("action") == o["action"]),
                           "dry" if DRY else "unknown")
-                f.write(json.dumps({**o, "ts": datetime.now().strftime("%Y-%m-%dT%H:%M"),
+                f.write(json.dumps({**o, "ts": now_et().strftime("%Y-%m-%dT%H:%M"),
                                     "status": st, "venue": "robinhood"}) + "\n")
-    try:
-        subprocess.run(["git", "add", STATUS_F, LOG_F], capture_output=True, timeout=30)
-        if subprocess.run(["git", "diff", "--cached", "--quiet"],
-                          capture_output=True, timeout=30).returncode != 0:
-            subprocess.run(["git", "commit", "-m",
-                            f"rh bot {datetime.now().strftime('%Y-%m-%dT%H:%M')}"],
-                           capture_output=True, timeout=60)
-            if subprocess.run(["git", "push"], capture_output=True, timeout=90).returncode != 0:
-                subprocess.run(["git", "pull", "--rebase", "--autostash"],
-                               capture_output=True, timeout=90)
-                subprocess.run(["git", "push"], capture_output=True, timeout=90)
-    except Exception as e:
-        log(f"git persist skipped: {e}")
+
+    # Push on: a trade (monitoring must see fills immediately), a structural change,
+    # or the heartbeat. The heartbeat is not optional: without it a quiet laptop and
+    # a dead laptop look identical to whoever is watching the repo.
+    material = _material(snap)
+    due = (time.time() - _last_push_at) >= PUSH_HEARTBEAT_SEC
+    reason = ("trade" if traded else
+              "change" if material != _last_push_material else
+              "heartbeat" if due else None)
+    if reason and _push_status(reason):
+        _last_push_at, _last_push_material = time.time(), material
 
 
 # ── Code sync: inherit cloud-bot improvements, but verify before trusting ───
@@ -383,6 +436,11 @@ def main():
             # we must retry next pass, and roll_day only fires once per day.
             if led.get("needs_reconcile"):
                 if adopt_truth(led, reconcile()):
+                    led["needs_reconcile"] = False
+                elif DRY:
+                    # A dry ledger is simulated, so it can never match the real
+                    # book. Blocking here would deadlock every validation run at
+                    # session open, so the simulation just owns the ledger.
                     led["needs_reconcile"] = False
                 else:
                     log("session-open snapshot not trustworthy, trading nothing "

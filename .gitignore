@@ -4,3 +4,4 @@ session_output.txt
 rh_config.json
 rh_ledger.json
 rh_HALT
+rh_daemon.log
