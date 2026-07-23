@@ -1,0 +1,13 @@
+{
+ "dry": true,
+ "equity": 59.92,
+ "held": [],
+ "hold": 5.99,
+ "holds": [],
+ "index": 0,
+ "orders_today": 6,
+ "positions": {},
+ "settled": 59.92,
+ "trade": 8.99,
+ "ts": "2026-07-23T10:22"
+}
