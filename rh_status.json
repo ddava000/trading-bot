@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 59.76,
+ "equity": 59.75,
  "held": [
   "ALLE",
   "CLF",
@@ -10,10 +10,10 @@
   "QQQ",
   "SPY"
  ],
- "hold": 13.92,
+ "hold": 13.93,
  "holds": [
+  "DGX",
   "IMAX",
-  "LMT",
   "NVCR"
  ],
  "index": 29.86,
@@ -21,6 +21,7 @@
  "positions": {
   "ALLE": 0.019017,
   "CLF": 0.524522,
+  "DGX": 0.007897,
   "IMAX": 0.135092,
   "IWM": 0.034247,
   "LMT": 0.003188,
@@ -31,6 +32,6 @@
  "regime": "risk-off",
  "risk": 0.3,
  "settled": 8.98,
- "trade": 8.8,
- "ts": "2026-07-23T14:06"
+ "trade": 8.78,
+ "ts": "2026-07-23T14:19"
 }
