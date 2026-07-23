@@ -132,6 +132,41 @@ def reconcile():
     return None
 
 
+def adopt_truth(led, truth):
+    """Take the broker's view into the ledger, unless the snapshot looks corrupt.
+
+    Returns True when adopted. A real Alpaca blip on 2026-07-07 returned an empty
+    position list and wiped the cloud bot's hold ledger, which cost real money.
+    alpaca_bot guards that on both its passes; the laptop had no equivalent, so a
+    single flaky MCP response would clear positions AND the hold basis/peak
+    history here, and the next cycle would re-buy the whole book from scratch.
+
+    Holds are pruned to match real positions on every adopted snapshot, so a hold
+    entry for a name we no longer own cannot linger and keep ratcheting.
+    """
+    if not truth:
+        return False
+    positions = [{"symbol": p["symbol"], "qty": float(p["qty"]),
+                  "avg_cost": float(p.get("avg_cost") or 0)}
+                 for p in truth.get("positions") or [] if float(p["qty"]) > 0]
+    if not positions and led.get("positions"):
+        if DRY:
+            # Dry fills are simulated, so the real book disagreeing is expected,
+            # not a fault. Keeping the simulated ledger is also what stops a dry
+            # run re-deciding the same buys every cycle forever.
+            log(f"dry run: {len(led['positions'])} simulated position(s) vs the "
+                f"broker's empty book, as expected; keeping the simulated ledger")
+        else:
+            log(f"!! broker reported ZERO positions but the ledger holds "
+                f"{len(led['positions'])} name(s): corrupt snapshot, keeping the ledger")
+        return False
+    led["cash"] = float(truth.get("cash") or led["cash"])
+    led["positions"] = positions
+    led["holds"] = {s: h for s, h in (led.get("holds") or {}).items()
+                    if any(p["symbol"] == s for p in positions)}
+    return True
+
+
 def place(orders):
     """Hand the agent an exact order list. Returns the fills it reports."""
     if DRY:
@@ -309,14 +344,9 @@ def cycle(led, fast):
                     f"{o.get('notional') or o.get('qty')} — {o['reason']}")
             placed = place(res["orders"])
             apply_fills(led, res["orders"], placed, prices)
-            after = reconcile()                    # truth up after every trade
-            if after:
-                led["cash"] = float(after.get("cash") or led["cash"])
-                led["positions"] = [{"symbol": p["symbol"], "qty": float(p["qty"]),
-                                     "avg_cost": float(p.get("avg_cost") or 0)}
-                                    for p in after["positions"] if float(p["qty"]) > 0]
-                led["holds"] = {s: h for s, h in led.get("holds", {}).items()
-                                if any(p["symbol"] == s for p in led["positions"])}
+            # Truth up after every trade. The orders are already away, so a
+            # corrupt snapshot here means keep the local ledger, not skip.
+            adopt_truth(led, reconcile())
     for n in res.get("notes", []):
         log(f"  note: {n}")
     persist(led, res, placed)
@@ -335,7 +365,10 @@ def main():
     last_full = 0.0
     while True:
         if os.path.exists(HALT_F):
-            log("rh_HALT present — trading paused"); time.sleep(FAST_PASS_SEC); continue
+            log("rh_HALT present — trading paused")
+            if "--once" in sys.argv:      # otherwise --once spins here forever
+                return 0
+            time.sleep(FAST_PASS_SEC); continue
         open_, et = bot.check_market()
         if not open_:
             if "--once" in sys.argv:
@@ -345,12 +378,20 @@ def main():
         try:
             if roll_day(led, et.strftime("%Y-%m-%d")):
                 log("new session — settling T+1 proceeds, reconciling with broker")
-                truth = reconcile()
-                if truth:
-                    led["cash"] = float(truth.get("cash") or led["cash"])
-                    led["positions"] = [{"symbol": p["symbol"], "qty": float(p["qty"]),
-                                         "avg_cost": float(p.get("avg_cost") or 0)}
-                                        for p in truth["positions"] if float(p["qty"]) > 0]
+                led["needs_reconcile"] = True
+            # Held as a ledger flag, not a local variable: if the snapshot is bad
+            # we must retry next pass, and roll_day only fires once per day.
+            if led.get("needs_reconcile"):
+                if adopt_truth(led, reconcile()):
+                    led["needs_reconcile"] = False
+                else:
+                    log("session-open snapshot not trustworthy, trading nothing "
+                        "this pass and retrying next minute")
+                    _save(LEDGER_F, led)
+                    if "--once" in sys.argv:
+                        return 0
+                    time.sleep(FAST_PASS_SEC)
+                    continue
             full = (time.time() - last_full) >= FULL_CYCLE_SEC
             if full and sync_code():
                 _save(LEDGER_F, led)          # ledger is the source of truth across restarts
