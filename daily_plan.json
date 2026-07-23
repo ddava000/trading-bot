@@ -1,29 +1,28 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.5,
+  "risk_scale": 0.4,
   "avoid_symbols": [
-    "CVI",
-    "AAPL",
-    "META",
     "TSLA",
-    "CNMD",
+    "META",
     "PLTK",
-    "LCID",
+    "CNMD",
+    "AAPL",
+    "CVI",
+    "QQQ",
+    "IWM",
     "ETHUSD",
-    "SOLUSD",
-    "NET",
-    "RKLZ"
+    "SOLUSD"
   ],
   "favor_symbols": [
-    "SPY",
     "ABT",
     "JXN",
     "REZI",
-    "VOD"
+    "VOD",
+    "SPY"
   ],
-  "notes": "VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%), but Big Tech (AAPL/META) earnings, this week's jobs data and rising oil keep me at neutral 0.5. TSLA is a deep landmine (-10.1%), PLTK -7.9% and LCID -5.8% soft, and CVI/CNMD carry event risk.",
-  "journal_entry": "Wed 7/22 14:52: holding neutral 0.5 into the close, VIX flat 17.0, tape firm SPY +1.9% but breadth 'weird' per WSJ. TSLA landmine deepened to -10.1%, PLTK/LCID weak. Watching AAPL/META earnings and this week's jobs data.",
-  "date": "2026-07-22",
-  "mode": "INTRADAY",
-  "updated_at": "2026-07-22T14:52 ET"
+  "notes": "VIX up to 18.9 with futures slipping on Alphabet/Tesla earnings fallout, surging oil and Iran headlines; nudging risk down to 0.4. TSLA is a severe landmine (-17.2%), META -5.7% and PLTK -8.2% remain weak, and CNMD carries takeover event risk. CPI and jobs data still loom this week.",
+  "journal_entry": "Thu 7/23 09:00: cut to neutral 0.4 as VIX ticked 17->18.9 and futures slip on Alphabet/Tesla earnings, AI capex fears and oil/Iran. TSLA blew out to -17.2% (deep landmine), META/PLTK still soft. ABT strong on Q2 report. Watching CPI, jobs data and Mideast headlines.",
+  "date": "2026-07-23",
+  "mode": "MORNING",
+  "updated_at": "2026-07-23T09:00 ET"
 }
