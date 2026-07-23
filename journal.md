@@ -766,3 +766,9 @@
 - avoid: ['TSLA', 'META', 'PLTK', 'CNMD', 'AAPL', 'CVI', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'JXN', 'REZI', 'VOD', 'SPY']
 - notes: VIX up to 18.9 with futures slipping on Alphabet/Tesla earnings fallout, surging oil and Iran headlines; nudging risk down to 0.4. TSLA is a severe landmine (-17.2%), META -5.7% and PLTK -8.2% remain weak, and CNMD carries takeover event risk. CPI and jobs data still loom this week.
 - journal: Thu 7/23 09:00: cut to neutral 0.4 as VIX ticked 17->18.9 and futures slip on Alphabet/Tesla earnings, AI capex fears and oil/Iran. TSLA blew out to -17.2% (deep landmine), META/PLTK still soft. ABT strong on Q2 report. Watching CPI, jobs data and Mideast headlines.
+
+### 2026-07-23T10:38 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'AMBP', 'CNMD', 'CVI', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Dow futures down 600 with Brent topping $100 and widening Mideast attacks; TSLA cratered to -22%, META -6.6%, PLTK -12.5% and IWM/QQQ soft. VIX 18.9 plus CPI/jobs still ahead—cutting to risk-off 0.3 and parking landmines and event-risk names.
+- journal: Thu 7/23 10:38: dropped to risk-off 0.3 as oil spike >$100 and Iran headlines slam the tape (Dow futs -600). TSLA blew out to -22%, PLTK -12.5%, META -6.6%. ABT still firm on Q2. Watching CPI, jobs data and Mideast escalation.
