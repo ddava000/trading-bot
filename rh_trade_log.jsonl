@@ -39,3 +39,4 @@
 {"action": "buy", "symbol": "NVCR", "notional": 5.99, "sleeve": "HOLD", "reason": "HOLD +1 RSI 63 up (4 votes)", "ts": "2026-07-23T11:07", "status": "dry", "venue": "robinhood"}
 {"action": "buy", "symbol": "ALLE", "notional": 5.99, "sleeve": "TRADE", "reason": "TRADE +1 RSI 73 up (3 votes)", "ts": "2026-07-23T11:07", "status": "dry", "venue": "robinhood"}
 {"action": "buy", "symbol": "TMO", "notional": 3.0, "sleeve": "TRADE", "reason": "TRADE +1 RSI 73 up (3 votes)", "ts": "2026-07-23T11:07", "status": "dry", "venue": "robinhood"}
+{"action": "buy", "symbol": "DGX", "notional": 5.99, "sleeve": "HOLD", "reason": "HOLD +1 RSI 60 up (4 votes)", "ts": "2026-07-23T12:11", "status": "dry", "venue": "robinhood"}
