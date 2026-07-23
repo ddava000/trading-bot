@@ -59,8 +59,28 @@ def now_et():
     return datetime.now(bot.ET_TZ)
 
 
+DAEMON_LOG = "rh_daemon.log"
+
+
 def log(msg):
-    print(f"[{now_et().strftime('%Y-%m-%d %H:%M:%S')} ET] {msg}", flush=True)
+    """Write to rh_daemon.log directly, and to stdout when there is one.
+
+    The task used to run "cmd.exe /c python ... >> rh_daemon.log", which meant a
+    console had to exist for logging to work. That console is what kept killing
+    the bot. Owning the log file here lets the task run pythonw.exe with no
+    console at all, and pythonw gives the process no stdout, hence the None check.
+    """
+    line = f"[{now_et().strftime('%Y-%m-%d %H:%M:%S')} ET] {msg}"
+    if sys.stdout is not None:
+        try:
+            print(line, flush=True)
+        except Exception:
+            pass
+    try:
+        with open(DAEMON_LOG, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+    except Exception:
+        pass
 
 
 def _load(path, default):
@@ -77,6 +97,20 @@ def _load(path, default):
 
 def _save(path, obj):
     with open(path, "w", encoding="utf-8") as f: json.dump(obj, f, indent=1, sort_keys=True)
+
+
+def save_ledger(led):
+    """Stamp the mode INTO the ledger, then write it.
+
+    rh_status.json also carries a dry flag, but it describes the last CYCLE, not
+    the ledger. One stray `rh_daemon.py --dry --once` against a live install
+    rewrites status to dry:true while the real ledger sits there untouched, and
+    -Live keys off exactly that flag to decide whether wiping the ledger is safe.
+    Done that once already. Keeping the flag with the data it describes makes the
+    desync impossible.
+    """
+    led["dry"] = DRY
+    _save(LEDGER_F, led)
 
 
 CFG = _load(CONFIG_F, {})
@@ -343,7 +377,7 @@ def email_trades(res, placed, led):
 def persist(led, res, placed):
     """Write the ledger locally; commit the shareable log/status for monitoring."""
     global _last_push_at, _last_push_material
-    _save(LEDGER_F, led)
+    save_ledger(led)
     snap = dict(res.get("snapshot") or {})
     snap.update({"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
@@ -460,7 +494,7 @@ def _detach_from_console():
     the task remains stoppable, and rh_HALT is the real kill switch regardless.
     """
     try:
-        if not sys.stdout.isatty():
+        if sys.stdout is None or not sys.stdout.isatty():
             import signal
             signal.signal(signal.SIGINT, signal.SIG_IGN)
             return True
@@ -510,14 +544,14 @@ def main():
                 else:
                     log("session-open snapshot not trustworthy, trading nothing "
                         "this pass and retrying next minute")
-                    _save(LEDGER_F, led)
+                    save_ledger(led)
                     if "--once" in sys.argv:
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
             full = (time.time() - last_full) >= FULL_CYCLE_SEC
             if full and sync_code():
-                _save(LEDGER_F, led)          # ledger is the source of truth across restarts
+                save_ledger(led)          # ledger is the source of truth across restarts
                 log("restarting into updated code")
                 try:
                     os.execv(sys.executable, [sys.executable] + sys.argv)

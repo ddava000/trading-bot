@@ -197,8 +197,15 @@ if ($LASTEXITCODE -ne 0) { Die "strategy selftest FAILED - stopping before anyth
 # -Live ledger reset below delete real positions and their hold basis. Safe on a
 # fresh box, destructive on a running one.
 $liveAlready = $false
-if ((Test-Path $statusPath) -and (Test-Path $ledgerPath)) {
-    try { $liveAlready = -not [bool](Get-Content $statusPath -Raw | ConvertFrom-Json).dry } catch { }
+if (Test-Path $ledgerPath) {
+    try {
+        $lj = Get-Content $ledgerPath -Raw | ConvertFrom-Json
+        if ($null -ne $lj.dry) {
+            $liveAlready = -not [bool]$lj.dry          # the ledger's own flag wins
+        } elseif (Test-Path $statusPath) {
+            $liveAlready = -not [bool](Get-Content $statusPath -Raw | ConvertFrom-Json).dry
+        }
+    } catch { }
 }
 if ($liveAlready) {
     Warn "LIVE install detected - skipping the dry smoke test"
@@ -214,9 +221,19 @@ $taskName = "rh-trading-bot"
 # DRY is set only by sys.argv, so a task registered without --dry goes live at
 # the next logon whether or not anyone chose that. Default to --dry and let
 # -Live be the single explicit act that arms real trading.
-$dryFlag = if ($Live) { "" } else { " --dry" }
-$action = New-ScheduledTaskAction -Execute "cmd.exe" `
-    -Argument "/c `"`"$py`" rh_daemon.py$dryFlag >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
+$dryFlag = if ($Live) { "" } else { "--dry" }
+
+# pythonw.exe, NOT cmd.exe. The old action was "cmd.exe /c python ... >> log",
+# which needs a console, and the task registers as LogonType Interactive, so it
+# attached to whichever console started it. Closing that window delivered CTRL_C
+# and killed the bot: exit 0xC000013A, three times on 2026-07-23, once leaving
+# seven live positions unmonitored for seventeen minutes. pythonw has no console
+# at all, so there is nothing to deliver the event to. rh_daemon writes the log
+# itself now, which is what makes dropping the redirect possible.
+$pyw = Join-Path (Split-Path $py -Parent) "pythonw.exe"
+if (-not (Test-Path $pyw)) { $pyw = $py; Warn "pythonw.exe not found - falling back to python.exe" }
+$action = New-ScheduledTaskAction -Execute $pyw `
+    -Argument "rh_daemon.py $dryFlag".Trim() -WorkingDirectory $RepoDir
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -MultipleInstances IgnoreNew
@@ -299,9 +316,22 @@ if ($Live) {
     # this can never wipe a genuine live ledger and its hold basis/peak history.
     $statusFile = Join-Path $RepoDir "rh_status.json"
     $ledgerFile = Join-Path $RepoDir "rh_ledger.json"
-    if ((Test-Path $statusFile) -and (Test-Path $ledgerFile)) {
+    if (Test-Path $ledgerFile) {
+        # Trust the LEDGER's own flag. rh_status.json describes the last cycle, not
+        # the ledger, so one stray `--dry --once` against a live install flips it to
+        # dry:true while the real positions sit untouched, and this block would then
+        # delete them. Status is only a fallback for ledgers written before the flag
+        # existed, and anything undeterminable counts as live: refusing to delete is
+        # the safe failure mode when real money is on the other side of the guess.
         $wasDry = $false
-        try { $wasDry = [bool](Get-Content $statusFile -Raw | ConvertFrom-Json).dry } catch { $wasDry = $false }
+        try {
+            $lj = Get-Content $ledgerFile -Raw | ConvertFrom-Json
+            if ($null -ne $lj.dry) {
+                $wasDry = [bool]$lj.dry
+            } elseif (Test-Path $statusFile) {
+                $wasDry = [bool](Get-Content $statusFile -Raw | ConvertFrom-Json).dry
+            }
+        } catch { $wasDry = $false }
         if ($wasDry) {
             Remove-Item $ledgerFile -Force
             Ok "simulated dry ledger cleared - live starts from broker truth"
