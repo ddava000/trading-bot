@@ -238,6 +238,25 @@ if ($Live) {
     # Arming live has to clear the kill switch too, otherwise the task starts
     # and immediately pauses, which looks identical to a broken daemon.
     if (Test-Path $haltFile) { Remove-Item $haltFile -Force; Ok "kill switch cleared" }
+
+    # A dry ledger records SIMULATED fills the real account never had. Carried into
+    # live, session-open reconcile sees positions the broker denies, the corrupt-
+    # snapshot guard correctly refuses it, and every pass skips forever: a bot that
+    # looks healthy and never trades. Gated on the dry flag in rh_status.json so
+    # this can never wipe a genuine live ledger and its hold basis/peak history.
+    $statusFile = Join-Path $RepoDir "rh_status.json"
+    $ledgerFile = Join-Path $RepoDir "rh_ledger.json"
+    if ((Test-Path $statusFile) -and (Test-Path $ledgerFile)) {
+        $wasDry = $false
+        try { $wasDry = [bool](Get-Content $statusFile -Raw | ConvertFrom-Json).dry } catch { $wasDry = $false }
+        if ($wasDry) {
+            Remove-Item $ledgerFile -Force
+            Ok "simulated dry ledger cleared - live starts from broker truth"
+        } else {
+            Warn "existing LIVE ledger kept (real positions and hold history preserved)"
+        }
+    }
+
     if ($registered) {
         Start-ScheduledTask -TaskName $taskName
         Ok "task started - the bot is LIVE and will place real orders"
