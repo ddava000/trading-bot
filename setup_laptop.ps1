@@ -98,11 +98,39 @@ if ($LASTEXITCODE -ne 0) { Warn "pip install had trouble - continuing, the smoke
 else { Ok "python deps ready" }
 
 Step "3/7  Locating the Claude CLI"
-$claude = Get-ChildItem "$env:APPDATA\Claude\claude-code\*\claude.exe" -ErrorAction SilentlyContinue |
-          Sort-Object LastWriteTime | Select-Object -Last 1 -ExpandProperty FullName
-if (-not $claude) { $claude = (Get-Command claude -ErrorAction SilentlyContinue).Source }
-if (-not $claude) { Die "Claude CLI not found. Open Claude Desktop once, then re-run this script." }
-Ok $claude
+# Having Claude Desktop installed and open is NOT enough: Desktop only provisions
+# its bundled claude.exe after Claude Code has actually run inside it, so a fresh
+# Desktop install has no CLI at all. Check every real location, then install.
+function Find-Claude {
+    foreach ($p in @("$env:USERPROFILE\.local\bin\claude.exe",
+                     "$env:LOCALAPPDATA\Programs\claude\claude.exe")) {
+        if (Test-Path $p) { return $p }
+    }
+    $d = Get-ChildItem "$env:APPDATA\Claude\claude-code\*\claude.exe" -ErrorAction SilentlyContinue |
+         Sort-Object LastWriteTime | Select-Object -Last 1
+    if ($d) { return $d.FullName }
+    $c = Get-Command claude -ErrorAction SilentlyContinue
+    if ($c) { return $c.Source }
+    return $null
+}
+$claude = Find-Claude
+if ($claude) {
+    $ver = (& $claude --version) 2>&1 | Out-String
+    if ($ver -notmatch "\d+\.\d+") {
+        Warn "found $claude but it reported no version - reinstalling"
+        $claude = $null
+    }
+}
+if (-not $claude) {
+    Warn "Claude CLI not installed - installing the official one (about a minute)"
+    irm https://claude.ai/install.ps1 | iex
+    Refresh-Path
+    $claude = Find-Claude
+}
+if (-not $claude) {
+    Die "Claude CLI install did not land on PATH. Close this window, open a NEW PowerShell, re-run."
+}
+Ok "$claude  ($((((& $claude --version) 2>&1) | Out-String).Trim()))"
 
 Step "4/7  Signing the Claude CLI in   << BROWSER APPROVAL 1 of 2 >>"
 # Claude Desktop's login does NOT carry to the CLI - it keeps separate credentials.
