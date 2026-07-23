@@ -171,16 +171,43 @@ Step "6/7  Writing config and smoke-testing (DRY - places nothing)"
 if (-not $Account) { $Account = Read-Host "  Robinhood AGENTIC account number" }
 # WriteAllText with an explicit no-BOM encoder, NOT Out-File -Encoding utf8:
 # PS 5.1's "utf8" means utf8-WITH-BOM, and the BOM makes Python's json.load fail.
-$cfgJson = @{ account = $Account.Trim(); claude = $claude } | ConvertTo-Json
-[System.IO.File]::WriteAllText(
-    (Join-Path $RepoDir "rh_config.json"), $cfgJson,
+# MERGE, never overwrite: rh_config.json also carries gmail_app_password, and a
+# plain rewrite would silently delete it on every re-run and stop the mail.
+$cfgPath   = Join-Path $RepoDir "rh_config.json"
+$statusPath = Join-Path $RepoDir "rh_status.json"
+$ledgerPath = Join-Path $RepoDir "rh_ledger.json"
+$cfg = @{}
+if (Test-Path $cfgPath) {
+    try {
+        (Get-Content $cfgPath -Raw | ConvertFrom-Json).PSObject.Properties |
+            ForEach-Object { $cfg[$_.Name] = $_.Value }
+    } catch { Warn "existing rh_config.json unreadable - writing a fresh one" }
+}
+$cfg["account"] = $Account.Trim()
+$cfg["claude"]  = $claude
+[System.IO.File]::WriteAllText($cfgPath, ($cfg | ConvertTo-Json),
     (New-Object System.Text.UTF8Encoding $false))
 Ok "rh_config.json written (gitignored - never leaves this laptop)"
+
 & $py rh_bot.py --selftest
 if ($LASTEXITCODE -ne 0) { Die "strategy selftest FAILED - stopping before anything can trade." }
-& $py rh_daemon.py --dry --once
-if ($LASTEXITCODE -ne 0) { Warn "dry run returned $LASTEXITCODE - review the output above" }
-else { Ok "smoke test complete - no orders were placed" }
+
+# Never smoke-test over a LIVE install. The dry run writes simulated fills into
+# the real ledger and flips rh_status.json to dry:true, which would then make the
+# -Live ledger reset below delete real positions and their hold basis. Safe on a
+# fresh box, destructive on a running one.
+$liveAlready = $false
+if ((Test-Path $statusPath) -and (Test-Path $ledgerPath)) {
+    try { $liveAlready = -not [bool](Get-Content $statusPath -Raw | ConvertFrom-Json).dry } catch { }
+}
+if ($liveAlready) {
+    Warn "LIVE install detected - skipping the dry smoke test"
+    Warn "(it would write simulated fills into the real ledger)"
+} else {
+    & $py rh_daemon.py --dry --once
+    if ($LASTEXITCODE -ne 0) { Warn "dry run returned $LASTEXITCODE - review the output above" }
+    else { Ok "smoke test complete - no orders were placed" }
+}
 
 Step "7/7  Registering the always-on task"
 $taskName = "rh-trading-bot"
@@ -193,6 +220,19 @@ $action = New-ScheduledTaskAction -Execute "cmd.exe" `
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -MultipleInstances IgnoreNew
+# Stop before unregistering. Unregistering a RUNNING task can leave the daemon
+# orphaned, and starting the new one below would then put two bots on the same
+# account placing the same orders twice.
+try {
+    if (Get-ScheduledTask -TaskName $taskName -ErrorAction Stop) {
+        Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+    }
+} catch { }
+Get-CimInstance Win32_Process -Filter "Name like '%python%'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like "*rh_daemon.py*" } |
+    ForEach-Object { Warn "stopping orphaned daemon pid $($_.ProcessId)"
+                     Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
 
 # -AtStartup needs admin (it runs before any user logs on); -AtLogOn does not.
