@@ -14,7 +14,10 @@
 
 param(
     [string]$Account = "",
-    [string]$RepoDir = "$env:USERPROFILE\trading-bot"
+    [string]$RepoDir = "$env:USERPROFILE\trading-bot",
+    # -Live is the ONE explicit act that arms real trading. Without it the task
+    # runs --dry, so a plain re-run can never silently put the bot into the market.
+    [switch]$Live
 )
 
 $ErrorActionPreference = "Continue"
@@ -181,12 +184,12 @@ else { Ok "smoke test complete - no orders were placed" }
 
 Step "7/7  Registering the always-on task"
 $taskName = "rh-trading-bot"
-# --dry is deliberate. The closing banner promises the bot ships NOT trading,
-# but DRY is set only by sys.argv, so a task registered without the flag went
-# live at the next logon with nobody having chosen to go live. Removing --dry
-# here is the single, explicit act that arms real trading.
+# DRY is set only by sys.argv, so a task registered without --dry goes live at
+# the next logon whether or not anyone chose that. Default to --dry and let
+# -Live be the single explicit act that arms real trading.
+$dryFlag = if ($Live) { "" } else { " --dry" }
 $action = New-ScheduledTaskAction -Execute "cmd.exe" `
-    -Argument "/c `"`"$py`" rh_daemon.py --dry >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
+    -Argument "/c `"`"$py`" rh_daemon.py$dryFlag >> rh_daemon.log 2>&1`"" -WorkingDirectory $RepoDir
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
     -RestartCount 999 -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit (New-TimeSpan -Seconds 0) -MultipleInstances IgnoreNew
@@ -230,14 +233,29 @@ if (-not $registered) {
     }
 }
 
+$haltFile = Join-Path $RepoDir "rh_HALT"
+if ($Live) {
+    # Arming live has to clear the kill switch too, otherwise the task starts
+    # and immediately pauses, which looks identical to a broken daemon.
+    if (Test-Path $haltFile) { Remove-Item $haltFile -Force; Ok "kill switch cleared" }
+    if ($registered) {
+        Start-ScheduledTask -TaskName $taskName
+        Ok "task started - the bot is LIVE and will place real orders"
+    }
+} elseif (Test-Path $haltFile) {
+    Warn "rh_HALT is present, so the daemon will pause on its next pass."
+}
+
+$mode = if ($Live) { "LIVE - placing REAL orders" } else { "DRY - places nothing" }
 Write-Host @"
 
 ================================================================
-  DONE. Installed but NOT trading - it is in DRY mode by design.
+  DONE. Mode: $mode
 
   Repo:    $RepoDir
   Log:     $RepoDir\rh_daemon.log
   STOP IT: create a file named  rh_HALT  in the repo folder
+  GO LIVE: re-run this script with  -Live
 ================================================================
 
 "@ -ForegroundColor Green
