@@ -1,6 +1,6 @@
 {
  "dry": true,
- "equity": 59.93,
+ "equity": 59.92,
  "held": [
   "ALLE",
   "IWM",
@@ -9,14 +9,16 @@
   "SPY",
   "TMO"
  ],
- "hold": 5.99,
+ "hold": 11.98,
  "holds": [
+  "IMAX",
   "NVCR"
  ],
  "index": 29.99,
  "orders_today": 0,
  "positions": {
   "ALLE": 0.038039,
+  "IMAX": 0.137464,
   "IWM": 0.034335,
   "NVCR": 0.307653,
   "QQQ": 0.014489,
@@ -24,6 +26,6 @@
   "TMO": 0.005192
  },
  "settled": 14.97,
- "trade": 8.98,
- "ts": "2026-07-23T10:50"
+ "trade": 8.97,
+ "ts": "2026-07-23T10:51"
 }
