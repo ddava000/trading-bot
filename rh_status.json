@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 59.79,
+ "equity": 59.76,
  "held": [
   "ALLE",
   "CLF",
@@ -10,18 +10,20 @@
   "QQQ",
   "SPY"
  ],
- "hold": 12.17,
+ "hold": 13.92,
  "holds": [
   "IMAX",
+  "LMT",
   "NVCR"
  ],
- "index": 29.87,
- "orders_today": 7,
+ "index": 29.86,
+ "orders_today": 8,
  "positions": {
   "ALLE": 0.019017,
   "CLF": 0.524522,
   "IMAX": 0.135092,
   "IWM": 0.034247,
+  "LMT": 0.003188,
   "NVCR": 0.310079,
   "QQQ": 0.014387,
   "SPY": 0.013515
@@ -29,6 +31,6 @@
  "regime": "risk-off",
  "risk": 0.3,
  "settled": 8.98,
- "trade": 8.77,
- "ts": "2026-07-23T14:02"
+ "trade": 8.8,
+ "ts": "2026-07-23T14:06"
 }
