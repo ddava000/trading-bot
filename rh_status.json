@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 103.35,
+ "equity": 103.11,
  "held": [
   "ALLE",
   "DGX",
@@ -17,7 +17,7 @@
   "THC",
   "WEX"
  ],
- "hold": 18.61,
+ "hold": 18.5,
  "holds": [
   "IMAX",
   "LMT",
@@ -25,7 +25,7 @@
   "NVDA",
   "WEX"
  ],
- "index": 55.03,
+ "index": 54.93,
  "orders_today": 9,
  "positions": {
   "ALLE": 0.019017,
@@ -44,8 +44,8 @@
   "WEX": 0.006326
  },
  "regime": "neutral",
- "risk": 0.5,
+ "risk": 0.45,
  "settled": 8.13,
- "trade": 15.67,
- "ts": "2026-07-24T15:00"
+ "trade": 15.64,
+ "ts": "2026-07-24T15:20"
 }
