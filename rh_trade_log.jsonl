@@ -16,3 +16,4 @@
 {"action": "sell", "symbol": "CLF", "qty": 0.524522, "reason": "SELL signal RSI 69 (-1.4%)", "ts": "2026-07-24T10:33", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "SSNC", "notional": 4.14, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "FAF", "notional": 1.1, "sleeve": "TRADE", "reason": "TRADE +1 RSI 60 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "NVDA", "notional": 4.16, "sleeve": "HOLD", "reason": "HOLD +1 RSI 63 up (5 votes)", "ts": "2026-07-24T12:06", "status": "ok", "venue": "robinhood"}
