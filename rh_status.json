@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 109.72,
+ "equity": 109.55,
  "held": [
   "ALLE",
   "CLF",
@@ -15,18 +15,15 @@
   "THC",
   "WEX"
  ],
- "hold": 15.0,
  "holds": [
   "IMAX",
   "LMT",
   "NVCR",
   "WEX"
  ],
- "index": 55.04,
- "orders_today": 5,
+ "orders_today": 6,
  "positions": {
   "ALLE": 0.019017,
-  "CLF": 0.524522,
   "DGX": 0.007897,
   "IMAX": 0.135092,
   "IWM": 0.06294,
@@ -38,9 +35,5 @@
   "THC": 0.004984,
   "WEX": 0.006326
  },
- "regime": "neutral",
- "risk": 0.4,
- "settled": 23.44,
- "trade": 16.24,
- "ts": "2026-07-24T10:30"
+ "ts": "2026-07-24T10:33"
 }
