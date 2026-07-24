@@ -784,3 +784,9 @@
 - avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'AMBP', 'CNMD', 'CVI', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
 - notes: Tape stays ugly into late afternoon: Dow -600, Brent over $100 on Iran war fears, Big Tech slumping post-earnings and yields climbing; VIX 19.6 and rising. TSLA a severe landmine (-23.1%), META -6.4%, PLTK -14.5%, IWM/QQQ soft, ABT hit 52-week low—holding risk-off 0.3 with Fed decision looming.
 - journal: Thu 7/23 14:54: staying risk-off 0.3, VIX ticked 19.1->19.6, tape still weak (Dow -600, oil >$100 on Iran). TSLA -23.1%, PLTK -14.5%, META -6.4% remain landmines; ABT slipped to 52wk low despite prior Q2 strength. Watching Fed decision, CPI/jobs and Mideast escalation into the close.
+
+### 2026-07-24T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['TSLA', 'META', 'PLTK', 'EHGO', 'JXN', 'CNMD', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Futures inch higher and oil halts its surge after Thursday's oil-driven Mag-7 rout (-$797B); VIX eased 19.6->18.8. Still fragile with Big Tech weak, so nudging to neutral 0.4 while keeping deep landmines (TSLA -22.9%, PLTK -15.4%, META -7%, EHGO -14.5%) off the buy list.
+- journal: Fri 7/24 09:00: lifted from risk-off 0.3 to neutral 0.4 as oil surge stalls and futures firm, VIX 19.6->18.8. TSLA/PLTK/META/EHGO still bleeding landmines; CVI reports next week. Watching inflation data, Warsh testimony and whether the oil/Iran relief holds.
