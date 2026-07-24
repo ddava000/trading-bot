@@ -5,14 +5,14 @@
     "TSLA",
     "META",
     "PLTK",
-    "EHGO",
     "JXN",
-    "CNMD",
-    "QQQ",
     "IWM",
+    "QQQ",
+    "CNMD",
     "AAPL",
     "ETHUSD",
-    "SOLUSD"
+    "SOLUSD",
+    "WLDS"
   ],
   "favor_symbols": [
     "ABT",
@@ -21,9 +21,9 @@
     "VOD",
     "WAB"
   ],
-  "notes": "Futures inch higher and oil halts its surge after Thursday's oil-driven Mag-7 rout (-$797B); VIX eased 19.6->18.8. Still fragile with Big Tech weak, so nudging to neutral 0.4 while keeping deep landmines (TSLA -22.9%, PLTK -15.4%, META -7%, EHGO -14.5%) off the buy list.",
-  "journal_entry": "Fri 7/24 09:00: lifted from risk-off 0.3 to neutral 0.4 as oil surge stalls and futures firm, VIX 19.6->18.8. TSLA/PLTK/META/EHGO still bleeding landmines; CVI reports next week. Watching inflation data, Warsh testimony and whether the oil/Iran relief holds.",
+  "notes": "VIX steady at 18.8 with no fresh macro/news shocks, but the tape is split: SPY green while QQQ/IWM soft (-3.3%/-2.6%) and Big Tech still bleeding (META -7.2%, TSLA -24.8%). Holding neutral 0.4 and keeping deep losers plus the parabolic WLDS (+19.7%) off the buy list.",
+  "journal_entry": "Fri 7/24 10:18: staying neutral 0.4, VIX flat 18.8, no new headlines. Growth/small-caps lag (QQQ -3.3%, IWM -2.6%) while defensives (ABT, SPY, REZI, VOD, WAB) hold up; TSLA/META/PLTK remain landmines. Added WLDS to avoid after a +19.7% parabolic pop. Watching whether oil relief holds and if Big Tech stabilizes.",
   "date": "2026-07-24",
-  "mode": "MORNING",
-  "updated_at": "2026-07-24T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-24T10:18 ET"
 }
