@@ -796,3 +796,9 @@
 - avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
 - notes: VIX steady at 18.8 with no fresh macro/news shocks, but the tape is split: SPY green while QQQ/IWM soft (-3.3%/-2.6%) and Big Tech still bleeding (META -7.2%, TSLA -24.8%). Holding neutral 0.4 and keeping deep losers plus the parabolic WLDS (+19.7%) off the buy list.
 - journal: Fri 7/24 10:18: staying neutral 0.4, VIX flat 18.8, no new headlines. Growth/small-caps lag (QQQ -3.3%, IWM -2.6%) while defensives (ABT, SPY, REZI, VOD, WAB) hold up; TSLA/META/PLTK remain landmines. Added WLDS to avoid after a +19.7% parabolic pop. Watching whether oil relief holds and if Big Tech stabilizes.
+
+### 2026-07-24T13:05 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'CVI', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Conditions improving into the close: Dow +300 as oil retreats on Iran/Pakistan peace-talk reports, VIX easing 18.8->17.9. Tape still split (QQQ/IWM red, Big Tech soft with META -7.2%), so nudging up to neutral 0.5 while keeping deep losers, the parabolic WLDS (+20.5%) and next-week reporter CVI off the buy list.
+- journal: Fri 7/24 13:05: lifted 0.4->0.5 as oil relief holds and VIX slips to 17.9 with Dow +300. Defensives (ABT/SPY/REZI/VOD/WAB) firm; META/PLTK/TSLA still landmines, added CVI (reports next week). Watching next week's Fed decision, tech earnings deluge and whether Big Tech stabilizes.
