@@ -8,3 +8,8 @@
 {"action": "buy", "symbol": "LMT", "notional": 1.79, "sleeve": "HOLD", "reason": "HOLD +1 RSI 57 up (4 votes)", "ts": "2026-07-23T14:06", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "DGX", "notional": 1.79, "sleeve": "HOLD", "reason": "HOLD +1 RSI 62 up (4 votes)", "ts": "2026-07-23T14:19", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "WEX", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 70 up (4 votes)", "ts": "2026-07-23T15:28", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 8.4, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 8.48, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 8.38, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "RNG", "notional": 4.42, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (3 votes)", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "THC", "notional": 1.2, "sleeve": "TRADE", "reason": "TRADE +1 RSI 68 up (3 votes)", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
