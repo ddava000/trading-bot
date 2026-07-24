@@ -6,26 +6,26 @@
  },
  "bot": "alpaca-cloud",
  "cash": 31.02,
- "day_pnl": 1.35,
- "equity": 437.4,
+ "day_pnl": 1.21,
+ "equity": 437.26,
  "halted": false,
  "holds_pct_vs_basis": {
   "AAPL": 3.3,
-  "ABT": 4.1,
-  "META": -7.5,
+  "ABT": 4.2,
+  "META": -7.6,
   "PLTK": -11.4,
-  "REZI": 3.5
+  "REZI": 3.6
  },
  "mode": "PAPER",
  "orders_this_run": 0,
  "regime": "risk-off",
  "sleeves": {
   "crypto": 22.07,
-  "hold": 75.35,
-  "index": 241.31,
-  "trade": 67.65
+  "hold": 75.33,
+  "index": 241.4,
+  "trade": 67.44
  },
- "ts": "2026-07-24T15:30 ET",
+ "ts": "2026-07-24T15:45 ET",
  "vix": 18.9,
- "vs_baseline_pct": -4.01
+ "vs_baseline_pct": -4.04
 }
