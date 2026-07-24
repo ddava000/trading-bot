@@ -404,7 +404,18 @@ def email_trades(res, placed, led):
               "", "Stop it: create a file named rh_HALT in the repo folder."]
     subject = (f"RH laptop bot: {ok}/{len(orders)} order(s) "
                f"{'placed' if not DRY else 'simulated'}")
-    bot.send_email(subject, "\n".join(lines))
+    # Log the attempt. send_email's only feedback is a print() to a stream the
+    # daemon does not capture, so email delivery was previously invisible: a trade
+    # went out with zero trace of whether the notification did. If no password is
+    # configured say so, since that is the silent-no-mail case.
+    if not bot.GMAIL_APP_PW:
+        log(f"NOT emailing {ok}/{len(orders)} fills: no gmail_app_password set")
+        return
+    try:
+        bot.send_email(subject, "\n".join(lines))
+        log(f"emailed {ok}/{len(orders)} fills to {bot.ALERT_TO}")
+    except Exception as e:
+        log(f"email FAILED ({e}) — trade still placed, notification lost")
 
 
 def persist(led, res, placed):
