@@ -1,0 +1,30 @@
+name: Email Report
+
+# Emails a committed report file to Devon through the bot's Gmail secret.
+# Manual only: dispatch with the path to the report to send.
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        description: "Report file to email"
+        default: "reports/latest.md"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: requirements-alpaca.txt
+      - run: pip install -r requirements-alpaca.txt
+      - name: Send report
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python send_report.py "${{ inputs.path }}"
