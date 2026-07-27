@@ -6,7 +6,6 @@
     "META",
     "PLTK",
     "CVI",
-    "WLDS",
     "ETHUSD",
     "SOLUSD",
     "BMNR",
@@ -21,9 +20,9 @@
     "VOD",
     "WAB"
   ],
-  "notes": "VIX steady at 19.7 with chips dragging Nasdaq red (QQQ -4.5%, IWM -2.6%, META -8%) even as oil relief supports the Dow; holding 0.45 into a Fed decision and AAPL-led tech-earnings deluge this week. Keeping reporters AAPL/CVI, deep losers META/PLTK, parabolic WLDS/BMNR and volatile crypto off the buy list.",
-  "journal_entry": "Mon 7/27 13:17: holding 0.45 as VIX firmed 18.9->19.7 and Big Tech/small-caps stayed heavy despite Dow strength. No new avoids; META now -8%, WLDS +72% still parabolic. Watching the Fed outcome and whether chips/tech stabilize.",
+  "notes": "VIX eased slightly to 19.3 but chips keep dragging Nasdaq red (QQQ -3.9%, IWM -2.2%, META -8.1%) while oil relief supports the Dow; holding 0.45 into the Fed decision and AAPL-led big-tech earnings this week. Keeping reporters AAPL/CVI, deep losers META/PLTK, extended BMNR and volatile crypto off the buy list.",
+  "journal_entry": "Mon 7/27 15:05: holding 0.45 as VIX ticked 19.7->19.3 into the close; tech/small-caps still heavy, META -8.1%. No new avoids. Watching the Fed outcome and whether Big Tech stabilizes post-earnings this week.",
   "date": "2026-07-27",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-27T13:17 ET"
+  "updated_at": "2026-07-27T15:05 ET"
 }
