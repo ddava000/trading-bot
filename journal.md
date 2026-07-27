@@ -808,3 +808,9 @@
 - avoid: ['META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'CVI', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
 - notes: VIX ticked back up to 18.7 and growth/small-caps stay red (QQQ -3.6%, IWM -2.6%, META -7.4%) into a Friday close ahead of next week's Fed decision and tech earnings deluge; trimming to 0.45 to limit weekend/event exposure while defensives hold firm.
 - journal: Fri 7/24 15:07: nudged 0.5->0.45 into the close as VIX crept 17.9->18.7 and Big Tech stayed weak, heading into a Fed-and-earnings-heavy week. Kept META/PLTK/JXN losers, parabolic WLDS and next-week reporter CVI off the buy list. Watching weekend Iran headlines and whether tech stabilizes Monday.
+
+### 2026-07-27T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'QQQ', 'IWM', 'CNMD', 'JXN'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Constructive open — Dow futures +500 as oil dives on U.S.-Iran de-escalation and VIX eased to 17.7, but a Fed decision and a heavy tech-earnings deluge (AAPL reports this week) loom, so I'm holding neutral 0.5 rather than pressing risk. Keeping AAPL/CVI (reporters), deep losers META/PLTK, parabolic WLDS and volatile crypto off the buy list.
+- journal: Mon 7/27 09:00: nudged 0.45->0.5 as VIX slipped to 17.7 and the Iran/oil relief held into a green futures open. Added AAPL to avoid (earnings this week, leads the wave); still dodging Fed/earnings event risk. Watching Fed decision and whether Big Tech stabilizes post-report.
