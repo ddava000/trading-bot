@@ -820,3 +820,9 @@
 - avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM', 'CNMD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
 - notes: VIX crept back to 18.9 and growth/small-caps stay heavy (QQQ -4.2%, IWM -2.3%, META -6.7%) even as oil relief buoys the Dow; with a Fed decision and a tech-earnings deluge (AAPL reports this week) dead ahead I'm trimming to 0.45 to limit event exposure. Keeping earnings reporters AAPL/CVI, deep losers META/PLTK, parabolic WLDS/BMNR and volatile crypto off the buy list.
 - journal: Mon 7/27 11:19: nudged 0.5->0.45 as VIX ticked 17.7->18.9 and Nasdaq/small-caps stayed red despite the Iran/oil relief rally in the Dow. Added BMNR (ETH-linked, extended) to avoids; still dodging Fed decision and AAPL-led tech earnings this week. Watching whether Big Tech stabilizes and the Fed outcome.
+
+### 2026-07-27T13:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM', 'CNMD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady at 19.7 with chips dragging Nasdaq red (QQQ -4.5%, IWM -2.6%, META -8%) even as oil relief supports the Dow; holding 0.45 into a Fed decision and AAPL-led tech-earnings deluge this week. Keeping reporters AAPL/CVI, deep losers META/PLTK, parabolic WLDS/BMNR and volatile crypto off the buy list.
+- journal: Mon 7/27 13:17: holding 0.45 as VIX firmed 18.9->19.7 and Big Tech/small-caps stayed heavy despite Dow strength. No new avoids; META now -8%, WLDS +72% still parabolic. Watching the Fed outcome and whether chips/tech stabilize.
