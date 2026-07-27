@@ -17,3 +17,7 @@
 {"action": "buy", "symbol": "SSNC", "notional": 4.14, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "FAF", "notional": 1.1, "sleeve": "TRADE", "reason": "TRADE +1 RSI 60 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "NVDA", "notional": 4.16, "sleeve": "HOLD", "reason": "HOLD +1 RSI 63 up (5 votes)", "ts": "2026-07-24T12:06", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 1.45, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 1.56, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 1.39, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "BMNR", "notional": 2.04, "sleeve": "TRADE", "reason": "TRADE +1 RSI 65 up (3 votes)", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}

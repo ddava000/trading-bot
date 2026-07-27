@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 103.01,
+ "equity": 119.76,
  "held": [
   "ALLE",
   "DGX",
@@ -17,7 +17,7 @@
   "THC",
   "WEX"
  ],
- "hold": 18.45,
+ "hold": 18.47,
  "holds": [
   "IMAX",
   "LMT",
@@ -25,27 +25,28 @@
   "NVDA",
   "WEX"
  ],
- "index": 54.96,
- "orders_today": 9,
+ "index": 55.48,
+ "orders_today": 4,
  "positions": {
   "ALLE": 0.019017,
+  "BMNR": 0.113907,
   "DGX": 0.007897,
   "FAF": 0.014818,
   "IMAX": 0.135092,
-  "IWM": 0.06294,
+  "IWM": 0.067647,
   "LMT": 0.003188,
   "NVCR": 0.310079,
   "NVDA": 0.0197,
-  "QQQ": 0.026717,
+  "QQQ": 0.02898,
   "RNG": 0.090555,
-  "SPY": 0.024881,
+  "SPY": 0.02683,
   "SSNC": 0.056082,
   "THC": 0.004984,
   "WEX": 0.006326
  },
  "regime": "neutral",
- "risk": 0.45,
- "settled": 8.13,
- "trade": 15.56,
- "ts": "2026-07-24T15:40"
+ "risk": 0.5,
+ "settled": 29.89,
+ "trade": 17.96,
+ "ts": "2026-07-27T09:51"
 }
