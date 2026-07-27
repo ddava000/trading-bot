@@ -155,6 +155,22 @@ def check_market():
     close_ = et.replace(hour=15, minute=55, second=0, microsecond=0)
     return open_ <= et <= close_, et
 
+def next_market_run(et):
+    """UTC time by which the bot should next run. During market hours that is one
+    cadence out; when closed it is the next session's 9:45 ET open. This is what
+    lets a remote monitor tell 'quiet weekend, fine' from 'dead during trading':
+    compare the CURRENT clock to this, not the last-updated timestamp, which on a
+    Saturday is correctly old. Returned as a tz-aware UTC datetime."""
+    open_, _ = check_market()
+    if open_:
+        return datetime.now(timezone.utc) + timedelta(minutes=20)   # 15 cadence + grace
+    cand = et.replace(hour=9, minute=45, second=0, microsecond=0)
+    for _ in range(9):                              # today's open if still ahead, else scan forward
+        if cand > et and cand.weekday() < 5 and cand.strftime("%Y-%m-%d") not in MARKET_HOLIDAYS:
+            return cand.astimezone(timezone.utc)
+        cand = (cand + timedelta(days=1)).replace(hour=9, minute=45, second=0, microsecond=0)
+    return datetime.now(timezone.utc) + timedelta(hours=12)          # fallback, never stick
+
 
 # ── Indicators (identical to the Robinhood bot) ───────────────────────────────
 def calc_rsi(closes, n=14):
@@ -1310,9 +1326,21 @@ def run_bot():
             b  = float(positions.get(s, {}).get("avg_cost") or h.get("basis") or 0)
             if lv and b > 0:
                 hold_pct[s] = round((lv / b - 1) * 100, 1)
+        # Market-aware liveness, all in UTC so no reader has to juggle timezones.
+        # as_of_utc = when this was written; next_expected_utc = when the next run
+        # is due. A monitor flags "down" only when NOW is well past next_expected,
+        # NOT when ts merely looks old (which is correct and fine on a weekend).
+        nowu = datetime.now(timezone.utc)
+        nxt  = next_market_run(et)
         status = {
             "bot": "alpaca-cloud", "mode": MODE, "acct": acct_tag,
             "ts": et.strftime("%Y-%m-%dT%H:%M ET"),
+            "as_of_utc": nowu.strftime("%Y-%m-%dT%H:%MZ"),
+            "market_open": open_,
+            "next_expected_utc": nxt.strftime("%Y-%m-%dT%H:%MZ"),
+            "monitor_note": ("Down ONLY if current UTC is >45 min past "
+                             "next_expected_utc. An old ts outside market hours "
+                             "(nights/weekends/holidays) is normal, not a failure."),
             "equity": round(equity, 2), "cash": round(cash, 2),
             "day_pnl": round(daily_pnl, 2),
             "sleeves": {"index": round(index_core_val, 2), "trade": round(trade_val, 2),
