@@ -19,15 +19,18 @@
   "THC",
   "WEX"
  ],
+ "hold": 29.16,
  "holds": [
   "GENI",
   "IMAX",
+  "INCY",
   "LMT",
   "NVCR",
   "NVDA",
   "WEX"
  ],
- "orders_today": 1,
+ "index": 59.4,
+ "orders_today": 2,
  "positions": {
   "ALLE": 0.019017,
   "BMNR": 0.113907,
@@ -35,6 +38,7 @@
   "FAF": 0.014818,
   "GENI": 0.727085,
   "IMAX": 0.135092,
+  "INCY": 0.04185,
   "IWM": 0.067647,
   "LMT": 0.003188,
   "NVCR": 0.310079,
@@ -46,5 +50,9 @@
   "THC": 0.004984,
   "WEX": 0.006326
  },
- "ts": "2026-07-28T13:31"
+ "regime": "neutral",
+ "risk": 0.45,
+ "settled": 18.07,
+ "trade": 18.92,
+ "ts": "2026-07-28T13:33"
 }
