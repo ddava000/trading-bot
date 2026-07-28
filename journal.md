@@ -838,3 +838,9 @@
 - avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
 - notes: VIX eased to 18.6 but Asia chip sell-off has Nasdaq futures red and a Fed decision plus a Big Tech/earnings blitz loom this week; holding 0.45. CNMD reports tomorrow (added to avoids), AAPL/CVI report this week, and META/PLTK remain heavy losers while crypto/BMNR stay volatile.
 - journal: Tue 7/28 09:00: VIX ticked 19.3->18.6 but futures soft on Asia chip weakness ahead of Fed decision and earnings deluge. Added CNMD (reports tomorrow) to avoids, dropped it from favor. Watching Fed outcome and whether tech stabilizes post-report.
+
+### 2026-07-28T10:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady at 18.8 with the chip sell-off deepening (Micron/SK Hynix dragging Nasdaq) even as strong earnings lift the Dow; holding 0.45 into the Fed decision and Big Tech earnings blitz this week. Keeping reporters AAPL/CVI/CNMD (CNMD tomorrow), deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Tue 7/28 10:55: VIX flat ~18.8; chip selloff persists but Dow supported by KO/SHW earnings. No changes to avoids/favors. Watching Fed outcome and whether tech/small-caps stabilize.
