@@ -22,3 +22,4 @@
 {"action": "buy", "symbol": "IWM", "notional": 1.39, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "BMNR", "notional": 2.04, "sleeve": "TRADE", "reason": "TRADE +1 RSI 65 up (3 votes)", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "GENI", "notional": 5.38, "sleeve": "HOLD", "reason": "HOLD +1 RSI 66 up (4 votes)", "ts": "2026-07-27T15:01", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "MSFT", "notional": 5.4, "sleeve": "HOLD", "reason": "HOLD +1 RSI 60 up (5 votes)", "ts": "2026-07-28T11:36", "status": "unknown", "venue": "robinhood"}
