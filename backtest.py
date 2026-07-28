@@ -51,7 +51,7 @@ for day,D in enumerate(cal):
             if rr: s[sym]=rr
     day_sig[D]=s
 
-def simulate(mode, htrail, exit_rule="ratchet"):
+def simulate(mode, htrail, exit_rule="ratchet", hstop=HSTOP):
     cash=START; pos={}; curve=[]
     for day,D in enumerate(cal):
         if day<55: curve.append(START); continue
@@ -71,12 +71,12 @@ def simulate(mode, htrail, exit_rule="ratchet"):
                     if p.get("tier",0)<2 and g>=1.00 and p["sh"]>1e-9:   # +100%: trim another 1/3
                         ss=min(osh/3,p["sh"]); cash+=ss*live; p["sh"]-=ss; p["tier"]=2
                     if p["sh"]<=1e-9: del pos[s]; continue
-                    if live<=max(cost*HSTOP,p["peak"]*htrail): reason=1  # rest rides the ratchet
+                    if live<=max(cost*hstop,p["peak"]*htrail): reason=1  # rest rides the ratchet
                 elif exit_rule=="accel":                                 # tighten trail only for big winners
                     ht=htrail if pg<0.5 else (0.70 if pg<1.0 else 0.78)
-                    if live<=max(cost*HSTOP,p["peak"]*ht): reason=1
+                    if live<=max(cost*hstop,p["peak"]*ht): reason=1
                 else:
-                    if live<=max(cost*HSTOP,p["peak"]*htrail): reason=1
+                    if live<=max(cost*hstop,p["peak"]*htrail): reason=1
             else:
                 if live<=cost*STOP or (live>=cost*TP and con<=0) or con==-1: reason=1
             if reason: cash+=p["sh"]*live; del pos[s]
@@ -106,12 +106,21 @@ def stats(curve):
     return r,cg,dd
 def line(nm,cv):
     r,cg,dd=stats(cv); print(f"  {nm:<36} total {r*100:>+7.1f}%  CAGR {cg*100:>+6.1f}%  maxDD {dd*100:>+7.1f}%  ret/risk {cg/abs(dd):.2f}")
-RULES=[("current 40% ratchet","ratchet"),("scale-out (1/3 @+50, 1/3 @+100)","scaleout"),("accelerating ratchet","accel")]
-print("\n"+"="*86)
-print(f"EXIT-RULE TEST: capturing more of parabolic winners (the MTEN problem)  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
-print("  NOTE: tested on 40 LIQUID names; the real MTEN-style pops live in microcaps the backtest can't include.")
-print("="*86)
-print("-- ACTIVE strategy (the live hold sleeve) --")
-for nm,er in RULES: line(nm, simulate("active",0.60,er))
-print("-- ALL-HOLD (everything held = maximum exit-rule sensitivity) --")
-for nm,er in RULES: line(nm, simulate("allhold",0.60,er))
+print("\n"+"="*90)
+print(f"CONVICTION-HOLD TEST: does a WIDER hold stop (riding losers longer) help?  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
+print("  The live hold sleeve stops a loser at -25% from basis (0.75). 'Conviction' = give it a")
+print("  wider leash. Each row widens the basis stop, and the last also loosens the peak ratchet.")
+print("  HONEST LIMIT: a real conviction hold is a FEW chosen names; this applies the wider stop to")
+print("  ALL holds, so it is the UPPER BOUND on how much riding losers could help or hurt. Also: no")
+print("  microcaps/crypto, daily bars, zero slippage. TSLA is one of the 40 names, so it is included.")
+print("="*90)
+# (name, htrail=peak-ratchet floor, hstop=basis stop)
+CONV=[("current live  (-25% basis / -40% ratchet)", 0.60, 0.75),
+      ("mild          (-35% basis / -40% ratchet)", 0.60, 0.65),
+      ("no basis stop (ride to the -40% ratchet)",  0.60, 0.0001),
+      ("deep ride     (-50% basis / -55% ratchet)", 0.45, 0.50)]
+print("-- ACTIVE strategy (mirrors the live hold sleeve) --")
+for nm,ht,hs in CONV: line(nm, simulate("active",ht,"ratchet",hs))
+print("-- ALL-HOLD (everything held = maximum sensitivity to the hold stop) --")
+for nm,ht,hs in CONV: line(nm, simulate("allhold",ht,"ratchet",hs))
+line("SPY buy & hold", [START*bench[D][0]/bench[cal[55]][0] for D in cal])
