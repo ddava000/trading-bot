@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 119.95,
+ "equity": 119.9,
  "held": [
   "ALLE",
   "BMNR",
@@ -30,7 +30,7 @@
   "NVDA",
   "WEX"
  ],
- "index": 59.28,
+ "index": 59.29,
  "orders_today": 2,
  "positions": {
   "ALLE": 0.019017,
@@ -54,6 +54,6 @@
  "regime": "neutral",
  "risk": 0.45,
  "settled": 12.66,
- "trade": 18.85,
- "ts": "2026-07-28T14:10"
+ "trade": 18.8,
+ "ts": "2026-07-28T14:35"
 }
