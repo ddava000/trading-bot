@@ -44,6 +44,27 @@ Both bots publish status files read from the public repo: `status.json` (cloud) 
 only if the current UTC time is well past it. An old timestamp on a weekend or
 overnight is normal, both bots rest when markets are closed.
 
+## Work from your phone (Claude Code on the web)
+Devon can drive this repo from a phone with zero computer running, via Claude Code
+on the web (claude.ai/code, or the Code tab in the Claude app). One-time: connect
+GitHub (one approval), then pick `ddava000/trading-bot` and start a session. Edits,
+test runs, commits and PRs all happen in Anthropic's cloud.
+
+To make a web session as capable as a local one, paste this into the cloud
+environment's **Setup script** field (claude.ai environment settings). It installs
+`gh` (for triggering/reading the bot's Actions runs) and the Python deps:
+
+```bash
+#!/bin/bash
+apt update && apt install -y gh || true
+pip install -r requirements-alpaca.txt || true
+```
+
+Not covered by that script: the Robinhood account-lookup MCP connector is a
+claude.ai connector, so a web session may need it connected separately, or it may
+not be available there. Core dev work (edit, run tests, fix, commit) needs none of
+it.
+
 ## Working with Devon (hard preferences)
 - **Never use em dashes.** Hard rule.
 - **No emojis in email subject lines** (he prints mail to PDF; the subject becomes
