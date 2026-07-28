@@ -9,7 +9,7 @@
  "ABT": {
   "basis": 98.99,
   "notional": 5.82,
-  "peak": 105.19,
+  "peak": 107.885,
   "peak_saved": 104.01,
   "ts": "2026-07-16T12:45"
  },
@@ -23,12 +23,12 @@
  "PLTK": {
   "basis": 4.155,
   "notional": 4.16,
-  "peak": 3.835,
+  "peak": 3.93,
   "ts": "2026-07-21T15:45"
  },
  "REZI": {
-  "basis": 33.51,
-  "notional": 18.75,
+  "basis": 34.1686,
+  "notional": 29.48,
   "peak": 37.215,
   "peak_saved": 37.215,
   "ts": "2026-07-10T13:15"
