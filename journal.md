@@ -874,3 +874,9 @@
 - avoid: ['AAPL', 'CNMD', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
 - notes: Dow down 800+ with VIX up to 20 as the tape sells off hard into this afternoon's Fed decision, oil spiking on Iran threats and chips sliding — a full event-risk day, so trimming to 0.3 and staying firmly risk-off. AAPL reports Thursday and CNMD reports tomorrow (both avoid), deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR remain off the buy list.
 - journal: Wed 7/29 12:49: Tape deteriorated hard (Dow -800/-900), VIX 19.5->20 into the Fed decision. Cut scale 0.35->0.3, keeping risk-off; AAPL (Thu) and CNMD (tomorrow) stay on avoids. Watching the Fed announcement/presser and whether the selloff stabilizes before re-adding risk.
+
+### 2026-07-29T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Fed held rates steady as expected but the tape stayed heavy (Dow down 800+) with AI earnings still looming; VIX eased slightly to 18.8. Staying risk-off at 0.35 until the selloff stabilizes — AAPL reports Thursday and CNMD tomorrow (both avoid), and deep losers META/PLTK/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Wed 7/29 14:47: Fed held rates steady (as expected), VIX ticked 20->18.8 but tape still weak into AI earnings. Nudged scale 0.3->0.35 as event risk clears, staying risk-off; AAPL (Thu) and CNMD (Fri) remain on avoids. Watching whether the post-Fed tape stabilizes and how AI names react.
