@@ -78,15 +78,23 @@ jobs:
       - name: Persist trade log + holds ledger
         if: always()
         run: |
-          changed=""
+          changed=""; trades=""
           for f in trade_log.jsonl holds.json status.json; do
-            if [ -n "$(git status --porcelain -- "$f")" ]; then git add -- "$f"; changed=1; fi
+            if [ -n "$(git status --porcelain -- "$f")" ]; then
+              git add -- "$f"; changed=1
+              # status.json updates every run (the monitoring heartbeat); only
+              # trade_log/holds changing means an actual order. Label honestly so
+              # the history isn't 30+ "trade log" commits that were really just
+              # heartbeats (which reads like the bot went haywire).
+              [ "$f" != "status.json" ] && trades=1
+            fi
           done
           if [ -n "$changed" ]; then
             git config user.name  "alpaca-bot"
             git config user.email "alpaca-bot@users.noreply.github.com"
-            git commit -m "trade log $(date -u +%FT%TZ)"
+            if [ -n "$trades" ]; then msg="trade log $(date -u +%FT%TZ)"; else msg="status heartbeat $(date -u +%FT%TZ)"; fi
+            git commit -m "$msg"
             git push || (git pull --rebase --autostash origin main && git push) || true
           else
-            echo "no new trades to log"
+            echo "nothing to persist"
           fi
