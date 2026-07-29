@@ -1,6 +1,6 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.35,
+  "risk_scale": 0.3,
   "avoid_symbols": [
     "AAPL",
     "CNMD",
@@ -19,9 +19,9 @@
     "REZI",
     "VOD"
   ],
-  "notes": "Fed decision lands this afternoon with VIX up to 19.5, oil jumping on Iran strike threats and chips sliding \u2014 full event-risk day, staying risk-off at 0.35 into the announcement. AAPL reports Thursday and CNMD reports tomorrow (both avoid), plus deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR stay off the buy list.",
-  "journal_entry": "Wed 7/29 10:37: VIX ticked 18.7->19.5 pre-Fed, tape slipping and oil spiking on Iran headlines. Holding risk-off 0.35; added CNMD back to avoids (reports tomorrow). Watching the Fed decision/presser this afternoon before re-adding any risk.",
+  "notes": "Dow down 800+ with VIX up to 20 as the tape sells off hard into this afternoon's Fed decision, oil spiking on Iran threats and chips sliding \u2014 a full event-risk day, so trimming to 0.3 and staying firmly risk-off. AAPL reports Thursday and CNMD reports tomorrow (both avoid), deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR remain off the buy list.",
+  "journal_entry": "Wed 7/29 12:49: Tape deteriorated hard (Dow -800/-900), VIX 19.5->20 into the Fed decision. Cut scale 0.35->0.3, keeping risk-off; AAPL (Thu) and CNMD (tomorrow) stay on avoids. Watching the Fed announcement/presser and whether the selloff stabilizes before re-adding risk.",
   "date": "2026-07-29",
   "mode": "INTRADAY",
-  "updated_at": "2026-07-29T10:37 ET"
+  "updated_at": "2026-07-29T12:49 ET"
 }
