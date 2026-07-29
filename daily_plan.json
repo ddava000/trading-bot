@@ -3,12 +3,12 @@
   "risk_scale": 0.35,
   "avoid_symbols": [
     "AAPL",
+    "CNMD",
     "META",
     "PLTK",
     "QQQ",
     "IWM",
     "CVI",
-    "CNMD",
     "ETHUSD",
     "SOLUSD",
     "BMNR"
@@ -19,9 +19,9 @@
     "REZI",
     "VOD"
   ],
-  "notes": "Fed rate decision lands today with oil jumping on Iran news and chips selling off \u2014 classic event-risk day, so cutting to 0.35 and staying risk-off into the announcement. AAPL reports Thursday (avoid), keeping deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.",
-  "journal_entry": "Wed 7/29 09:00: Fed decision day, VIX 18.7, oil spiking on Iran, chips soft. Dropped scale 0.45->0.35 and moved to risk-off ahead of the announcement; AAPL earnings Thursday keeps it on avoids. Watching Fed outcome/presser and post-decision tape before re-adding risk.",
+  "notes": "Fed decision lands this afternoon with VIX up to 19.5, oil jumping on Iran strike threats and chips sliding \u2014 full event-risk day, staying risk-off at 0.35 into the announcement. AAPL reports Thursday and CNMD reports tomorrow (both avoid), plus deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR stay off the buy list.",
+  "journal_entry": "Wed 7/29 10:37: VIX ticked 18.7->19.5 pre-Fed, tape slipping and oil spiking on Iran headlines. Holding risk-off 0.35; added CNMD back to avoids (reports tomorrow). Watching the Fed decision/presser this afternoon before re-adding any risk.",
   "date": "2026-07-29",
-  "mode": "MORNING",
-  "updated_at": "2026-07-29T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-07-29T10:37 ET"
 }
