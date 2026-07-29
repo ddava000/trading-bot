@@ -24,3 +24,4 @@
 {"action": "buy", "symbol": "GENI", "notional": 5.38, "sleeve": "HOLD", "reason": "HOLD +1 RSI 66 up (4 votes)", "ts": "2026-07-27T15:01", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "MSFT", "notional": 5.4, "sleeve": "HOLD", "reason": "HOLD +1 RSI 60 up (5 votes)", "ts": "2026-07-28T11:36", "status": "unknown", "venue": "robinhood"}
 {"action": "buy", "symbol": "INCY", "notional": 5.41, "sleeve": "HOLD", "reason": "HOLD +1 RSI 70 up (4 votes)", "ts": "2026-07-28T13:33", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "COUR", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-07-29T14:25", "status": "ok", "venue": "robinhood"}

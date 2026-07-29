@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 119.46,
+ "equity": 119.3,
  "held": [
   "ALLE",
   "BMNR",
@@ -20,8 +20,9 @@
   "THC",
   "WEX"
  ],
- "hold": 28.78,
+ "hold": 29.83,
  "holds": [
+  "COUR",
   "GENI",
   "IMAX",
   "INCY",
@@ -30,11 +31,12 @@
   "NVDA",
   "WEX"
  ],
- "index": 59.03,
- "orders_today": 0,
+ "index": 58.88,
+ "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
   "BMNR": 0.113907,
+  "COUR": 0.17476,
   "DGX": 0.007897,
   "FAF": 0.014818,
   "GENI": 0.727085,
@@ -54,6 +56,6 @@
  "regime": "risk-off",
  "risk": 0.3,
  "settled": 12.66,
- "trade": 18.99,
- "ts": "2026-07-29T14:09"
+ "trade": 19.02,
+ "ts": "2026-07-29T14:25"
 }
