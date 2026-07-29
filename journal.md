@@ -856,3 +856,9 @@
 - avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
 - notes: VIX steady ~18.3 with Dow rallying on strong earnings and falling oil, but the chip selloff keeps Nasdaq heavy and a Fed decision plus earnings deluge loom this week; holding 0.45 into the close. Keeping reporters AAPL/CVI/CNMD (CNMD tomorrow), deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
 - journal: Tue 7/28 15:00: VIX flat ~18.3, Dow up ~600pts on earnings/oil while chips still soft into the close. No changes to avoids/favors. Watching Fed decision and whether tech/small-caps stabilize this week.
+
+### 2026-07-29T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Fed rate decision lands today with oil jumping on Iran news and chips selling off — classic event-risk day, so cutting to 0.35 and staying risk-off into the announcement. AAPL reports Thursday (avoid), keeping deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Wed 7/29 09:00: Fed decision day, VIX 18.7, oil spiking on Iran, chips soft. Dropped scale 0.45->0.35 and moved to risk-off ahead of the announcement; AAPL earnings Thursday keeps it on avoids. Watching Fed outcome/presser and post-decision tape before re-adding risk.
