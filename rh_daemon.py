@@ -36,6 +36,12 @@ CONFIG_F, LEDGER_F = "rh_config.json", "rh_ledger.json"
 STATUS_F, LOG_F    = "rh_status.json", "rh_trade_log.jsonl"
 HALT_F             = "rh_HALT"
 
+# The only files the daemon imports and runs. A pulled commit touching anything
+# else (status.json, trade logs, daily_plan.json, briefs, backtest.py) is data or
+# cloud-only code and needs no restart, since decide() reads the plan fresh each
+# cycle. Keep this in sync with the actual import graph: rh_daemon -> rh_bot -> bot.
+CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py")
+
 FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
 MAX_ORDERS_DAY = 40      # circuit breaker: a runaway loop can't machine-gun orders
@@ -488,7 +494,20 @@ def sync_code():
         after = git("rev-parse", "HEAD").stdout.strip()
         if not after or after == before:
             return False
-        log(f"upstream code changed {before[:7]} -> {after[:7]} - verifying before use")
+        # Restart ONLY when code the daemon actually RUNS changed. The cloud pushes
+        # status.json every few minutes plus trade logs, briefs and daily_plan.json,
+        # and a restart just to adopt those was costing a protective-pass gap each
+        # time (4 restarts in one morning, ~20 min of no stops, all for status.json).
+        # The pull already put those files on disk, and decide() reads daily_plan
+        # fresh every cycle, so nothing needs reloading unless a module changed.
+        changed = git("diff", "--name-only", f"{before}..{after}").stdout.split()
+        code_changed = [f for f in changed if f in CODE_FILES]
+        if not code_changed:
+            log(f"pulled {before[:7]} -> {after[:7]} — data only "
+                f"({', '.join(changed)[:70]}), not restarting")
+            return False
+        log(f"code changed ({', '.join(code_changed)}) {before[:7]} -> {after[:7]} "
+            f"— verifying before use")
         chk = subprocess.run([sys.executable, "rh_bot.py", "--selftest"],
                              capture_output=True, text=True, timeout=180)
         if chk.returncode != 0:
