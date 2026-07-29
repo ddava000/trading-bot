@@ -2,15 +2,15 @@
  "AAPL": {
   "basis": 322.125,
   "notional": 10.68,
-  "peak": 338.59,
+  "peak": 341.03,
   "peak_saved": 338.59,
   "ts": "2026-07-13T09:45"
  },
  "ABT": {
   "basis": 98.99,
   "notional": 5.82,
-  "peak": 107.885,
-  "peak_saved": 104.01,
+  "peak": 109.23,
+  "peak_saved": 109.23,
   "ts": "2026-07-16T12:45"
  },
  "META": {
@@ -23,7 +23,7 @@
  "PLTK": {
   "basis": 4.155,
   "notional": 4.16,
-  "peak": 3.93,
+  "peak": 4.06,
   "ts": "2026-07-21T15:45"
  },
  "REZI": {
