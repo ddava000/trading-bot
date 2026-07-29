@@ -25,3 +25,4 @@
 {"action": "buy", "symbol": "MSFT", "notional": 5.4, "sleeve": "HOLD", "reason": "HOLD +1 RSI 60 up (5 votes)", "ts": "2026-07-28T11:36", "status": "unknown", "venue": "robinhood"}
 {"action": "buy", "symbol": "INCY", "notional": 5.41, "sleeve": "HOLD", "reason": "HOLD +1 RSI 70 up (4 votes)", "ts": "2026-07-28T13:33", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "COUR", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-07-29T14:25", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "BMNR", "qty": 0.113907, "reason": "STOP-LOSS -7.4%", "ts": "2026-07-29T15:51", "status": "ok", "venue": "robinhood"}
