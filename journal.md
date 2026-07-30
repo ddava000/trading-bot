@@ -898,3 +898,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
 - notes: Tape holding steady midday with VIX at 18.3 and day P&L only -$8; keeping neutral 0.5. AAPL reports after the close (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
 - journal: Thu 7/30 13:00: Tape stable into the close, VIX flat at 18.3, no new landmines. Holding scale 0.5 and posture unchanged. AAPL prints tonight — staying off it; watching after-hours reaction and Friday's data/jobs setup before re-adding risk.
+
+### 2026-07-30T15:04 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Tape recovered with Nasdaq up ~2% on chip/MSFT strength and VIX easing to 17.8; day P&L only -$7 so holding neutral 0.5. AAPL reports after the close (avoid) and treasury yields at multiyear highs keep me from reaching further.
+- journal: Thu 7/30 15:04: Late-day rebound holding, VIX 18.3->17.8, Nasdaq +2% on AI relief. Keeping scale 0.5 and posture unchanged into the close. AAPL prints tonight (avoid); watching after-hours reaction and Friday's jobs/inflation data before adding risk.
