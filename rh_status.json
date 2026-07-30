@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 118.25,
+ "equity": 118.26,
  "held": [
   "ALLE",
   "COUR",
@@ -57,6 +57,6 @@
  "regime": "neutral",
  "risk": 0.5,
  "settled": 12.22,
- "trade": 17.66,
- "ts": "2026-07-30T13:53"
+ "trade": 17.67,
+ "ts": "2026-07-30T14:09"
 }
