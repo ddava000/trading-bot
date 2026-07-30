@@ -51,7 +51,7 @@ for day,D in enumerate(cal):
             if rr: s[sym]=rr
     day_sig[D]=s
 
-def simulate(mode, htrail, exit_rule="ratchet", hstop=HSTOP):
+def simulate(mode, htrail, exit_rule="ratchet", hstop=HSTOP, tstop=STOP):
     cash=START; pos={}; curve=[]
     for day,D in enumerate(cal):
         if day<55: curve.append(START); continue
@@ -78,7 +78,7 @@ def simulate(mode, htrail, exit_rule="ratchet", hstop=HSTOP):
                 else:
                     if live<=max(cost*hstop,p["peak"]*htrail): reason=1
             else:
-                if live<=cost*STOP or (live>=cost*TP and con<=0) or con==-1: reason=1
+                if live<=cost*tstop or (live>=cost*TP and con<=0) or con==-1: reason=1
             if reason: cash+=p["sh"]*live; del pos[s]
         inv=sum(pos[s]["sh"]*price[s] for s in pos if s in price)
         inv_h=sum(pos[s]["sh"]*price[s] for s in pos if pos[s]["sleeve"]=="hold" and s in price)
@@ -107,20 +107,20 @@ def stats(curve):
 def line(nm,cv):
     r,cg,dd=stats(cv); print(f"  {nm:<36} total {r*100:>+7.1f}%  CAGR {cg*100:>+6.1f}%  maxDD {dd*100:>+7.1f}%  ret/risk {cg/abs(dd):.2f}")
 print("\n"+"="*90)
-print(f"CONVICTION-HOLD TEST: does a WIDER hold stop (riding losers longer) help?  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
-print("  The live hold sleeve stops a loser at -25% from basis (0.75). 'Conviction' = give it a")
-print("  wider leash. Each row widens the basis stop, and the last also loosens the peak ratchet.")
-print("  HONEST LIMIT: a real conviction hold is a FEW chosen names; this applies the wider stop to")
-print("  ALL holds, so it is the UPPER BOUND on how much riding losers could help or hurt. Also: no")
-print("  microcaps/crypto, daily bars, zero slippage. TSLA is one of the 40 names, so it is included.")
+print(f"ACTIVE-STOP TIGHTNESS TEST: does cutting active-sleeve losers FASTER help?  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
+print("  Live: trade sleeve hard-stops at -7% (0.93); hold sleeve at -25% basis (0.75).")
+print("  Motivation (2026-07-30): on up-days the active picks sometimes bleed while the market rises.")
+print("  Sweep the TRADE hard stop tighter; last row also tightens the HOLD basis stop.")
+print("  HONEST LIMIT: daily bars + ZERO slippage FLATTER tight stops badly — a real -3% stop gets")
+print("  whipsawed out by intraday noise this can't see, then pays slippage to re-enter. Read tight-stop")
+print("  rows as an OPTIMISTIC upper bound; reality is worse. No microcaps/crypto.")
 print("="*90)
-# (name, htrail=peak-ratchet floor, hstop=basis stop)
-CONV=[("current live  (-25% basis / -40% ratchet)", 0.60, 0.75),
-      ("mild          (-35% basis / -40% ratchet)", 0.60, 0.65),
-      ("no basis stop (ride to the -40% ratchet)",  0.60, 0.0001),
-      ("deep ride     (-50% basis / -55% ratchet)", 0.45, 0.50)]
-print("-- ACTIVE strategy (mirrors the live hold sleeve) --")
-for nm,ht,hs in CONV: line(nm, simulate("active",ht,"ratchet",hs))
-print("-- ALL-HOLD (everything held = maximum sensitivity to the hold stop) --")
-for nm,ht,hs in CONV: line(nm, simulate("allhold",ht,"ratchet",hs))
+# (name, tstop=trade hard stop, hstop=hold basis stop)
+STOPS=[("current      (-7% trade / -25% hold)", 0.93, 0.75),
+       ("trade -5%    (-5% trade / -25% hold)", 0.95, 0.75),
+       ("trade -4%    (-4% trade / -25% hold)", 0.96, 0.75),
+       ("trade -3%    (-3% trade / -25% hold)", 0.97, 0.75),
+       ("both tight   (-5% trade / -15% hold)", 0.95, 0.85)]
+print("-- ACTIVE strategy (mirrors the live bot: trade + hold sleeves) --")
+for nm,ts,hs in STOPS: line(nm, simulate("active",0.60,"ratchet",hs,ts))
 line("SPY buy & hold", [START*bench[D][0]/bench[cal[55]][0] for D in cal])
