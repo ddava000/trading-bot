@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 117.94,
+ "equity": 117.8,
  "held": [
   "ALLE",
   "COUR",
@@ -32,7 +32,7 @@
   "NVDA",
   "WEX"
  ],
- "index": 59.25,
+ "index": 59.11,
  "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
@@ -55,8 +55,8 @@
   "WEX": 0.006326
  },
  "regime": "neutral",
- "risk": 0.45,
+ "risk": 0.5,
  "settled": 12.22,
- "trade": 17.47,
- "ts": "2026-07-30T10:36"
+ "trade": 17.45,
+ "ts": "2026-07-30T10:52"
 }
