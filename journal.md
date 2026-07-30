@@ -892,3 +892,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
 - notes: Post-Fed tape is stabilizing with VIX easing to 18.3 and futures firm on chip/MSFT strength; nudging to neutral 0.5. AAPL reports after the close today (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
 - journal: Thu 7/30 10:38: Selloff finding footing, VIX 19.1->18.3, day P&L only -$8. Raised scale 0.45->0.5 as tape calms. AAPL still on avoid ahead of tonight's print; earnings winners ABT/CNMD/CVI stay favored. Watching AAPL/AMZN after-hours reaction.
+
+### 2026-07-30T13:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Tape holding steady midday with VIX at 18.3 and day P&L only -$8; keeping neutral 0.5. AAPL reports after the close (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Thu 7/30 13:00: Tape stable into the close, VIX flat at 18.3, no new landmines. Holding scale 0.5 and posture unchanged. AAPL prints tonight — staying off it; watching after-hours reaction and Friday's data/jobs setup before re-adding risk.
