@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 118.21,
+ "equity": 118.34,
  "held": [
   "ALLE",
   "COUR",
@@ -11,6 +11,7 @@
   "INCY",
   "IWM",
   "LMT",
+  "MSFT",
   "NVCR",
   "NVDA",
   "QQQ",
@@ -20,7 +21,7 @@
   "THC",
   "WEX"
  ],
- "hold": 29.2,
+ "hold": 29.19,
  "holds": [
   "COUR",
   "GENI",
@@ -31,7 +32,7 @@
   "NVDA",
   "WEX"
  ],
- "index": 59.06,
+ "index": 59.26,
  "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
@@ -55,7 +56,7 @@
  },
  "regime": "neutral",
  "risk": 0.45,
- "settled": 13.47,
- "trade": 17.73,
- "ts": "2026-07-30T09:46"
+ "settled": 12.22,
+ "trade": 17.67,
+ "ts": "2026-07-30T10:03"
 }
