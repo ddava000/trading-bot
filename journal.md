@@ -886,3 +886,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
 - notes: Fed Day is behind us and futures are firming as Microsoft results eased AI worries; VIX slipped to 19.1 after peaking near 20. Nudging up to neutral 0.45 as the post-Fed tape stabilizes, but AAPL reports today (avoid) and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
 - journal: Thu 7/30 09:00: Fed held (as expected), Wednesday's Dow -1100 selloff appears to be finding footing with futures up on MSFT AI relief; VIX 18.8->19.1. Removed CNMD (Q2 beat, stock soars) and CVI (revenue beat) from avoids and moved to favor. AAPL reports today so kept on avoid. Watching AAPL's after-hours print and whether the recovery holds.
+
+### 2026-07-30T10:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Post-Fed tape is stabilizing with VIX easing to 18.3 and futures firm on chip/MSFT strength; nudging to neutral 0.5. AAPL reports after the close today (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Thu 7/30 10:38: Selloff finding footing, VIX 19.1->18.3, day P&L only -$8. Raised scale 0.45->0.5 as tape calms. AAPL still on avoid ahead of tonight's print; earnings winners ABT/CNMD/CVI stay favored. Watching AAPL/AMZN after-hours reaction.
