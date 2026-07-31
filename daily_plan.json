@@ -1,6 +1,6 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.5,
+  "risk_scale": 0.55,
   "avoid_symbols": [
     "AAPL",
     "META",
@@ -15,12 +15,12 @@
     "ABT",
     "CNMD",
     "CVI",
-    "REZI",
-    "VOD"
+    "CORT",
+    "REZI"
   ],
-  "notes": "Tape recovered with Nasdaq up ~2% on chip/MSFT strength and VIX easing to 17.8; day P&L only -$7 so holding neutral 0.5. AAPL reports after the close (avoid) and treasury yields at multiyear highs keep me from reaching further.",
-  "journal_entry": "Thu 7/30 15:04: Late-day rebound holding, VIX 18.3->17.8, Nasdaq +2% on AI relief. Keeping scale 0.5 and posture unchanged into the close. AAPL prints tonight (avoid); watching after-hours reaction and Friday's jobs/inflation data before adding risk.",
-  "date": "2026-07-30",
-  "mode": "INTRADAY",
-  "updated_at": "2026-07-30T15:04 ET"
+  "notes": "Tape is constructive with Nasdaq up ~3% on MSFT/AMZN earnings, cooling inflation and solid GDP, and VIX easing to 17.2, so nudging risk to 0.55. AAPL's weak forecast overshadowed its beat (stay off), META still deep in the red, and volatile crypto/BMNR remain off the buy list.",
+  "journal_entry": "Fri 7/31 09:00: AAPL printed a sales beat but weak guidance/supply concerns \u2014 keeping it on avoid. Broad rebound holding, VIX 17.8->17.2, so raised scale 0.5->0.55. Earnings winners CNMD/CVI/CORT stay favored; watching next week's jobs report and inflation data before reaching further.",
+  "date": "2026-07-31",
+  "mode": "MORNING",
+  "updated_at": "2026-07-31T09:00 ET"
 }
