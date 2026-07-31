@@ -916,3 +916,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
 - notes: Tape stays constructive on the tech rebound with VIX steady at 17.9 and day P&L only -$6, so holding neutral 0.55. AAPL's weak guidance keeps it on avoid, META remains deep in the red, and volatile crypto/BMNR stay off the buy list.
 - journal: Fri 7/31 10:44: Rebound holding, VIX 17.2->17.9 (slightly up but calm), P&L -$6. Kept scale 0.55 and posture unchanged. Earnings winners CNMD/CVI/CORT still favored; watching next week's Fed decision and jobs report before reaching for more risk.
+
+### 2026-07-31T13:04 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
+- notes: Tape is whipsawing as bond yields jump and AAPL tumbles ~9% post-earnings, but VIX is calm at 17.0 and day P&L is only -$5, so holding neutral 0.55. AAPL/META stay on avoid, and volatile QQQ/IWM/crypto/BMNR remain off the buy list into a heavy macro week.
+- journal: Fri 7/31 13:04: VIX eased 17.9->17.0 but yields are spiking and AAPL is down ~9% — keeping AAPL/META on avoid. Held scale 0.55, posture unchanged. Earnings winners CNMD/CVI/CORT/ABT still favored; watching next week's Fed decision and jobs report before adding risk into the weekend.
