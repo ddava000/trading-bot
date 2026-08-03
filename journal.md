@@ -934,3 +934,9 @@
 - avoid: ['AAPL', 'META', 'ABT', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'CORT', 'REZI', 'VOD']
 - notes: VIX slipped to 15.9 with futures higher on easing oil and a called-off Iran attack — a calm, constructive open. Still a heavy macro/earnings week (jobs Friday) so holding neutral 0.55; AAPL (weak guidance) and META stay on avoid, and ABT just tagged a 52-week low so it moves off favor.
 - journal: Mon 8/3 09:00: Fed held last week (inflation 3-yr high); weekend calm, VIX 16.5->15.9, futures up on oil slide/Iran de-escalation. Bumped ABT to avoid after 52-wk low despite prior gain. Kept CNMD/CVI/CORT winners favored; watching Friday jobs report before adding risk.
+
+### 2026-08-03T11:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'REZI', 'VOD', 'ABT']
+- notes: VIX eased to 15.7 with a strong tape (Dow +600) on oil slide and de-escalation — calm and constructive, so nudging up to 0.6. AAPL (weak guidance) and META (-8.6%) stay on avoid, and volatile QQQ/IWM/crypto/BMNR remain off the buy list into Friday's jobs report.
+- journal: Mon 8/3 11:22: VIX 15.9->15.7, Dow up big, day P&L +$5. Bumped scale 0.55->0.6 on the calm/constructive tape; restored ABT to favor after 'bargain' framing and +8% today. Still watching Friday jobs report before reaching for more risk; AAPL/META stay avoided.
