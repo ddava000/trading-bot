@@ -940,3 +940,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'REZI', 'VOD', 'ABT']
 - notes: VIX eased to 15.7 with a strong tape (Dow +600) on oil slide and de-escalation — calm and constructive, so nudging up to 0.6. AAPL (weak guidance) and META (-8.6%) stay on avoid, and volatile QQQ/IWM/crypto/BMNR remain off the buy list into Friday's jobs report.
 - journal: Mon 8/3 11:22: VIX 15.9->15.7, Dow up big, day P&L +$5. Bumped scale 0.55->0.6 on the calm/constructive tape; restored ABT to favor after 'bargain' framing and +8% today. Still watching Friday jobs report before reaching for more risk; AAPL/META stay avoided.
+
+### 2026-08-03T13:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'REZI', 'VOD', 'ABT']
+- notes: VIX 15.5 with a broad rally (Dow +500-600) on oil slide and Iran de-escalation — calm and constructive, holding 0.6. AAPL (weak guidance) and META (-8.5%) stay avoided; volatile QQQ/IWM/crypto/BMNR off the buy list into Friday's jobs report.
+- journal: Mon 8/3 13:26: VIX 15.7->15.5, tape still strong, day P&L +$5. Held scale at 0.6. Palantir reports tonight (PLTR not held; PLTK is separate). Watching Friday jobs report before adding risk; AAPL/META remain avoided.
