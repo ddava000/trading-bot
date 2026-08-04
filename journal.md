@@ -958,3 +958,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
 - notes: VIX 15.6 with a record-high tape (Dow +700) on Iran de-escalation and oil slide — calm and constructive, holding 0.6. Added GTM to avoid (ZoomInfo reports Q2 tomorrow); AAPL/META stay off the buy list and volatile QQQ/IWM/crypto/BMNR remain excluded into Friday's jobs report.
 - journal: Tue 8/4 09:00: Overnight rally to record highs, VIX 15.8->15.6, day P&L -$8 early. Added GTM to avoid ahead of tomorrow's earnings; REZI (-21.9%) and META (-10.8%) sagging so dropped REZI from favor. Watching Friday jobs report before adding risk.
+
+### 2026-08-04T10:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX 15.8 with a record-high tape (Dow +600) on Iran de-escalation and falling oil; Fed already held steady so that event is behind us — calm and constructive, holding 0.6. AAPL/META (-10%) stay avoided, GTM off the list into tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR remain excluded ahead of Friday's jobs report.
+- journal: Tue 8/4 10:56: Fed held rates steady (inflation 3-yr high) but market shrugged and rallied to records, VIX 15.6->15.8, day P&L -$7. PLTR ripping on 'otherworldly' quarter (held, small), BLZE at 55-mo high. Held scale 0.6; still watching Friday jobs before adding risk, AAPL/META stay avoided.
