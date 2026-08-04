@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 118.4,
+ "equity": 132.92,
  "held": [
   "ALLE",
   "COUR",
@@ -21,7 +21,7 @@
   "THC",
   "WEX"
  ],
- "hold": 29.05,
+ "hold": 33.23,
  "holds": [
   "COUR",
   "GENI",
@@ -30,10 +30,11 @@
   "LMT",
   "NVCR",
   "NVDA",
+  "PLTR",
   "WEX"
  ],
- "index": 59.49,
- "orders_today": 1,
+ "index": 61.55,
+ "orders_today": 5,
  "positions": {
   "ALLE": 0.019017,
   "COUR": 0.17476,
@@ -42,21 +43,23 @@
   "GENI": 0.727085,
   "IMAX": 0.135092,
   "INCY": 0.04185,
-  "IWM": 0.067647,
+  "IWM": 0.073956,
   "LMT": 0.003188,
   "MSFT": 0.002775,
   "NVCR": 0.310079,
   "NVDA": 0.0197,
-  "QQQ": 0.02898,
+  "PLTR": 0.017283,
+  "QQQ": 0.030963,
   "RNG": 0.090555,
-  "SPY": 0.02683,
+  "SPY": 0.028917,
   "SSNC": 0.056082,
   "THC": 0.004984,
+  "W": 0.01228,
   "WEX": 0.006326
  },
  "regime": "neutral",
- "risk": 0.5,
- "settled": 12.22,
- "trade": 17.64,
- "ts": "2026-07-30T15:48"
+ "risk": 0.6,
+ "settled": 22.33,
+ "trade": 19.94,
+ "ts": "2026-08-04T11:00"
 }

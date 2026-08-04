@@ -27,3 +27,8 @@
 {"action": "buy", "symbol": "COUR", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-07-29T14:25", "status": "ok", "venue": "robinhood"}
 {"action": "sell", "symbol": "BMNR", "qty": 0.113907, "reason": "STOP-LOSS -7.4%", "ts": "2026-07-29T15:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "MSFT", "notional": 1.25, "sleeve": "TRADE", "reason": "TRADE +1 RSI 73 up (5 votes)", "ts": "2026-07-30T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 1.6, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 1.42, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 1.89, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "PLTR", "notional": 2.73, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (6 votes)", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "W", "notional": 1.4, "sleeve": "TRADE", "reason": "TRADE +1 RSI 68 up (3 votes)", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
