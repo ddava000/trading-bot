@@ -38,9 +38,17 @@ pull); the sessions cannot talk directly.
 - **Cloud session owns:** `alpaca_bot.py`, `brief.py`, `review.py`, `backtest.py`,
   `.github/workflows/`.
 - **Laptop session owns:** `rh_bot.py`, `rh_daemon.py`, `setup_laptop.ps1`.
-- `git pull --rebase` before any edit. Do not edit the other session's files; if a
-  shared change is needed, leave a note in a commit message or report for Devon to
-  relay.
+- `git pull --rebase` before any edit. Prefer not to edit the other session's files;
+  if you must (at Devon's request), say so in the commit message and post a note in
+  the mailbox below so the owner has context.
+
+## Agent mailbox (how the two sessions talk)
+The sessions cannot chat live (neither runs continuously). They leave notes in
+`AGENT_MAIL.md` at the repo root. **RULE: at the start of any work session, `git
+pull` and read `AGENT_MAIL.md`. If there is a message addressed to you with no reply
+from you, handle it and reply by APPENDING a new entry (never edit or delete an
+existing one).** Use it for cross-domain heads-ups, questions, and handoffs. The
+format and protocol are documented at the top of that file.
 
 ## Kill switch
 Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its
