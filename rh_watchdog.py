@@ -48,12 +48,16 @@ def alert(msg):
     """Fire every configured channel. One channel failing never blocks another."""
     print("ALERT:", msg)
     sent, pw = [], os.environ.get("GMAIL_APP_PASSWORD")
-    frm = os.environ.get("GMAIL_USER", "devonsdummy@gmail.com")
+    # `or`, not get-with-default: a missing GMAIL_USER secret expands to an EMPTY
+    # string in the workflow (the var is set, just blank), which slips past .get's
+    # default and 535-fails the Gmail login on every channel. Cloud session caught
+    # this 2026-08-04; adding the secret fixed it, this makes the code self-heal too.
+    frm = os.environ.get("GMAIL_USER") or "devonsdummy@gmail.com"
 
     # Email — subject carries no emoji; Devon prints mail to PDF by subject.
     if pw:
         try:
-            _email(frm, pw, os.environ.get("ALERT_EMAIL", "devondavasher@gmail.com"),
+            _email(frm, pw, os.environ.get("ALERT_EMAIL") or "devondavasher@gmail.com",
                    "ALERT: RH laptop bot is not reporting", msg)
             sent.append("email")
         except Exception as e:
