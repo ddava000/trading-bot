@@ -24,13 +24,16 @@ rails before doing anything.
   REAL money, ~$120, on an always-on Windows laptop. `rh_bot.py` imports every rail
   from `alpaca_bot` so the two strategies cannot drift.
 
-> IMPORTANT, learned the hard way (2026-07-28): the bot's order EXECUTOR is a
-> headless `claude -p` turn. It MUST run with a working directory OUTSIDE this
-> repo, because if it starts inside the repo it reads this CLAUDE.md, sees "never
-> place a real-money trade," and refuses to place the orders it was handed, which
-> silently blocks all trading. The "never trade" rule below is for INTERACTIVE,
-> human-directed sessions; the executor is kept isolated instead. Do not move the
-> executor back into the repo dir, and do not weaken the rule to accommodate it.
+> IMPORTANT, learned the hard way (2026-07-28): the `rh_daemon` order EXECUTOR (a
+> headless `claude -p` turn) is SANCTIONED, approved automation, not a rogue agent
+> placing trades. It is the only supported path to Robinhood, and it merely places
+> the exact order list `rh_bot.decide()` already produced. It MUST run with a
+> working directory OUTSIDE this repo: if it starts inside the repo it reads this
+> CLAUDE.md, sees "never place a real-money trade," and refuses the orders it was
+> handed, silently blocking all trading (including protective stops). The "never
+> trade" rule below governs INTERACTIVE, human-directed sessions only; the executor
+> is kept isolated instead. Do NOT move the executor back into the repo dir, and do
+> NOT "fix" it by weakening the rule, that isolation is the design.
 
 ## Two-session coordination
 Two Claude sessions may work here at once. Coordinate through the repo (commit +
