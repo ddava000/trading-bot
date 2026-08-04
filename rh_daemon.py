@@ -48,8 +48,20 @@ MAX_ORDERS_DAY = 40      # circuit breaker: a runaway loop can't machine-gun ord
 AGENT_TIMEOUT  = 240
 PUSH_HEARTBEAT_SEC = 900 # liveness ping when nothing changed, so a quiet laptop
                          # and a dead one don't look the same to whoever watches
+RECONCILE_MAX_AGE_SEC = 1800  # 30 min. The bot only learned its cash at session
+                         # open and after trades, so a mid-day DEPOSIT sat unseen
+                         # until the next morning. This reconciles at least this
+                         # often during market hours so added (or withdrawn) money
+                         # is noticed within the window. It is the one scheduled
+                         # token spend; keep it well above the 15-min full cycle so
+                         # it stays cheap. Trades reset the clock, so on an active
+                         # day this rarely fires on top of the reconciles already
+                         # happening.
 
 _last_push_at, _last_push_material = 0.0, None
+_last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
+                         # is also how a fresh start picks up a deposit made while
+                         # the laptop was off or since the last session open.
 
 DRY = "--dry" in sys.argv
 
@@ -277,6 +289,8 @@ def adopt_truth(led, truth):
     led["positions"] = positions
     led["holds"] = {s: h for s, h in (led.get("holds") or {}).items()
                     if any(p["symbol"] == s for p in positions)}
+    global _last_reconcile
+    _last_reconcile = time.time()   # feeds the periodic-reconcile clock in main()
     return True
 
 
@@ -611,8 +625,17 @@ def main():
             time.sleep(FAST_PASS_SEC); continue
 
         try:
+            full = (time.time() - last_full) >= FULL_CYCLE_SEC
             if roll_day(led, et.strftime("%Y-%m-%d")):
                 log("new session — settling T+1 proceeds, reconciling with broker")
+                led["needs_reconcile"] = True
+            # Periodic reconcile so a mid-day DEPOSIT (or withdrawal) is noticed
+            # within RECONCILE_MAX_AGE_SEC instead of sitting unseen until the next
+            # session open. Only on full cycles, and skipped when roll_day already
+            # forced one. adopt_truth resets the clock, so an active day rarely
+            # spends an extra reconcile here.
+            elif full and (time.time() - _last_reconcile) >= RECONCILE_MAX_AGE_SEC:
+                log("periodic reconcile — checking the broker for deposits/changes")
                 led["needs_reconcile"] = True
             # Held as a ledger flag, not a local variable: if the snapshot is bad
             # we must retry next pass, and roll_day only fires once per day.
@@ -632,7 +655,6 @@ def main():
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
-            full = (time.time() - last_full) >= FULL_CYCLE_SEC
             if full and sync_code():
                 save_ledger(led)          # ledger is the source of truth across restarts
                 # Do NOT execv on Windows: it spawns rather than replaces, which is
