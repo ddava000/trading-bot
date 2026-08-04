@@ -952,3 +952,9 @@
 - avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'REZI', 'VOD', 'ABT', 'SPSC']
 - notes: VIX 15.8 with a strong broad rally (Dow +500-600) on oil slide and Iran de-escalation — calm and constructive, holding 0.6. AAPL (weak guidance) and META (-8.6%) stay avoided; volatile QQQ/IWM/crypto/BMNR remain off the buy list into Friday's jobs report.
 - journal: Mon 8/3 15:13: VIX 15.5->15.8 into the close, tape still firm, day P&L +$6. Held scale at 0.6. Watching Friday jobs report and this week's chip/memory earnings before adding risk; AAPL/META remain avoided.
+
+### 2026-08-04T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX 15.6 with a record-high tape (Dow +700) on Iran de-escalation and oil slide — calm and constructive, holding 0.6. Added GTM to avoid (ZoomInfo reports Q2 tomorrow); AAPL/META stay off the buy list and volatile QQQ/IWM/crypto/BMNR remain excluded into Friday's jobs report.
+- journal: Tue 8/4 09:00: Overnight rally to record highs, VIX 15.8->15.6, day P&L -$8 early. Added GTM to avoid ahead of tomorrow's earnings; REZI (-21.9%) and META (-10.8%) sagging so dropped REZI from favor. Watching Friday jobs report before adding risk.
