@@ -28,7 +28,11 @@ import alpaca_bot as bot
 
 STATUS_F  = "rh_status.json"
 STALE_MIN = 30    # heartbeat is 15 min, so >30 = ~2 missed pushes = likely down
-GRACE_MIN = 45    # after the open, give the laptop time to boot and push once
+GRACE_MIN = 5     # Devon 2026-08-04: minimal delay after the open. The 30-min
+                  # workflow schedule still lands the first live check at ~10:00 ET
+                  # (first run once the market is open), which is right after the
+                  # laptop's own first heartbeat — so a no-show laptop is caught by
+                  # then without false-alarming before it has had a chance to push.
 
 
 def _email(frm, pw, to, subject, body):
