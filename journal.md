@@ -970,3 +970,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
 - notes: VIX 16.3 with record-high tape (Dow +900) on Iran/Hormuz optimism and oil drop; Fed hold is behind us but inflation hit a 3-yr high, so staying at 0.6. AAPL/META (-10%) stay avoided, GTM off ahead of tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR remain excluded into Friday's jobs report.
 - journal: Tue 8/4 13:12: VIX 15.8->16.3 even as tape hit fresh records, day P&L -$5. PLTR still ripping on strong quarter (held small). Held scale 0.6; watching Friday jobs report and creeping VIX before adding risk, AAPL/META/GTM stay avoided.
+
+### 2026-08-04T15:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX steady at 16.3 with record-high tape (Dow +900) on Iran/Hormuz optimism and falling oil; Fed hold behind us but inflation at a 3-yr high, so holding 0.6. AAPL/META (down) stay avoided, GTM off into tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR excluded ahead of Friday's jobs report.
+- journal: Tue 8/4 15:14: Late-day, VIX flat at 16.3, day P&L -$3 (improved). No new landmines; PLTR/CNMD leaders held small. Kept scale 0.6 into the close, watching Friday jobs and chip/memory earnings before adding risk; AAPL/META/GTM stay avoided.
