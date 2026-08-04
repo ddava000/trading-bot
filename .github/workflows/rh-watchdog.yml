@@ -11,7 +11,12 @@ on:
     # both EST and EDT; rh_watchdog.py's check_market() is the precise gate, so
     # off-hours runs just exit 0. While the bot is down you get pinged each run.
     - cron: "*/30 13-21 * * 1-5"
-  workflow_dispatch: {}   # allow a manual run to test
+  workflow_dispatch:      # manual run; set force=true to send a test alert now
+    inputs:
+      force:
+        description: "Send a TEST alert to all channels regardless of bot state"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -34,4 +39,5 @@ jobs:
           SMS_TO:             ${{ secrets.SMS_TO }}
           ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
           ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          FORCE_ALERT:        ${{ inputs.force }}
         run: python rh_watchdog.py

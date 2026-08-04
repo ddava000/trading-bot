@@ -82,6 +82,13 @@ def alert(msg):
 
 
 def main():
+    # Manual test path: verify every channel reaches the phone without waiting
+    # for a real outage. Triggered from the Actions tab with force=true.
+    if os.environ.get("FORCE_ALERT", "").lower() == "true":
+        alert("TEST alert from the RH watchdog. All three channels are wired up. "
+              "This is not a real outage.")
+        return 0
+
     et = datetime.now(bot.ET_TZ)
     open_now, _ = bot.check_market()
     if not open_now:
