@@ -1,36 +1,36 @@
 {
  "acct": "RRQ1",
- "as_of_utc": "2026-08-04T17:00Z",
+ "as_of_utc": "2026-08-04T17:15Z",
  "baseline": {
   "equity": 455.67,
   "set": "2026-07-15T10:15 ET"
  },
  "bot": "alpaca-cloud",
  "cash": 44.19,
- "day_pnl": -4.84,
- "equity": 440.29,
+ "day_pnl": -4.51,
+ "equity": 440.62,
  "halted": false,
  "holds_pct_vs_basis": {
-  "AAPL": -4.2,
-  "ABT": 7.0,
-  "META": -10.4,
+  "AAPL": -3.7,
+  "ABT": 7.1,
+  "META": -9.6,
   "PLTK": -2.8,
   "PLTR": 5.1,
-  "SPSC": 0.3
+  "SPSC": 0.2
  },
  "market_open": true,
  "mode": "PAPER",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-08-04T17:20Z",
+ "next_expected_utc": "2026-08-04T17:35Z",
  "orders_this_run": 0,
  "regime": "risk-on",
  "sleeves": {
-  "crypto": 22.09,
-  "hold": 66.47,
-  "index": 252.09,
-  "trade": 55.45
+  "crypto": 22.17,
+  "hold": 66.86,
+  "index": 252.27,
+  "trade": 55.13
  },
- "ts": "2026-08-04T13:00 ET",
- "vix": 16.2,
- "vs_baseline_pct": -3.38
+ "ts": "2026-08-04T13:15 ET",
+ "vix": 16.3,
+ "vs_baseline_pct": -3.3
 }
