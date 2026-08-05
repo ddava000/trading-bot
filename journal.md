@@ -982,3 +982,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'DXST', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
 - notes: Tape at fresh records (S&P above 7,700) on Iran/Hormuz optimism and falling oil, but VIX ticked up to 16.8 and Friday's jobs report plus CPI loom, so holding 0.6. AAPL/META (down) stay avoided, GTM likely reporting today, DXST added after a volatile -16.6% swing, and QQQ/IWM/crypto/BMNR remain excluded.
 - journal: Wed 8/5 09:00: Overnight ADP jobs came in soft; VIX 16.3->16.8, day P&L +$1. Record rally continues on Iran deal hopes. Added DXST to avoid after sharp adverse move; GTM earnings due today. Watching Friday jobs/CPI before adding risk; AAPL/META/GTM stay avoided.
+
+### 2026-08-05T10:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'DXST', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
+- notes: Tape at fresh records (S&P above 7,700) on Iran/Hormuz optimism and easing oil, but VIX 16.9 and Friday jobs plus CPI loom, so staying 0.6. GTM avoided on securities-fraud/AI-integration crash (-33%), AAPL/META remain weak, and volatile QQQ/IWM/crypto/BMNR excluded into the catalysts.
+- journal: Wed 8/5 10:42: VIX 16.8->16.9, day P&L -$1. GTM news confirms the -33% drop (fraud class action) - keep firmly avoided. Record rally intact; CNMD/PLTR/ABT leaders holding. Holding 0.6 into Friday jobs/CPI; AAPL/META/GTM/DXST stay avoided.
