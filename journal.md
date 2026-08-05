@@ -994,3 +994,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
 - notes: VIX eased to 16.0 and tape at records but rally is losing momentum (S&P gave up gains, Nasdaq red), and Friday jobs plus upcoming CPI/Fed minutes loom, so holding 0.6. GTM stays avoided on fraud/AI crash, AAPL/META/PLTK/ZETA weak, and volatile crypto/BMNR/QQQ/IWM excluded into catalysts.
 - journal: Wed 8/5 13:02: VIX 16.9->16.0, day P&L -$2. Rally stalling midday (4-day run losing steam, Nasdaq gave back gains). Dropped DXST from avoid, added ZETA (down -3.8%). Holding 0.6 into Friday jobs/CPI; AAPL/META/GTM stay avoided.
+
+### 2026-08-05T15:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
+- notes: VIX calm at 15.6 and tape near records but the 4-day rally is losing momentum (S&P gave up gains, Nasdaq red) with Friday jobs plus CPI/Fed minutes ahead, so holding 0.6. GTM stays firmly avoided on the fraud/AI crash, AAPL/META/PLTK/ZETA weak, and crypto/BMNR/QQQ/IWM excluded into catalysts.
+- journal: Wed 8/5 15:07: VIX 16.0->15.6, day P&L -$2. Rally still stalling into the close, no new landmines; CNMD/ABT leaders holding. Keeping 0.6 into Friday jobs/CPI/Fed minutes; AAPL/META/GTM stay avoided.
