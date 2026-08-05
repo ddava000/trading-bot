@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 208.75,
+ "equity": 208.94,
  "held": [
   "ALLE",
   "COUR",
@@ -25,6 +25,7 @@
   "W",
   "WEX"
  ],
+ "hold": 52.23,
  "holds": [
   "COUR",
   "GENI",
@@ -34,10 +35,12 @@
   "NVCR",
   "NVDA",
   "PLTR",
+  "SHOP",
   "TDW",
   "WEX"
  ],
- "orders_today": 0,
+ "index": 104.57,
+ "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
   "COUR": 0.17476,
@@ -55,6 +58,7 @@
   "PLTR": 0.017283,
   "QQQ": 0.048115,
   "RNG": 0.090555,
+  "SHOP": 0.042497,
   "SPY": 0.045138,
   "SSNC": 0.056082,
   "TDW": 0.148358,
@@ -62,5 +66,9 @@
   "W": 0.01228,
   "WEX": 0.006326
  },
- "ts": "2026-08-05T11:06"
+ "regime": "neutral",
+ "risk": 0.6,
+ "settled": 26.95,
+ "trade": 31.44,
+ "ts": "2026-08-05T11:11"
 }
