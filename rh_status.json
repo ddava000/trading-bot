@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 208.19,
+ "equity": 208.14,
  "held": [
   "ALLE",
   "COUR",
@@ -26,7 +26,7 @@
   "W",
   "WEX"
  ],
- "hold": 52.14,
+ "hold": 52.07,
  "holds": [
   "COUR",
   "GENI",
@@ -40,7 +40,7 @@
   "TDW",
   "WEX"
  ],
- "index": 104.16,
+ "index": 104.14,
  "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
@@ -70,6 +70,6 @@
  "regime": "neutral",
  "risk": 0.6,
  "settled": 20.69,
- "trade": 31.19,
- "ts": "2026-08-05T12:00"
+ "trade": 31.25,
+ "ts": "2026-08-05T12:16"
 }
