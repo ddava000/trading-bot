@@ -1006,3 +1006,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'SHOP', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB', 'GTM']
 - notes: VIX calm at 16.0 and Dow at record highs on a fifth winning day, but chips are slipping (Sandisk earnings dive) and Friday's jobs report plus lingering CPI/Fed risk keep me at 0.6. GTM stays firmly avoided on the fraud/AI crash, AAPL/META/PLTK/ZETA/SHOP weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
 - journal: Thu 8/6 09:00: VIX 15.6->16.0, day P&L -$1. Dow record close but Nasdaq/chips soft on Sandisk; jobs report tomorrow. Added SHOP to avoid (weak, -2.3%). Holding 0.6 into Friday jobs; AAPL/META/GTM stay avoided.
+
+### 2026-08-06T10:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'SHOP', 'SPSC', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB']
+- notes: VIX calm at 15.9 and Dow near record highs, but Nasdaq futures soft on Iran headlines/chip weakness and Friday's jobs report looms, so holding 0.6. GTM stays firmly avoided on the fraud crash; AAPL/META/PLTK/ZETA/SHOP weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
+- journal: Thu 8/6 10:42: VIX 16.0->15.9, day P&L +$2. Fixed prior plan's error (GTM was mistakenly in favor - now avoid only). Iran geopolitics and soft Nasdaq futures noted; jobs report tomorrow. Holding 0.6; CNMD/ABT/WAB leaders steady.
