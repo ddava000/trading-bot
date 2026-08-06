@@ -8,7 +8,7 @@ Defaults to the PAPER endpoint. To go live, set the ALPACA_BASE_URL secret to
 https://api.alpaca.markets (and use live API keys).
 """
 
-import os, math, json, requests
+import os, math, json, time, requests
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 
@@ -343,9 +343,20 @@ def fetch_day_gainers():
 # ── Alpaca broker layer (official REST API) ───────────────────────────────────
 ALPACA_DATA = "https://data.alpaca.markets"
 
-def alpaca_get(path):
-    r = requests.get(ALPACA_BASE + path, headers=ALPACA_HDRS, timeout=15)
-    return r.json()
+def alpaca_get(path, _tries=3):
+    """GET + parse JSON, with a short retry on TRANSIENT network errors. A single
+    connect/read timeout on a critical read like /v2/account would otherwise crash
+    the whole run — harmless (it dies before trading) but it fires a GitHub failure
+    email (2026-08-06). Reads are idempotent so retrying is safe; order POSTs are
+    deliberately NOT retried (a timed-out POST may already have filled)."""
+    for i in range(_tries):
+        try:
+            r = requests.get(ALPACA_BASE + path, headers=ALPACA_HDRS, timeout=15)
+            return r.json()
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            if i == _tries - 1:
+                raise
+            time.sleep(2 * (i + 1))                  # 2s, then 4s, then give up
 
 def alpaca_data_get(path):
     r = requests.get(ALPACA_DATA + path, headers=ALPACA_HDRS, timeout=10)
