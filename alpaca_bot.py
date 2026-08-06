@@ -1482,17 +1482,44 @@ if __name__ == "__main__":
         raise SystemExit(0)
 
     try:
-        run_bot()
+        # NETWORK SHIELD (2026-08-06): the 14:30Z outage outlasted alpaca_get's
+        # ~50s of read retries, run_bot() raised, the job died, and the WHOLE
+        # 15-min window of protective passes was lost. When Alpaca is unreachable,
+        # retry INSIDE this job instead of waiting for the next trigger: three
+        # attempts at the full cycle, and even if all fail, still run the fast
+        # loop below — stops resume within ~EXIT_PASS_SEC of Alpaca coming back.
+        # Only network errors are shielded; real code crashes still raise (red X).
+        # Retrying the cycle is safe: a fresh run re-reads positions AND pending
+        # orders, so anything placed before a mid-run drop is seen and skipped.
+        _NET_ERRS = (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+        t0 = time.time()
+        cycle_ok = False
+        for _attempt in range(3):
+            try:
+                run_bot()
+                cycle_ok = True
+                break
+            except _NET_ERRS as e:
+                print(f"⚠ Alpaca unreachable (cycle attempt {_attempt + 1}/3): {e}")
+                if _attempt < 2:
+                    print("  retrying in 60s — staying inside this job instead of losing the window")
+                    time.sleep(60)
+                else:
+                    print("  full cycle skipped this window — running protective passes anyway")
+
         # Fast protective loop: keep this job alive until the next 15-min trigger,
         # checking hard stops + danger news every ~EXIT_PASS_SEC. Free (public-repo
         # minutes); ends early after any fast-pass order so the log persists.
+        # Deadline anchors to JOB START, not to run_bot finishing, so retry time
+        # above can't push the job into its 18-min kill (a timeout is a red X —
+        # the exact thing this shield exists to prevent).
         if check_market()[0]:
-            import time as _time
-            deadline = _time.time() + LOOP_WINDOW_MIN * 60
+            deadline = t0 + (LOOP_WINDOW_MIN + 1.5) * 60
             alerted  = set()
             passes = acted = 0
-            while _time.time() < deadline:
-                _time.sleep(EXIT_PASS_SEC)
+            reached = cycle_ok   # did we get through to Alpaca at all this window?
+            while time.time() < deadline:
+                time.sleep(EXIT_PASS_SEC)
                 open_, _et = check_market()
                 if not open_:
                     print("  [fast loop: market closed — done]"); break
@@ -1500,11 +1527,24 @@ if __name__ == "__main__":
                 try:
                     if exit_pass(_et, alerted):
                         acted = 1
+                        reached = True
                         print("  [fast pass placed orders — ending job so the log persists now]")
                         break
+                    reached = True
+                except _NET_ERRS:
+                    print("  [fast pass: Alpaca unreachable — trying again next pass]")
                 except Exception as _e:
                     print(f"  [fast pass error (loop continues): {_e}]")
             print(f"  [fast loop done: {passes} pass(es), orders={'yes' if acted else 'no'}]")
+            if not reached:
+                # An entire window with ZERO contact means stops are not being
+                # watched. The job exits 0 (nothing to fix in the code), but that
+                # blind spot deserves a real alert, not silence.
+                send_email(f"Alpaca bot ({MODE}) - Alpaca unreachable all window",
+                           "Every attempt this window failed to reach Alpaca (full cycle and "
+                           "every protective pass). No orders were placed; positions are "
+                           "unwatched until a run gets through. If this repeats next window, "
+                           "check https://status.alpaca.markets — nothing is wrong with the bot.")
     except Exception:
         import traceback
         tb = traceback.format_exc()
