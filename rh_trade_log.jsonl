@@ -38,3 +38,4 @@
 {"action": "buy", "symbol": "TDW", "notional": 12.56, "sleeve": "HOLD", "reason": "HOLD +1 RSI 65 up (4 votes)", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "IT", "notional": 11.26, "sleeve": "TRADE", "reason": "TRADE +1 RSI 75 up (3 votes)", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "SHOP", "notional": 6.26, "sleeve": "HOLD", "reason": "HOLD +1 RSI 65 up (4 votes)", "ts": "2026-08-05T11:11", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "FAF", "qty": 0.014818, "reason": "TIME-STOP +0.8% after 13d", "ts": "2026-08-06T09:47", "status": "ok", "venue": "robinhood"}
