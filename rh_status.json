@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 205.37,
+ "equity": 203.9,
  "held": [
   "ALLE",
   "COUR",
@@ -22,9 +22,9 @@
   "SSNC",
   "TDW",
   "THC",
-  "W",
   "WEX"
  ],
+ "hold": 51.9,
  "holds": [
   "COUR",
   "GENI",
@@ -38,7 +38,8 @@
   "TDW",
   "WEX"
  ],
- "orders_today": 4,
+ "index": 103.9,
+ "orders_today": 5,
  "positions": {
   "ALLE": 0.019017,
   "COUR": 0.17476,
@@ -46,6 +47,7 @@
   "GENI": 0.727085,
   "IMAX": 0.135092,
   "INCY": 0.04185,
+  "INSM": 0.015341,
   "IT": 0.059762,
   "IWM": 0.115443,
   "LMT": 0.003188,
@@ -62,5 +64,9 @@
   "THC": 0.004984,
   "WEX": 0.006326
  },
- "ts": "2026-08-06T11:16"
+ "regime": "neutral",
+ "risk": 0.6,
+ "settled": 15.98,
+ "trade": 30.59,
+ "ts": "2026-08-06T11:27"
 }
