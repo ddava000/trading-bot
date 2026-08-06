@@ -70,7 +70,10 @@ HOLD_CLUSTER_MAX = 2      # max holds per correlated theme (wk1: AMAT+MU+SNDK = 
 # buys/TPs stay on the 15-min clock (signals are daily-bar; faster buying would be
 # churn, not edge). All of it $0: public-repo Actions minutes + Alpaca's news API
 # (Benzinga) included with our keys. Claude stays on its 3x/day brief schedule.
-LOOP_WINDOW_MIN  = 12.5   # keep fast-passing this long, then end the job (persists log)
+LOOP_WINDOW_MIN  = 9.5    # fast-pass this long from JOB START, then end. Must leave
+                          # the whole job (setup ~2m + this) comfortably under the
+                          # 15-min trigger interval, or runs overlap, pile up on the
+                          # concurrency queue, and get cancelled (the 2026-08-06 wave).
 EXIT_PASS_SEC    = 60     # seconds between protective passes
 NEWS_BLOCK_MIN   = 720    # a danger headline within this window blocks BUYING the name
 NEWS_ALERT_MIN   = 16     # only articles this fresh alert/exit (dedup across passes)
@@ -1493,28 +1496,29 @@ if __name__ == "__main__":
         # orders, so anything placed before a mid-run drop is seen and skipped.
         _NET_ERRS = (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
         t0 = time.time()
+        # Run the full cycle ONCE. If Alpaca is unreachable, do NOT sit here retrying
+        # with sleeps — that unbounded retry loop is what blew jobs past their window
+        # on 2026-08-06 (runs ran ~16 min, overlapping the 15-min trigger, and got
+        # cancelled/timed out). Skip straight to the fast protective loop, which keeps
+        # retrying Alpaca every ~EXIT_PASS_SEC for the rest of the window and places
+        # stops the moment it comes back. Losing one BUY/rebalance cycle to an outage
+        # is fine (the next 15-min trigger redoes it); the protective passes are what
+        # matter and they are preserved. Only network errors are caught; real crashes
+        # still raise (red X).
         cycle_ok = False
-        for _attempt in range(3):
-            try:
-                run_bot()
-                cycle_ok = True
-                break
-            except _NET_ERRS as e:
-                print(f"⚠ Alpaca unreachable (cycle attempt {_attempt + 1}/3): {e}")
-                if _attempt < 2:
-                    print("  retrying in 60s — staying inside this job instead of losing the window")
-                    time.sleep(60)
-                else:
-                    print("  full cycle skipped this window — running protective passes anyway")
+        try:
+            run_bot()
+            cycle_ok = True
+        except _NET_ERRS as e:
+            print(f"⚠ Alpaca unreachable for the full cycle ({e}) — skipping to "
+                  "protective passes, which retry Alpaca every pass.")
 
-        # Fast protective loop: keep this job alive until the next 15-min trigger,
-        # checking hard stops + danger news every ~EXIT_PASS_SEC. Free (public-repo
-        # minutes); ends early after any fast-pass order so the log persists.
-        # Deadline anchors to JOB START, not to run_bot finishing, so retry time
-        # above can't push the job into its 18-min kill (a timeout is a red X —
-        # the exact thing this shield exists to prevent).
+        # Fast protective loop: check hard stops + danger news every ~EXIT_PASS_SEC
+        # until the deadline, then end so the log persists and the job finishes well
+        # before the next 15-min trigger. Deadline anchors to JOB START so a slow full
+        # cycle can't push total run time past the interval (which caused the pileup).
         if check_market()[0]:
-            deadline = t0 + (LOOP_WINDOW_MIN + 1.5) * 60
+            deadline = t0 + LOOP_WINDOW_MIN * 60
             alerted  = set()
             passes = acted = 0
             reached = cycle_ok   # did we get through to Alpaca at all this window?
