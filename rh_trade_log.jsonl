@@ -40,3 +40,4 @@
 {"action": "buy", "symbol": "SHOP", "notional": 6.26, "sleeve": "HOLD", "reason": "HOLD +1 RSI 65 up (4 votes)", "ts": "2026-08-05T11:11", "status": "ok", "venue": "robinhood"}
 {"action": "sell", "symbol": "FAF", "qty": 0.014818, "reason": "TIME-STOP +0.8% after 13d", "ts": "2026-08-06T09:47", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "INSM", "notional": 1.16, "sleeve": "TRADE", "reason": "TRADE +1 RSI 77 up (4 votes)", "ts": "2026-08-06T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INSM", "qty": 0.008451, "reason": "STOP-LOSS -27.9%", "ts": "2026-08-06T10:14", "status": "ok", "venue": "robinhood"}
