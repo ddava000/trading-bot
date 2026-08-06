@@ -62,6 +62,12 @@ _last_push_at, _last_push_material = 0.0, None
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
                          # the laptop was off or since the last session open.
+_run_head = None         # git commit whose CODE is loaded in memory, captured at
+                         # startup. Code-change detection compares against THIS, not
+                         # against sync_code's own pull, because the status-push path
+                         # also pulls --rebase and can absorb a cloud code change
+                         # before sync_code sees it (which left the daemon running
+                         # 3-day-stale code on 2026-08-06).
 
 DRY = "--dry" in sys.argv
 
@@ -497,37 +503,47 @@ def sync_code():
     this the daemon would run whatever code it started with, forever.
 
     A bad upstream push must never break trading here, so new code has to pass
-    rh_bot's selftest; if it fails we hard-reset to the commit we were already
-    running and keep trading on known-good code. Returns True when the process
-    should restart to load the new modules (Python caches imports)."""
+    rh_bot's selftest; if it fails we stay on the known-good code already loaded in
+    memory. Returns True when the process should restart to load the new modules
+    (Python caches imports).
+
+    Detection compares CODE_FILES between the RUNNING commit (_run_head) and the
+    current HEAD, not between this pull's before and after. The status-push path
+    also runs `git pull --rebase`, so a cloud code change can land on disk via that
+    push before sync_code's own pull sees it; comparing to the running commit
+    catches it however HEAD advanced."""
     try:
         def git(*a, t=90):
             return subprocess.run(["git", *a], capture_output=True, text=True, timeout=t)
         before = git("rev-parse", "HEAD").stdout.strip()
         git("pull", "--rebase", "--autostash", "--quiet")
         after = git("rev-parse", "HEAD").stdout.strip()
-        if not after or after == before:
+        head = after or before
+        base = _run_head or before          # what our in-memory modules were built from
+        if not head or head == base:
             return False
-        # Restart ONLY when code the daemon actually RUNS changed. The cloud pushes
-        # status.json every few minutes plus trade logs, briefs and daily_plan.json,
-        # and a restart just to adopt those was costing a protective-pass gap each
-        # time (4 restarts in one morning, ~20 min of no stops, all for status.json).
-        # The pull already put those files on disk, and decide() reads daily_plan
-        # fresh every cycle, so nothing needs reloading unless a module changed.
-        changed = git("diff", "--name-only", f"{before}..{after}").stdout.split()
+        # Restart ONLY when code the daemon RUNS changed. The cloud pushes
+        # status.json, trade logs, briefs and daily_plan.json constantly; a restart
+        # to adopt those just costs a protective-pass gap, and decide() reads the
+        # plan fresh each cycle anyway.
+        changed = git("diff", "--name-only", f"{base}..{head}").stdout.split()
         code_changed = [f for f in changed if f in CODE_FILES]
         if not code_changed:
-            log(f"pulled {before[:7]} -> {after[:7]} — data only "
-                f"({', '.join(changed)[:70]}), not restarting")
+            if after and after != before:   # log only when this pull moved HEAD
+                pulled = git("diff", "--name-only", f"{before}..{after}").stdout.split()
+                log(f"pulled {before[:7]} -> {after[:7]} — data only "
+                    f"({', '.join(pulled)[:70]}), not restarting")
             return False
-        log(f"code changed ({', '.join(code_changed)}) {before[:7]} -> {after[:7]} "
+        log(f"code changed ({', '.join(code_changed)}) {base[:7]} -> {head[:7]} "
             f"— verifying before use")
         chk = subprocess.run([sys.executable, "rh_bot.py", "--selftest"],
                              capture_output=True, text=True, timeout=180)
         if chk.returncode != 0:
-            log("!! NEW CODE FAILED SELFTEST - rolling back, staying on known-good code")
+            # Do not reset the shared tree (that would fight the cloud's commits).
+            # The good code is already in memory; just refuse to restart into the
+            # bad code, and keep flagging until an upstream fix passes.
+            log("!! NEW CODE FAILED SELFTEST - staying on known-good in-memory code")
             log((chk.stdout or "")[-400:] + (chk.stderr or "")[-400:])
-            git("reset", "--hard", before)
             return False
         log("new code passed selftest - restarting to load it")
         return True
@@ -609,6 +625,16 @@ def main():
         return 1
     log(f"rh_daemon starting | account …{ACCOUNT[-4:]} | "
         f"{'DRY RUN' if DRY else 'LIVE'} | full {FULL_CYCLE_SEC}s / fast {FAST_PASS_SEC}s")
+
+    # Pin the commit our just-loaded modules were built from, so sync_code can tell
+    # when the live CODE has drifted from disk no matter which git path advanced HEAD.
+    global _run_head
+    try:
+        _run_head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                                   text=True, timeout=30).stdout.strip() or None
+        log(f"running code at {(_run_head or '?')[:7]}")
+    except Exception as e:
+        log(f"could not capture running HEAD ({e}); code-sync will use pull deltas")
 
     led = _load(LEDGER_F, fresh_ledger())
     last_full = 0.0
