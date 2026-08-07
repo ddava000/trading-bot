@@ -1018,3 +1018,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR', 'AZI'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB']
 - notes: VIX still calm at 15.1 but the tape rolled over — Dow snapped its 5-day streak as oil/Strait of Hormuz headlines pressure stocks, and Friday's jobs report looms, so holding 0.6. GTM avoided on the fraud crash, META (-9.1%)/PLTK (-20.9%) in free-fall, AAPL/SHOP/AZI weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
 - journal: Thu 8/6 19:46: VIX 15.9->15.1, day P&L -$1. Dow broke its winning streak on oil/Iran pressure; META bleeding -9%, PLTK -20%, AZI slipping on weak balance sheet (added to avoid). Holding 0.6 into Friday jobs; CNMD/ABT/WAB leaders steady, GTM/AAPL/META stay avoided.
+
+### 2026-08-07T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'AZI', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'ABT', 'SPY', 'WAB']
+- notes: VIX calm at 15.3 but today is jobs-report day with oil pressuring the tape (Dow -460 Thu snapped its streak), so trimming to 0.5 into the catalyst. AAPL slid 6% on forecast miss (avoid), META/PLTK still bleeding, GTM/AZI weak; CNMD firm on PE-takeover interest and ABT/WAB steady leaders.
+- journal: Fri 8/7 09:00: VIX 15.1->15.3, day P&L +$3. Jobs report hits today — cut risk 0.6->0.5 into the event. AAPL down 6% on forecast miss added-focus avoid; META/PLTK/GTM/AZI stay avoided; CNMD/ABT/WAB holding as leaders. Watching jobs reaction and oil.
