@@ -1024,3 +1024,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'AZI', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'ABT', 'SPY', 'WAB']
 - notes: VIX calm at 15.3 but today is jobs-report day with oil pressuring the tape (Dow -460 Thu snapped its streak), so trimming to 0.5 into the catalyst. AAPL slid 6% on forecast miss (avoid), META/PLTK still bleeding, GTM/AZI weak; CNMD firm on PE-takeover interest and ABT/WAB steady leaders.
 - journal: Fri 8/7 09:00: VIX 15.1->15.3, day P&L +$3. Jobs report hits today — cut risk 0.6->0.5 into the event. AAPL down 6% on forecast miss added-focus avoid; META/PLTK/GTM/AZI stay avoided; CNMD/ABT/WAB holding as leaders. Watching jobs reaction and oil.
+
+### 2026-08-07T09:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'ABT', 'WAB', 'QQQ']
+- notes: Jobs report landed weak (-23k, unexpected loss) but the tape is rallying as rate-hike odds fade and yields drop; VIX calm at 15.3 so the immediate event risk has cleared. Nudging up slightly to 0.55 but staying cautious — economic softness plus next week's CPI keeps me from leaning in.
+- journal: Fri 8/7 09:45: jobs report out — surprise -23k loss, but stocks rallied on lower rate-hike odds and falling yields. Event cleared, so bumped 0.5->0.55. CPI next week is the next catalyst. AAPL/META/PLTK/GTM/AZI stay avoided; CNMD moved to avoid on PE-takeover event risk; SPY/ABT/WAB steady, added QQQ to favor as Nasdaq firms.
