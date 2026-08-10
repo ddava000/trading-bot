@@ -1042,3 +1042,9 @@
 - avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'ABT', 'WAB', 'QQQ']
 - notes: VIX calm at 14.9 and the tape held its banner week after the weak jobs report cleared; holding 0.55 into the Friday afternoon with weekend gap risk and CPI next week keeping me from leaning in. META still bleeding -8.8%, AAPL weak, CNMD on PE-takeover event risk, crypto/BMNR excluded for volatility.
 - journal: Fri 8/7 14:35: VIX 15.0->14.9, day P&L +$3 steady. Nothing changed intraday — jobs event long behind us, tape constructive; holding 0.55 into the weekend. Watching CPI next week as the next catalyst. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/ABT/WAB/QQQ remain leaders.
+
+### 2026-08-10T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT', 'WAB']
+- notes: VIX calm at 15.4 and futures steady after the weak jobs report, but CPI lands this week as the dominant catalyst and geopolitics (Hormuz/Iran, oil) add noise, so I'm holding a cautious 0.5. META still bleeding -6.9%, AAPL weak post-earnings, CNMD on PE/takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Mon 8/10 09:00: weekend cleared uneventfully, VIX 14.9->15.4, still calm. Trimmed to 0.5 ahead of this week's CPI which is the key risk event. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT/WAB remain leaders. Watching CPI and oil/Iran headlines.
