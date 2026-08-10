@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 220.81,
+ "equity": 221.01,
  "held": [
   "ACHR",
   "ALLE",
@@ -27,7 +27,7 @@
   "THC",
   "WEX"
  ],
- "hold": 55.43,
+ "hold": 55.54,
  "holds": [
   "ACHR",
   "COUR",
@@ -42,8 +42,8 @@
   "TDW",
   "WEX"
  ],
- "index": 104.24,
- "orders_today": 2,
+ "index": 104.26,
+ "orders_today": 3,
  "positions": {
   "ACHR": 0.236611,
   "ALLE": 0.019017,
@@ -54,7 +54,7 @@
   "INCY": 0.04185,
   "INSM": 0.015341,
   "IT": 0.059762,
-  "IWM": 0.115443,
+  "IWM": 0.122811,
   "LMT": 0.003188,
   "MSFT": 0.002775,
   "NVCR": 0.310079,
@@ -73,6 +73,6 @@
  "regime": "neutral",
  "risk": 0.5,
  "settled": 27.72,
- "trade": 33.42,
- "ts": "2026-08-10T15:00"
+ "trade": 33.48,
+ "ts": "2026-08-10T15:17"
 }
