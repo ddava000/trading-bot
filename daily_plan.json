@@ -18,9 +18,9 @@
     "QQQ",
     "ABT"
   ],
-  "notes": "VIX calm at 15.3 and futures little changed, but this week's CPI is the dominant catalyst and Hormuz/Iran-oil headlines add noise, so holding a cautious 0.5. META still bleeding -8.3%, AAPL weak post-earnings, CNMD on PE/takeover event risk, crypto/BMNR excluded for volatility.",
-  "journal_entry": "Mon 8/10 09:50: VIX steady 15.3, tape flat as traders await CPI and watch Hormuz deal/oil. No change to posture, holding 0.5. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT remain leaders. Watching CPI print this week as the key risk event.",
+  "notes": "VIX calm at 15.1 and tape little changed, but CPI is the dominant catalyst this week and Hormuz/Iran headlines add noise, so holding a cautious 0.5. META still bleeding -7.8%, AAPL weak post-earnings, CNMD on takeover/PE event risk, crypto/BMNR excluded for volatility.",
+  "journal_entry": "Mon 8/10 12:23: VIX 15.3->15.1, midday tape seesawing on Hormuz/Iran and awaiting CPI. No change to posture, holding 0.5. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT leaders. Watching CPI print as the key event.",
   "date": "2026-08-10",
   "mode": "INTRADAY",
-  "updated_at": "2026-08-10T09:50 ET"
+  "updated_at": "2026-08-10T12:23 ET"
 }
