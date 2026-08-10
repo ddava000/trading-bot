@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 219.58,
+ "equity": 220.21,
  "held": [
   "ALLE",
   "COUR",
@@ -19,13 +19,14 @@
   "QQQ",
   "RNG",
   "SHOP",
+  "SPCX",
   "SPY",
   "SSNC",
   "TDW",
   "THC",
   "WEX"
  ],
- "hold": 53.06,
+ "hold": 53.34,
  "holds": [
   "COUR",
   "GENI",
@@ -39,7 +40,7 @@
   "TDW",
   "WEX"
  ],
- "index": 104.32,
+ "index": 104.44,
  "orders_today": 1,
  "positions": {
   "ALLE": 0.019017,
@@ -68,7 +69,7 @@
  },
  "regime": "neutral",
  "risk": 0.5,
- "settled": 31.07,
- "trade": 32.94,
- "ts": "2026-08-10T09:47"
+ "settled": 29.25,
+ "trade": 33.18,
+ "ts": "2026-08-10T10:04"
 }
