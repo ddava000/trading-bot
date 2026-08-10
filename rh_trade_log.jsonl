@@ -44,3 +44,4 @@
 {"action": "sell", "symbol": "W", "qty": 0.01228, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-06T11:16", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "INSM", "notional": 2.01, "sleeve": "TRADE", "reason": "TRADE +1 RSI 74 up (4 votes)", "ts": "2026-08-06T11:27", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "SPCX", "notional": 1.82, "sleeve": "TRADE", "reason": "TRADE +1 RSI 56 neutral (4 votes)", "ts": "2026-08-10T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "ACHR", "notional": 1.53, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-08-10T11:09", "status": "ok", "venue": "robinhood"}
