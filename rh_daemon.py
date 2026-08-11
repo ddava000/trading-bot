@@ -59,6 +59,14 @@ RECONCILE_MAX_AGE_SEC = 1800  # 30 min. The bot only learned its cash at session
                          # happening.
 
 _last_push_at, _last_push_material = 0.0, None
+SELFTEST_FAIL_ALERT  = 3     # consecutive upstream selftest rejections before we
+                             # tell Devon. The gate keeps trading safely on the old
+                             # in-memory code, but silently: without this he never
+                             # learns the laptop stopped inheriting cloud fixes.
+SELFTEST_REALERT_SEC = 14400 # 4h. Re-alert while still pinned, so a break that
+                             # lasts days is not forgotten after one email.
+
+_selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
                          # the laptop was off or since the last session open.
@@ -419,6 +427,25 @@ def _push_status(reason):
         return False
 
 
+def notify(subject, body):
+    """Email Devon about an operational condition (not a trade). Never raises.
+
+    Logs the outcome, because send_email's own confirmation is a print() and the
+    daemon runs under pythonw with no stdout, so mail delivery would otherwise
+    leave no trace either way.
+    """
+    if not bot.GMAIL_APP_PW:
+        log(f"NOT emailing ({subject}): no gmail_app_password set")
+        return False
+    try:
+        bot.send_email(subject, body)
+        log(f"emailed: {subject}")
+        return True
+    except Exception as e:
+        log(f"email FAILED ({e}): {subject}")
+        return False
+
+
 def email_trades(res, placed, led):
     """Tell Devon what the laptop bot just did. No subject-line emoji: he prints
     these to PDF and the subject becomes the filename."""
@@ -512,6 +539,7 @@ def sync_code():
     also runs `git pull --rebase`, so a cloud code change can land on disk via that
     push before sync_code's own pull sees it; comparing to the running commit
     catches it however HEAD advanced."""
+    global _selftest_fails, _selftest_alert_at
     try:
         def git(*a, t=90):
             return subprocess.run(["git", *a], capture_output=True, text=True, timeout=t)
@@ -542,9 +570,44 @@ def sync_code():
             # Do not reset the shared tree (that would fight the cloud's commits).
             # The good code is already in memory; just refuse to restart into the
             # bad code, and keep flagging until an upstream fix passes.
-            log("!! NEW CODE FAILED SELFTEST - staying on known-good in-memory code")
-            log((chk.stdout or "")[-400:] + (chk.stderr or "")[-400:])
+            _selftest_fails += 1
+            log(f"!! NEW CODE FAILED SELFTEST ({_selftest_fails}x) - staying on "
+                f"known-good in-memory code")
+            err = ((chk.stdout or "")[-400:] + (chk.stderr or "")[-400:]).strip()
+            log(err)
+            # Alert at the threshold, then at most every SELFTEST_REALERT_SEC while
+            # it stays broken. Trading continues safely throughout; what is stalled
+            # is inheriting cloud changes, which is a silent condition otherwise.
+            if _selftest_fails >= SELFTEST_FAIL_ALERT and (
+                    time.time() - _selftest_alert_at) >= SELFTEST_REALERT_SEC:
+                notify("ALERT: RH laptop bot pinned on old code",
+                       "\n".join([
+                           "The laptop bot is STILL TRADING normally, on the last "
+                           "known-good code. It has stopped inheriting cloud updates.",
+                           "",
+                           f"{_selftest_fails} consecutive selftest rejections of "
+                           f"upstream code.",
+                           f"running code : {(_run_head or '?')[:7]}",
+                           f"code on disk : {head[:7]}",
+                           f"files        : {', '.join(code_changed)}",
+                           "",
+                           "Selftest output (tail):",
+                           err[-600:],
+                           "",
+                           "This clears itself once an upstream commit passes the "
+                           "selftest. Stop the bot any time with a file named "
+                           "rh_HALT in the repo folder.",
+                       ]))
+                _selftest_alert_at = time.time()
             return False
+        if _selftest_fails:
+            log(f"upstream selftest recovered after {_selftest_fails} failure(s)")
+            if _selftest_alert_at:
+                notify("RH laptop bot: upstream code fixed, updates resumed",
+                       f"Upstream code passes the selftest again after "
+                       f"{_selftest_fails} rejection(s). The laptop is restarting "
+                       f"into {head[:7]} and inheriting cloud changes normally.")
+            _selftest_fails, _selftest_alert_at = 0, 0.0
         log("new code passed selftest - restarting to load it")
         return True
     except Exception as e:
