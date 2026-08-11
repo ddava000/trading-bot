@@ -15,6 +15,10 @@ on:
         description: "Place a $1 paper test order and exit (paper only)"
         type: boolean
         default: false
+      account_test:
+        description: "READ-ONLY connection check (safe on live) and exit"
+        type: boolean
+        default: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -79,6 +83,7 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_TEST:         ${{ inputs.email_test }}
           ORDER_TEST:         ${{ inputs.order_test }}
+          ACCOUNT_TEST:       ${{ inputs.account_test }}
         run: python alpaca_bot.py
 
       - name: Persist trade log + holds ledger

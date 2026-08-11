@@ -1513,6 +1513,31 @@ if __name__ == "__main__":
                    "Cloud email alerts are working for the Alpaca bot.")
         raise SystemExit(0)
 
+    # Connection check: READ-ONLY, places nothing, so it is safe against a LIVE
+    # account — unlike ORDER_TEST, which refuses on live before it ever reads the
+    # account and so can't confirm a go-live worked. Answers the only questions
+    # that matter after swapping keys: which endpoint, which account, how much
+    # money, and which strategy arm is actually loaded.
+    if os.environ.get("ACCOUNT_TEST", "").lower() == "true":
+        print(f"=== ACCOUNT_TEST ({MODE}) ===")
+        a = alpaca_get("/v2/account") or {}
+        if a.get("message"):
+            print(f"  ✗ API rejected the credentials: {a['message']}")
+            raise SystemExit(1)
+        cash_, eq, _d = alpaca_account()
+        pos = alpaca_positions()
+        print(f"  endpoint : {ALPACA_BASE}")
+        print(f"  mode     : {MODE}")
+        print(f"  account  : …{str(a.get('account_number', '????'))[-4:]}  status={a.get('status')}")
+        print(f"  equity   : ${eq:,.2f}   cash ${cash_:,.2f}")
+        print(f"  positions: {len(pos)} {sorted(pos) if pos else '(none — clean slate)'}")
+        print(f"  ARM      : {'INDEX-ONLY' if _INDEX_ONLY else 'HYBRID'}  "
+              f"(index {INDEX_CORE_PCT:.0%} / hold {HOLD_PCT:.0%} / "
+              f"trade {MAX_INVESTED_PCT:.0%} / crypto {CRYPTO_PCT:.0%})")
+        print(f"  rails    : cash-only, no leverage/shorting/options; "
+              f"stop {1-STOP_LOSS_PCT:.0%}, loss-halt {LOSS_CAP_PCT:.0%}, VIX halt >35")
+        raise SystemExit(0)
+
     # Order-path test: `gh workflow run alpaca-bot.yml -f order_test=true`
     # Validates auth + the order endpoint by placing a tiny $1 PAPER buy, any time
     # of day. Refuses to run against a LIVE account so it can't spend real money.
