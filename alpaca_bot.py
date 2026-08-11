@@ -783,9 +783,23 @@ def run_bot():
     # SNAPSHOT SANITY (2026-07-07): if the broker says we hold NOTHING while the
     # ledger says we should, the snapshot is corrupt (a real Alpaca blip returned
     # empty positions + equity==cash once) — skip the run rather than trade on it.
+    # A GENUINELY empty account looks identical to that blip, which deadlocked the
+    # first LIVE run (2026-08-11): the fresh live account had 0 positions while
+    # holds.json still carried the old PAPER account's names, so every run skipped
+    # forever. Distinguish the two by asking the broker per-symbol: a real 404 means
+    # the position is truly gone (account switch / clean slate) so the ledger is
+    # merely stale and gets cleared; anything else (error, timeout) still means a
+    # bad snapshot and we skip, preserving the 2026-07-07 protection.
     if holds and not positions:
-        print("⚠ positions came back EMPTY but the holds ledger is non-empty — corrupt snapshot, skipping this run.")
-        return
+        confirmed_gone = all(alpaca_position_gone(s) for s in holds)
+        if confirmed_gone:
+            print(f"  ledger lists {len(holds)} hold(s) the broker confirms are GONE "
+                  f"(404) — stale ledger from another account, clearing it: {sorted(holds)}")
+            holds = {}; holds_dirty = True
+        else:
+            print("⚠ positions came back EMPTY but the holds ledger is non-empty and the "
+                  "broker did NOT confirm them gone — corrupt snapshot, skipping this run.")
+            return
     # Prune a hold only on positive confirmation it's gone (per-symbol 404), never
     # on its mere absence from one batch positions read.
     stale = [s for s in holds if s in INDEX_ETFS
@@ -1431,8 +1445,11 @@ def exit_pass(et, alerted):
     placed any order — the job then ends early so the workflow persists the log."""
     holds     = load_holds()
     positions = alpaca_positions()
-    if holds and not positions:
-        print(f"  [{et.strftime('%H:%M')} fast pass: EMPTY positions vs non-empty ledger — corrupt snapshot, skip]")
+    if not positions:
+        # Nothing held means nothing to protect, so there is no exit to place either
+        # way. Stay quiet instead of crying "corrupt snapshot" every 60s, which is
+        # what a clean-slate account did on go-live day. run_bot() owns deciding
+        # whether an empty snapshot is real or a blip; this pass just no-ops.
         return False
     pending     = alpaca_open_orders()
     acct        = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]
