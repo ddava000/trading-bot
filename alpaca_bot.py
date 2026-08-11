@@ -35,8 +35,9 @@ from zoneinfo import ZoneInfo
 # doesn't bind either.
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-MAX_INVESTED_PCT = 0.15   # active TRADING sleeve (hybrid: index core takes the bulk now)
-HOLD_PCT         = 0.25   # active HOLD sleeve (keep winners — where the big gains came from)
+MAX_INVESTED_PCT = 0.00   # A/B EXPERIMENT 2026-08-11: active TRADING sleeve OFF (was 0.15)
+HOLD_PCT         = 0.00   # A/B EXPERIMENT: active HOLD sleeve OFF (was 0.25). Live evidence:
+                          # 13 closed hold round-trips, 0% win rate, -$40.60 realized.
 HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
@@ -87,7 +88,8 @@ DANGER_WORDS = ["bankrupt", "chapter 11", "fraud", "sec investigation", "sec pro
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
-CRYPTO_PCT       = 0.05   # crypto slice of the active sleeve (index core + 45% active + 5% cash)
+CRYPTO_PCT       = 0.00   # A/B EXPERIMENT: crypto sleeve OFF (was 0.05) — it is active
+                          # trading, excluded so the index-only arm is a clean test.
 CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
 CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
 CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
@@ -98,7 +100,7 @@ CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
 # index core (the shock absorber) + the FULL old active day-trader on the rest
 # (~45%, where the big momentum/meme gains live) + ~5% cash. Beats the old active
 # bot alone on both return and drawdown; trails pure index (the cost of trading).
-INDEX_CORE_PCT = 0.50     # held index core, equal-weight across the ETFs below
+INDEX_CORE_PCT = 0.90     # A/B EXPERIMENT: INDEX-ONLY arm (was 0.50). ~90% deployed, ~10% cash.
 INDEX_ETFS     = ["SPY", "QQQ", "IWM"]   # broad market + growth/tech + small caps
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
@@ -1030,6 +1032,39 @@ def run_bot():
                      f"({len(comp)} holds move as one theme {sorted(comp)} — max {HOLD_CLUSTER_MAX})",
                      sigs.get(sym)):
                 holds.pop(sym); holds_dirty = True
+
+    # RETIRE a sleeve whose cap has been set to 0. Zeroing a cap stops NEW buys but
+    # leaves existing positions to dribble out over weeks via stops/time-stops, which
+    # would contaminate an A/B comparison for a month. When a sleeve is switched off,
+    # close its positions deliberately instead. Guarded on the cap being EXACTLY 0, so
+    # a normal (nonzero) config can never trigger a mass exit.
+    if MAX_INVESTED_PCT == 0 and HOLD_PCT == 0:
+        for sym, p in list(positions.items()):
+            if sym in INDEX_ETFS or sym in crypto_flat: continue
+            if sym in pending or sym in sold_now or p["qty"] <= 0: continue
+            live = market.get(sym, {}).get("live")
+            if not live: continue
+            if _exit(sym, p["qty"], live, "SLEEVE-RETIRED",
+                     "(active sleeves switched OFF — index-only mode)", sigs.get(sym)):
+                if sym in holds: holds.pop(sym); holds_dirty = True
+    if CRYPTO_PCT == 0 and crypto_pos:
+        for flat, p in list(crypto_pos.items()):
+            pair = crypto_flat[flat]
+            if flat in pending or p["qty"] <= 0: continue
+            try:
+                live = (crypto_latest_multi([pair]) or {}).get(pair)
+                if not live: continue
+                print(f"SLEEVE-RETIRED {pair} qty={p['qty']} (crypto sleeve OFF)")
+                r = place_crypto_sell(pair, p["qty"])
+                if _ok(r):
+                    cash += p["qty"] * live
+                    events.append(f"SLEEVE-RETIRED {pair} → PLACED ({r['id']})")
+                    trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                        "acct": acct_tag, "symbol": pair, "side": "sell", "crypto": True,
+                        "qty": p["qty"], "retired": True, "order_id": r["id"],
+                        "live": live, "vix": round(vix, 1)})
+            except Exception as e:
+                print(f"  [crypto retire error: {e}]")
 
     # INDEX CORE (50%): equal-weight SPY/QQQ/IWM, funded FIRST. Self-rebalancing:
     # trims any ETF >25% over target (cleans a legacy overweight + keeps the core
