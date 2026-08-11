@@ -33,11 +33,22 @@ from zoneinfo import ZoneInfo
 # removing daytrade_count from the API — the old 3-day-trade ration is gone.
 # The bot sizes off CASH (never margin), so the new intraday-margin framework
 # doesn't bind either.
+# ── STRATEGY ARM (A/B experiment, 2026-08-11) ────────────────────────────────
+# CRITICAL: rh_bot.py IMPORTS this module and reads the sleeve percentages below,
+# by design, so the two bots never drift on risk rules. That also means editing
+# these numbers in source would silently reconfigure the REAL-MONEY Robinhood bot.
+# So the arm is chosen by ENVIRONMENT, which only the cloud workflow sets:
+#   STRATEGY_INDEX_ONLY=true  -> Alpaca cloud arm: index-only (no active sleeves)
+#   unset (the default)       -> full HYBRID, what every importer gets
+# The Robinhood laptop never sets it, so it keeps the hybrid and stays the control
+# arm. Shared MECHANICS (stops, ratchet, RSI caps, correlation, news, earnings) are
+# NOT arm-dependent and remain common to both bots.
+_INDEX_ONLY = os.environ.get("STRATEGY_INDEX_ONLY", "").strip().lower() == "true"
+
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-MAX_INVESTED_PCT = 0.00   # A/B EXPERIMENT 2026-08-11: active TRADING sleeve OFF (was 0.15)
-HOLD_PCT         = 0.00   # A/B EXPERIMENT: active HOLD sleeve OFF (was 0.25). Live evidence:
-                          # 13 closed hold round-trips, 0% win rate, -$40.60 realized.
+MAX_INVESTED_PCT = 0.00 if _INDEX_ONLY else 0.15   # active TRADING sleeve
+HOLD_PCT         = 0.00 if _INDEX_ONLY else 0.25   # active HOLD sleeve
 HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
 MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (≥4 names = diversified)
@@ -88,8 +99,7 @@ DANGER_WORDS = ["bankrupt", "chapter 11", "fraud", "sec investigation", "sec pro
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
-CRYPTO_PCT       = 0.00   # A/B EXPERIMENT: crypto sleeve OFF (was 0.05) — it is active
-                          # trading, excluded so the index-only arm is a clean test.
+CRYPTO_PCT       = 0.00 if _INDEX_ONLY else 0.05   # crypto slice (active trading)
 CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
 CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
 CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
@@ -100,7 +110,7 @@ CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
 # index core (the shock absorber) + the FULL old active day-trader on the rest
 # (~45%, where the big momentum/meme gains live) + ~5% cash. Beats the old active
 # bot alone on both return and drawdown; trails pure index (the cost of trading).
-INDEX_CORE_PCT = 0.90     # A/B EXPERIMENT: INDEX-ONLY arm (was 0.50). ~90% deployed, ~10% cash.
+INDEX_CORE_PCT = 0.90 if _INDEX_ONLY else 0.50     # held index core
 INDEX_ETFS     = ["SPY", "QQQ", "IWM"]   # broad market + growth/tech + small caps
 
 ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
