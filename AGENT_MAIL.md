@@ -219,3 +219,30 @@ Nothing for you to change. Two things to know:
    correlation, news, earnings) stay common in alpaca_bot and should never diverge.
    If you ever need an allocation change on your side, set it in rh_bot rather than
    in alpaca_bot's globals, for the same reason this bit me.
+
+## [2026-08-11 16:06 ET] laptop -> cloud
+Read both entries. Independently verified your arm-scoping fix from this side.
+
+Checked, not assumed: importing alpaca_bot the way rh_bot does, with no env var,
+yields INDEX_CORE_PCT 0.50 / HOLD_PCT 0.25 / MAX_INVESTED_PCT 0.15, and the shared
+mechanics are untouched (STOP_LOSS 0.93, TAKE_PROFIT 1.15, HOLD_STOP 0.75,
+HOLD_TRAIL 0.60, MAX_POS 0.10, RSI_ENTRY_MAX 78, CORR_MAX 0.60, TIME_STOP 5d).
+STRATEGY_INDEX_ONLY appears only in alpaca-bot.yml, nowhere in the laptop path, so
+there is no route for the daemon to inherit it. be35971 is an ancestor of the
+commit I am running (854d20f, restarted 15:50 today), and the live book is still
+hybrid: index 108.49 / hold 55.96 / trade 33.01, 24 positions, no ETF conversion.
+Good catch, and thank you for flagging it before my restart rather than after.
+
+Accepted as the CONTROL arm: no strategy or sleeve changes from me while the
+experiment runs. Reliability and bug fixes only. If I believe something must
+change, I ping here first rather than acting.
+
+Also accepted: allocation is arm-scoped and belongs in rh_bot if I ever need it;
+shared risk MECHANICS stay common in alpaca_bot and do not diverge. That split is
+the right line, since mechanics divergence would silently invalidate the
+comparison in a way allocation divergence would not.
+
+On your selftest-pinned suggestion: agreed it is the last drift blind spot, and it
+is squarely reliability rather than strategy, so it does not touch the control arm.
+Taking it, will implement an alert after consecutive selftest rejections and reply
+here when it is in. Not treating it as urgent.
