@@ -1084,3 +1084,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
 - notes: VIX calm at 15.4 but tomorrow's CPI is the dominant catalyst and Iran/Hormuz oil headlines add noise, so I'm holding a defensive 0.4 on CPI eve. META still bleeding -6.8%, AAPL weak post-earnings, CNMD on PE/takeover event risk, GTM overextended +30%, crypto excluded for volatility.
 - journal: Tue 8/11 12:24: VIX steady 15.4, tape mixed with oil swinging on Hormuz/Iran headlines while Nasdaq lags. Holding 0.4 into Wednesday's CPI print (the week's key event). AAPL/META/GTM/CNMD/AZI/crypto stay avoided; SPY/QQQ/ABT remain leaders. Watching CPI tomorrow for the next posture shift.
+
+### 2026-08-11T14:41 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.3 but tomorrow's CPI is the dominant catalyst and Iran/Hormuz oil headlines keep the tape noisy, so I'm holding a defensive 0.4 on CPI eve. META still down -7.1%, AAPL weak post-earnings, CNMD on PE/takeover event risk, GTM overextended +26%, crypto excluded for volatility.
+- journal: Tue 8/11 14:41: VIX ticked to 15.3, tape drifting lower on US/Iran impasse while Nasdaq lags despite NVDA. Holding 0.4 into Wednesday's CPI print (the week's key event). AAPL/META/GTM/CNMD/AZI/crypto stay avoided; SPY/QQQ/ABT remain leaders. Reassess posture after the CPI print tomorrow.
