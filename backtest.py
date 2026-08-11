@@ -18,10 +18,27 @@ UNIVERSE = ["AAPL","MSFT","NVDA","AMZN","GOOGL","META","TSLA","AMD","AVGO","MU",
             "INTC","QCOM","ORCL","CRM","NFLX","DIS","BAC","JPM","XOM","CVX",
             "PFE","NKE","SBUX","UBER","PLTR","SOFI","COIN","AMC","AAL","CCL",
             "F","RIVN","SNAP","ROKU","MARA","RIOT","DKNG","HOOD","PLUG","NIO"]
+# MICRO/MEME sleeve universe — the "slot machine" the live bot actually trades and
+# the blue-chip UNIVERSE above cannot represent. Deliberately includes names that
+# collapsed or went to zero (EV/SPAC/meme busts), because the whole question is
+# whether the occasional 10-bagger pays for the wipeouts.
+#
+# SURVIVORSHIP WARNING, and the reason this list is written out in full: Yahoo
+# returns NOTHING for fully delisted/bankrupt tickers, so every name that died
+# hardest silently drops out of the test. The run prints how many vanished, which
+# is a live measurement of the bias — the surviving-only result is an OPTIMISTIC
+# upper bound on the micro sleeve, never a fair estimate.
+MICRO_UNIVERSE = ["MULN","BBIG","ATER","PROG","GNUS","SNDL","EXPR","WISH","CLOV",
+                  "SPCE","RIDE","WKHS","GOEV","ARVL","FFIE","NKLA","HYZN","XELA",
+                  "BBBY","AMC","GME","KOSS","NAKD","CENN","IDEX","SOS","ZOM",
+                  "OCGN","SENS","CTRM","TOPS","SHIP","MARK","JAGX","ENZC"]
+
 START=10_000.0; WINDOW=90; RANGE=os.environ.get("BT_RANGE","5y")
 MAX_POS,STOP,TP,RSI_MAX = bot.MAX_POS_PCT,bot.STOP_LOSS_PCT,bot.TAKE_PROFIT_PCT,bot.RSI_ENTRY_MAX
 HSTOP,HRSI = bot.HOLD_STOP,bot.HOLD_RSI_MAX
 HOLD_CAP,TRADE_CAP = bot.HOLD_PCT,bot.MAX_INVESTED_PCT
+MICRO_POS,SMALL_POS = bot.MICRO_POS_PCT,bot.SMALLCAP_POS_PCT
+MICRO_PX,SMALL_PX   = bot.MICRO_PX,bot.SMALL_PX
 
 def fetch(sym):
     try:
@@ -35,9 +52,22 @@ def fetch(sym):
 print(f"Fetching {RANGE} bars...")
 data={s:d for s in UNIVERSE for d in [fetch(s)] if len(d)>60}
 bench=fetch("SPY"); cal=sorted(bench)
+
+# Micro sleeve data, kept in the SAME structures but tagged so sizing/routing can
+# tell them apart. Names returning no history are almost all delisted/bankrupt —
+# counted and reported, because their absence is the survivorship bias itself.
+MICRO=set(); micro_dead=[]
+for s in MICRO_UNIVERSE:
+    d=fetch(s)
+    if len(d)>60: data[s]=d; MICRO.add(s)
+    else:         micro_dead.append(s)
+
 series={s:sorted(d.items()) for s,d in data.items()}
 idx={s:{dt:i for i,(dt,_) in enumerate(ser)} for s,ser in series.items()}
-print(f"  {len(data)} names, {len(cal)} days ({cal[0]} -> {cal[-1]})")
+print(f"  {len(data)-len(MICRO)} blue-chip + {len(MICRO)} micro names, {len(cal)} days ({cal[0]} -> {cal[-1]})")
+print(f"  MICRO SURVIVORSHIP: {len(micro_dead)}/{len(MICRO_UNIVERSE)} micro tickers returned NO data "
+      f"(delisted/bankrupt) and are therefore ABSENT from the sim: {', '.join(micro_dead) or 'none'}")
+print( "  => micro results below EXCLUDE the worst outcomes and are an OPTIMISTIC upper bound.")
 
 day_sig={}
 for day,D in enumerate(cal):
@@ -124,3 +154,80 @@ STOPS=[("current      (-7% trade / -25% hold)", 0.93, 0.75),
 print("-- ACTIVE strategy (mirrors the live bot: trade + hold sleeves) --")
 for nm,ts,hs in STOPS: line(nm, simulate("active",0.60,"ratchet",hs,ts))
 line("SPY buy & hold", [START*bench[D][0]/bench[cal[55]][0] for D in cal])
+
+print("\n"+"="*90)
+print(f"SLEEVE-SPLIT TEST: shift weight from ACTIVE (trade+hold) into the INDEX core  |  {cal[55]} -> {cal[-1]} ({yrs:.1f}y)")
+print("  Live split: INDEX 50% / TRADE 15% / HOLD 25% / CRYPTO 5% / cash ~5%.")
+print("  This harness excludes crypto (see file docstring); crypto's 5% + the cash buffer are folded into")
+print("  a fixed ~10% idle residual in every row below, so only INDEX vs ACTIVE moves. Trade:hold keeps")
+print("  today's 15:25 ratio as ACTIVE shrinks. Stops/brackets unchanged from live at every split.")
+print("  Index sleeve = equal-weight SPY/QQQ/IWM bought once on day 55 and held flat (no >25%-over-target")
+print("  trim modeled) — optimistic, so index-heavy rows here are a slight upper bound on the live design.")
+print("="*90)
+IDX_ETFS = ["SPY","QQQ","IWM"]
+idx_series = {"SPY": bench, "QQQ": fetch("QQQ"), "IWM": fetch("IWM")}
+
+def simulate_split(index_pct, active_pct, micro_pct=0.0, hold_pct=None, trade_pct=None):
+    """index_pct = held SPY/QQQ/IWM core. active_pct = trade+hold, split on the live
+    15:25 ratio unless hold_pct/trade_pct are given explicitly. micro_pct = the
+    slot-machine sleeve, drawn ONLY from MICRO names and sized like the live bot
+    (2.5% per name under $2, 5% under $15), exiting on the same -7%/+15% brackets."""
+    hold_cap  = hold_pct  if hold_pct  is not None else active_pct * (HOLD_CAP/(HOLD_CAP+TRADE_CAP))
+    trade_cap = trade_pct if trade_pct is not None else active_pct * (TRADE_CAP/(HOLD_CAP+TRADE_CAP))
+    cash=START; pos={}; curve=[]; idx_sh={}
+    for day,D in enumerate(cal):
+        if day<55: curve.append(START); continue
+        if day==55 and index_pct>0:
+            budget=START*index_pct/len(IDX_ETFS)
+            for s in IDX_ETFS:
+                px=idx_series[s].get(D)
+                if px: idx_sh[s]=budget/px[0]; cash-=budget
+        price={s:data[s][D][0] for s in data if D in data[s]}
+        idx_val=sum(idx_sh.get(s,0)*idx_series[s][D][0] for s in IDX_ETFS if D in idx_series[s])
+        equity=cash+sum(pos[s]["sh"]*price[s] for s in pos if s in price)+idx_val
+        curve.append(equity)
+        sig=day_sig[D]
+        for s in list(pos):
+            if s not in price: continue
+            live=price[s]; p=pos[s]; cost=p["cost"]; con=sig.get(s,{}).get("consensus",0); reason=None
+            if p["sleeve"]=="hold":
+                p["peak"]=max(p["peak"],live)
+                if live<=max(cost*HSTOP,p["peak"]*0.60): reason=1
+            else:
+                if live<=cost*STOP or (live>=cost*TP and con<=0) or con==-1: reason=1
+            if reason: cash+=p["sh"]*live; del pos[s]
+        inv=sum(pos[s]["sh"]*price[s] for s in pos if s in price)
+        inv_h=sum(pos[s]["sh"]*price[s] for s in pos if pos[s]["sleeve"]=="hold" and s in price)
+        inv_m=sum(pos[s]["sh"]*price[s] for s in pos if pos[s]["sleeve"]=="micro" and s in price)
+        for s,r in sig.items():
+            if s in pos or r["consensus"]!=1 or r["rsi"]>RSI_MAX: continue
+            if s in MICRO:
+                # Slot machine: micro names never enter hold/trade, only their own
+                # sleeve, at the live bot's reduced per-name size.
+                if micro_pct<=0 or inv_m>=equity*micro_pct: continue
+                px=price[s]
+                cap = MICRO_POS if px<MICRO_PX else (SMALL_POS if px<SMALL_PX else MAX_POS)
+                sleeve,room="micro",min(equity*cap,equity*micro_pct-inv_m,cash*0.98)
+            else:
+                strong=r["buys"]>=4 and r["trend"]=="up" and r["rsi"]<=HRSI
+                if strong and inv_h<equity*hold_cap: sleeve,room="hold",min(equity*MAX_POS,equity*hold_cap-inv_h,cash*0.98)
+                elif inv-inv_h-inv_m<equity*trade_cap: sleeve,room="trade",min(equity*MAX_POS,equity*trade_cap-(inv-inv_h-inv_m),cash*0.98)
+                else: continue
+            if room<equity*0.005: continue      # micro bets are small by design
+            sh=room/price[s]; cash-=sh*price[s]; pos[s]={"sh":sh,"cost":price[s],"sleeve":sleeve,"peak":price[s]}
+            inv+=room
+            if   sleeve=="hold":  inv_h+=room
+            elif sleeve=="micro": inv_m+=room
+    return curve
+
+# Every row deploys the SAME ~90% (the live 5% crypto sleeve is outside this
+# harness), so differences are pure allocation, not more/less money at work.
+# idx, hold, trade, micro
+SPLITS=[("all-active   ( 0 idx / 35 tr / 55 hold)", 0.00, 0.55, 0.35, 0.00),
+        ("current live (50 idx / 15 tr / 25 hold)", 0.50, 0.25, 0.15, 0.00),
+        ("current+slots(50 idx / 13 tr / 22 hold / 5 mic)", 0.50, 0.22, 0.13, 0.05),
+        ("PROPOSED     (75 idx /  5 tr /  5 hold / 5 mic)", 0.75, 0.05, 0.05, 0.05),
+        ("index+slots  (85 idx /  0 tr /  0 hold / 5 mic)", 0.85, 0.00, 0.00, 0.05),
+        ("all-index    (90 idx / no active at all)", 0.90, 0.00, 0.00, 0.00)]
+for nm,ip,hp,tp,mp in SPLITS:
+    line(nm, simulate_split(ip, hp+tp, micro_pct=mp, hold_pct=hp, trade_pct=tp))
