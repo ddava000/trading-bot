@@ -1,0 +1,26 @@
+{
+ "started": "2026-08-11",
+ "decide_no_earlier_than": "2026-11-11",
+ "benchmark": "SPY @ 770.37 on 2026-08-11",
+ "rule": "Both arms measured against SPY, not just against each other. If both trail SPY, neither 'won'.",
+ "arm_A": {
+  "name": "Alpaca LIVE \u2014 INDEX ONLY",
+  "real_money": true,
+  "start_equity": 250.0,
+  "config": "index 90% / hold 0 / trade 0 / crypto 0",
+  "account": "live \u20268736",
+  "selected_by": "STRATEGY_INDEX_ONLY=true, set only in .github/workflows/alpaca-bot.yml"
+ },
+ "arm_B": {
+  "name": "Robinhood laptop \u2014 FULL HYBRID (control)",
+  "real_money": true,
+  "start_equity": 220.87,
+  "config": "index 50 / hold 25 / trade 15 / crypto 5",
+  "note": "DO NOT change strategy or sleeve sizing while the experiment runs; bug/reliability fixes only."
+ },
+ "caveats": [
+  "different brokers and account sizes",
+  "Robinhood has no crypto sleeve",
+  "not a perfect A/B \u2014 directional evidence about strategy, not an isolated variable"
+ ]
+}
