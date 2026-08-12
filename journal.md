@@ -1096,3 +1096,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
 - notes: VIX calm at 15.1 and July CPI eased to 3.4% roughly as expected, removing the week's dominant overhang, so I'm lifting risk modestly to 0.55 while staying alert to any hawkish Fed re-pricing. Kept the earnings/event/free-fall names avoided (META, AAPL, GTM, CNMD, crypto/BMNR).
 - journal: Wed 8/12 09:00: CPI cleared at 3.4% (eased, in-line) and futures firmed with VIX 15.1, so I nudged risk from 0.4 to 0.55 now that the key catalyst is behind us. Watching the tape's reaction through the open and any Fed-path repricing; SPY/QQQ/ABT still leaders, same avoid list.
+
+### 2026-08-12T09:53 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: CPI cleared at 3.4% (eased, in-line) with September rate-hike odds falling; VIX low at 14.9 and S&P opening at record territory, so I'm shifting to a constructive risk-on posture at 0.6. Kept earnings/event/free-fall names avoided (META, AAPL post-earnings weakness, GTM overextended, CNMD PE/takeover, crypto/BMNR).
+- journal: Wed 8/12 09:53: Post-CPI tape firm, S&P at record highs, VIX 14.9 and yields ticking up but benign; lifted risk 0.55->0.6 with the key catalyst behind us. Watching for any late-morning fade or hawkish Fed repricing; same avoid list, SPY/QQQ/ABT still leaders.
