@@ -302,3 +302,4 @@
 {"ts": "2026-08-12T10:45", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 19.79, "live": 301.46, "order_id": "83169d84-449d-4ae5-b0e1-5d4d83333a2b", "vix": 14.8}
 {"ts": "2026-08-12T11:00", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 14.84, "live": 301.04, "order_id": "287e9cb6-63dd-4e82-b339-3e9cfa26b38c", "vix": 14.8}
 {"ts": "2026-08-12T11:15", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 11.13, "live": 301.53, "order_id": "da352a51-a92b-4fd7-bb39-12fb02693327", "vix": 14.9}
+{"ts": "2026-08-12T11:30", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 8.28, "live": 301.91, "order_id": "999c0925-ec7e-48a8-8fdf-ecffbac3675e", "vix": 14.8}
