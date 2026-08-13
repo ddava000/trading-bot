@@ -1114,3 +1114,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Afternoon tape stays constructive with VIX low at 14.5 and S&P near record highs, AI names leading; CPI catalyst cleared with no hawkish repricing. Holding risk-on at 0.6 with a watchful eye on the US-Iran headline noise, which is minor for now.
 - journal: Wed 8/12 14:42: No material change since midday \5, indexes firm, QQQ leading on AI. Holding 0.6; only new wrinkle is US-Iran impasse headlines but market shrugging. Same avoid list; SPY/QQQ leaders, IWM firm.
+
+### 2026-08-13T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: New session opens calm with VIX 14.5, S&P near record highs and AI optimism (CoreWeave) supporting tech; CPI catalyst cleared with no hawkish repricing. Holding risk-on at 0.6, only mild overhang from US-Iran impasse headlines.
+- journal: Thu 8/13 09:00: Fresh day, tape constructive post-CPI (3.4% eased), VIX 14.5, indexes firm and AI leading. Holding 0.6; watching US-Iran headlines and any Fed-path repricing. ETF holdings carry no earnings risk; avoid list unchanged.
