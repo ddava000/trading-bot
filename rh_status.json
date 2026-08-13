@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 222.47,
+ "equity": 222.44,
  "held": [
   "ACHR",
   "ALLE",
@@ -27,7 +27,7 @@
   "THC",
   "WEX"
  ],
- "hold": 56.42,
+ "hold": 56.38,
  "holds": [
   "ACHR",
   "COUR",
@@ -42,7 +42,7 @@
   "TDW",
   "WEX"
  ],
- "index": 109.99,
+ "index": 110.05,
  "orders_today": 0,
  "positions": {
   "ACHR": 0.236611,
@@ -73,6 +73,6 @@
  "regime": "risk-on",
  "risk": 0.6,
  "settled": 23.29,
- "trade": 32.77,
- "ts": "2026-08-13T10:03"
+ "trade": 32.71,
+ "ts": "2026-08-13T10:19"
 }
