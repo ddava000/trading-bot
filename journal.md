@@ -1120,3 +1120,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: New session opens calm with VIX 14.5, S&P near record highs and AI optimism (CoreWeave) supporting tech; CPI catalyst cleared with no hawkish repricing. Holding risk-on at 0.6, only mild overhang from US-Iran impasse headlines.
 - journal: Thu 8/13 09:00: Fresh day, tape constructive post-CPI (3.4% eased), VIX 14.5, indexes firm and AI leading. Holding 0.6; watching US-Iran headlines and any Fed-path repricing. ETF holdings carry no earnings risk; avoid list unchanged.
+
+### 2026-08-13T09:54 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Tape stays constructive: VIX 14.4, S&P near record highs, holdings all green (IWM/QQQ/SPY) with CPI catalyst cleared and no hawkish repricing. Cisco weighs slightly on Nasdaq but broad AI optimism intact; holding risk-on at 0.6.
+- journal: Thu 8/13 09:54: No material change since the open - VIX 14.4, indexes firm, all three ETF holdings modestly green. Holding 0.6; watching Cisco drag on Nasdaq and any late-morning fade. Avoid list unchanged.
