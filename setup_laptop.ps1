@@ -254,6 +254,17 @@ Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction Silent
 
 # -AtStartup needs admin (it runs before any user logs on); -AtLogOn does not.
 # Try boot+logon first, fall back to logon-only so an unelevated run still works.
+#
+# CAVEAT (2026-08-13): the principal below is Interactive, i.e. "run only when the
+# user is logged on", so the -AtStartup trigger CANNOT actually fire before login.
+# After an unattended reboot the machine sits at the login screen with the daemon
+# dead until someone signs in: that turned a Windows Update restart into a 51 min
+# outage during market hours. Kept as-is deliberately. The execution bridge shells
+# out to claude.exe, whose claude.ai connector auth lives in the interactive user
+# session, and an S4U ("whether logged on or not") principal risks breaking order
+# placement in a way that is hard to notice. The supported fix for unattended boot
+# is enabling auto-logon on this machine, which makes the -AtLogOn trigger fire
+# right after a reboot with the session intact.
 $isAdmin = ([Security.Principal.WindowsPrincipal] `
     [Security.Principal.WindowsIdentity]::GetCurrent()
     ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -279,7 +290,8 @@ if ($isAdmin) {
             -Settings $settings -Description "Robinhood laptop trading bot (always on)" `
             -ErrorAction Stop | Out-Null
         $registered = $true
-        Ok "task '$taskName' registered - starts at logon AND boot, restarts if it dies"
+        Ok "task '$taskName' registered - starts at logon, restarts if it dies"
+        Warn "boot trigger present but inert until login (see CAVEAT above): enable auto-logon for unattended reboot coverage"
     } catch {
         Warn "boot-trigger registration failed ($($_.Exception.Message)) - trying logon-only"
     }
