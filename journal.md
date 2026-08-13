@@ -1132,3 +1132,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Midday tape remains constructive: VIX 14.7, S&P at record highs on tame PPI/CPI data, all three ETF holdings green with AI optimism intact. Holding risk-on at 0.6 - no fresh event risk, just watching for a late-day fade.
 - journal: Thu 8/13 12:24: No material change since morning - VIX ticked to 14.7, indexes at records post-PPI, IWM/QQQ/SPY all modestly green. Holding 0.6; avoid list unchanged, watching for afternoon fade or Fed-path repricing.
+
+### 2026-08-13T14:43 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Afternoon tape steady and constructive: VIX 14.7, S&P at record highs post-tame PPI/CPI, all three ETF holdings green with AI optimism intact. Holding risk-on at 0.6 into the final stretch, no fresh event risk.
+- journal: Thu 8/13 14:43: No material change since midday - VIX 14.7, indexes firm at records, IWM/QQQ/SPY all modestly green, day P&L +2. Holding 0.6; avoid list unchanged, watching for a late-day fade into the close.
