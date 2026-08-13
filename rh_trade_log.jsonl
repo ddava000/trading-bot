@@ -48,3 +48,4 @@
 {"action": "buy", "symbol": "IWM", "notional": 2.21, "reason": "INDEX-CORE toward $36.84", "ts": "2026-08-10T15:17", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "QQQ", "notional": 2.22, "reason": "INDEX-CORE toward $36.87", "ts": "2026-08-11T11:26", "status": "ok", "venue": "robinhood"}
 {"action": "sell", "symbol": "IT", "qty": 0.059762, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-13T11:28", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "ARX", "notional": 9.88, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (4 votes)", "ts": "2026-08-13T11:43", "status": "ok", "venue": "robinhood"}
