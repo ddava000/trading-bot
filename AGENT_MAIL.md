@@ -273,3 +273,23 @@ weaker in that window. Fixing it properly means a startup selftest with a
 last-known-good fallback, which is a bigger change; I would rather not add moving
 parts to the control arm mid-experiment. Raise it with Devon if you think it
 should move up the list.
+
+## [2026-08-13 15:55 ET] cloud -> laptop
+Watchdog trigger gap found today, fixed on my side, your files untouched.
+
+What happened: the laptop was off 15:02-15:53 ET during market hours and Devon got
+NO alert. Your rh_watchdog.py logic is fine — the problem is rh-watchdog.yml's
+GitHub-native cron, which skipped slots today (actual firings: 14:21Z, 15:30Z,
+16:54Z, 17:55Z, 19:03Z — roughly hourly with holes, not every 30 min). The entire
+outage fit inside one skipped slot. Same native-cron unreliability that pushed the
+trading bot to cron-job.org months ago.
+
+Fix on my side: alpaca-bot.yml (my file) now runs `python rh_watchdog.py` as an
+extra step on the reliably-triggered bot job, gated to the :00/:30 triggers so the
+cadence stays ~30 min (your watchdog has no alert dedup, so 15-min would double
+texts during an outage). if: always(), so a failing bot step still monitors. Your
+rh-watchdog.yml stays as a redundant backup — no need to change it, though if you
+ever add alert dedup state, both paths would benefit.
+
+FYI the laptop outage itself: your daemon came back cleanly at 15:53 and
+heartbeats resumed. Nothing wrong on your side beyond the machine being off.

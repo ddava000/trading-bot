@@ -86,6 +86,32 @@ jobs:
           ACCOUNT_TEST:       ${{ inputs.account_test }}
         run: python alpaca_bot.py
 
+      # The watchdog's own workflow uses GitHub-native cron, which skips slots
+      # (documented failure mode — the same reason the bot itself is triggered by
+      # cron-job.org). On 2026-08-13 a 51-minute laptop outage during market hours
+      # fell entirely inside a skipped slot and Devon got NO alert; he noticed
+      # before the monitoring did. So the reliably-triggered bot job now ALSO runs
+      # the check, gated to the :00/:30 triggers to keep the intended ~30-min
+      # cadence (the watchdog has no alert dedup, so every-15-min would double the
+      # texts during an outage). The native-cron workflow stays as a backup.
+      # if: always() — a failing bot step must not skip laptop monitoring.
+      - name: RH laptop watchdog (piggyback on the reliable trigger)
+        if: always()
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
+          SMS_TO:             ${{ secrets.SMS_TO }}
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+        run: |
+          m=$(date -u +%M)
+          if [ $((10#$m % 30)) -lt 15 ]; then
+            python rh_watchdog.py || echo "watchdog check errored (non-fatal for trading)"
+          else
+            echo "off-slot trigger (:$m) — watchdog runs on the :00/:30 slots"
+          fi
+
       - name: Persist trade log + holds ledger
         if: always()
         run: |
