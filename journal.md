@@ -1126,3 +1126,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Tape stays constructive: VIX 14.4, S&P near record highs, holdings all green (IWM/QQQ/SPY) with CPI catalyst cleared and no hawkish repricing. Cisco weighs slightly on Nasdaq but broad AI optimism intact; holding risk-on at 0.6.
 - journal: Thu 8/13 09:54: No material change since the open - VIX 14.4, indexes firm, all three ETF holdings modestly green. Holding 0.6; watching Cisco drag on Nasdaq and any late-morning fade. Avoid list unchanged.
+
+### 2026-08-13T12:24 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Midday tape remains constructive: VIX 14.7, S&P at record highs on tame PPI/CPI data, all three ETF holdings green with AI optimism intact. Holding risk-on at 0.6 - no fresh event risk, just watching for a late-day fade.
+- journal: Thu 8/13 12:24: No material change since morning - VIX ticked to 14.7, indexes at records post-PPI, IWM/QQQ/SPY all modestly green. Holding 0.6; avoid list unchanged, watching for afternoon fade or Fed-path repricing.
