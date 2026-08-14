@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 223.0,
+ "equity": 222.76,
  "held": [
   "ACHR",
   "ALLE",
@@ -18,6 +18,7 @@
   "NVDA",
   "PLTR",
   "QQQ",
+  "RDDT",
   "RNG",
   "SHOP",
   "SPCX",
@@ -27,7 +28,7 @@
   "THC",
   "WEX"
  ],
- "hold": 57.14,
+ "hold": 57.1,
  "holds": [
   "ACHR",
   "COUR",
@@ -42,7 +43,7 @@
   "TDW",
   "WEX"
  ],
- "index": 110.01,
+ "index": 110.04,
  "orders_today": 1,
  "positions": {
   "ACHR": 0.236611,
@@ -73,7 +74,7 @@
  },
  "regime": "risk-on",
  "risk": 0.6,
- "settled": 23.81,
- "trade": 33.45,
- "ts": "2026-08-14T09:47"
+ "settled": 22.39,
+ "trade": 33.22,
+ "ts": "2026-08-14T10:03"
 }
