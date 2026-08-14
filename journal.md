@@ -1144,3 +1144,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Calm open with VIX 14.5, S&P at record above 7,800 and heading for a winning week; futures choppy with inflation data in focus and chip-sector rotation. Holding risk-on at 0.6 given constructive breadth (IWM breakout) but mindful of stretched-market warning chatter.
 - journal: Fri 8/14 09:00: New session, tape near records with VIX 14.5 and breadth broadening (IWM joins breakout). All three ETF holdings green, no earnings risk on holdings. Watching inflation-data reaction and 'warning flashed' overbought narratives for any late-week fade; holding 0.6, avoid list unchanged.
+
+### 2026-08-14T09:49 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Constructive tape: VIX 14.5, S&P at record above 7,800 heading for a winning week, all three ETF holdings green with breadth broadening (IWM breakout). Holding risk-on at 0.6 into a Friday with no fresh event risk, mindful of stretched/overbought chatter and thin capital.
+- journal: Fri 8/14 09:49: No material change since the open - VIX 14.5, indexes at records, IWM/QQQ/SPY all modestly green. Holding 0.6; avoid list unchanged, watching for a Friday afternoon fade or profit-taking into the weekend.
