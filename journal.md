@@ -1156,3 +1156,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Midday tape drifting slightly off record highs (indexes little changed to modestly lower) but VIX still calm at 14.5 and all three ETF holdings green; consumer sentiment dip and stretched-market chatter warrant staying at 0.6, not reaching higher into the weekend.
 - journal: Fri 8/14 12:23: Indexes fading a touch from record after soft consumer sentiment print; VIX 14.5, holdings still green, day P&L flat. Holding 0.6, avoid list unchanged; watching for a Friday afternoon profit-taking fade into the weekend and any chip-sector (AVGO/AMAT) drag on QQQ/SPY.
+
+### 2026-08-14T14:36 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Calm afternoon tape: VIX 14.3, indexes drifting modestly lower but poised for a third straight winning week, all three ETF holdings green. Holding risk-on at 0.6 into the weekend given constructive breadth but only $25 cash and stretched-market chatter.
+- journal: Fri 8/14 14:36: No material change since midday - VIX ticked down to 14.3, indexes little changed near records, IWM/QQQ/SPY all green, day P&L flat. Holding 0.6; watching for late-Friday profit-taking fade and any AVGO-driven chip drag on QQQ into the close.
