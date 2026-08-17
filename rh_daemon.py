@@ -33,6 +33,8 @@ import rh_bot
 import alpaca_bot as bot
 
 CONFIG_F, LEDGER_F = "rh_config.json", "rh_ledger.json"
+DEPOSITS_F         = "rh_deposits.json"   # COMMITTED: contributed capital, so the
+                                           # A/B check-in can subtract it from equity
 STATUS_F, LOG_F    = "rh_status.json", "rh_trade_log.jsonl"
 HALT_F             = "rh_HALT"
 
@@ -264,11 +266,48 @@ def reconcile():
     res = agent(
         f"Using the Robinhood MCP tools, call get_portfolio and get_equity_positions "
         f"for account {ACCOUNT}. Place no orders. Reply with ONLY a JSON object, no prose:\n"
-        '{"cash": <buying_power as number>, "positions": '
+        '{"cash": <buying_power as number>, '
+        '"pending_deposits": <pending_deposits as number, 0 if none>, "positions": '
         '[{"symbol": "X", "qty": <number>, "avg_cost": <number>}]}')
     if res and isinstance(res.get("positions"), list):
         return res
     return None
+
+
+def record_deposit(amount, source, note=""):
+    """Append a deposit event to the COMMITTED rh_deposits.json.
+
+    Devon has a recurring ~$10/week deposit. That is contributed capital, not
+    return, and leaving it in raw equity already turned a flat week into a fake
+    +4.26% for the A/B experiment. The cash is still real and still gets traded
+    normally; only the performance math subtracts this file's total.
+    """
+    try:
+        doc = _load(DEPOSITS_F, None) or {"currency": "USD", "events": [],
+                                          "total_deposited": 0.0}
+        doc.setdefault("events", []).append({
+            "date": now_et().strftime("%Y-%m-%d"),
+            "amount": round(float(amount), 2),
+            "confidence": "confirmed",
+            "source": source,
+            "note": note})
+        doc["total_deposited"] = round(
+            sum(float(e.get("amount") or 0) for e in doc["events"]), 2)
+        _save(DEPOSITS_F, doc)
+        total = doc["total_deposited"]
+        log(f"DEPOSIT recorded: ${float(amount):.2f} ({source}); cumulative ${total:.2f}")
+        body = [
+            f"Recorded a ${float(amount):.2f} deposit into the agentic account.",
+            f"Cumulative tracked deposits: ${total:.2f}.",
+            "",
+            "The bot invests this normally. It is excluded from performance math",
+            "so contributed capital does not get counted as a gain.",
+        ]
+        notify("RH laptop bot: deposit recorded", chr(10).join(body))
+        return True
+    except Exception as e:
+        log(f"could not record deposit ({e})")
+        return False
 
 
 def adopt_truth(led, truth):
@@ -303,6 +342,22 @@ def adopt_truth(led, truth):
     led["positions"] = positions
     led["holds"] = {s: h for s, h in (led.get("holds") or {}).items()
                     if any(p["symbol"] == s for p in positions)}
+    # Deposit capture. pending_deposits is the broker's own field, so a RISING
+    # edge is an authoritative new deposit, unlike inferring from a cash jump
+    # (T+1 settlement makes a sell look identical to a deposit the next day,
+    # which is exactly what made the retroactive log archaeology imprecise).
+    # Recorded once on the rising edge, so it is not double counted when the
+    # deposit later settles and pending drops back to 0.
+    try:
+        pend = float(truth.get("pending_deposits") or 0)
+        seen = float(led.get("pending_deposits_seen") or 0)
+        if pend > seen + 0.005:
+            record_deposit(pend - seen, "broker pending_deposits (rising edge)",
+                           f"pending went {seen:.2f} -> {pend:.2f}")
+        led["pending_deposits_seen"] = pend
+    except Exception as e:
+        log(f"deposit check skipped ({e})")
+
     global _last_reconcile
     _last_reconcile = time.time()   # feeds the periodic-reconcile clock in main()
     return True

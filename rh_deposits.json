@@ -1,0 +1,24 @@
+{
+  "_comment": "Cash Devon deposited into the Robinhood agentic account. Arm B equity must have the cumulative total subtracted before any performance comparison, since deposits are contributed capital and not returns. The cash itself IS real tradable capital and the bot invests it normally; only the performance math excludes it. Written by rh_daemon.py (laptop session).",
+  "currency": "USD",
+  "detection": "Going forward each event is captured live from the broker's pending_deposits field at reconcile time (confidence=confirmed). Events before that code existed were reconstructed from rh_daemon.log by deriving cash as EQ minus the index/hold/trade sleeves and finding increases with no sell available to settle into them (confidence=estimated).",
+  "events": [
+    {
+      "date": "2026-08-10",
+      "amount": 10.0,
+      "confidence": "estimated",
+      "source": "rh_daemon.log cash reconstruction",
+      "note": "Fri 08-07 close cash 21.08 -> Mon 08-10 open 29.26, +8.18 with zero sells in the window to settle. Amount recorded as 10.00 to match the confirmed recurring amount; the observed delta is lower because derived cash is net of same-cycle buys."
+    },
+    {
+      "date": "2026-08-17",
+      "amount": 10.0,
+      "confidence": "confirmed",
+      "source": "broker get_portfolio pending_deposits",
+      "note": "Broker reported pending_deposits=10 on 2026-08-17. Same Monday cadence."
+    }
+  ],
+  "total_deposited": 20.0,
+  "covers_from": "2026-08-10",
+  "known_gaps": "Deposits before 2026-08-10 are NOT itemized here. The initial funding and the two manual top-ups ($59.92 start, +$50, +$75) are separate contributed capital, already tracked outside this file as the $184.92 baseline."
+}
