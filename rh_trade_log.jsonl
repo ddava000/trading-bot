@@ -50,3 +50,6 @@
 {"action": "sell", "symbol": "IT", "qty": 0.059762, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-13T11:28", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "ARX", "notional": 9.88, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (4 votes)", "ts": "2026-08-13T11:43", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "RDDT", "notional": 1.42, "sleeve": "TRADE", "reason": "TRADE +1 RSI 50 up (3 votes)", "ts": "2026-08-14T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.74, "reason": "INDEX-CORE toward $38.76", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SNDK", "notional": 1.6, "sleeve": "TRADE", "reason": "TRADE +1 RSI 74 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "MU", "notional": 1.14, "sleeve": "HOLD", "reason": "HOLD +1 RSI 69 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}

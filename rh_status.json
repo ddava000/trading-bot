@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 222.81,
+ "equity": 232.54,
  "held": [
   "ACHR",
   "ALLE",
@@ -28,7 +28,7 @@
   "THC",
   "WEX"
  ],
- "hold": 57.35,
+ "hold": 58.14,
  "holds": [
   "ACHR",
   "COUR",
@@ -36,6 +36,7 @@
   "IMAX",
   "INCY",
   "LMT",
+  "MU",
   "NVCR",
   "NVDA",
   "PLTR",
@@ -44,7 +45,7 @@
   "WEX"
  ],
  "index": 109.87,
- "orders_today": 1,
+ "orders_today": 3,
  "positions": {
   "ACHR": 0.236611,
   "ALLE": 0.019017,
@@ -58,6 +59,7 @@
   "IWM": 0.122811,
   "LMT": 0.003188,
   "MSFT": 0.002775,
+  "MU": 0.001119,
   "NVCR": 0.310079,
   "NVDA": 0.0197,
   "PLTR": 0.017283,
@@ -65,16 +67,17 @@
   "RDDT": 0.007918,
   "RNG": 0.090555,
   "SHOP": 0.042497,
+  "SNDK": 0.000899,
   "SPCX": 0.013544,
-  "SPY": 0.045138,
+  "SPY": 0.04996,
   "SSNC": 0.056082,
   "TDW": 0.148358,
   "THC": 0.004984,
   "WEX": 0.006326
  },
- "regime": "risk-on",
- "risk": 0.6,
- "settled": 22.39,
- "trade": 33.2,
- "ts": "2026-08-14T15:46"
+ "regime": "neutral",
+ "risk": 0.5,
+ "settled": 32.39,
+ "trade": 34.88,
+ "ts": "2026-08-17T10:15"
 }
