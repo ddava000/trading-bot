@@ -1174,3 +1174,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Futures slipping after a three-week win streak into an event-heavy week (WMT/HD earnings, Fed minutes, inflation focus with September rate-hike odds alive). VIX calm at 15.1 and holdings green, but staying at 0.5 to respect midweek macro/earnings risk on only $25 cash.
 - journal: Mon 8/17 09:12: Holding 0.5 neutral, no change since 09:00 brief. Futures wavering, WMT/HD on avoid ahead of their reports; watching Fed minutes and inflation data reaction midweek.
+
+### 2026-08-17T11:50 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Midday tape mixed: tech/AI optimism offset by Iran/Middle East tensions, VIX steady at 15.0, all three ETF holdings green. Holding 0.5 neutral ahead of event-heavy week (WMT/HD earnings, Fed minutes, inflation focus) with only $25 cash to deploy.
+- journal: Mon 8/17 11:50: No change from 0.5 neutral since morning briefs; VIX flat at 15.0, holdings green (QQQ +1.2%, IWM +0.8%, SPY +0.3%), day P&L flat. Watching Middle East headline risk and midweek Fed minutes/inflation and WMT/HD reports.
