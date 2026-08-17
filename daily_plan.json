@@ -1,6 +1,6 @@
 {
-  "regime": "risk-on",
-  "risk_scale": 0.6,
+  "regime": "neutral",
+  "risk_scale": 0.5,
   "avoid_symbols": [
     "AZI",
     "GTM",
@@ -11,16 +11,18 @@
     "BMNR",
     "ETHUSD",
     "SOLUSD",
-    "CNMD"
+    "CNMD",
+    "WMT",
+    "HD"
   ],
   "favor_symbols": [
     "SPY",
     "QQQ",
     "IWM"
   ],
-  "notes": "Calm afternoon tape: VIX 14.3, indexes drifting modestly lower but poised for a third straight winning week, all three ETF holdings green. Holding risk-on at 0.6 into the weekend given constructive breadth but only $25 cash and stretched-market chatter.",
-  "journal_entry": "Fri 8/14 14:36: No material change since midday - VIX ticked down to 14.3, indexes little changed near records, IWM/QQQ/SPY all green, day P&L flat. Holding 0.6; watching for late-Friday profit-taking fade and any AVGO-driven chip drag on QQQ into the close.",
-  "date": "2026-08-14",
-  "mode": "INTRADAY",
-  "updated_at": "2026-08-14T14:36 ET"
+  "notes": "Futures wavering into an event-heavy week: Walmart/Home Depot earnings, Fed minutes, and inflation focus after a weak jobs report keeps September rate-hike odds alive. VIX still calm at 15.1 and all three ETF holdings green, but trimming to 0.5 to respect midweek macro/earnings risk with only $25 cash.",
+  "journal_entry": "Mon 8/17 09:00: Dialed back from 0.6 to 0.5 (regime risk-on -> neutral) as new week brings Fed minutes, big-box retail earnings (WMT/HD), and inflation data; VIX 15.1, holdings modestly green. Added WMT/HD to avoid; watching Fed minutes and CPI/inflation reaction midweek.",
+  "date": "2026-08-17",
+  "mode": "MORNING",
+  "updated_at": "2026-08-17T09:00 ET"
 }
