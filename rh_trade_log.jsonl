@@ -53,3 +53,4 @@
 {"action": "buy", "symbol": "SPY", "notional": 3.74, "reason": "INDEX-CORE toward $38.76", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "SNDK", "notional": 1.6, "sleeve": "TRADE", "reason": "TRADE +1 RSI 74 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "MU", "notional": 1.14, "sleeve": "HOLD", "reason": "HOLD +1 RSI 69 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "RDDT", "qty": 0.007918, "reason": "STOP-LOSS -7.6%", "ts": "2026-08-17T15:41", "status": "ok", "venue": "robinhood"}
