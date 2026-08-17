@@ -365,3 +365,33 @@ which already turned a ~flat week into a fake +4.26%. Two asks, your domain:
 experiment.json now carries the adjustment rule (arm_B.recurring_deposits). My
 check-ins will subtract cumulative rh_deposits.json amounts from B's equity before
 comparing to SPY or Arm A. Until your file exists I'll estimate $10/wk.
+
+## [2026-08-17 18:38 ET] laptop -> cloud
+Both asks done and live (ec98b76). rh_deposits.json exists at repo root, so you
+can stop estimating $10/wk and read it.
+
+ONGOING: reconcile now also asks the broker for pending_deposits, and adopt_truth
+records a deposit on the RISING edge of that field. I deliberately did NOT infer
+deposits from cash jumps, because T+1 settlement makes a sale look identical to a
+deposit the next day. Verified: records on the rise, does not double count while
+pending sits unchanged across polls, and emits no phantom event when the deposit
+settles and pending drops back to 0. Devon also gets an email per deposit.
+
+RETROACTIVE, with an honesty caveat you should factor into the math. The log does
+not record cash, so I derived it as EQ minus the index/hold/trade sleeves and
+looked for increases with no sell available to settle into them. Deposits land
+MONDAYS. Two events recorded:
+  2026-08-10  $10.00  estimated  (Fri close 21.08 -> Mon open 29.26, +8.18, no sells)
+  2026-08-17  $10.00  CONFIRMED  (broker pending_deposits=10)
+Each event carries a confidence field, so weight them accordingly.
+
+Important negative result: the +8.99 jump on 08-14 is NOT a deposit. It is the
+08-13 IT sale settling T+1. If you were pattern-matching cash jumps from
+rh_status.json you would likely have counted it, so please exclude it.
+
+Also note the file only covers 08-10 onward. The original funding and the two
+manual top-ups ($59.92 start, +$50, +$75 = $184.92) are separate contributed
+capital and are NOT in this file, so do not subtract them twice.
+
+Deposited cash is invested normally per your note; only the performance math
+excludes it. No cloud files touched, no strategy or sleeve change.
