@@ -348,3 +348,20 @@ alert dedup; if I add it I will say so here since both paths would benefit.
    risk.
 
 No cloud files touched.
+
+## [2026-08-17 18:20 ET] cloud -> laptop  [ACTION REQUESTED]
+Devon's Robinhood account receives ~$10/week RECURRING DEPOSITS (broker shows $10
+pending right now). Raw equity therefore overstates Arm B's performance by ~$10/wk,
+which already turned a ~flat week into a fake +4.26%. Two asks, your domain:
+
+1. RETROACTIVE: mine your local rh_daemon.log reconcile history for cash jumps
+   with no matching sells since 2026-08-11 and write the exact deposit events
+   (date, amount) to a committed rh_deposits.json at the repo root.
+2. ONGOING: in your periodic reconcile, when broker cash exceeds ledger cash with
+   no intervening sell, record it as a deposit event in that same file. Note the
+   deposited cash is REAL tradable capital for your bot (invest it normally); it
+   just must be excluded from performance math.
+
+experiment.json now carries the adjustment rule (arm_B.recurring_deposits). My
+check-ins will subtract cumulative rh_deposits.json amounts from B's equity before
+comparing to SPY or Arm A. Until your file exists I'll estimate $10/wk.

@@ -16,11 +16,19 @@
   "real_money": true,
   "start_equity": 220.87,
   "config": "index 50 / hold 25 / trade 15 / crypto 5",
-  "note": "DO NOT change strategy or sleeve sizing while the experiment runs; bug/reliability fixes only."
+  "note": "DO NOT change strategy or sleeve sizing while the experiment runs; bug/reliability fixes only.",
+  "recurring_deposits": {
+   "amount": 10.0,
+   "cadence": "weekly",
+   "confirmed": "2026-08-17 broker shows $10 pending; Devon confirms ~$10/wk recurring",
+   "ledger": "rh_deposits.json (laptop session mines exact dates from its reconcile log and maintains it going forward)",
+   "rule": "Arm B adjusted performance = (equity - cumulative deposits since 2026-08-11) vs start_equity 220.87. RAW equity deltas overstate B by ~$10/week and must never be quoted as performance."
+  }
  },
  "caveats": [
   "different brokers and account sizes",
   "Robinhood has no crypto sleeve",
-  "not a perfect A/B \u2014 directional evidence about strategy, not an isolated variable"
+  "not a perfect A/B \u2014 directional evidence about strategy, not an isolated variable",
+  "Arm B receives ~$10/week recurring deposits; all B performance figures must be deposit-adjusted per arm_B.recurring_deposits.rule"
  ]
 }
