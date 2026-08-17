@@ -1168,3 +1168,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Futures wavering into an event-heavy week: Walmart/Home Depot earnings, Fed minutes, and inflation focus after a weak jobs report keeps September rate-hike odds alive. VIX still calm at 15.1 and all three ETF holdings green, but trimming to 0.5 to respect midweek macro/earnings risk with only $25 cash.
 - journal: Mon 8/17 09:00: Dialed back from 0.6 to 0.5 (regime risk-on -> neutral) as new week brings Fed minutes, big-box retail earnings (WMT/HD), and inflation data; VIX 15.1, holdings modestly green. Added WMT/HD to avoid; watching Fed minutes and CPI/inflation reaction midweek.
+
+### 2026-08-17T09:12 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Futures slipping after a three-week win streak into an event-heavy week (WMT/HD earnings, Fed minutes, inflation focus with September rate-hike odds alive). VIX calm at 15.1 and holdings green, but staying at 0.5 to respect midweek macro/earnings risk on only $25 cash.
+- journal: Mon 8/17 09:12: Holding 0.5 neutral, no change since 09:00 brief. Futures wavering, WMT/HD on avoid ahead of their reports; watching Fed minutes and inflation data reaction midweek.
