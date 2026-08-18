@@ -58,3 +58,4 @@
 {"action": "sell", "symbol": "ALLE", "qty": 0.019017, "reason": "TIME-STOP +2.0% after 26d", "ts": "2026-08-18T10:02", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "TRGP", "notional": 2.64, "sleeve": "TRADE", "reason": "TRADE +1 RSI 67 up (3 votes)", "ts": "2026-08-18T10:05", "status": "ok", "venue": "robinhood"}
 {"action": "sell", "symbol": "SNDK", "qty": 0.000899, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-18T10:14", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SNDK", "notional": 1.23, "sleeve": "TRADE", "reason": "TRADE +1 RSI 72 up (5 votes)", "ts": "2026-08-18T10:23", "status": "ok", "venue": "robinhood"}
