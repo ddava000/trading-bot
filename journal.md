@@ -1198,3 +1198,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Confirming risk-off at 0.4: futures lower on US-Iran tensions and a deepening bond selloff (30Y at a 19-year high), VIX 15.8; HD reports today, WMT tomorrow, and Fed minutes midweek all pose event risk. With only $25 cash and holdings slightly red, respecting rising-yield/geopolitical pressure and keeping earnings names on avoid.
 - journal: Tue 8/18 09:15: Holding 0.4 risk-off, unchanged from 09:00. Yields still elevated and Iran ceasefire rejected weighing on the tape; watching oil, 30Y yield, HD reaction and Fed minutes midweek.
+
+### 2026-08-18T11:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Holding 0.4 risk-off midday: chip stocks selling off, bond yields still elevated and Iran tensions lingering, though VIX remains calm at 15.8. Holdings modestly red (day P&L -$2) with only $25 cash; keeping WMT/HD and other earnings names on avoid ahead of Fed minutes midweek.
+- journal: Tue 8/18 11:57: No change from 0.4 risk-off; tape drifting lower on chip selloff and high yields, VIX 15.8, holdings slightly red. Watching Fed minutes, WMT earnings tomorrow, and yield/oil reaction into the afternoon.
