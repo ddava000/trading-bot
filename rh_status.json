@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 225.75,
+ "equity": 225.4,
  "held": [
   "ACHR",
   "ARX",
@@ -30,7 +30,6 @@
   "TRGP",
   "WEX"
  ],
- "hold": 57.42,
  "holds": [
   "ACHR",
   "COUR",
@@ -46,7 +45,6 @@
   "TDW",
   "WEX"
  ],
- "index": 112.34,
  "orders_today": 4,
  "positions": {
   "ACHR": 0.236611,
@@ -77,9 +75,5 @@
   "TRGP": 0.00891,
   "WEX": 0.006326
  },
- "regime": "risk-off",
- "risk": 0.4,
- "settled": 17.61,
- "trade": 33.82,
- "ts": "2026-08-18T10:40"
+ "ts": "2026-08-18T10:56"
 }
