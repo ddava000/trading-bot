@@ -68,6 +68,10 @@ SELFTEST_FAIL_ALERT  = 3     # consecutive upstream selftest rejections before w
 SELFTEST_REALERT_SEC = 14400 # 4h. Re-alert while still pinned, so a break that
                              # lasts days is not forgotten after one email.
 
+BROKER_FAIL_ALERT  = 3      # consecutive failed broker snapshots before alerting
+BROKER_REALERT_SEC = 3600   # re-alert hourly while the broker stays unreachable
+
+_reconcile_fails, _broker_alert_at = 0, 0.0
 _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
@@ -746,7 +750,7 @@ def main():
 
     # Pin the commit our just-loaded modules were built from, so sync_code can tell
     # when the live CODE has drifted from disk no matter which git path advanced HEAD.
-    global _run_head
+    global _run_head, _reconcile_fails, _broker_alert_at
     try:
         _run_head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
                                    text=True, timeout=30).stdout.strip() or None
@@ -785,6 +789,13 @@ def main():
             # we must retry next pass, and roll_day only fires once per day.
             if led.get("needs_reconcile"):
                 if adopt_truth(led, reconcile()):
+                    if _reconcile_fails:
+                        log(f"broker reachable again after {_reconcile_fails} failed pass(es)")
+                        if _broker_alert_at:
+                            notify("RH bot: broker connection restored",
+                                   "The Robinhood connection is working again. "
+                                   "Normal trading and stop enforcement have resumed.")
+                        _reconcile_fails, _broker_alert_at = 0, 0.0
                     led["needs_reconcile"] = False
                 elif DRY:
                     # A dry ledger is simulated, so it can never match the real
@@ -792,9 +803,48 @@ def main():
                     # session open, so the simulation just owns the ledger.
                     led["needs_reconcile"] = False
                 else:
-                    log("session-open snapshot not trustworthy, trading nothing "
-                        "this pass and retrying next minute")
+                    # BROKER UNREACHABLE. Keep the heartbeat alive and say WHY.
+                    # This branch used to `continue` straight to the next pass,
+                    # which skipped cycle() and therefore persist(), so no status
+                    # was ever written or pushed. A dead broker connection then
+                    # looked identical to a dead laptop, and on 2026-08-18 the
+                    # watchdog duly reported "laptop silent" while the machine was
+                    # fine and the real fault was an expired Robinhood connector
+                    # authorization. Wrong diagnosis costs time that positions do
+                    # not have, since selling needs this same bridge.
+                    _reconcile_fails += 1
+                    log(f"broker snapshot unavailable ({_reconcile_fails}x), "
+                        f"trading nothing this pass and retrying next minute")
                     save_ledger(led)
+                    snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
+                            "degraded": "broker_unreachable",
+                            "degraded_since_passes": _reconcile_fails,
+                            "positions": {p["symbol"]: round(p["qty"], 6)
+                                          for p in led.get("positions") or []},
+                            "holds": sorted(led.get("holds") or {}),
+                            "orders_today": led.get("orders_today", 0),
+                            "dry": DRY}
+                    _save(STATUS_F, snap)
+                    _push_status("degraded")
+                    if (_reconcile_fails >= BROKER_FAIL_ALERT and
+                            (time.time() - _broker_alert_at) >= BROKER_REALERT_SEC):
+                        notify("ALERT: RH bot cannot reach the broker", chr(10).join([
+                            "The laptop is UP and the daemon is running. The problem is the",
+                            "Robinhood connection, not the machine.",
+                            "",
+                            f"{_reconcile_fails} consecutive failed broker snapshots.",
+                            "",
+                            "IMPACT: positions are UNPROTECTED. Order placement uses the same",
+                            "bridge, so stops and take-profits cannot execute either.",
+                            "",
+                            "MOST LIKELY CAUSE: the Robinhood connector needs re-authorization.",
+                            "`claude mcp list` can still report Connected while the OAuth grant",
+                            "is gone, because that only checks the endpoint is reachable.",
+                            "",
+                            "FIX: reconnect the Robinhood connector in claude.ai settings,",
+                            "then the bot recovers on its own within a minute.",
+                        ]))
+                        _broker_alert_at = time.time()
                     if "--once" in sys.argv:
                         return 0
                     time.sleep(FAST_PASS_SEC)
