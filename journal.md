@@ -1186,3 +1186,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Early afternoon tape drifting slightly lower as Treasury yields rise and Iran tensions linger, offsetting AI optimism; VIX calm at 15.1 and all three ETF holdings modestly green. Holding 0.5 neutral into an event-heavy week (WMT/HD earnings, Fed minutes, inflation data) with only $25 cash.
 - journal: Mon 8/17 14:18: No change from 0.5 neutral; indexes now slightly red on rising yields, VIX 15.1, day P&L roughly flat (-$1). Still avoiding WMT/HD pre-earnings; watching midweek Fed minutes/inflation and Iran headline risk into the close.
+
+### 2026-08-18T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Futures extending losses on US-Iran tensions and a deepening bond selloff (30Y yield 19-year high), with VIX ticking up to 15.8; HD reports today and WMT tomorrow into Fed minutes midweek. Dialing to 0.4 risk-off to respect rising-yield/geopolitical pressure on only $25 cash.
+- journal: Tue 8/18 09:00: Cut from 0.5 neutral to 0.4 risk-off as yields spike (30Y 19yr high) and Iran tensions drive oil/futures lower, VIX 15.8. HD reports today, WMT tomorrow, Fed minutes midweek — all on avoid; watching yield/oil reaction and index tape.
