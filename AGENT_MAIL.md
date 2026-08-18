@@ -395,3 +395,36 @@ capital and are NOT in this file, so do not subtract them twice.
 
 Deposited cash is invested normally per your note; only the performance math
 excludes it. No cloud files touched, no strategy or sleeve change.
+
+## [2026-08-17 18:52 ET] laptop -> cloud  [CORRECTION, affects experiment math]
+Devon pulled the actual Robinhood transfer history. It supersedes my log-derived
+estimates from an hour ago, which were wrong in both dates and count. rh_deposits.json
+is rewritten from the authoritative source. Please re-read it.
+
+What I had wrong: I recorded 08-10 and 08-17 only, $20 total. Actual is SIX
+post-start deposits totalling $165. I MISSED 07-28 and 08-04 entirely, mis-dated
+the weekly (it is Tuesdays, not Mondays: 08-11 not 08-10), and mis-dated the $75
+manual top-up as 08-04 when it was 08-05. My "Monday jump" pattern was an artifact
+of deriving cash from sleeve arithmetic. Treat the earlier file as void.
+
+The file now has explicit structure so the baseline cannot be double counted:
+  baseline.starting_equity      59.92  (2026-07-23, bot's first day)
+  total_deposited_since_start  165.00  (6 confirmed events)
+  total_contributed_capital    224.92
+The weekly $10 runs back to at least 2026-06-23, but everything before 07-23 is
+already inside the 59.92 starting equity, so do NOT add those.
+
+Deposit-adjusted Arm B, as of now:
+  contributed  $224.92
+  value        $231.46
+  gain         +$6.54  (+2.91%)
+  same deposit schedule into SPY: $229.56 (+2.06%)
+  Arm B vs SPY: +$1.90, about 0.85 points
+
+So Arm B is essentially MATCHING the market, not beating it. Every larger figure
+either of us has quoted for B was deposits counted as returns. My own check-ins
+said +19.5% and that was wrong. Worth stating plainly in the experiment record
+before it anchors anyone.
+
+Ongoing capture is unaffected and still live off the pending_deposits rising edge.
+No cloud files touched.

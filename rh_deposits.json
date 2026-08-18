@@ -1,24 +1,22 @@
 {
-  "_comment": "Cash Devon deposited into the Robinhood agentic account. Arm B equity must have the cumulative total subtracted before any performance comparison, since deposits are contributed capital and not returns. The cash itself IS real tradable capital and the bot invests it normally; only the performance math excludes it. Written by rh_daemon.py (laptop session).",
+  "_comment": "Contributed capital for the Robinhood agentic account (Arm B). Subtract from equity before any performance comparison. Source: Devon's Robinhood transfer history, read 2026-08-17. This SUPERSEDES the earlier log-derived estimates, which were wrong on both dates and count.",
   "currency": "USD",
-  "detection": "Going forward each event is captured live from the broker's pending_deposits field at reconcile time (confidence=confirmed). Events before that code existed were reconstructed from rh_daemon.log by deriving cash as EQ minus the index/hold/trade sleeves and finding increases with no sell available to settle into them (confidence=estimated).",
+  "detection": "Authoritative broker transfer history. Ongoing deposits are captured live by rh_daemon.py from the broker pending_deposits rising edge.",
+  "baseline": {
+    "date": "2026-07-23",
+    "starting_equity": 59.92,
+    "note": "Account value when the bot began trading. Deposits before this date (weekly $10 back to at least 2026-06-23, less a $0.24 transfer out on 07-22) are already inside this figure and must NOT be added again."
+  },
   "events": [
-    {
-      "date": "2026-08-10",
-      "amount": 10.0,
-      "confidence": "estimated",
-      "source": "rh_daemon.log cash reconstruction",
-      "note": "Fri 08-07 close cash 21.08 -> Mon 08-10 open 29.26, +8.18 with zero sells in the window to settle. Amount recorded as 10.00 to match the confirmed recurring amount; the observed delta is lower because derived cash is net of same-cycle buys."
-    },
-    {
-      "date": "2026-08-17",
-      "amount": 10.0,
-      "confidence": "confirmed",
-      "source": "broker get_portfolio pending_deposits",
-      "note": "Broker reported pending_deposits=10 on 2026-08-17. Same Monday cadence."
-    }
+    {"date": "2026-07-24", "amount": 50.0, "confidence": "confirmed", "source": "broker transfer history", "note": "manual top-up from Savings"},
+    {"date": "2026-07-28", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring from Bank of Little Rock"},
+    {"date": "2026-08-04", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring"},
+    {"date": "2026-08-05", "amount": 75.0, "confidence": "confirmed", "source": "broker transfer history", "note": "manual top-up"},
+    {"date": "2026-08-11", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring"},
+    {"date": "2026-08-17", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history + pending_deposits", "note": "weekly recurring"}
   ],
-  "total_deposited": 20.0,
-  "covers_from": "2026-08-10",
-  "known_gaps": "Deposits before 2026-08-10 are NOT itemized here. The initial funding and the two manual top-ups ($59.92 start, +$50, +$75) are separate contributed capital, already tracked outside this file as the $184.92 baseline."
+  "total_deposited_since_start": 165.0,
+  "total_contributed_capital": 224.92,
+  "recurring": {"amount": 10.0, "cadence": "weekly", "typical_day": "Tuesday"},
+  "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits."
 }
