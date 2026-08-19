@@ -1210,3 +1210,9 @@
 - avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: Holding 0.4 risk-off into the afternoon: tape drifting lower with QQQ -1.0% on chip weakness, yields still elevated and Iran tensions lingering, though VIX stays calm at 15.8. Only $25 cash and holdings modestly red (day P&L -$3); keeping WMT and other earnings names on avoid ahead of Fed minutes midweek.
 - journal: Tue 8/18 14:17: No change from 0.4 risk-off; indexes still red (QQQ -1.0%), day P&L -$3, VIX 15.8. Watching Fed minutes and WMT earnings tomorrow plus yield/oil into the close.
+
+### 2026-08-19T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: Fed minutes hit this afternoon and Target reports today, bond yields still elevated (selloff only waning) and chip names (Micron, Sandisk) getting hit dragging QQQ. VIX calm at 15.4 but with only $25 cash and holdings flat-to-red, I'd rather wait through the Fed-minutes event risk.
+- journal: Wed 8/19 09:00: Staying 0.4 risk-off. Bond selloff easing and VIX ticked to 15.4, but Fed minutes + Target earnings today keep me defensive; added TGT and chip names (MU/SNDK) to avoid on the semi selloff. Watching yields and the minutes reaction into the close.
