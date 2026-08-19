@@ -1222,3 +1222,9 @@
 - avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
 - notes: Holding 0.4 risk-off: futures firmer as bond pressure eases but 30Y yields remain near fresh highs and Fed minutes plus Target earnings hit today, keeping event risk elevated. VIX calm at 15.5 but with only $25 cash and holdings flat-to-red, staying defensive into the minutes.
 - journal: Wed 8/19 09:22: No change from 0.4 risk-off. Futures jumped on bond relief but yields still elevated; Fed minutes and TGT earnings today are the key events. Watching the minutes reaction and 30Y yield into the close.
+
+### 2026-08-19T11:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: Treasury buyback plan is calming the bond market and VIX is quiet at 15.3, but Fed minutes hit this afternoon and chip names remain weak, keeping event risk elevated. With only $25 cash and holdings flat-to-red, I'd rather ride through the minutes before adding.
+- journal: Wed 8/19 11:57: No change from 0.4 risk-off. Bond pressure eased on Treasury buybacks and tariff pause lifted the tape (Dow +300), VIX down to 15.3, day P&L flat. Fed minutes this afternoon is the key event; watching yields and the minutes reaction into the close before considering easing back to neutral.
