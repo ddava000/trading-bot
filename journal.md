@@ -1228,3 +1228,9 @@
 - avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
 - notes: Holding 0.4 risk-off: Treasury buyback plan is calming the bond market and VIX is quiet at 15.3, but Fed minutes hit this afternoon and chip names remain weak, keeping event risk elevated. With only $25 cash and holdings flat-to-red, I'd rather ride through the minutes before adding.
 - journal: Wed 8/19 11:57: No change from 0.4 risk-off. Bond pressure eased on Treasury buybacks and tariff pause lifted the tape (Dow +300), VIX down to 15.3, day P&L flat. Fed minutes this afternoon is the key event; watching yields and the minutes reaction into the close before considering easing back to neutral.
+
+### 2026-08-19T14:14 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off with Fed minutes hitting at 2pm ET — event risk is immediate and elevated. VIX is calm at 15.2 and tape is mixed (Dow up on bond relief, S&P down a third day on yields/oil), but with only $25 cash and holdings flat-to-red there's no reason to add ahead of the minutes.
+- journal: Wed 8/19 14:14: Still 0.4 risk-off, day P&L flat. Fed minutes drop momentarily — waiting for the reaction before any move toward neutral. Watching yields/oil and the minutes response into the close; WMT earnings tomorrow keeps WMT on avoid.
