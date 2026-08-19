@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 230.26,
+ "equity": 224.32,
  "held": [
   "ACHR",
   "ARX",
@@ -19,7 +19,6 @@
   "NVDA",
   "PLTR",
   "QQQ",
-  "RNG",
   "SHOP",
   "SNDK",
   "SPCX",
@@ -45,7 +44,7 @@
   "TDW",
   "WEX"
  ],
- "orders_today": 1,
+ "orders_today": 2,
  "positions": {
   "ACHR": 0.236611,
   "ARX": 0.505632,
@@ -70,9 +69,8 @@
   "SPY": 0.04996,
   "SSNC": 0.056082,
   "TDW": 0.148358,
-  "THC": 0.004984,
   "TRGP": 0.00891,
   "WEX": 0.006326
  },
- "ts": "2026-08-19T09:50"
+ "ts": "2026-08-19T09:54"
 }
