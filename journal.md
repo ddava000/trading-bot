@@ -1246,3 +1246,9 @@
 - avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
 - notes: Pulling back to 0.4 risk-off: Dow futures dropped ~400pts as Treasury yields reversed the Bessent-driven decline and Walmart is tumbling, a clear deterioration since the 9:00 brief despite VIX at 15.8. Holdings are flat-to-red and cash is just $25, so no reason to add into a weakening open.
 - journal: Thu 8/20 09:24: Reverted from 0.55 neutral to 0.4 risk-off — futures rolled over (Dow -400) as bond intervention relief faded and yields reversed higher, WMT tumbling post-earnings. Watching whether the 30Y yield stabilizes and if the tape finds footing before easing back.
+
+### 2026-08-20T11:59 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off midday: Dow down ~400 as Treasury yields climb, a tech selloff drags QQQ, and Walmart tumbles post-earnings. VIX still calm at 15.9 but the tape is clearly deteriorating and holdings are red, so no reason to add with only $25 cash.
+- journal: Thu 8/20 11:59: Staying 0.4 risk-off — yields reversed higher and tech is selling off, keeping the tape weak; all three ETF holds red, day P&L -2. Watching whether 30Y yields stabilize and if indexes find footing into the afternoon before easing back to neutral.
