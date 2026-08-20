@@ -71,7 +71,10 @@ SELFTEST_REALERT_SEC = 14400 # 4h. Re-alert while still pinned, so a break that
 BROKER_FAIL_ALERT  = 3      # consecutive failed broker snapshots before alerting
 BROKER_REALERT_SEC = 3600   # re-alert hourly while the broker stays unreachable
 
+RECONCILE_BACKOFF_MAX = 900   # cap retry spacing at 15 min during an outage
+
 _reconcile_fails, _broker_alert_at = 0, 0.0
+_next_reconcile_try = 0.0
 _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
@@ -580,6 +583,26 @@ def persist(led, res, placed):
         _last_push_at, _last_push_material = time.time(), material
 
 
+def publish_degraded(led, reason, passes):
+    """Heartbeat while the broker is unreachable, naming the reason.
+
+    Costs no agent turn, so it is safe to run on every pass even mid-outage. This
+    is what lets monitoring tell a dead BROKER from a dead LAPTOP: without it the
+    daemon simply went quiet and the watchdog reported the machine down, sending
+    Devon to check hardware that was fine.
+    """
+    snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
+            "degraded": reason,
+            "degraded_since_passes": passes,
+            "positions": {p["symbol"]: round(p["qty"], 6)
+                          for p in led.get("positions") or []},
+            "holds": sorted(led.get("holds") or {}),
+            "orders_today": led.get("orders_today", 0),
+            "dry": DRY}
+    _save(STATUS_F, snap)
+    _push_status("degraded")
+
+
 # ── Code sync: inherit cloud-bot improvements, but verify before trusting ───
 def sync_code():
     """Pull upstream changes and prove they work before running on them.
@@ -750,7 +773,7 @@ def main():
 
     # Pin the commit our just-loaded modules were built from, so sync_code can tell
     # when the live CODE has drifted from disk no matter which git path advanced HEAD.
-    global _run_head, _reconcile_fails, _broker_alert_at
+    global _run_head, _reconcile_fails, _broker_alert_at, _next_reconcile_try
     try:
         _run_head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
                                    text=True, timeout=30).stdout.strip() or None
@@ -788,6 +811,20 @@ def main():
             # Held as a ledger flag, not a local variable: if the snapshot is bad
             # we must retry next pass, and roll_day only fires once per day.
             if led.get("needs_reconcile"):
+                # BACK OFF failed broker snapshots. Each attempt is an agent turn
+                # against the SAME Claude quota the bridge needs, so retrying every
+                # 60s while the quota is exhausted burns the very resource we are
+                # waiting on. On 2026-08-20 that meant 140 attempts across a 2h41m
+                # session-limit outage, roughly 14x a normal day's usage, which can
+                # only prolong the lockout. Backoff caps it near 15 attempts.
+                # The heartbeat below stays on every pass: it costs nothing and it
+                # is what keeps a dead broker distinguishable from a dead laptop.
+                if time.time() < _next_reconcile_try:
+                    publish_degraded(led, "broker_unreachable", _reconcile_fails)
+                    if "--once" in sys.argv:
+                        return 0
+                    time.sleep(FAST_PASS_SEC)
+                    continue
                 if adopt_truth(led, reconcile()):
                     if _reconcile_fails:
                         log(f"broker reachable again after {_reconcile_fails} failed pass(es)")
@@ -796,6 +833,7 @@ def main():
                                    "The Robinhood connection is working again. "
                                    "Normal trading and stop enforcement have resumed.")
                         _reconcile_fails, _broker_alert_at = 0, 0.0
+                    _next_reconcile_try = 0.0
                     led["needs_reconcile"] = False
                 elif DRY:
                     # A dry ledger is simulated, so it can never match the real
@@ -813,19 +851,13 @@ def main():
                     # authorization. Wrong diagnosis costs time that positions do
                     # not have, since selling needs this same bridge.
                     _reconcile_fails += 1
+                    wait = min(FAST_PASS_SEC * (2 ** min(_reconcile_fails - 1, 4)),
+                               RECONCILE_BACKOFF_MAX)
+                    _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
                         f"trading nothing this pass and retrying next minute")
                     save_ledger(led)
-                    snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
-                            "degraded": "broker_unreachable",
-                            "degraded_since_passes": _reconcile_fails,
-                            "positions": {p["symbol"]: round(p["qty"], 6)
-                                          for p in led.get("positions") or []},
-                            "holds": sorted(led.get("holds") or {}),
-                            "orders_today": led.get("orders_today", 0),
-                            "dry": DRY}
-                    _save(STATUS_F, snap)
-                    _push_status("degraded")
+                    publish_degraded(led, "broker_unreachable", _reconcile_fails)
                     if (_reconcile_fails >= BROKER_FAIL_ALERT and
                             (time.time() - _broker_alert_at) >= BROKER_REALERT_SEC):
                         notify("ALERT: RH bot cannot reach the broker", chr(10).join([
