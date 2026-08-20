@@ -1240,3 +1240,9 @@
 - avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
 - notes: Easing to neutral 0.55: Fed minutes are behind us, indexes snapped a three-day slide, and the Treasury buyback plan has calmed the bond market with VIX steady at 16.0. Still cautious with inflation data in focus and a soft jobs backdrop, plus only $25 cash limits any real adds anyway.
 - journal: Thu 8/20 09:00: Moved from 0.4 risk-off to 0.55 neutral now that Fed minutes passed without incident and the tape stabilized (3-day slide snapped, bonds calmer). Watching inflation data and 30Y yields; keeping WMT on avoid for earnings and chip names weak.
+
+### 2026-08-20T09:24 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
+- notes: Pulling back to 0.4 risk-off: Dow futures dropped ~400pts as Treasury yields reversed the Bessent-driven decline and Walmart is tumbling, a clear deterioration since the 9:00 brief despite VIX at 15.8. Holdings are flat-to-red and cash is just $25, so no reason to add into a weakening open.
+- journal: Thu 8/20 09:24: Reverted from 0.55 neutral to 0.4 risk-off — futures rolled over (Dow -400) as bond intervention relief faded and yields reversed higher, WMT tumbling post-earnings. Watching whether the 30Y yield stabilizes and if the tape finds footing before easing back.
