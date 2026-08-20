@@ -1,34 +1,7 @@
 {
+ "degraded": "broker_unreachable",
+ "degraded_since_passes": 1,
  "dry": false,
- "equity": 229.79,
- "held": [
-  "ACHR",
-  "ARX",
-  "COUR",
-  "DGX",
-  "FIGR",
-  "GENI",
-  "IMAX",
-  "INCY",
-  "INSM",
-  "IWM",
-  "LMT",
-  "MSFT",
-  "MU",
-  "NVCR",
-  "NVDA",
-  "PLTR",
-  "QQQ",
-  "SHOP",
-  "SNDK",
-  "SPCX",
-  "SPY",
-  "SSNC",
-  "TDW",
-  "TRGP",
-  "TWST",
-  "WEX"
- ],
  "holds": [
   "ACHR",
   "COUR",
@@ -73,5 +46,5 @@
   "TWST": 0.050738,
   "WEX": 0.006326
  },
- "ts": "2026-08-20T15:18"
+ "ts": "2026-08-20T15:19"
 }
