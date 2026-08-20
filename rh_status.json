@@ -1,6 +1,6 @@
 {
  "degraded": "broker_unreachable",
- "degraded_since_passes": 85,
+ "degraded_since_passes": 86,
  "dry": false,
  "holds": [
   "ACHR",
@@ -46,5 +46,5 @@
   "TWST": 0.050738,
   "WEX": 0.006326
  },
- "ts": "2026-08-20T13:36"
+ "ts": "2026-08-20T13:37"
 }
