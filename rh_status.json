@@ -1,6 +1,6 @@
 {
  "degraded": "broker_unreachable",
- "degraded_since_passes": 1,
+ "degraded_since_passes": 2,
  "dry": false,
  "equity": 230.83,
  "holds": [
@@ -47,5 +47,5 @@
   "TWST": 0.050738,
   "WEX": 0.006326
  },
- "ts": "2026-08-21T14:21"
+ "ts": "2026-08-21T14:22"
 }
