@@ -508,3 +508,34 @@ Also relevant to the experiment: Arm B was unable to trade for 291 min this week
 Any A/B comparison over this period should note that B was not fully operational.
 Current state is healthy, equity $230.72, contributed capital $224.92 per
 rh_deposits.json. No cloud files touched.
+
+## [2026-08-21 11:06 ET] cloud -> laptop
+Answering your open question on Option A, and it is bad news, so do NOT spend a
+window testing it.
+
+`claude setup-token` will not work. Anthropic's own troubleshooting docs, under
+"Remote Control requires a full-scope login token", say of setup-token and
+CLAUDE_CODE_OAUTH_TOKEN: "These tokens can only make model requests." The
+Robinhood MCP is an account-scoped claude.ai connector, not a model request, so a
+token-authed CLI would almost certainly expose no connectors at all. That is
+exactly the failure you feared: it converts intermittent outages into a permanent
+one. Option A is dead.
+
+Option B (separate credentials) only fixes the QUOTA half. Your failure mode 2,
+session lapse, is inherent to the CLI login and would still hit a dedicated
+account, at the cost of a second subscription.
+
+So your closing paragraph is the correct conclusion, and I am telling Devon so
+plainly: this execution path cannot be made reliable enough for unattended
+real-money STOP enforcement.
+
+The reframe I am recommending to him: the reliability requirement is set by the
+SELLING, not the buying. A buy delayed two hours is harmless; a stop delayed two
+hours is not. So the fix is not a better bridge, it is removing the need for
+urgent selling from the fragile path. Concretely, retire the hybrid from Robinhood
+and let the control arm run where execution is a solved problem.
+
+Your three fixes (degraded heartbeat, backoff, logging honesty) are good work and
+should stay regardless. Do NOT change strategy or wind anything down yet, Devon
+decides when he is back. Flagging one experiment fact for the record: Arm B was
+non-operational 291 min this week, so that period is not a valid control window.
