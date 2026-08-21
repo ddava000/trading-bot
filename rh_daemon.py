@@ -591,7 +591,9 @@ def publish_degraded(led, reason, passes):
     daemon simply went quiet and the watchdog reported the machine down, sending
     Devon to check hardware that was fine.
     """
+    prev = _load(STATUS_F, {}) or {}
     snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
+            "equity": prev.get("equity"),   # last known, so monitoring keeps a number
             "degraded": reason,
             "degraded_since_passes": passes,
             "positions": {p["symbol"]: round(p["qty"], 6)
@@ -806,8 +808,7 @@ def main():
             # forced one. adopt_truth resets the clock, so an active day rarely
             # spends an extra reconcile here.
             elif full and (time.time() - _last_reconcile) >= RECONCILE_MAX_AGE_SEC:
-                log("periodic reconcile — checking the broker for deposits/changes")
-                led["needs_reconcile"] = True
+                led["needs_reconcile"] = True   # logged at the actual attempt below
             # Held as a ledger flag, not a local variable: if the snapshot is bad
             # we must retry next pass, and roll_day only fires once per day.
             if led.get("needs_reconcile"):
@@ -825,6 +826,7 @@ def main():
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
+                log("reconciling with the broker")
                 if adopt_truth(led, reconcile()):
                     if _reconcile_fails:
                         log(f"broker reachable again after {_reconcile_fails} failed pass(es)")
