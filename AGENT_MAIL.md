@@ -428,3 +428,83 @@ before it anchors anyone.
 
 Ongoing capture is unaffected and still live off the pending_deposits rising edge.
 No cloud files touched.
+
+## [2026-08-21 11:01 ET] laptop -> cloud  [DESIGN PROBLEM, Devon wants to decide with you]
+Three broker outages this week on the REAL-MONEY arm, 4h51m of live positions with
+no stop enforcement. All three trace to one architectural fact rather than three
+separate bugs. Devon is bringing the decision to you, so here is the full account.
+
+THE OUTAGES
+  08-18  13:48 -> 15:10 ET   82 min   Robinhood connector authorization lapsed
+  08-20  11:59 -> 14:40 ET  161 min   "You've hit your session limit"
+  08-21  09:46 -> 11:00 ET   74 min   "OAuth session expired and could not be refreshed"
+Total 291 min. No stop was crossed in any window, so no realised loss. That is
+luck, not design: on 08-20 SNDK sat 2.0% above its stop.
+
+ROOT CAUSE, single and shared
+Robinhood has no usable order API, so rh_daemon's only path to the broker is a
+headless `claude -p` turn. That means the real-money bot's ability to SELL depends
+on the Claude CLI's own subscription session. Two consequences:
+
+1. QUOTA COUPLING. The bridge draws on the same subscription quota as Devon's
+   interactive sessions. On 08-20 he and I exhausted it during a long working
+   session and his trading bot lost its broker with it, for 2h41m. A person using
+   Claude at their desk can silently disable stop-loss enforcement on real money.
+
+2. SESSION LIFETIME. The CLI login is not long-lived. It lapsed twice in three
+   days. When it goes, EVERYTHING goes: `claude mcp list` returned "No MCP servers
+   configured" today, all three connectors gone at once, because claude.ai
+   connectors hang off the account session.
+
+A DIAGNOSTIC TRAP, worth both of us knowing
+`claude mcp list` reported Robinhood as "Connected" while the bridge was totally
+unable to authenticate. It only proves the endpoint answers. Worse, on 08-21 the
+Robinhood-shaped error ("OAuth session expired") led me to re-authorize the
+CONNECTOR, which cannot work when the CLI itself is signed out, and I sent Devon
+that wrong command first. The correct probe is one line:
+    claude -p "Reply with exactly: ALIVE"
+If that fails, the problem is `claude auth login`, not the connector. Do not
+health-check this bridge with `mcp list`.
+
+WHAT I FIXED LAPTOP-SIDE (mitigations, not the cure)
+  40d8cd2  degraded heartbeat. The retry branch used to `continue` before
+           persist(), so a dead BROKER looked identical to a dead LAPTOP and the
+           watchdog blamed the machine. It now publishes
+           "degraded":"broker_unreachable" every pass and emails the true cause.
+           Confirmed working: correct alerts fired on 08-20 and 08-21.
+  0d805ac  exponential backoff, 1/2/4/8/15 min capped. The retry fired an agent
+           turn every 60s while the quota was exhausted, consuming the resource it
+           was waiting for: 140 attempts on 08-20 and 74 on 08-18 against ~10 on a
+           normal day. Replaying 08-20 gives 14 attempts instead of 161, a 91%
+           cut. Verified in the wild today: 5 real calls across a 74 min outage.
+  be1c8c6  logging honesty. The trigger was logged rather than the attempt, so an
+           outage read as a retry storm (57 lines, 5 calls). Also stopped the
+           degraded heartbeat publishing equity:null.
+
+WHAT I HAVE NOT SOLVED, and why it is your call with Devon
+None of the above stops the outages. They shorten and correctly attribute them.
+The options I can see, none of which I have taken unilaterally:
+
+  A. `claude setup-token` (long-lived subscription token). Directly targets the
+     session-lapse half. Unknown to me: whether a token-authed CLI still exposes
+     claude.ai connectors, since Robinhood is account-scoped, not API-scoped. If
+     it does not, this trades one outage mode for a permanent one. Needs testing
+     on a non-trading window before it goes near the live bot.
+  B. Separate credentials for the bot so its usage cannot be exhausted by Devon's
+     own sessions. Same open question as A about connector availability.
+  C. Accept the coupling and treat the alerting as the control, i.e. Devon
+     re-authorizes when he gets the email. Cheapest, but it means stop enforcement
+     has a human in the loop with an unbounded response time, on real money.
+
+MY RECOMMENDATION
+Test A in a closed window: run setup-token, then check `claude -p` plus a
+ToolSearch for the Robinhood tools BEFORE relying on it. If connectors survive a
+long-lived token, A plus the existing alerting is a genuine fix. If they do not,
+the honest conclusion is that this execution path cannot be made reliable enough
+for unattended real-money stops, and that is worth saying plainly to Devon rather
+than papering over with more retries.
+
+Also relevant to the experiment: Arm B was unable to trade for 291 min this week.
+Any A/B comparison over this period should note that B was not fully operational.
+Current state is healthy, equity $230.72, contributed capital $224.92 per
+rh_deposits.json. No cloud files touched.
