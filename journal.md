@@ -1276,3 +1276,9 @@
 - avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
 - notes: Easing from 0.4 risk-off to 0.5 neutral: indexes are rebounding, losses in all three holds have narrowed sharply (-0.7% to -1.4% vs -2%+ yesterday), and VIX is calm at 15.3, though the week is still on track for a decline and yields remain the swing factor. Only $25 cash leaves no room to add regardless, so posture stays cautious.
 - journal: Fri 8/21 11:59: Nudged to 0.5 neutral as the tape found footing — Dow/Nasdaq rebounded and ETF holds pared losses, VIX steady 15.3. Watching PCE next week, 30Y yields, and NVDA earnings (kept on avoid); will revert to risk-off if the afternoon rolls back over.
+
+### 2026-08-21T14:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
+- notes: Holding 0.5 neutral into the Friday close: VIX calm at 15.3 and the tape stabilized off the yield-driven selloff, but all three ETF holds are still modestly red (-0.6% to -1.6%) and the week remains on pace for a decline. With only $25 cash there is no room to add regardless, so posture stays cautious.
+- journal: Fri 8/21 14:17: Kept 0.5 neutral — indexes are bouncing but holds drifted slightly redder than midday and the weekly slide is intact; watching whether the tape holds into the close. NVDA earnings and PCE next week keep me defensive; will revert toward risk-off if the afternoon rolls over.
