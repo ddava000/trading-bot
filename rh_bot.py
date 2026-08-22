@@ -35,6 +35,23 @@ import alpaca_bot as bot   # THE strategy: signals, rails, screeners, tripwire
 MIN_ORDER = 1.00   # Robinhood fractional minimum (the cloud bot's $5 floor exists
                    # to dodge Alpaca whole-share rejections; RH fractions everything)
 
+# ── STRATEGY: set EXPLICITLY here, deliberately NOT inherited ────────────────
+# 2026-08-22, Devon swapped the arms. Robinhood drops the hybrid day-trader and
+# becomes plain buy-and-hold index ETFs; the hybrid moved to Alpaca, whose REST
+# API can honour a stop in seconds. The reason is execution reliability, not
+# strategy preference: this bot's only path to the broker is a headless claude -p
+# turn that went down four times in one week (expired CLI logins, exhausted usage
+# quota), leaving real positions with no enforceable stops for 291 minutes. Index
+# buy-and-hold has no stops to miss, so an outage now costs a delayed purchase.
+#
+# These MUST live here. alpaca_bot now resolves to the HYBRID for importers, so
+# reading INDEX_CORE_PCT / HOLD_PCT / MAX_INVESTED_PCT from it would silently keep
+# day-trading Robinhood, which is the exact thing being stopped. Risk RAILS
+# (stops, ratchet, correlation, news, earnings) are still imported unchanged.
+INDEX_ONLY       = True   # no active sleeves: no new HOLD or TRADE entries
+WIND_DOWN        = True   # liquidate every non-index holding into the ETFs
+INDEX_TARGET_PCT = 1.00   # equal weight across INDEX_ETFS; budget keeps a 5% buffer
+
 
 def _quote(sym, meme):
     """(live, signal, closes) from Yahoo. Nones when data is unusable."""
@@ -85,6 +102,15 @@ def decide(state, fast=False):
     for sym, h in held.items():
         if sym in bot.INDEX_ETFS or h["qty"] <= 0 or h["cost"] <= 0:
             continue                                  # index core is buy-and-hold
+        if WIND_DOWN:
+            # Exit the whole legacy book regardless of where it sits against
+            # its rails. These are being liquidated into ETFs, so a stop level
+            # is irrelevant; holding on for a better price would just extend
+            # exposure on the bridge we no longer trust for urgent selling.
+            pct_ = (h["live"] / h["cost"] - 1) * 100
+            _sell(sym, h["qty"], f"WIND-DOWN to index ({pct_:+.1f}%)")
+            sold.add(sym)
+            continue
         live, cost = h["live"], h["cost"]
         con = (h["sig"] or {}).get("consensus", 0)
         pct, why = (live / cost - 1) * 100, None
@@ -135,8 +161,11 @@ def decide(state, fast=False):
         notes.append(f"plan: {plan['regime']} risk {plan['risk']} "
                      f"avoid {sorted(plan['avoid']) or 'none'}")
 
-    # ── INDEX CORE: equal-weight SPY/QQQ/IWM toward 50%, funded FIRST ─────────
-    per_tgt = equity * bot.INDEX_CORE_PCT / len(bot.INDEX_ETFS)
+    # ── INDEX CORE: equal-weight SPY/QQQ/IWM ─────────────────────────────────
+    # INDEX_TARGET_PCT is ours; bot.INDEX_CORE_PCT is the hybrid's 50% and would
+    # leave half the account permanently in cash under an index-only strategy.
+    index_pct = INDEX_TARGET_PCT if INDEX_ONLY else bot.INDEX_CORE_PCT
+    per_tgt = equity * index_pct / len(bot.INDEX_ETFS)
     for etf in bot.INDEX_ETFS:
         h = held.get(etf)
         val = (h["live"] * h["qty"]) if h else 0.0
@@ -150,7 +179,10 @@ def decide(state, fast=False):
                 budget -= amt
 
     # ── ACTIVE ENTRIES: same sleeve routing, theme cap, guards ───────────────
-    if budget >= MIN_ORDER:
+    # Skipped entirely under INDEX_ONLY. Relying on zero sleeve room to block
+    # these would be fragile, since those percentages now come from a module
+    # that resolves to the hybrid.
+    if not INDEX_ONLY and budget >= MIN_ORDER:
         universe, seen = [], set(held) | sold | set(bot.INDEX_ETFS)
         for s in ((bot.fetch_day_gainers() or []) + (bot.fetch_smallcaps() or [])
                   + meme + (bot.fetch_screener() or [])):
@@ -227,6 +259,14 @@ def _selftest():
     # perfectly good code and roll the laptop back. Rails get tested, not weather.
     bot.load_plan = lambda et: {"regime": "neutral", "risk": 1.0,
                                 "avoid": set(), "favor": [], "notes": "selftest"}
+
+    # The rail tests below exercise stops, ratchet and the theme cap, which are
+    # still IMPORTED from alpaca_bot and must keep working even though Robinhood
+    # no longer trades them: this selftest is the gate on upstream code. Run them
+    # with the hybrid config, then restore the live index-only config and test
+    # what this bot actually does.
+    _live_cfg = (INDEX_ONLY, WIND_DOWN)
+    globals()["INDEX_ONLY"], globals()["WIND_DOWN"] = False, False
     flat  = [10.0 + random.gauss(0, 0.05) for _ in range(60)]
     theme = [random.gauss(0, 0.02) for _ in range(60)]
 
@@ -290,6 +330,63 @@ def _selftest():
     assert any("OILC" in n and "theme" in n for n in out["notes"]), out["notes"]
     assert "INDY" in bought, f"uncorrelated name wrongly blocked: {bought}"
     print(f"theme cap: bought {bought} — 3rd correlated name blocked, independent allowed  OK")
+
+    # ── LIVE CONFIG: index-only buy-and-hold + wind-down ────────────────────
+    # Everything above ran with the hybrid config restored, because those rails
+    # are imported from alpaca_bot and an upstream change could still break them.
+    # What follows tests what this bot ACTUALLY does now.
+    globals()["INDEX_ONLY"], globals()["WIND_DOWN"] = _live_cfg
+
+    # wind-down liquidates every non-index holding, whatever its P/L, and the
+    # index core is never sold out from under us
+    q.update({"WIN": (20.0, {"consensus": 1, "rsi": 60, "trend": "up", "buys": 4}, flat),
+              "LOSS": (5.0, {"consensus": 0, "rsi": 45, "trend": "down", "buys": 1}, flat),
+              "SPY": (100.0, {"consensus": 0, "rsi": 50, "trend": "up", "buys": 2}, flat)})
+    out = decide({"cash": 0.0, "positions": [
+        {"symbol": "WIN",  "qty": 1, "avg_cost": 10.0},   # +100%, still exits
+        {"symbol": "LOSS", "qty": 1, "avg_cost": 10.0},   # -50%,  still exits
+        {"symbol": "SPY",  "qty": 1, "avg_cost": 90.0}]}, fast=True)
+    sells = {o["symbol"]: o["reason"].split()[0] for o in out["orders"] if o["action"] == "sell"}
+    assert sells.get("WIN") == "WIND-DOWN" and sells.get("LOSS") == "WIND-DOWN", sells
+    assert "SPY" not in sells, f"wind-down must not sell the index core: {sells}"
+    print("wind-down: winners and losers exit, index core untouched  OK")
+
+    # index-only opens NO active positions even with a screener full of buys
+    bot.fetch_day_gainers = lambda: ["OILA", "INDY"]
+    out = decide({"cash": 60.0, "unsettled": 0.0, "positions": []})
+    active = [o["symbol"] for o in out["orders"]
+              if o["action"] == "buy" and o["symbol"] not in bot.INDEX_ETFS]
+    assert not active, f"index-only must not open active positions: {active}"
+    print("index-only: screener ignored, zero active entries  OK")
+
+    # index target is OURS (100% equal weight), not the inherited hybrid 50%.
+    # From all cash the last ETF is short by the 5% budget buffer, and later
+    # cycles top it up because the funded ones are already at target, so the
+    # book converges on equal weight rather than reaching it in one pass.
+    idx = {o["symbol"]: o["notional"] for o in out["orders"] if o.get("reason", "").startswith("INDEX")}
+    per_tgt = 60.0 / len(bot.INDEX_ETFS)
+    assert set(idx) == set(bot.INDEX_ETFS), idx
+    assert all(v <= per_tgt + 0.01 for v in idx.values()), f"over target: {idx}"
+    assert abs(sum(idx.values()) - 60.0 * 0.95) < 0.51, f"should deploy ~95%: {idx}"
+    print(f"index target: {idx} toward ${per_tgt:.2f} each (100% equal weight)  OK")
+
+    # convergence: with the leaders already at target, spare cash goes to the laggard
+    q.update({"SPY": (100.0, None, flat), "QQQ": (100.0, None, flat), "IWM": (100.0, None, flat)})
+    out2 = decide({"cash": 6.0, "unsettled": 0.0, "positions": [
+        {"symbol": "SPY", "qty": 0.20, "avg_cost": 100.0},   # $20, at target
+        {"symbol": "QQQ", "qty": 0.20, "avg_cost": 100.0},   # $20, at target
+        {"symbol": "IWM", "qty": 0.17, "avg_cost": 100.0}]}) # $17, short
+    tops = {o["symbol"]: o["notional"] for o in out2["orders"] if o["action"] == "buy"}
+    # New cash lifts equity, so every target rises and all three get a top-up.
+    # Convergence is that the LAGGARD takes the largest share.
+    assert tops and max(tops, key=tops.get) == "IWM",         f"laggard should take the largest top-up, got {tops}"
+    print(f"index rebalance: laggard IWM takes the largest share {tops}  OK")
+
+    # the config cannot silently revert to the hybrid by inheritance
+    assert INDEX_ONLY and WIND_DOWN, "live config must be index-only + wind-down"
+    assert INDEX_TARGET_PCT == 1.00, INDEX_TARGET_PCT
+    print("config: explicit index-only, not inherited from alpaca_bot  OK")
+
     print("SELFTEST PASS")
 
 
