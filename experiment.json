@@ -19,8 +19,8 @@
   "real_money": true,
   "start_equity": 231.3,
   "config": "equal-weight index ETFs, no stops, no active sleeves",
-  "execution": "Robinhood native recurring investments \u2014 no laptop, no bridge",
-  "note": "Laptop bot RETIRED. Deposits ~$10/wk continue; keep logging them in rh_deposits.json."
+  "execution": "Robinhood agentic bridge via the laptop daemon, KEPT RUNNING (Devon 2026-08-22: 'the laptop can stay unreliable - i can fix the login here and there'). Acceptable now because index buy-and-hold has NO stops: an outage delays a purchase, it cannot miss an exit. Probe is `claude -p \"Reply with exactly: ALIVE\"`, fix is `claude auth login`; `claude mcp list` lies.",
+  "note": "Laptop bot NOT retired. It keeps publishing rh_status.json (how Arm B is measured), rebalances to equal weight, and maintains rh_deposits.json. Deposits ~$10/wk continue and MUST be netted out of performance."
  },
  "prior_windows": [
   {
