@@ -73,10 +73,13 @@ jobs:
 
       - name: Run Alpaca bot
         env:
-          # Selects the INDEX-ONLY arm of the A/B experiment. Set ONLY here, in the
-          # cloud workflow. The Robinhood laptop imports alpaca_bot without it and
-          # therefore keeps the full hybrid as the control arm.
-          STRATEGY_INDEX_ONLY: "true"
+          # A/B ARM SELECTOR. 2026-08-22 STRATEGY SWAP (Devon): Alpaca now runs the
+          # HYBRID and Robinhood runs plain index. Rationale: the hybrid's stops must
+          # be honoured within minutes, and Alpaca's REST API is the only execution
+          # path here that is reliable enough for that. Robinhood's agentic bridge had
+          # 3 outages / 291 min in one week, which is survivable for buy-and-hold and
+          # not for stop enforcement. "false" => full hybrid.
+          STRATEGY_INDEX_ONLY: "false"
           ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
           ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
           ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}

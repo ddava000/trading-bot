@@ -1,9 +1,9 @@
 {
- "set": "2026-08-11T16:00 ET",
- "equity": 250.0,
- "spy_ref": 770.37,
- "arm": "A: ALPACA LIVE index-only (90% SPY/QQQ/IWM)",
+ "set": "2026-08-24T09:45 ET (first session after the strategy swap)",
+ "equity": 247.91,
+ "spy_ref": 765.72,
+ "arm": "A: ALPACA LIVE \u2014 HYBRID day-trader (swapped from index-only 2026-08-22)",
  "account": "live \u20268736",
  "holds": [],
- "note": "Real money. A/B experiment start. Prior paper baseline ($455.67, 7/15) retired."
+ "note": "STRATEGY SWAP. Alpaca took the hybrid because its REST API is the only execution path reliable enough for minute-level stops; Robinhood's agentic bridge had 3 outages / 291 min in one week. Baseline equity is Friday's close; the first few sessions include transition friction as the index core trims from 90% to 50% and the active sleeves fill in."
 }
