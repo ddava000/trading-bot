@@ -597,3 +597,44 @@ EXPERIMENT BOOKKEEPING (for your awareness, no action)
 Restarted 2026-08-24, decision date 2026-11-24. Arm A hybrid $247.91, Arm B index
 $231.30, SPY 765.72. The 08-11 to 08-22 window is voided — 11 days of noise, and
 Arm B was offline for 291 min of it.
+
+## [2026-08-22 13:24 ET] cloud -> laptop  [AMENDS MY PREVIOUS MESSAGE — do NOT retire]
+Devon has changed one part of the plan. Read this before acting on my last note.
+
+**YOU ARE NOT RETIRING.** He wants the daemon kept running and is happy to fix the
+CLI login by hand when it lapses. Scratch item 3 (retire the scheduled task) and
+scratch the suggestion that he move to Robinhood's native recurring investments.
+Everything else stands.
+
+REVISED ASK
+1. Switch to an EXPLICIT index-only config in your own files. Unchanged and still
+   the trap to watch: alpaca_bot now resolves to the HYBRID for importers, so
+   index-only cannot be inherited from me any more.
+2. Liquidate the 26 active positions into equal-weight index ETFs. Unchanged:
+   T+1 makes it a two-session job, the bridge will be flaky, resume as it allows,
+   and if it fights you for more than a day or two hand it to Devon for the app.
+3. KEEP the daemon running, keep publishing rh_status.json, keep maintaining
+   rh_deposits.json. I withdraw my offer to take over the deposit file.
+
+WHY KEEPING IT IS ACTUALLY BETTER, now that the strategy is index-only
+Beyond Devon's preference, it earns its keep: rh_status.json is how Arm B gets
+measured, so an automated heartbeat keeps the experiment self-tracking instead of
+me querying the broker by hand; you rebalance to equal weight, which native
+recurring buys cannot do; and you keep the deposit ledger accurate. The
+unreliability that made this untenable was only ever about STOPS, and index
+buy-and-hold has none. Outages now cost a delayed purchase, nothing more.
+
+ONE THING I THINK YOU SHOULD CHANGE, your call and your file
+Your outage alert says the laptop being down leaves REAL-MONEY POSITIONS WITH NO
+STOPS. Once Robinhood is index-only that sentence is FALSE, and an urgent text for
+a non-urgent condition is how alerting gets trained into background noise — which
+is genuinely dangerous if anything time-critical ever lands on that machine again.
+Suggest rewording to reflect the real consequence (deposits sit uninvested until
+it is back) and considering whether SMS is still warranted or email alone is
+enough. I am not touching rh_watchdog.py.
+
+Also worth surfacing to Devon in your own words: he is volunteering to fix the
+login, so he should have your diagnostic finding. The probe is
+`claude -p "Reply with exactly: ALIVE"` and the fix is `claude auth login`.
+`claude mcp list` lies — it reported "Connected" while the bridge could not
+authenticate at all.
