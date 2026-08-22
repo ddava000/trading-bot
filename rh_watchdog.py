@@ -3,12 +3,12 @@
 
 Runs in GitHub Actions on a schedule, independent of the laptop. The laptop
 pushes rh_status.json with an ET "ts" every ~15 min while it is alive; if that
-timestamp goes stale during CONFIRMED open-market hours, this alerts Devon on
-every configured channel at once: email, ntfy push, and SMS.
+timestamp goes stale during CONFIRMED open-market hours, this emails Devon.
 
-Each channel is gated on its own secret, so the watchdog degrades gracefully:
-email works the moment GMAIL_APP_PASSWORD exists, and push/SMS light up as their
-secrets are added. On a normal day it prints one line and exits 0 (market closed,
+Since Robinhood went index-only on 2026-08-22 a silent laptop is NOT urgent: there
+are no stops waiting to fire, only deposits sitting uninvested. So routine alerts
+go by email alone, and SMS/push are reserved for urgent=True. Each channel is also
+gated on its own secret, so the watchdog degrades gracefully. On a normal day it prints one line and exits 0 (market closed,
 or the bot is fresh), so it is silent unless something is actually wrong.
 
 Freshness is read from the COMMITTED rh_status.json, i.e. the last state that
@@ -44,8 +44,16 @@ def _email(frm, pw, to, subject, body):
         s.sendmail(frm, [to], m.as_string())
 
 
-def alert(msg):
-    """Fire every configured channel. One channel failing never blocks another."""
+def alert(msg, urgent=False):
+    """Notify. Email always; SMS and push only when urgent.
+
+    Robinhood went index-only buy-and-hold on 2026-08-22, so a laptop that is
+    down no longer means unenforced stops. The real consequence is that
+    deposits sit uninvested until it is back, which is worth an email and is
+    not worth a 3am text. Texting for a non-urgent condition is how alerting
+    gets trained into background noise, which would matter if anything
+    time-critical ever lands on this machine again.
+    """
     print("ALERT:", msg)
     sent, pw = [], os.environ.get("GMAIL_APP_PASSWORD")
     # `or`, not get-with-default: a missing GMAIL_USER secret expands to an EMPTY
@@ -57,8 +65,10 @@ def alert(msg):
     # Email — subject carries no emoji; Devon prints mail to PDF by subject.
     if pw:
         try:
+            subject = ("ALERT: RH laptop bot needs attention" if urgent
+                       else "RH laptop bot is not reporting (not urgent)")
             _email(frm, pw, os.environ.get("ALERT_EMAIL") or "devondavasher@gmail.com",
-                   "ALERT: RH laptop bot is not reporting", msg)
+                   subject, msg)
             sent.append("email")
         except Exception as e:
             print("email failed:", e)
@@ -66,7 +76,7 @@ def alert(msg):
     # SMS — SMS_TO is a full carrier email-to-SMS address (e.g. 5551234567@vtext.com),
     # set by Devon as a secret so his number never lands in this public repo.
     sms = os.environ.get("SMS_TO")
-    if pw and sms:
+    if pw and sms and urgent:
         try:
             _email(frm, pw, sms, "", msg[:140])
             sent.append("sms")
@@ -75,7 +85,7 @@ def alert(msg):
 
     # ntfy push — unguessable topic kept in a secret, not committed.
     topic = os.environ.get("NTFY_TOPIC")
-    if topic:
+    if topic and urgent:
         try:
             req = urllib.request.Request(
                 "https://ntfy.sh/" + topic, data=msg.encode(),
@@ -94,7 +104,7 @@ def main():
     # for a real outage. Triggered from the Actions tab with force=true.
     if os.environ.get("FORCE_ALERT", "").lower() == "true":
         alert("TEST alert from the RH watchdog. All three channels are wired up. "
-              "This is not a real outage.")
+              "This is not a real outage.", urgent=True)
         return 0
 
     et = datetime.now(bot.ET_TZ)
@@ -114,7 +124,8 @@ def main():
         ts = datetime.strptime(status["ts"], "%Y-%m-%dT%H:%M").replace(tzinfo=bot.ET_TZ)
     except Exception as e:
         # A missing or unreadable status file during open market is itself a red flag.
-        alert(f"RH watchdog could not read {STATUS_F} ({e}). Check the laptop.")
+        alert(f"RH watchdog could not read {STATUS_F} ({e}). Check the laptop "
+              f"when convenient; Robinhood is index-only so nothing urgent is pending.")
         return 0
 
     stale = (et - ts).total_seconds() / 60
@@ -122,9 +133,22 @@ def main():
         print(f"bot healthy — last heartbeat {int(stale)}m ago ({status['ts']} ET)")
         return 0
 
-    alert(f"RH laptop bot has gone SILENT: last heartbeat {status['ts']} ET, "
-          f"about {int(stale)} min ago, during open market. Check the laptop "
-          f"(it auto-starts on boot/login).")
+    alert(chr(10).join([
+        f"The RH laptop bot has stopped reporting. Last heartbeat {status['ts']} ET, "
+        f"about {int(stale)} min ago, during open market.",
+        "",
+        "NOT URGENT. Robinhood is index-only buy-and-hold, so there are no stops",
+        "waiting to fire. The cost of downtime is that deposits sit uninvested and",
+        "the ETFs do not rebalance until it is back.",
+        "",
+        "The daemon auto-starts on boot and login, so a reboot usually fixes it.",
+        "If it is running but still silent, the Claude CLI login has probably",
+        "lapsed. Diagnose with:",
+        '    claude -p "Reply with exactly: ALIVE"',
+        "and if that fails:  claude auth login",
+        "Do NOT trust `claude mcp list`; it reports Connected even when the bridge",
+        "cannot authenticate at all.",
+    ]))
     return 0
 
 

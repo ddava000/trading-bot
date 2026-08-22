@@ -862,18 +862,22 @@ def main():
                     publish_degraded(led, "broker_unreachable", _reconcile_fails)
                     if (_reconcile_fails >= BROKER_FAIL_ALERT and
                             (time.time() - _broker_alert_at) >= BROKER_REALERT_SEC):
-                        notify("ALERT: RH bot cannot reach the broker", chr(10).join([
+                        notify("RH bot: broker unreachable (not urgent)", chr(10).join([
                             "The laptop is UP and the daemon is running. The problem is the",
                             "Robinhood connection, not the machine.",
                             "",
                             f"{_reconcile_fails} consecutive failed broker snapshots.",
                             "",
-                            "IMPACT: positions are UNPROTECTED. Order placement uses the same",
-                            "bridge, so stops and take-profits cannot execute either.",
+                            "IMPACT: NOT URGENT. Robinhood is index-only buy-and-hold, so",
+                            "there are no stops waiting to fire. Deposits and rebalancing",
+                            "just sit until the bridge is back. Fix it when convenient.",
                             "",
-                            "MOST LIKELY CAUSE: the Robinhood connector needs re-authorization.",
-                            "`claude mcp list` can still report Connected while the OAuth grant",
-                            "is gone, because that only checks the endpoint is reachable.",
+                            "DIAGNOSE with this, NOT with `claude mcp list`, which reported",
+                            "Connected while the bridge could not authenticate at all:",
+                            "    claude -p \"Reply with exactly: ALIVE\"",
+                            "If that fails the CLI login lapsed:  claude auth login",
+                            "If it succeeds but Robinhood tools are missing, reconnect that",
+                            "connector:  claude mcp login \"claude.ai Robinhood\"",
                             "",
                             "FIX: reconnect the Robinhood connector in claude.ai settings,",
                             "then the bot recovers on its own within a minute.",
