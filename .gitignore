@@ -5,3 +5,6 @@ rh_config.json
 rh_ledger.json
 rh_HALT
 rh_daemon.log
+
+# per-runner mailbox watcher state (each session tracks what IT has seen)
+.mail_check_state.json
