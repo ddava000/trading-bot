@@ -287,10 +287,16 @@ YF_HEADERS = {"User-Agent": "Mozilla/5.0"}
 # cached on the session. Still fails OPEN on any error: it is a landmine guard, not
 # a gate, and Yahoo blocking a cloud IP must never stop the bot from trading.
 _YF_SESSION = None
+# "unknown" until something actually needs the guard this run; then "live" or
+# "degraded". Published in status.json so a silently-degraded guard is VISIBLE —
+# it was dead for weeks and nothing reported it. Verified from a residential IP;
+# Yahoo may block this cookie/crumb flow from cloud runner ranges, so the first
+# real runner exercise is the true test.
+EARN_GUARD_STATE = "unknown"
 def yf_session():
     """requests.Session carrying Yahoo's A3 cookie + crumb. `.crumb` is "" if the
     handshake failed (callers then behave exactly as they did before)."""
-    global _YF_SESSION
+    global _YF_SESSION, EARN_GUARD_STATE
     if _YF_SESSION is not None:
         return _YF_SESSION
     s = requests.Session()
@@ -303,6 +309,7 @@ def yf_session():
             s.crumb = r.text.strip()
     except Exception as e:
         print(f"  [yahoo crumb handshake failed ({e}) — earnings guard degraded]")
+    EARN_GUARD_STATE = "live" if s.crumb else "degraded"
     if not s.crumb:
         print("  [yahoo crumb unavailable — earnings guard degraded (fails open)]")
     _YF_SESSION = s
@@ -615,14 +622,18 @@ def news_flags(symbols, minutes):
 _EARN_CACHE = {}
 def earnings_within(sym, days=EARNINGS_BLOCK_D):
     """True if sym reports earnings within `days`. Yahoo calendarEvents, cached per
-    run, fail-OPEN on any error/429 — it's a landmine guard, not a gate."""
-    if sym in _EARN_CACHE:
-        return _EARN_CACHE[sym]
+    run, fail-OPEN on any error/429 — it's a landmine guard, not a gate.
+    Cache key includes `days`: keying on the symbol alone made a second call with a
+    different window silently return the first window's answer (only one production
+    caller today, but it is a trap for the next one)."""
+    ck = (sym, days)
+    if ck in _EARN_CACHE:
+        return _EARN_CACHE[ck]
     hit = False
     try:
         sess = yf_session()
         if not sess.crumb:
-            _EARN_CACHE[sym] = False      # handshake down: fail open, don't hammer Yahoo
+            _EARN_CACHE[ck] = False       # handshake down: fail open, don't hammer Yahoo
             return False
         d = sess.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
                      f"?modules=calendarEvents&crumb={sess.crumb}", timeout=8).json()
@@ -636,7 +647,7 @@ def earnings_within(sym, days=EARNINGS_BLOCK_D):
                 break
     except Exception:
         hit = False
-    _EARN_CACHE[sym] = hit
+    _EARN_CACHE[ck] = hit
     return hit
 
 
@@ -1461,6 +1472,11 @@ def run_bot():
             "regime": "risk-on" if risk_on else "risk-off",
             "vix": round(vix, 1), "halted": halted,
             "orders_this_run": len(trades_log),
+            # "live" = the Yahoo crumb handshake worked and the earnings guard is
+            # really enforcing. "degraded" = it fails open and blocks NOTHING, which
+            # is indistinguishable from "no earnings soon" unless it is reported.
+            # "unknown" = nothing needed the guard this run.
+            "earnings_guard": EARN_GUARD_STATE,
         }
         try:
             base = json.load(open("baseline.json"))
