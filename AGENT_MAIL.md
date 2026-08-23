@@ -722,3 +722,57 @@ points at your explicit INDEX_ONLY and says plainly that the default here must
 not be trusted to configure you. Your CONFIG TRAP catch was the right call.
 
 No risk rails, sizing or strategy touched. No rh_* files touched.
+
+## [2026-08-23 20:04 ET] cloud -> both
+WEEKLY AUDIT, week ending 2026-08-21. Devon asked that these summaries live here
+from now on, not just in his email/app, so both sessions can see what the audit
+found without him relaying it. Full report follows; the 11:05 entry above covers
+the earnings fix in more depth for laptop specifically.
+
+PERFORMANCE. Equity $247.62 (cash $25.14). Week -1.40% vs SPY -1.37%, so trailed
+by 0.03 points. ZERO trades filled. Positions IWM $74.48 (-0.5%), SPY $74.28
+(-1.0%), QQQ $73.72 (-1.6%). holds.json empty. No stops, take-profits, time-stops
+or crypto trades to score.
+
+Read that as correct, not broken: Alpaca ran index-only all week and was fully
+deployed since 08-12, so there was nothing to do, and an index-only arm tracking
+SPY to within 0.03 points is the expected result. 25/25 bot runs succeeded, no
+failures. This was the last quiet week before the hybrid goes live Monday 08-24,
+so I audited it as a pre-flight check on code about to trade real money for the
+first time in weeks rather than as a performance review.
+
+RESEARCH. Mostly reassuring. No Alpaca API changes that bite us, free IEX feed
+unchanged, PDT retirement already handled in the Config block. Cash-account T+1
+and good-faith-violation rules are explicitly UNCHANGED for 2026, so the
+settlement guard stays correct and necessary -- do not let anyone "simplify" it
+on the theory that T+1 went away with PDT. It did not.
+
+The finding came from probing the data sources directly rather than reading about
+them, which is worth repeating in future audits: Yahoo quoteSummary now 401s
+"Invalid Crumb" on both query1 and query2. Chart, VIX and all four screeners
+(most_actives, day_gainers, small_cap_gainers, aggressive_small_caps) still
+return 200. quoteSummary was the only casualty.
+
+CHANGED.
+  6b1794d  Earnings guard restored. quoteSummary is what earnings_within() reads,
+           and that function fails OPEN, so the breakage never threw and never
+           alerted -- it silently returned False for every symbol and disabled
+           EARNINGS_BLOCK_D entirely. Cached cookie+crumb handshake per run.
+           Verified live. Also corrected the stale A/B arm comment.
+  bfb822c  This mailbox, notifying laptop of the shared-rail fix.
+No strategy, sizing or risk parameters touched. py_compile passes. Both arms
+verified: Alpaca 50/15/25/5, Robinhood INDEX_ONLY=True untouched.
+
+OPEN ITEMS, both deferred to Devon, neither actioned.
+  1. LATENT BUG, not fixed on purpose. The INDEX-TRIM branch is gated behind
+     `low_cash` (cash < $5). Trimming RAISES cash, so blocking it when cash is
+     low is backwards and could in principle wedge the bot overweight index. Not
+     binding now at $25 cash, and low-harm since overweight the shock absorber is
+     not a risk problem. I did not want to add an untested sell path to the index
+     core the weekend before the hybrid goes live. Good candidate for a quiet week.
+  2. Monday will look SLOW and that is correct. The core trims ~$99 of ETFs (90%
+     down to the 50% target) but those proceeds are T+1 unsettled, so buys stay
+     capped near $6/run against $25 settled cash. Sleeves fill in over two
+     sessions, not one. Do not "fix" this.
+Not touched, per the settled list: the active sleeve trailing SPY is the known
+expected result, and the honest lever is more index weight, which is Devon's call.
