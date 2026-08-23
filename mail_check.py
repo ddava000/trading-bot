@@ -30,6 +30,8 @@ Usage:
   python mail_check.py --quiet                  # no email, exit code only (0 none, 1 new)
 """
 import os, re, json, sys, smtplib
+
+NL = chr(10)
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from email.mime.text import MIMEText
@@ -76,11 +78,13 @@ def send(subject, body):
 
 
 def main():
-    who = None
+    whos = [None]
     if "--for" in sys.argv:
-        who = sys.argv[sys.argv.index("--for") + 1].lower()
-        if who not in SESSIONS:
-            print(f"unknown session {who!r}; expected one of {SESSIONS}"); return 2
+        raw = sys.argv[sys.argv.index("--for") + 1].lower()
+        whos = [w.strip() for w in raw.split(",") if w.strip()]
+        bad = [w for w in whos if w not in SESSIONS]
+        if bad:
+            print(f"unknown session(s) {bad}; expected from {SESSIONS}"); return 2
     quiet = "--quiet" in sys.argv
     since = None
     if "--since-hours" in sys.argv:
@@ -111,8 +115,9 @@ def main():
                 continue          # malformed stamp: ignore rather than spam
             if when >= cutoff:
                 new.append(e)
-        fresh = [e for e in new if addressed_to(e, who) and not (who and e["from"] == who)]
-        return _report(fresh, who, quiet, f"in the last {since:g}h")
+        buckets = {w: [e for e in new
+                       if addressed_to(e, w) and not (w and e["from"] == w)] for w in whos}
+        return _report(buckets, quiet, f"in the last {since:g}h")
 
     try:
         seen = json.load(open(STATE)).get("last_hdr", "")
@@ -132,29 +137,40 @@ def main():
         new = all_e[-1:]
 
     # A session's own entries are not mail TO it.
-    fresh = [e for e in new if addressed_to(e, who) and not (who and e["from"] == who)]
+    buckets = {w: [e for e in new
+                   if addressed_to(e, w) and not (w and e["from"] == w)] for w in whos}
     json.dump({"last_hdr": all_e[-1]["hdr"]}, open(STATE, "w"), indent=1)
 
-    return _report(fresh, who, quiet, f"({len(new)} new entr(y/ies))")
+    return _report(buckets, quiet, f"({len(new)} new entr(y/ies))")
 
 
-def _report(fresh, who, quiet, ctx):
-    """Single reporting path shared by the stateful and stateless modes, so the two
-    can never drift in what they emit."""
-    label = who or "the sessions"
-    if not fresh:
-        print(f"no new mail{' for ' + who if who else ''} {ctx}")
+def _report(buckets, quiet, ctx):
+    """ONE email covering every session asked about, rather than one per session.
+    Devon was on three separate notification paths for a single file (audit's step,
+    cloud's step, and the laptop daemon), all saying the same thing on a busy day.
+    Sections are only included for sessions that actually have mail."""
+    hits = {w: es for w, es in buckets.items() if es}
+    names = ", ".join(w or "the sessions" for w in buckets)
+    if not hits:
+        print(f"no new mail for {names} {ctx}")
         return 0
-    n = len(fresh)
-    lines = [f"{n} new AGENT_MAIL entr{'y' if n == 1 else 'ies'} for {label}:", ""]
-    for e in fresh:
-        lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}", f"      {e['first'][:100]}", ""]
+
+    total = sum(len(es) for es in hits.values())
+    lines = []
+    for w, es in hits.items():
+        label = w or "the sessions"
+        lines.append(f"{len(es)} for {label}:")
+        for e in es:
+            lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}",
+                      f"      {e['first'][:100]}"]
+        lines.append("")
     lines += ["Open a session in the repo and read AGENT_MAIL.md.",
               "This watcher reports that mail arrived; it does not read or act on content."]
-    body = "\n".join(lines)
+    body = NL.join(lines)
     print(body)
     if not quiet:
-        send(f"AGENT_MAIL: {n} new for {label}", body)
+        who_txt = " + ".join(w or "sessions" for w in hits)
+        send(f"AGENT_MAIL: {total} new for {who_txt}", body)
     return 1
 
 

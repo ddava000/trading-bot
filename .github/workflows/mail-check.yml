@@ -37,23 +37,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      # Independent steps: one session's mail must not be skipped because the
-      # other's check failed. Both use STATELESS --since-hours (a runner is fresh
-      # every time, so a state file would never exist and every run would silently
-      # adopt the backlog and report nothing -- fd37d07).
-      - name: Check AGENT_MAIL for entries addressed to audit
+      # ONE step, ONE digest email covering both sessions. Was two steps sending
+      # two separate emails; combined with the laptop daemon's own notifier that put
+      # Devon on three notification paths for a single file, all saying the same
+      # thing on a busy day. mail_check.py --for a,b reports per-session sections in
+      # one message and only includes a section for a session that actually has mail.
+      #
+      # Losing the independent-failure property of two steps is acceptable: the two
+      # checks parse the SAME file in the SAME process, so there is no realistic
+      # failure that hits one addressee and not the other. A crash now loses both,
+      # which is why the step still reports loudly rather than swallowing errors.
+      #
+      # STATELESS --since-hours on purpose: a runner is fresh every time, so a state
+      # file would never exist and every run would silently adopt the backlog and
+      # report nothing (fd37d07).
+      - name: Check AGENT_MAIL for entries addressed to audit or cloud
         if: always()
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           # exit 1 means "new mail found and emailed", which is success here.
-          python mail_check.py --for audit --since-hours 24 || true
-
-      - name: Check AGENT_MAIL for entries addressed to cloud
-        if: always()
-        env:
-          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: |
-          python mail_check.py --for cloud --since-hours 24 || true
+          python mail_check.py --for audit,cloud --since-hours 24 || true
