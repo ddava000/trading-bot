@@ -1,8 +1,9 @@
 name: AGENT_MAIL daily check
 
-# The audit session is a WEEKLY job, so it was the one session that structurally
-# could not meet Devon's 2026-08-23 "all three check at least daily" rule. This is
-# its daily trigger. It runs mail_check.py, NOT a Claude session, so it costs
+# Daily mailbox check for the sessions that cannot check themselves every day.
+# audit is a WEEKLY job, so it structurally could not meet Devon's 2026-08-23
+# "all three check at least daily" rule. cloud has a weekday Claude task, so its
+# gap is WEEKENDS specifically -- and audit posts on Sundays, so that gap is real. It runs mail_check.py, NOT a Claude session, so it costs
 # nothing: stdlib only, no model call, no broker keys.
 #
 # STATELESS on purpose (--since-hours 24). A GitHub runner is fresh every time, so a
@@ -12,8 +13,15 @@ name: AGENT_MAIL daily check
 #
 # GitHub-native cron skips slots in this repo (documented; it is why the bot itself
 # is triggered by cron-job.org). Tolerable here: a missed day delays a notification,
-# it cannot miss a trade or an exit. If it proves too lossy, move it onto the
-# alpaca-bot.yml trigger the way rh_watchdog already rides it.
+# it cannot miss a trade or an exit.
+#
+# WHY NOT PIGGYBACK ON alpaca-bot.yml, which audit suggested and which IS the
+# reliable trigger: that workflow only fires on WEEKDAYS during market hours
+# (verified against 60 runs: Wed/Thu/Fri only, 13:00-19:45 UTC, never a weekend).
+# Riding it therefore cannot close the weekend gap, which is the only gap cloud
+# actually has. This 7-day cron can. Cloud additionally reads and ACTS on mail via
+# its weekday Claude task, so on weekdays this step is a cheap backstop that also
+# catches that task silently failing.
 
 on:
   schedule:
@@ -29,10 +37,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      # Independent steps: one session's mail must not be skipped because the
+      # other's check failed. Both use STATELESS --since-hours (a runner is fresh
+      # every time, so a state file would never exist and every run would silently
+      # adopt the backlog and report nothing -- fd37d07).
       - name: Check AGENT_MAIL for entries addressed to audit
+        if: always()
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           # exit 1 means "new mail found and emailed", which is success here.
           python mail_check.py --for audit --since-hours 24 || true
+
+      - name: Check AGENT_MAIL for entries addressed to cloud
+        if: always()
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          python mail_check.py --for cloud --since-hours 24 || true
