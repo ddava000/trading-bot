@@ -14,12 +14,24 @@ It does NOT parse or act on message content. It reports that mail arrived, which
 what prompts a session to be opened. Deliberately dependency-free (stdlib only, no
 Alpaca keys) so any of the three can run it from any trigger.
 
+Two modes, because the two kinds of runner need different things:
+  STATEFUL (default) tracks the last entry it saw in a gitignored per-runner file.
+    Right for a long-lived machine like the laptop.
+  STATELESS (--since-hours N) reports entries newer than N hours and keeps no state.
+    Right for CI: a GitHub runner is fresh every time, so a state file would never
+    exist, every run would look like a first run, and it would silently adopt the
+    backlog and NEVER report anything. For a daily cron, "addressed to me in the
+    last 24h" is the same question anyway.
+
 Usage:
-  python mail_check.py                 # report new entries for anyone
-  python mail_check.py --for audit     # only entries addressed to audit/both/all
-  python mail_check.py --quiet         # no email, just exit code (0 none, 1 new mail)
+  python mail_check.py                          # new entries for anyone (stateful)
+  python mail_check.py --for audit              # only entries addressed to audit/both/all
+  python mail_check.py --for audit --since-hours 24   # stateless, for a daily cron
+  python mail_check.py --quiet                  # no email, exit code only (0 none, 1 new)
 """
 import os, re, json, sys, smtplib
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from email.mime.text import MIMEText
 
 MAILBOX = "AGENT_MAIL.md"
@@ -70,6 +82,12 @@ def main():
         if who not in SESSIONS:
             print(f"unknown session {who!r}; expected one of {SESSIONS}"); return 2
     quiet = "--quiet" in sys.argv
+    since = None
+    if "--since-hours" in sys.argv:
+        try:
+            since = float(sys.argv[sys.argv.index("--since-hours") + 1])
+        except (IndexError, ValueError):
+            print("--since-hours needs a number"); return 2
 
     try:
         text = open(MAILBOX, encoding="utf-8").read()
@@ -79,6 +97,22 @@ def main():
     all_e = entries(text)
     if not all_e:
         print("no entries parsed — mailbox format may have changed"); return 2
+
+    # Stateless path: entries newer than N hours. No state file, so a fresh CI
+    # runner behaves identically every time.
+    if since is not None:
+        ET = ZoneInfo("America/New_York")
+        cutoff = datetime.now(ET) - timedelta(hours=since)
+        new = []
+        for e in all_e:
+            try:
+                when = datetime.strptime(e["ts"], "%Y-%m-%d %H:%M").replace(tzinfo=ET)
+            except ValueError:
+                continue          # malformed stamp: ignore rather than spam
+            if when >= cutoff:
+                new.append(e)
+        fresh = [e for e in new if addressed_to(e, who) and not (who and e["from"] == who)]
+        return _report(fresh, who, quiet, f"in the last {since:g}h")
 
     try:
         seen = json.load(open(STATE)).get("last_hdr", "")
@@ -101,12 +135,18 @@ def main():
     fresh = [e for e in new if addressed_to(e, who) and not (who and e["from"] == who)]
     json.dump({"last_hdr": all_e[-1]["hdr"]}, open(STATE, "w"), indent=1)
 
-    if not fresh:
-        print(f"no new mail{' for ' + who if who else ''} ({len(new)} new entr(y/ies), none addressed)")
-        return 0
+    return _report(fresh, who, quiet, f"({len(new)} new entr(y/ies))")
 
+
+def _report(fresh, who, quiet, ctx):
+    """Single reporting path shared by the stateful and stateless modes, so the two
+    can never drift in what they emit."""
     label = who or "the sessions"
-    lines = [f"{len(fresh)} new AGENT_MAIL entr{'y' if len(fresh)==1 else 'ies'} for {label}:", ""]
+    if not fresh:
+        print(f"no new mail{' for ' + who if who else ''} {ctx}")
+        return 0
+    n = len(fresh)
+    lines = [f"{n} new AGENT_MAIL entr{'y' if n == 1 else 'ies'} for {label}:", ""]
     for e in fresh:
         lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}", f"      {e['first'][:100]}", ""]
     lines += ["Open a session in the repo and read AGENT_MAIL.md.",
@@ -114,7 +154,7 @@ def main():
     body = "\n".join(lines)
     print(body)
     if not quiet:
-        send(f"AGENT_MAIL: {len(fresh)} new for {label}", body)
+        send(f"AGENT_MAIL: {n} new for {label}", body)
     return 1
 
 
