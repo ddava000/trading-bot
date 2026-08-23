@@ -26,7 +26,7 @@ Run:  python rh_daemon.py            (live)
       python rh_daemon.py --once     (one cycle, then exit)
 """
 
-import os, sys, json, time, subprocess
+import os, re, sys, json, time, subprocess
 from datetime import datetime
 
 import rh_bot
@@ -605,6 +605,59 @@ def publish_degraded(led, reason, passes):
     _push_status("degraded")
 
 
+MAIL_F = "AGENT_MAIL.md"
+_MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)\s*->\s*([A-Za-z]+)", re.M)
+
+
+def check_mail(led):
+    """Tell Devon when the mailbox has a new entry addressed to this session.
+
+    cloud's cadence protocol (2026-08-23) states "laptop: at every daemon
+    start/restart, which is frequent. Effectively the fastest reader." That was
+    NOT true. The daemon pulls AGENT_MAIL.md to disk but nothing here read it, and
+    only a Claude session on this machine does, which happens when Devon opens
+    one. A time-sensitive entry addressed to laptop could therefore sit unseen for
+    days while the sender believed it landed in minutes.
+
+    The daemon cannot reason about mail, so it does not try. It just says mail
+    arrived, which is what makes the protocol's assumption real: the notification
+    is what prompts a session to be opened.
+
+    First run adopts the current newest entry without notifying, so adding this
+    does not replay the whole backlog.
+    """
+    try:
+        with open(MAIL_F, encoding="utf-8", errors="replace") as f:
+            heads = _MAIL_HEAD.findall(f.read())
+        if not heads:
+            return
+        keys = ["|".join(h) for h in heads]
+        seen = led.get("last_mail_seen")
+        if seen is None:
+            led["last_mail_seen"] = keys[-1]
+            return
+        if keys[-1] == seen:
+            return
+        start = keys.index(seen) + 1 if seen in keys else len(keys) - 1
+        fresh = [h for h in heads[start:]
+                 if h[2].strip().lower() in ("laptop", "both", "all")]
+        led["last_mail_seen"] = keys[-1]
+        if not fresh:
+            return
+        summary = "; ".join(f"{ts} {frm}->{to}" for ts, frm, to in fresh)
+        log(f"NEW MAIL for the laptop session: {summary}")
+        notify("RH bot: new mailbox entry for the laptop session", chr(10).join([
+            "New AGENT_MAIL.md entries addressed to the laptop session:",
+            "",
+            *[f"  [{ts}] {frm} -> {to}" for ts, frm, to in fresh],
+            "",
+            "The daemon cannot act on these; it only reports that they arrived.",
+            "Open a Claude session on the laptop to read and respond.",
+        ]))
+    except Exception as e:
+        log(f"mail check skipped ({e})")
+
+
 # ── Code sync: inherit cloud-bot improvements, but verify before trusting ───
 def sync_code():
     """Pull upstream changes and prove they work before running on them.
@@ -887,6 +940,8 @@ def main():
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
+            if full:
+                check_mail(led)   # surface new mailbox entries for this session
             if full and sync_code():
                 save_ledger(led)          # ledger is the source of truth across restarts
                 # Do NOT execv on Windows: it spawns rather than replaces, which is
