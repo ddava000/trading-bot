@@ -38,11 +38,16 @@ from zoneinfo import ZoneInfo
 # by design, so the two bots never drift on risk rules. That also means editing
 # these numbers in source would silently reconfigure the REAL-MONEY Robinhood bot.
 # So the arm is chosen by ENVIRONMENT, which only the cloud workflow sets:
-#   STRATEGY_INDEX_ONLY=true  -> Alpaca cloud arm: index-only (no active sleeves)
+#   STRATEGY_INDEX_ONLY=true  -> index-only (no active sleeves)
 #   unset (the default)       -> full HYBRID, what every importer gets
-# The Robinhood laptop never sets it, so it keeps the hybrid and stays the control
-# arm. Shared MECHANICS (stops, ratchet, RSI caps, correlation, news, earnings) are
-# NOT arm-dependent and remain common to both bots.
+#
+# 2026-08-22 STRATEGY SWAP — the arms traded places, so read this before trusting
+# any older comment: ALPACA (cloud) now runs the HYBRID and sets the env var to
+# "false"; ROBINHOOD (laptop) now runs INDEX-ONLY. Robinhood does NOT get there via
+# this env var — rh_bot.py sets its own INDEX_ONLY=True explicitly and asserts it at
+# startup, precisely so a change to the default here cannot silently re-arm the
+# real-money laptop's active sleeves. Shared MECHANICS (stops, ratchet, RSI caps,
+# correlation, news, earnings) are NOT arm-dependent and remain common to both bots.
 _INDEX_ONLY = os.environ.get("STRATEGY_INDEX_ONLY", "").strip().lower() == "true"
 
 LOSS_CAP_PCT     = 0.10
@@ -272,6 +277,36 @@ def compute_signals(sym, closes, vols, live, meme_tickers):
 
 # ── Yahoo Finance helpers (broker-agnostic, identical) ────────────────────────
 YF_HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+# Yahoo's quoteSummary endpoint (the earnings-calendar source) began requiring a
+# cookie + "crumb" token; without it it returns 401 {"code":"Unauthorized",
+# "description":"Invalid Crumb"}. The chart and screener endpoints are unaffected.
+# Audit 2026-08-23 caught this: earnings_within() fails open, so the guard had gone
+# silently dead — the bot would happily open a NEW position the day before a report.
+# One handshake per run (GET fc.yahoo.com for the A3 cookie, then /v1/test/getcrumb),
+# cached on the session. Still fails OPEN on any error: it is a landmine guard, not
+# a gate, and Yahoo blocking a cloud IP must never stop the bot from trading.
+_YF_SESSION = None
+def yf_session():
+    """requests.Session carrying Yahoo's A3 cookie + crumb. `.crumb` is "" if the
+    handshake failed (callers then behave exactly as they did before)."""
+    global _YF_SESSION
+    if _YF_SESSION is not None:
+        return _YF_SESSION
+    s = requests.Session()
+    s.headers.update(YF_HEADERS)
+    s.crumb = ""
+    try:
+        s.get("https://fc.yahoo.com", timeout=8)          # 404 is fine — we want the cookie
+        r = s.get("https://query2.finance.yahoo.com/v1/test/getcrumb", timeout=8)
+        if r.status_code == 200 and r.text.strip() and "<" not in r.text:
+            s.crumb = r.text.strip()
+    except Exception as e:
+        print(f"  [yahoo crumb handshake failed ({e}) — earnings guard degraded]")
+    if not s.crumb:
+        print("  [yahoo crumb unavailable — earnings guard degraded (fails open)]")
+    _YF_SESSION = s
+    return s
 
 def yf_ohlcv(sym):
     try:
@@ -585,8 +620,12 @@ def earnings_within(sym, days=EARNINGS_BLOCK_D):
         return _EARN_CACHE[sym]
     hit = False
     try:
-        d = requests.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
-                         "?modules=calendarEvents", headers=YF_HEADERS, timeout=8).json()
+        sess = yf_session()
+        if not sess.crumb:
+            _EARN_CACHE[sym] = False      # handshake down: fail open, don't hammer Yahoo
+            return False
+        d = sess.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
+                     f"?modules=calendarEvents&crumb={sess.crumb}", timeout=8).json()
         res = ((d.get("quoteSummary") or {}).get("result") or [{}])[0]
         eds = ((res.get("calendarEvents") or {}).get("earnings") or {}).get("earningsDate") or []
         now = datetime.now(timezone.utc).timestamp()
