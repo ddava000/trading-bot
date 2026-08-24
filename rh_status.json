@@ -1,46 +1,23 @@
 {
  "dry": false,
- "equity": 239.26,
+ "equity": 147.91,
  "held": [
-  "ACHR",
-  "ARX",
-  "COUR",
-  "DGX",
-  "FIGR",
-  "GENI",
-  "IMAX",
-  "INCY",
-  "INSM",
   "IWM",
-  "LMT",
-  "MSFT",
-  "MU",
-  "NVCR",
-  "NVDA",
-  "PLTR",
   "QQQ",
-  "SHOP",
-  "SNDK",
-  "SPCX",
-  "SPY",
-  "SSNC",
-  "TDW",
-  "TRGP",
-  "TWST",
-  "WEX"
+  "SPY"
  ],
- "hold": 57.71,
+ "hold": 0,
  "holds": [],
- "index": 110.75,
- "orders_today": 24,
+ "index": 146.05,
+ "orders_today": 25,
  "positions": {
   "IWM": 0.122811,
   "QQQ": 0.051197,
-  "SPY": 0.096189
+  "SPY": 0.064616
  },
  "regime": "risk-off",
  "risk": 0.4,
- "settled": 37.14,
- "trade": 33.67,
- "ts": "2026-08-24T09:48"
+ "settled": 0.0,
+ "trade": 0.0,
+ "ts": "2026-08-24T10:05"
 }
