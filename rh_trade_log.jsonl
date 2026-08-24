@@ -62,3 +62,27 @@
 {"action": "sell", "symbol": "RNG", "qty": 0.090555, "reason": "TAKE-PROFIT +33.6%", "ts": "2026-08-19T09:50", "status": "ok", "venue": "robinhood"}
 {"action": "sell", "symbol": "THC", "qty": 0.004984, "reason": "TAKE-PROFIT +15.1%", "ts": "2026-08-19T09:54", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "TWST", "notional": 6.87, "sleeve": "TRADE", "reason": "TRADE +1 RSI 75 up (3 votes)", "ts": "2026-08-19T10:03", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "MSFT", "qty": 0.002775, "reason": "WIND-DOWN to index (+7.4%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "NVDA", "qty": 0.0197, "reason": "WIND-DOWN to index (-0.8%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "NVCR", "qty": 0.310079, "reason": "WIND-DOWN to index (-13.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "IMAX", "qty": 0.135092, "reason": "WIND-DOWN to index (+23.0%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "LMT", "qty": 0.003188, "reason": "WIND-DOWN to index (+0.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "DGX", "qty": 0.007897, "reason": "WIND-DOWN to index (+8.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "WEX", "qty": 0.006326, "reason": "WIND-DOWN to index (+17.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SSNC", "qty": 0.056082, "reason": "WIND-DOWN to index (+13.2%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "GENI", "qty": 0.727085, "reason": "WIND-DOWN to index (+8.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INCY", "qty": 0.04185, "reason": "WIND-DOWN to index (-1.3%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "COUR", "qty": 0.17476, "reason": "WIND-DOWN to index (-3.8%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "PLTR", "qty": 0.017283, "reason": "WIND-DOWN to index (+9.2%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TDW", "qty": 0.148358, "reason": "WIND-DOWN to index (+11.9%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SHOP", "qty": 0.042497, "reason": "WIND-DOWN to index (+0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INSM", "qty": 0.015341, "reason": "WIND-DOWN to index (-5.9%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SPCX", "qty": 0.013544, "reason": "WIND-DOWN to index (+1.0%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "ACHR", "qty": 0.236611, "reason": "WIND-DOWN to index (-7.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "ARX", "qty": 0.505632, "reason": "WIND-DOWN to index (+0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SNDK", "qty": 0.000741, "reason": "WIND-DOWN to index (-14.3%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "MU", "qty": 0.001119, "reason": "WIND-DOWN to index (-11.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "FIGR", "qty": 0.033547, "reason": "WIND-DOWN to index (+9.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TRGP", "qty": 0.00891, "reason": "WIND-DOWN to index (-0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TWST", "qty": 0.050738, "reason": "WIND-DOWN to index (+2.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 35.28, "reason": "INDEX-CORE toward $79.75", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
