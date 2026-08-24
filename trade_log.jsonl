@@ -303,3 +303,7 @@
 {"ts": "2026-08-12T11:00", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 14.84, "live": 301.04, "order_id": "287e9cb6-63dd-4e82-b339-3e9cfa26b38c", "vix": 14.8}
 {"ts": "2026-08-12T11:15", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 11.13, "live": 301.53, "order_id": "da352a51-a92b-4fd7-bb39-12fb02693327", "vix": 14.9}
 {"ts": "2026-08-12T11:30", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "buy", "index": true, "notional": 8.28, "live": 301.91, "order_id": "999c0925-ec7e-48a8-8fdf-ecffbac3675e", "vix": 14.8}
+{"ts": "2026-08-24T09:45", "mode": "LIVE", "acct": "8736", "symbol": "SPY", "side": "sell", "index": true, "qty": 0.043278, "live": 762.37, "order_id": "72560fc6-7eb9-4aab-8368-1a6e21d7753f", "vix": 15.9}
+{"ts": "2026-08-24T09:45", "mode": "LIVE", "acct": "8736", "symbol": "QQQ", "side": "sell", "index": true, "qty": 0.04508, "live": 703.6, "order_id": "69405944-fabd-43be-a45d-6f7ed3027adf", "vix": 15.9}
+{"ts": "2026-08-24T09:45", "mode": "LIVE", "acct": "8736", "symbol": "IWM", "side": "sell", "index": true, "qty": 0.111079, "live": 298.64, "order_id": "3a13d4f5-c0b2-4a66-8bc6-683e017361bd", "vix": 15.9}
+{"ts": "2026-08-24T09:45", "mode": "LIVE", "acct": "8736", "symbol": "MSTR", "side": "buy", "add": false, "smallcap": false, "hold": false, "notional": 6.29, "order_id": "e4d3c12d-34b1-4ab4-ada5-575563c51b55", "live": 120.55, "rsi": 71.0, "trend": "up", "consensus": 1, "delta": 0.0112, "buys": 5, "macd_up": true, "meme": true, "vix": 15.9}
