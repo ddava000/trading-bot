@@ -1300,3 +1300,9 @@
 - avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
 - notes: Holding 0.4 risk-off midday: chip-led tech slide continues (QQQ -2.3% on holds), NVDA earnings and Jackson Hole loom this week, and inflation focus persists after weak jobs. VIX still calm at 15.8 but event calendar is loaded and cash is only $117 with day P&L flat.
 - journal: Mon 8/24 12:04: Kept 0.4 risk-off — tape softened through morning with tech sagging and US-Canada trade spat escalating; QQQ hold now -2.3%. Watching NVDA print, Powell at Jackson Hole, and whether indexes stabilize before easing back toward neutral.
+
+### 2026-08-24T14:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off into the afternoon: chip-led tech slide persists (QQQ -2.3% on holds), NVDA earnings and Jackson Hole loom this week, and geopolitical noise from the Iran sanctions campaign adds uncertainty. VIX still calm at 15.8 but the event calendar is loaded and cash is only $117.
+- journal: Mon 8/24 14:19: Staying 0.4 risk-off — tape still soft on chip weakness, Iran sanctions headlines added, day P&L flat. Added MSTR to avoid (Trump exit headline, crypto-linked volatility). Watching NVDA print and Powell at Jackson Hole before easing toward neutral.
