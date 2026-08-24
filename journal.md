@@ -1294,3 +1294,9 @@
 - avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
 - notes: Holding 0.4 risk-off: tech-led futures slip ahead of NVDA earnings and Jackson Hole, US-Canada talks broke down, and inflation data looms after a weak jobs report — QQQ hold already -2.2%. VIX calm at 15.8 but event calendar is loaded, and with only $25 cash there's no room to add anyway.
 - journal: Mon 8/24 09:27: Staying 0.4 risk-off into a heavy event week — chip slide and NVDA earnings plus Jackson Hole and inflation focus keep tech vulnerable, QQQ kept on avoid. Watching NVDA print, Powell, and whether indexes stabilize before easing back toward neutral.
+
+### 2026-08-24T12:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off midday: chip-led tech slide continues (QQQ -2.3% on holds), NVDA earnings and Jackson Hole loom this week, and inflation focus persists after weak jobs. VIX still calm at 15.8 but event calendar is loaded and cash is only $117 with day P&L flat.
+- journal: Mon 8/24 12:04: Kept 0.4 risk-off — tape softened through morning with tech sagging and US-Canada trade spat escalating; QQQ hold now -2.3%. Watching NVDA print, Powell at Jackson Hole, and whether indexes stabilize before easing back toward neutral.
