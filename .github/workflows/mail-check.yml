@@ -51,7 +51,7 @@ jobs:
       # STATELESS --since-hours on purpose: a runner is fresh every time, so a state
       # file would never exist and every run would silently adopt the backlog and
       # report nothing (fd37d07).
-      - name: Check AGENT_MAIL for entries addressed to audit or cloud
+      - name: Check AGENT_MAIL for entries addressed to cloud or laptop
         if: always()
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
@@ -59,4 +59,4 @@ jobs:
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           # exit 1 means "new mail found and emailed", which is success here.
-          python mail_check.py --for audit,cloud --since-hours 24 || true
+          python mail_check.py --for cloud,laptop --since-hours 24 || true
