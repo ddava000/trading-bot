@@ -1,22 +1,71 @@
 {
-  "_comment": "Contributed capital for the Robinhood agentic account (Arm B). Subtract from equity before any performance comparison. Source: Devon's Robinhood transfer history, read 2026-08-17. This SUPERSEDES the earlier log-derived estimates, which were wrong on both dates and count.",
-  "currency": "USD",
-  "detection": "Authoritative broker transfer history. Ongoing deposits are captured live by rh_daemon.py from the broker pending_deposits rising edge.",
-  "baseline": {
-    "date": "2026-07-23",
-    "starting_equity": 59.92,
-    "note": "Account value when the bot began trading. Deposits before this date (weekly $10 back to at least 2026-06-23, less a $0.24 transfer out on 07-22) are already inside this figure and must NOT be added again."
+ "_comment": "Contributed capital for the Robinhood agentic account (Arm B). Subtract from equity before any performance comparison. Source: Devon's Robinhood transfer history, read 2026-08-17. This SUPERSEDES the earlier log-derived estimates, which were wrong on both dates and count.",
+ "baseline": {
+  "date": "2026-07-23",
+  "note": "Account value when the bot began trading. Deposits before this date (weekly $10 back to at least 2026-06-23, less a $0.24 transfer out on 07-22) are already inside this figure and must NOT be added again.",
+  "starting_equity": 59.92
+ },
+ "covers_from": "2026-07-24",
+ "currency": "USD",
+ "detection": "Authoritative broker transfer history. Ongoing deposits are captured live by rh_daemon.py from the broker pending_deposits rising edge.",
+ "events": [
+  {
+   "amount": 50.0,
+   "confidence": "confirmed",
+   "date": "2026-07-24",
+   "note": "manual top-up from Savings",
+   "source": "broker transfer history"
   },
-  "events": [
-    {"date": "2026-07-24", "amount": 50.0, "confidence": "confirmed", "source": "broker transfer history", "note": "manual top-up from Savings"},
-    {"date": "2026-07-28", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring from Bank of Little Rock"},
-    {"date": "2026-08-04", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring"},
-    {"date": "2026-08-05", "amount": 75.0, "confidence": "confirmed", "source": "broker transfer history", "note": "manual top-up"},
-    {"date": "2026-08-11", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history", "note": "weekly recurring"},
-    {"date": "2026-08-17", "amount": 10.0, "confidence": "confirmed", "source": "broker transfer history + pending_deposits", "note": "weekly recurring"}
-  ],
-  "total_deposited_since_start": 165.0,
-  "total_contributed_capital": 224.92,
-  "recurring": {"amount": 10.0, "cadence": "weekly", "typical_day": "Tuesday"},
-  "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits."
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-07-28",
+   "note": "weekly recurring from Bank of Little Rock",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-04",
+   "note": "weekly recurring",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 75.0,
+   "confidence": "confirmed",
+   "date": "2026-08-05",
+   "note": "manual top-up",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-11",
+   "note": "weekly recurring",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-17",
+   "note": "weekly recurring",
+   "source": "broker transfer history + pending_deposits"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-24",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  }
+ ],
+ "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits.",
+ "recurring": {
+  "amount": 10.0,
+  "cadence": "weekly",
+  "typical_day": "Tuesday"
+ },
+ "total_contributed_capital": 234.92,
+ "total_deposited": 175.0,
+ "total_deposited_since_start": 175.0
 }

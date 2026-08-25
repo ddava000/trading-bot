@@ -302,6 +302,25 @@ def reconcile():
     return None
 
 
+def _recompute_deposit_totals(doc):
+    """Keep every summary field in rh_deposits.json consistent with events.
+
+    The file is hand-authored with baseline.starting_equity,
+    total_deposited_since_start and total_contributed_capital, but record_deposit
+    originally wrote only "total_deposited". So the 2026-08-24 deposit WAS captured
+    correctly as an event while every published total stayed stale, and the cloud
+    session read Arm B as ~3.6 points better than it was and called the start
+    figure contaminated. The data was right; the summary was not. One writer for
+    all of them now, so they cannot diverge again.
+    """
+    ev = round(sum(float(e.get("amount") or 0) for e in doc.get("events") or []), 2)
+    base = float((doc.get("baseline") or {}).get("starting_equity") or 0)
+    doc["total_deposited_since_start"] = ev
+    doc["total_deposited"] = ev            # legacy name, kept so nothing breaks
+    doc["total_contributed_capital"] = round(base + ev, 2)
+    return doc
+
+
 def record_deposit(amount, source, note=""):
     """Append a deposit event to the COMMITTED rh_deposits.json.
 
@@ -319,14 +338,13 @@ def record_deposit(amount, source, note=""):
             "confidence": "confirmed",
             "source": source,
             "note": note})
-        doc["total_deposited"] = round(
-            sum(float(e.get("amount") or 0) for e in doc["events"]), 2)
+        _recompute_deposit_totals(doc)
         _save(DEPOSITS_F, doc)
-        total = doc["total_deposited"]
-        log(f"DEPOSIT recorded: ${float(amount):.2f} ({source}); cumulative ${total:.2f}")
+        total = doc["total_contributed_capital"]
+        log(f"DEPOSIT recorded: ${float(amount):.2f} ({source}); contributed ${total:.2f}")
         body = [
             f"Recorded a ${float(amount):.2f} deposit into the agentic account.",
-            f"Cumulative tracked deposits: ${total:.2f}.",
+            f"Total contributed capital is now ${total:.2f}.",
             "",
             "The bot invests this normally. It is excluded from performance math",
             "so contributed capital does not get counted as a gain.",
