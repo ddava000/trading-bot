@@ -205,19 +205,34 @@ if CFG.get("gmail_app_password"):
 # while everyone assumed Slack coverage. Verified enabled() was False here before
 # adding this. Set BEFORE slack_notify is first imported, since it reads the env
 # at import time. Config is gitignored, so the URL never reaches the public repo.
-_slack_url = (CFG.get("slack_webhook_url") or "").strip()
-if _slack_url:
-    # VALIDATE the shape. slack_notify.enabled() only checks the string is
-    # non-empty, so a malformed value reports "configured" and then fails on every
-    # single post. That happened on 2026-08-25: the config held the literal text
-    # "$url = Read-Host ..." because a multi-line paste stored the instruction
-    # instead of running it, and enabled() still said True. A misconfiguration
-    # that announces itself once beats one that fails quietly forever.
-    if _slack_url.startswith("https://hooks.slack.com/"):
-        os.environ["SLACK_WEBHOOK_URL"] = _slack_url
-    else:
-        log("slack_webhook_url in rh_config.json is not a Slack webhook URL "
-            "(expected https://hooks.slack.com/...); Slack mirror stays OFF")
+# Slack credentials, read from the gitignored config because this daemon runs on
+# the LAPTOP and the GitHub secrets only reach the workflows. Validated by prefix:
+# slack_notify only checks a value is non-empty, so a malformed one reports
+# "configured" and then fails on every call. That already happened once, when a
+# multi-line paste stored the literal text "$url = Read-Host ..." and enabled()
+# still returned True. A misconfiguration that announces itself once beats one
+# that fails quietly forever.
+#
+# Set BEFORE slack_notify is first imported, since it reads all three at import.
+#
+# READ-ONLY here on purpose. Cloud's alpaca-bot.yml already runs --pull-ingest
+# every 15 min, so it owns writing Slack messages into AGENT_MAIL.md. The daemon
+# must never also ingest: two writers on the same append-only file is how you get
+# duplicated or conflicting entries. Token and channel are here so a laptop
+# session can READ the channel on demand, nothing more.
+for _key, _env, _prefix in (
+        ("slack_webhook_url", "SLACK_WEBHOOK_URL", "https://hooks.slack.com/"),
+        ("slack_bot_token",   "SLACK_BOT_TOKEN",   "xoxb-"),
+        ("slack_channel_id",  "SLACK_CHANNEL_ID",  ""),
+):
+    _val = (CFG.get(_key) or "").strip()
+    if not _val:
+        continue
+    if _prefix and not _val.startswith(_prefix):
+        log(f"{_key} in rh_config.json does not look right (expected it to start "
+            f"with {_prefix!r}); that Slack feature stays OFF")
+        continue
+    os.environ[_env] = _val
 
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
