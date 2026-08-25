@@ -802,8 +802,14 @@ def check_mail(led):
         if keys[-1] == seen:
             return
         start = keys.index(seen) + 1 if seen in keys else len(keys) - 1
+        # Exclude our OWN entries. The addressee filter alone matched every
+        # "laptop -> all" post, so writing to the mailbox emailed Devon about our
+        # own message: two such notifications went out today (15:21 and 15:53)
+        # before this was caught. audit's mail_check.py had this right from the
+        # start; mine did not.
         fresh = [h for h in heads[start:]
-                 if h[2].strip().lower() in ("laptop", "both", "all")]
+                 if h[2].strip().lower() in ("laptop", "both", "all")
+                 and h[1].strip().lower() != "laptop"]
         led["last_mail_seen"] = keys[-1]
         if not fresh:
             return
