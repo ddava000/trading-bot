@@ -199,6 +199,15 @@ CLAUDE_BIN = CFG.get("claude", "claude")
 if CFG.get("gmail_app_password"):
     bot.GMAIL_APP_PW = CFG["gmail_app_password"]
 
+# Slack webhook, same pattern and same reason. SLACK_WEBHOOK_URL is a GitHub
+# secret, which covers the workflows, but this daemon runs on the LAPTOP where no
+# such environment exists, so the mirror would have silently no-opped forever
+# while everyone assumed Slack coverage. Verified enabled() was False here before
+# adding this. Set BEFORE slack_notify is first imported, since it reads the env
+# at import time. Config is gitignored, so the URL never reaches the public repo.
+if CFG.get("slack_webhook_url"):
+    os.environ["SLACK_WEBHOOK_URL"] = CFG["slack_webhook_url"]
+
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
 # The Robinhood connector is a claude.ai MCP server, so its tools are DEFERRED:
@@ -500,13 +509,31 @@ def _push_status(reason):
         return False
 
 
-def notify(subject, body):
-    """Email Devon about an operational condition (not a trade). Never raises.
+def notify(subject, body, untrusted=False):
+    """Tell Devon about an operational condition. Never raises.
 
     Logs the outcome, because send_email's own confirmation is a print() and the
-    daemon runs under pythonw with no stdout, so mail delivery would otherwise
-    leave no trace either way.
+    daemon runs under pythonw with no stdout, so delivery would otherwise leave no
+    trace either way.
+
+    untrusted=True fences the body as data in Slack. Use it for anything carrying
+    text we did not author. Proven live, not theoretical: bot.news_flags returns
+    Yahoo/Alpaca HEADLINES, rh_bot embeds them in an order reason
+    ("NEWS-EXIT (<headline>)"), and email_trades puts order reasons straight into
+    this body. A hostile headline would therefore land verbatim in a channel that
+    @Claude reads as context. Dormant right now because WIND_DOWN short-circuits
+    before the news check and index-only opens no positions, but it is one config
+    change from live, so the fence goes in now rather than after.
     """
+    # Slack FIRST and outside the GMAIL guard. An empty GMAIL secret has blanked
+    # every channel here twice; it must not be able to take Slack with it.
+    try:
+        import slack_notify
+        slack_notify.post(f"*{subject}*\n{body}" if not untrusted else body,
+                          untrusted=untrusted)
+    except Exception as e:
+        log(f"slack mirror failed ({e}): {subject}")
+
     if not bot.GMAIL_APP_PW:
         log(f"NOT emailing ({subject}): no gmail_app_password set")
         return False
@@ -551,14 +578,13 @@ def email_trades(res, placed, led):
     # daemon does not capture, so email delivery was previously invisible: a trade
     # went out with zero trace of whether the notification did. If no password is
     # configured say so, since that is the silent-no-mail case.
-    if not bot.GMAIL_APP_PW:
-        log(f"NOT emailing {ok}/{len(orders)} fills: no gmail_app_password set")
-        return
-    try:
-        bot.send_email(subject, "\n".join(lines))
-        log(f"emailed {ok}/{len(orders)} fills to {bot.ALERT_TO}")
-    except Exception as e:
-        log(f"email FAILED ({e}) — trade still placed, notification lost")
+    # Routed through notify() so this gets the Slack mirror too, and fenced as
+    # UNTRUSTED: order reasons can embed an external news headline
+    # ("NEWS-EXIT (<headline>)"), which would otherwise land verbatim in a channel
+    # @Claude reads as context. notify() logs delivery either way, which matters
+    # because send_email's own feedback is a print() the daemon cannot see.
+    if notify(subject, chr(10).join(lines), untrusted=True):
+        log(f"reported {ok}/{len(orders)} fills")
 
 
 def persist(led, res, placed):
