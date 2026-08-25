@@ -1,0 +1,34 @@
+name: slack-test
+
+# Manual only. Proves the SLACK_WEBHOOK_URL secret reaches a runner and that the
+# channel accepts posts. Touches no broker API, reads no keys, places no orders.
+# Kept as a permanent tool: any time the channel goes quiet, run this to tell
+# "nothing happened" apart from "the pipe is broken".
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "test = one hello line. mail = post the newest AGENT_MAIL entry."
+        type: choice
+        options: [test, mail]
+        default: test
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Post to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        # slack_notify exits non-zero when the post fails, so a broken webhook
+        # shows up as a RED run instead of a green one that quietly did nothing.
+        run: |
+          if [ "${{ inputs.mode }}" = "mail" ]; then
+            python slack_notify.py --mail-latest
+          else
+            python slack_notify.py --test
+          fi
