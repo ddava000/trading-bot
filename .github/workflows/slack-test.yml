@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path."
+        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side)."
         type: choice
-        options: [test, mail, alert]
+        options: [test, mail, alert, read]
         default: test
 
 jobs:
@@ -25,13 +25,20 @@ jobs:
       - name: Post to Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID:  ${{ secrets.SLACK_CHANNEL_ID }}
         # slack_notify exits non-zero when the post fails, so a broken webhook
         # shows up as a RED run instead of a green one that quietly did nothing.
+        # "read" is the same deal for the read side: it exits non-zero when the
+        # channel returns nothing, so an unset token or a missing invite is RED
+        # rather than a green run that silently read zero messages.
         run: |
           if [ "${{ inputs.mode }}" = "mail" ]; then
             python slack_notify.py --mail-latest
           elif [ "${{ inputs.mode }}" = "alert" ]; then
             python slack_alert_probe.py
+          elif [ "${{ inputs.mode }}" = "read" ]; then
+            python slack_notify.py --pull 25
           else
             python slack_notify.py --test
           fi
