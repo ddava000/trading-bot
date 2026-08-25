@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "test = one hello line. mail = post the newest AGENT_MAIL entry."
+        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path."
         type: choice
-        options: [test, mail]
+        options: [test, mail, alert]
         default: test
 
 jobs:
@@ -21,6 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - run: pip install -r requirements-alpaca.txt
       - name: Post to Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -29,6 +30,8 @@ jobs:
         run: |
           if [ "${{ inputs.mode }}" = "mail" ]; then
             python slack_notify.py --mail-latest
+          elif [ "${{ inputs.mode }}" = "alert" ]; then
+            python slack_alert_probe.py
           else
             python slack_notify.py --test
           fi
