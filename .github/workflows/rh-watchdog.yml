@@ -35,6 +35,7 @@ jobs:
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
           NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
           SMS_TO:             ${{ secrets.SMS_TO }}
           ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}

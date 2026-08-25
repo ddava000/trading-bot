@@ -132,8 +132,28 @@ GMAIL_USER   = os.environ.get("GMAIL_USER", "devonsdummy@gmail.com")    # bot se
 GMAIL_APP_PW = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 
+def _slack(text):
+    """Mirror an alert into the Slack channel. Best-effort, never raises.
+
+    Imported lazily and inside a try: an alerting side-channel must never be
+    able to stop a trading run, and slack_notify.py is not on the laptop's
+    import path in every context.
+    """
+    try:
+        import slack_notify
+        slack_notify.post(text)
+    except Exception as e:
+        print(f"  [slack mirror failed: {e}]")
+
+
 def send_email(subject, body):
-    """Best-effort Gmail alert. Never raises. No-op if GMAIL_APP_PASSWORD unset."""
+    """Best-effort Gmail alert, mirrored to Slack. Never raises.
+
+    Slack is mirrored FIRST and independently of the Gmail guard, so a missing
+    or wrong GMAIL_APP_PASSWORD (which has silently blanked every channel here
+    before) cannot also take out Slack.
+    """
+    _slack(f"*{subject}*\n{body}")
     if not GMAIL_APP_PW:
         print("  [email skipped — GMAIL_APP_PASSWORD not set]")
         return

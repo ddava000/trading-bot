@@ -56,6 +56,17 @@ def alert(msg, urgent=False):
     """
     print("ALERT:", msg)
     sent, pw = [], os.environ.get("GMAIL_APP_PASSWORD")
+
+    # Slack first and outside the pw guard: an empty GMAIL_USER/PASSWORD secret
+    # has blanked every other channel here before, and an outage alert is
+    # exactly the message that must not go missing.
+    try:
+        import slack_notify
+        if slack_notify.post(("*RH laptop bot needs attention*\n" if urgent
+                              else "*RH laptop bot is not reporting (not urgent)*\n") + msg):
+            sent.append("slack")
+    except Exception as e:
+        print("slack failed:", e)
     # `or`, not get-with-default: a missing GMAIL_USER secret expands to an EMPTY
     # string in the workflow (the var is set, just blank), which slips past .get's
     # default and 535-fails the Gmail login on every channel. Cloud session caught

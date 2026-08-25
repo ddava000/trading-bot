@@ -56,6 +56,7 @@ jobs:
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           # exit 1 means "new mail found and emailed", which is success here.
           python mail_check.py --for audit,cloud --since-hours 24 || true
