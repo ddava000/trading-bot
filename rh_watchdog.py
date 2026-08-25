@@ -67,19 +67,32 @@ def alert(msg, urgent=False):
             sent.append("slack")
     except Exception as e:
         print("slack failed:", e)
-    # `or`, not get-with-default: a missing GMAIL_USER secret expands to an EMPTY
-    # string in the workflow (the var is set, just blank), which slips past .get's
-    # default and 535-fails the Gmail login on every channel. Cloud session caught
-    # this 2026-08-04; adding the secret fixed it, this makes the code self-heal too.
-    frm = os.environ.get("GMAIL_USER") or "devonsdummy@gmail.com"
+    # SENDER comes from the secret only. It used to carry a hardcoded fallback so an
+    # empty GMAIL_USER could not 535-fail the login silently (2026-08-04), but that
+    # published Devon's bot sender address in a PUBLIC repo: the exact address his
+    # alerts arrive from, which is a ready-made phishing kit. The fallback's real
+    # job was making the failure LOUD, and the print below does that without
+    # publishing anything. Safe because every workflow already passes GMAIL_USER.
+    frm = (os.environ.get("GMAIL_USER") or "").strip()
+    if pw and not frm:
+        print("email SKIPPED: GMAIL_USER is unset/blank here - set the repo secret; "
+              "deliberately NOT falling back to a hardcoded address")
+
+    # RECIPIENT still has a fallback, deliberately, and removing it would break
+    # alerting everywhere. Checked before touching it: NO workflow passes ALERT_TO
+    # or ALERT_EMAIL - only GMAIL_USER - so this literal is what every email in the
+    # system actually resolves to. Removing it without first adding the secret AND
+    # wiring it into rh-watchdog.yml, alpaca-bot.yml and mail-check.yml would kill
+    # email silently in Actions, which is worse than the exposure it fixes.
+    to = (os.environ.get("ALERT_EMAIL") or os.environ.get("ALERT_TO")
+          or "devondavasher@gmail.com").strip()
 
     # Email — subject carries no emoji; Devon prints mail to PDF by subject.
-    if pw:
+    if pw and frm and to:
         try:
             subject = ("ALERT: RH laptop bot needs attention" if urgent
                        else "RH laptop bot is not reporting (not urgent)")
-            _email(frm, pw, os.environ.get("ALERT_EMAIL") or "devondavasher@gmail.com",
-                   subject, msg)
+            _email(frm, pw, to, subject, msg)
             sent.append("email")
         except Exception as e:
             print("email failed:", e)
@@ -87,7 +100,7 @@ def alert(msg, urgent=False):
     # SMS — SMS_TO is a full carrier email-to-SMS address (e.g. 5551234567@vtext.com),
     # set by Devon as a secret so his number never lands in this public repo.
     sms = os.environ.get("SMS_TO")
-    if pw and sms and urgent:
+    if pw and frm and sms and urgent:
         try:
             _email(frm, pw, sms, "", msg[:140])
             sent.append("sms")
