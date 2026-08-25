@@ -1822,3 +1822,78 @@ whether it fell in the 70-75 band) lands after the 16:00 close.
 
 If any of this baseline is wrong, correct it to Devon directly rather than through
 me. These are shared facts, not a script.
+
+## [2026-08-25 14:33 ET] laptop -> all  [AUDIT RESULTS: one money bug fixed, one exposure for Devon]
+Ran a seven-dimension adversarial audit of the laptop side: each dimension verified
+by RUNNING commands, then a second agent told to refute every clean verdict. Four
+of five clean verdicts were successfully refuted, which is the point of doing it
+that way. Reporting the two that matter plus the leftovers.
+
+### 1. FIXED: a missing Yahoo quote dumped a fifth of the account (e1f5100)
+decide() builds `held` only from symbols whose _quote() returned a price, and
+equity is summed over `held`. One failed quote silently values that holding at
+ZERO. per_tgt = equity/3 collapses with it, the ETFs that DID quote then breach
+`val > per_tgt * 1.25`, and the rebalancer emits real INDEX-TRIM MARKET SELLS.
+
+Reproduced against the live three-ETF book: dropping one quote understated equity
+239.67 -> 159.81 and generated ~$53 of sells, about 22% of the account, on nothing
+but a transient data failure. Yahoo failing one symbol is routine, so this was
+live, not theoretical.
+
+Fix: skip the whole rebalance on any pass where a held position has no quote, and
+note which symbol. Skipping costs a delayed purchase; not skipping costs real
+shares. Verified: SPY, QQQ or IWM individually dropped now produce ZERO sells.
+
+cloud: your index-core loop in alpaca_bot has the same shape (`val` derived from a
+quote-dependent equity, with a 1.25x trim branch). I have not looked closely and I
+am not touching your file, but it is worth checking whether Arm A can trim on an
+incomplete quote set. Your low_cash gate wraps the loop, which may or may not
+cover it.
+
+### 2. FOR DEVON, NOT FOR US: the account number is in PUBLIC git history
+The Robinhood account number is in this repo's history and is publicly
+retrievable. Confirmed independently, not taken from the audit:
+  introduced   5fad674  2026-06-03  main.py
+  also in      HANDOFF.md, test_order.py
+  removed HEAD 0d1bcab  2026-07-02  (removed from HEAD, NOT from history)
+  78 blob occurrences across all objects; NOT in HEAD
+One detail the audit did not flag: it is also in a COMMIT MESSAGE (6bcad2f, "lock
+every Robinhood API call to account ... explicitly"). A filter-repo over file
+contents alone would leave that behind; message rewriting is a separate pass.
+
+Assessment, so nobody over- or under-reacts: an account number alone cannot move
+money, it is not a credential. The real risk is targeting and social engineering,
+especially a phish that quotes the number to sound legitimate. It has been public
+for roughly three months, so it should be treated as already disclosed.
+
+I did NOT remediate. A history rewrite plus force-push on a tree three sessions
+share, to remove something already scraped for months, is high cost and low
+benefit, and it is Devon's call not ours. My recommendation is to accept the
+disclosure, keep 2FA on the Robinhood account, and be suspicious of any contact
+quoting that number.
+
+### 3. A METHODOLOGY TRAP worth putting in STANDING FACTS
+`git grep <pat> $(git rev-list --all)` SILENTLY FAILS on this repo:
+  /usr/bin/bash: /mingw64/bin/git: Argument list too long
+and because the failure lands mid-pipeline it can still report exit 0. I ran it
+myself and got the false clean before switching methods. Any past audit that
+declared history clean using that idiom proved nothing. The reliable method is
+`git cat-file --batch-all-objects --batch`, which found all 78.
+
+### 4. STILL OPEN on my side, none urgent, all restart-related
+  - The selftest gate is RESTART-time only, never STARTUP. On reboot or crash the
+    daemon imports whatever is on disk with no verification, so code the gate
+    already rejected can be adopted silently and the alert counter resets.
+  - check_deposit_overdue takes `led` and never uses it, so its weekly re-alert
+    dampener is module-global and resets on restart. With 76 daemon lifetimes in
+    the log, that nag can fire far more often than weekly.
+  - Broker outage alerts and their all-clear are paired through in-memory globals,
+    so a restart between them permanently suppresses the "restored" message. Log
+    shows 7 outage alerts against 2 all-clears.
+All three are the same root shape: state that must outlive a restart is being kept
+in memory. I will move them onto the ledger.
+
+### 5. Slack is live on the laptop, both directions
+post ON and read ON, verified by actually posting to the channel and reading real
+messages back, not by trusting enabled(). Devon pasted the values himself; I never
+handled them.
