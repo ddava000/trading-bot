@@ -171,7 +171,12 @@ def read_channel(limit=25, oldest=None):
         return []
     msgs = []
     for m in d.get("messages", []):
-        if m.get("subtype") in ("channel_join", "channel_leave", "bot_message"):
+        sub = m.get("subtype") or ""
+        # Housekeeping events carry a channel_* subtype (join, leave, rename,
+        # purpose, topic, archive). The first live read filed "has renamed the
+        # channel from new-channel to trading-bots" as if Devon had said it, so
+        # match the whole family by prefix rather than listing them one at a time.
+        if sub.startswith("channel_") or sub in ("bot_message", "tombstone"):
             continue
         if m.get("bot_id"):          # our own webhook posts -- do not read ourselves
             continue
