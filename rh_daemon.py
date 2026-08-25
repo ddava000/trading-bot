@@ -234,6 +234,19 @@ for _key, _env, _prefix in (
         continue
     os.environ[_env] = _val
 
+# Say plainly which Slack capabilities are live. cloud's point (2026-08-25): if
+# only the webhook is pasted, posting works while reading stays off, and that
+# asymmetry should be visible rather than inferred from the absence of a line.
+_slack_post = bool(os.environ.get("SLACK_WEBHOOK_URL"))
+_slack_read = bool(os.environ.get("SLACK_BOT_TOKEN") and os.environ.get("SLACK_CHANNEL_ID"))
+log(f"slack: post {'ON' if _slack_post else 'off'} | read "
+    f"{'ON' if _slack_read else 'off'}"
+    + ("" if (_slack_post and _slack_read) else
+       "  (missing values go in rh_config.json: "
+       + ", ".join(k for k, ok in (("slack_webhook_url", _slack_post),
+                                   ("slack_bot_token+slack_channel_id", _slack_read))
+                   if not ok) + ")"))
+
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
 # The Robinhood connector is a claude.ai MCP server, so its tools are DEFERRED:
@@ -315,6 +328,62 @@ def reconcile():
     if res and isinstance(res.get("positions"), list):
         return res
     return None
+
+
+DEPOSIT_OVERDUE_DAYS   = 10      # weekly cadence plus slack for a shifted day
+DEPOSIT_REALERT_DAYS   = 7       # nag weekly, not daily, while it stays unresolved
+_deposit_alert_on = None         # date string of the last overdue alert
+
+
+def check_deposit_overdue(led):
+    """Ask Devon to confirm a deposit rather than inventing one.
+
+    The rising-edge detector only sees pending_deposits while the daemon is awake,
+    so a deposit that posts AND settles inside an off-window is invisible. There is
+    no transfer or funding endpoint in the Robinhood MCP to level-check against
+    (verified 2026-08-25), and inferring one from a cash jump is not safe: T+1
+    settlement produces the identical signature, which is exactly what made the
+    08-14 reconstruction wrong.
+
+    So this never writes an event. It notices the weekly cadence has lapsed and
+    asks Devon to read his app, because a nagging alert is a recoverable failure
+    and a fabricated deposit silently corrupts the experiment.
+    """
+    global _deposit_alert_on
+    try:
+        doc = _load(DEPOSITS_F, None) or {}
+        events = doc.get("events") or []
+        if not events:
+            return
+        last = max(e.get("date", "") for e in events)
+        today = now_et().date()
+        gap = (today - datetime.strptime(last, "%Y-%m-%d").date()).days
+        if gap < DEPOSIT_OVERDUE_DAYS:
+            return
+        if _deposit_alert_on:
+            since = (today - datetime.strptime(_deposit_alert_on, "%Y-%m-%d").date()).days
+            if since < DEPOSIT_REALERT_DAYS:
+                return
+        _deposit_alert_on = today.isoformat()
+        log(f"deposit overdue: {gap} days since {last}, asking Devon to confirm")
+        notify("RH bot: is a weekly deposit missing?", chr(10).join([
+            f"No deposit recorded since {last}, which is {gap} days ago. The weekly "
+            f"~$10 transfer usually lands within {DEPOSIT_OVERDUE_DAYS}.",
+            "",
+            "This is NOT an error and nothing is wrong with the account. The bot can",
+            "only see a deposit while it is awake, and there is no transfer endpoint",
+            "to check against, so it asks rather than guesses.",
+            "",
+            "Please check Robinhood: Account -> History -> Transfers.",
+            "  If a deposit landed, tell the laptop session and it will record it.",
+            "  If none landed, ignore this; it will ask again in a week.",
+            "",
+            "Why it matters: contributed capital is subtracted from Arm B before any",
+            "performance comparison, so a missed deposit makes Arm B look better than",
+            "it is. An unrecorded one is the error, not this message.",
+        ]))
+    except Exception as e:
+        log(f"deposit overdue check skipped ({e})")
 
 
 def _recompute_deposit_totals(doc):
@@ -1036,6 +1105,7 @@ def main():
                     continue
             if full:
                 check_mail(led)   # surface new mailbox entries for this session
+                check_deposit_overdue(led)   # ask, never invent, a missed deposit
             if full and sync_code():
                 save_ledger(led)          # ledger is the source of truth across restarts
                 # Do NOT execv on Windows: it spawns rather than replaces, which is
