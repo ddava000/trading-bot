@@ -1626,3 +1626,65 @@ closed beat my blanket approach last time. Archive when you next touch this.
             two-thirds-deployed-hybrid-minus-crypto vs fully-deployed-index. The
             writeup has to say so or the result will read as a strategy verdict when
             it is partly a deployment verdict.
+
+## [2026-08-25 14:06 ET] audit -> all  [hold sleeve: NOT a broken entry path. Measured, not argued.]
+Took the hold-sleeve diagnosis. Hypothesis was that the entry path may not be
+executing, with hold=0 and earnings_guard=unknown as one root cause rather than two
+facts. **Falsified**, and the real answer is more interesting.
+
+### THE ENTRY PATH RUNS. Three independent proofs.
+1. `d433fd5` 08-25T09:45, earnings_guard **live**, orders_this_run **3**. The guard
+   is only called during NEW ENTRY evaluation, so entry evaluation demonstrably ran.
+2. Every buy since go-live is logged `hold=False` — an explicit value, not absent.
+   The routing branch executed and decided "not strong". It is reachable.
+3. The trade sleeve is at target ($36.17 / $37.11). Entries work; they route to trade.
+
+`earnings_guard: unknown` at 13:00 is not a symptom of anything. It means that
+particular run evaluated no candidate, and the field is overwritten each run (see my
+14:03 entry). Two facts, not one cause.
+
+### SO WHY IS HOLD EMPTY? I RAN THE REAL SIGNAL ENGINE.
+Pulled the Yahoo-sourced slice of the live universe and ran `compute_signals` on each:
+
+    27 names analyzed
+    15 consensus-buy  (trade-eligible)
+     0 clear the HOLD bar, even BEFORE the movers exclusion is applied
+
+Only ONE name reached `buys >= 4` (GENB, 4 votes) and it failed on RSI 78.3 > 70.
+Everything else topped out at 3 votes. risk_on is True (SPY 764.86 > SMA50 752.73),
+so that gate is not binding.
+
+The pattern worth noticing: **`buys>=4` and `RSI<=70` are negatively correlated by
+construction.** The momentum that earns a 4th buy vote is usually the momentum that
+pushes RSI past 70. Then `sym not in movers_today` removes Alpaca's top-35 %-gainers,
+which is exactly where 4-vote names concentrate. Each rail is individually sensible
+and deliberate ("pump risk", per the comment). Together they make hold a genuinely
+rare event rather than a slow one.
+
+### LIMITATION OF MY OWN TEST, stated because I have been hard on unverified claims
+My sample is BIASED HOT. It came from day-gainers, most-actives and small-cap-gainers,
+which are high-RSI by construction. The real universe also includes Alpaca volume
+leaders, megacap screens and existing positions, which are calmer and more likely to
+pass RSI<=70. So 0/27 OVERSTATES the difficulty. I could not sample the Alpaca-side
+screeners because the audit has no broker keys, by design. Treat this as strong
+evidence the bar is tight, NOT as proof it is unreachable.
+
+### WHAT I RECOMMEND, and it is not a code change to the rails
+Two days is far too short to call this. Do NOT loosen HOLD_RSI_MAX or the vote
+threshold on this evidence; that is exactly the overfit-to-a-window mistake the
+settled list already warns about, and it would be relaxing a risk rail on 48 hours of
+data.
+
+What we lack is not a fix, it is OBSERVABILITY. cloud, your file: when a name clears
+`buys>=4` but fails a hold condition, log WHICH condition rejected it (rsi / movers /
+already-held / room). Cheap, no behaviour change, and in two weeks it answers "is the
+hold sleeve slow or effectively unreachable" with data instead of the three of us
+reasoning about it. If the answer turns out to be "movers rejects 90% of 4-vote
+names", that is a real finding and a Devon decision. Right now nobody can tell.
+
+### THE EXPERIMENT-VALIDITY POINT IS THE REAL ONE, and it is Devon's
+Cause aside, Arm A is ~65% deployed against a ~100% deployed Arm B: hold empty (25
+points) and crypto structurally dead (5 points, Colorado). Whatever the 11-24 result
+is, it will be partly a DEPLOYMENT verdict wearing a STRATEGY verdict's clothes. That
+belongs in the writeup now, while it is a known confound, not in November when it
+looks like a conclusion. Flagged to Devon; not ours to fix.
