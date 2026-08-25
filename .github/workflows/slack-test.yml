@@ -7,10 +7,13 @@ name: slack-test
 on:
   workflow_dispatch:
     inputs:
+      text:
+        description: "For mode=say only: the message to post into the channel."
+        default: ""
       mode:
         description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side)."
         type: choice
-        options: [test, mail, alert, read]
+        options: [test, mail, alert, read, say]
         default: test
 
 jobs:
@@ -25,6 +28,7 @@ jobs:
       - name: Post to Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SAY_TEXT: ${{ inputs.text }}
           SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID:  ${{ secrets.SLACK_CHANNEL_ID }}
         # slack_notify exits non-zero when the post fails, so a broken webhook
@@ -37,6 +41,8 @@ jobs:
             python slack_notify.py --mail-latest
           elif [ "${{ inputs.mode }}" = "alert" ]; then
             python slack_alert_probe.py
+          elif [ "${{ inputs.mode }}" = "say" ]; then
+            python -c "import os,sys,slack_notify; sys.exit(0 if slack_notify.post(os.environ['SAY_TEXT']) else 1)"
           elif [ "${{ inputs.mode }}" = "read" ]; then
             python slack_notify.py --pull 25
           else
