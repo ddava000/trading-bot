@@ -293,6 +293,14 @@ _YF_SESSION = None
 # Yahoo may block this cookie/crumb flow from cloud runner ranges, so the first
 # real runner exercise is the true test.
 EARN_GUARD_STATE = "unknown"
+
+# Set True when the broker rejects a crypto order because the ACCOUNT is not
+# entitled to crypto (live account 2026-08-25: "crypto orders not allowed for
+# account", 4 rejections in one run and an emailed alert every run afterwards).
+# Retrying an entitlement failure is pointless: it cannot succeed until Devon
+# enables crypto on the account, and it turns a config gap into recurring alarm
+# noise, which is how real alerts get ignored.
+CRYPTO_BLOCKED = False
 def yf_session():
     """requests.Session carrying Yahoo's A3 cookie + crumb. `.crumb` is "" if the
     handshake failed (callers then behave exactly as they did before)."""
@@ -773,7 +781,13 @@ def place_crypto_buy(pair, dollar_amount):
     r = alpaca_order({"symbol": pair, "notional": str(round(dollar_amount, 2)),
                       "side": "buy", "type": "market", "time_in_force": "gtc"})
     if not _ok(r):
-        print(f"    [crypto buy rejected: {(r or {}).get('message', r)}]")
+        msg = str((r or {}).get("message", r))
+        print(f"    [crypto buy rejected: {msg}]")
+        if "not allowed" in msg.lower() or "not permitted" in msg.lower():
+            global CRYPTO_BLOCKED
+            CRYPTO_BLOCKED = True
+            print("    [account is not entitled to crypto — skipping the crypto sleeve "
+                  "for the rest of this run; enable crypto on the Alpaca account to restore it]")
     return r
 
 def place_crypto_sell(pair, qty):
@@ -1357,6 +1371,7 @@ def run_bot():
         if not low_cash and not halted:
             crypto_spent = 0.0
             for pair, sig in csigs.items():
+                if CRYPTO_BLOCKED: break          # account not entitled; stop asking
                 flat = pair.replace("/", "")
                 if sig["consensus"] != 1 or flat in crypto_pos or flat in pending: continue
                 if sig["rsi"] > RSI_ENTRY_MAX:
@@ -1477,6 +1492,10 @@ def run_bot():
             # is indistinguishable from "no earnings soon" unless it is reported.
             # "unknown" = nothing needed the guard this run.
             "earnings_guard": EARN_GUARD_STATE,
+            # False once the broker refuses crypto for lack of account entitlement.
+            # The hybrid allocates CRYPTO_PCT to it, so while this is False that
+            # slice sits in cash and Arm A is running hybrid-minus-crypto.
+            "crypto_enabled": not CRYPTO_BLOCKED,
         }
         try:
             base = json.load(open("baseline.json"))
