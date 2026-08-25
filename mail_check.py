@@ -41,7 +41,25 @@ STATE   = ".mail_check_state.json"
 SESSIONS = ("cloud", "laptop", "audit")
 BROADCAST = ("both", "all")
 
-HDR = re.compile(r"^## \[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) ET\]\s+(\w+)\s*->\s*([\w]+)", re.M)
+# Capture the timestamp, do NOT validate it. laptop's fe8c2e0 parser cross-check
+# (2026-08-23) found the strict version silently skipped ordinary typos: a
+# single-digit hour, a missing "ET", or seconds. The format is documented at the top
+# of AGENT_MAIL.md, so the parser does not need to re-enforce it, and being strict
+# about a field nobody reads costs mail.
+HDR = re.compile(r"^## \[([^\]]+)\]\s*(\w+)\s*->\s*(\w+)", re.M)
+_TZ_SUFFIX = re.compile(r"\s*(ET|EST|EDT|UTC|Z)\s*$", re.I)
+
+
+def parse_ts(ts, tz):
+    """Best-effort entry timestamp. Returns None if genuinely unparseable.
+    Tolerates a missing/na timezone suffix, seconds, and a single-digit hour."""
+    clean = _TZ_SUFFIX.sub("", ts).strip()
+    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return datetime.strptime(clean, fmt).replace(tzinfo=tz)
+        except ValueError:
+            pass
+    return None
 
 
 def entries(text):
@@ -49,7 +67,7 @@ def entries(text):
     for i, m in enumerate(ms):
         end = ms[i + 1].start() if i + 1 < len(ms) else len(text)
         body = text[m.end():end].strip()
-        out.append({"ts": m.group(1), "from": m.group(2).lower(),
+        out.append({"ts": _TZ_SUFFIX.sub("", m.group(1)).strip(), "from": m.group(2).lower(),
                     "to": m.group(3).lower(), "hdr": m.group(0).strip(),
                     "first": next((l for l in body.split("\n") if l.strip()), "")})
     return out
@@ -107,14 +125,22 @@ def main():
     if since is not None:
         ET = ZoneInfo("America/New_York")
         cutoff = datetime.now(ET) - timedelta(hours=since)
-        new = []
+        new, unparsed = [], 0
         for e in all_e:
-            try:
-                when = datetime.strptime(e["ts"], "%Y-%m-%d %H:%M").replace(tzinfo=ET)
-            except ValueError:
-                continue          # malformed stamp: ignore rather than spam
+            when = parse_ts(e["ts"], ET)
+            if when is None:
+                # BIAS TOWARD REPORTING. The old code skipped these, which is the
+                # silent-miss failure this whole watcher exists to prevent: a typo'd
+                # stamp would drop a real message and nobody would ever know. An
+                # entry we cannot date might be old, but over-reporting costs one
+                # line in an email and under-reporting costs the message.
+                unparsed += 1
+                new.append(e)
+                continue
             if when >= cutoff:
                 new.append(e)
+        if unparsed:
+            print(f"[{unparsed} entr(y/ies) had an unparseable timestamp — included rather than skipped]")
         buckets = {w: [e for e in new
                        if addressed_to(e, w) and not (w and e["from"] == w)] for w in whos}
         return _report(buckets, quiet, f"in the last {since:g}h")
