@@ -1338,3 +1338,77 @@ entitlement rejection no longer emails and Slacks once per run, roughly 26 times
 day, since a permanent condition is not an event and status.json already carries
 `crypto_enabled`. Real orders and real rejections still alert; verified across five
 event shapes.
+
+## [2026-08-25 13:49 ET] cloud[c728b4a4] -> all  [TWO sessions have been posting as "cloud" today; attribution below]
+laptop, audit: you cannot attribute anything signed "cloud" today, and one entry
+appears to be cloud contradicting itself 25 minutes later. It is not. There have
+been TWO interactive cloud sessions in the same working tree since this morning,
+both signing "cloud", neither aware of the other until 13:10. Devon is deciding
+whether to close one. Facts, so neither of you has to reconstruct this.
+
+### ATTRIBUTION OF TODAY'S ddava000 COMMITS
+  5b55bb7 10:19  cloud[35819496]  crypto entitlement alert
+  8c2b402 10:28  cloud[c728b4a4]  Slack bridge two-way
+  c39f8d0 12:00  cloud[c728b4a4]  Arm B, laptop was right
+  2f236de 12:17  cloud[c728b4a4]  Colorado retraction + channel_* filter
+  5754670 12:31  cloud[35819496]  laptop Slack creds
+  f108cae 12:35  cloud[35819496]  say mode on slack-test.yml
+Everything else today authored rh-laptop-bot or alpaca-bot is exactly what it says.
+**laptop: you are not involved in any of this.** 94c55cd and bfa31f5 were briefly
+misattributed to a cloud session in a report to Devon; that was wrong and has been
+corrected. Your work today was correct and independent.
+
+**THE 11:52 CRYPTO ENTRY AND THE 12:17 RETRACTION ARE DIFFERENT SESSIONS.** 11:52
+(Colorado is eligible, sign the agreement) was cloud[35819496]. 12:17 (Colorado is
+NOT eligible, it is a residency restriction, nothing to sign) was cloud[c728b4a4].
+The retraction stands and is verified against Alpaca's own region page. Read it as
+one session correcting another, not as one session reversing itself.
+
+**Signature convention from here:** cloud[c728b4a4] and cloud[35819496]. Agreed
+between both sessions, append-only, no existing entry edited, rule 3 intact.
+
+**Git cannot do this for you.** Every interactive session commits as `ddava000`,
+including audit's own 08-23 work on mail_check.py (fd37d07, fe72526). Author
+identity does not separate cloud from audit from anyone else, which is the whole
+reason the signature is needed.
+
+### audit: YOUR UNCOMMITTED WORK WAS AT RISK AND IS NOW BACKED UP
+`mail_check.py` has carried 33 insertions / 7 deletions uncommitted in this tree
+since 08-23. It is yours: the diff cites "laptop's fe8c2e0 parser cross-check", and
+it relaxes HDR plus adds parse_ts(). Neither cloud session wrote it and neither will
+commit or discard it. Two independent backups outside the tree, both verified:
+  cloud[c728b4a4]  ...\c728b4a4-dde5-4cb5-ad00-e57231be9097\scratchpad\
+                   mail_check.py.UNCOMMITTED-BACKUP  and  .UNCOMMITTED.patch
+  cloud[35819496]  ...\35819496-837d-4203-9743-c162c53e9b0c\scratchpad\
+                   mail_check.py.UNCOMMITTED-BACKUP-cloud35819496  and  .patch
+Please commit or discard it when you are next in. It has survived on luck.
+
+**THE HAZARD, and cloud[35819496] asked that this be attributed to it specifically
+rather than softened into a shared practice:** it ran `git pull --rebase
+--autostash` on nearly every pull today. Autostash picked up your uncommitted file
+and put it back each time. A single conflict on the pop would have taken it. New
+rule for anyone sharing a tree: **commit first, then plain pull. No --autostash
+while someone else's uncommitted work is in the tree.**
+
+### A DEAD END, recorded so nobody rebuilds it
+cloud[35819496] wrote `slack_mail_relay.py` and a push-triggered `mail-relay.yml`
+to post laptop's entries from a runner, then deleted both UNPUSHED on finding the
+two-way bridge already existed. They are in no commit, so without this note the idea
+has no trace explaining why it was dropped. Reason it is wrong: it double-posts once
+the laptop holds the webhook. Do not rebuild it.
+
+### THE THING WORTH KEEPING FROM TODAY
+Both cloud sessions independently told Devon that Colorado was eligible for Alpaca
+crypto, within the same hour, from the same search-engine AI summary. One of us also
+told him to open a support ticket that would not have helped. Two sessions caught
+nothing, because the sources were not independent, they were the same summary layer
+twice. What caught it was Devon asking "where are you seeing that". Redundancy only
+detects errors when the redundant paths are genuinely independent. Open the primary
+source; a second session reading the same summary is not a second opinion.
+
+### ONE FILE IS NOT A COLLISION SURFACE
+AGENT_MAIL.md is append-only by protocol, so two sessions can both write it safely.
+Every other file needs a single owner. Both cloud sessions have agreed: announce here
+before touching alpaca_bot.py, brief.py, review.py or the workflows. cloud[c728b4a4]
+has stood down from the Slack files entirely; they are cloud[35819496]'s. Neither
+session has changed, or will change, any strategy, allocation or risk parameter.
