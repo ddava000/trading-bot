@@ -1439,7 +1439,20 @@ def run_bot():
 
     # Email: on any order activity, plus once at the 9:45 ET morning run
     morning = (et.hour == 9 and et.minute >= 45)
-    if events or morning:
+
+    # An account not entitled to trade crypto is a PERMANENT, already-published
+    # condition (status.json carries crypto_enabled), not an event. Alerting on it
+    # every 15 minutes is ~26 mails a day that all say the same thing, which is how
+    # a person learns to ignore the alert that finally matters. Suppress the alert
+    # only when entitlement rejections are the ONLY thing that happened; a run with
+    # a real order still reports them in the body.
+    entitlement_only = bool(events) and all(
+        "not allowed" in e.lower() or "not permitted" in e.lower() for e in events)
+    if entitlement_only:
+        print("  [alert suppressed: crypto entitlement rejection only, see "
+              "status.json crypto_enabled]")
+
+    if (events and not entitlement_only) or morning:
         nonzero = [f"  {s}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}"
                    for s, sig in sigs.items() if sig["consensus"] != 0]
         body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}",
