@@ -32,6 +32,10 @@ Usage:
 import os, re, json, sys, smtplib
 
 NL = chr(10)
+
+# How far back an entry with an unparseable timestamp still counts as "recent"
+# in stateless mode. Bounds the repeat without going back to silently dropping it.
+UNPARSED_TAIL = 10
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from email.mime.text import MIMEText
@@ -125,20 +129,35 @@ def main():
     if since is not None:
         ET = ZoneInfo("America/New_York")
         cutoff = datetime.now(ET) - timedelta(hours=since)
-        new, unparsed = [], 0
-        for e in all_e:
+        new, unparsed, aged_out = [], 0, 0
+        tail_start = len(all_e) - UNPARSED_TAIL
+        for i, e in enumerate(all_e):
             when = parse_ts(e["ts"], ET)
             if when is None:
-                # BIAS TOWARD REPORTING. The old code skipped these, which is the
-                # silent-miss failure this whole watcher exists to prevent: a typo'd
-                # stamp would drop a real message and nobody would ever know. An
-                # entry we cannot date might be old, but over-reporting costs one
-                # line in an email and under-reporting costs the message.
-                unparsed += 1
-                new.append(e)
+                # BIAS TOWARD REPORTING, BUT BOUNDED. Skipping these is the
+                # silent-miss failure this watcher exists to prevent: a typo'd stamp
+                # would drop a real message and nobody would ever know. But this path
+                # keeps NO state, so reporting them unconditionally meant every
+                # undateable entry reappeared in the daily digest forever, and a line
+                # that shows up every day is how a digest becomes wallpaper. That
+                # loses every message in it, which is the same silent miss through
+                # the other door. (Empirically: a permanent Alpaca crypto rejection
+                # firing ~26 identical alerts a day had already trained Devon to
+                # ignore it. Caught by a peer session, 2026-08-25.)
+                # So: undateable entries report only while they are among the newest
+                # UNPARSED_TAIL, then age out on position instead of time.
+                if i >= tail_start:
+                    unparsed += 1
+                    new.append(e)
+                else:
+                    aged_out += 1
                 continue
             if when >= cutoff:
                 new.append(e)
+        if aged_out:
+            # Never silent about the suppression itself.
+            print(f"[{aged_out} undateable entr(y/ies) older than the newest "
+                  f"{UNPARSED_TAIL} - aged out, not reported]")
         if unparsed:
             print(f"[{unparsed} entr(y/ies) had an unparseable timestamp — included rather than skipped]")
         buckets = {w: [e for e in new
