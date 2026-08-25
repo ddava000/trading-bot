@@ -142,14 +142,17 @@ jobs:
         if: always()
         run: |
           changed=""; trades=""
-          for f in trade_log.jsonl holds.json status.json; do
+          for f in trade_log.jsonl holds.json status.json outage.json; do
             if [ -n "$(git status --porcelain -- "$f")" ]; then
               git add -- "$f"; changed=1
               # status.json updates every run (the monitoring heartbeat); only
               # trade_log/holds changing means an actual order. Label honestly so
               # the history isn't 30+ "trade log" commits that were really just
               # heartbeats (which reads like the bot went haywire).
-              [ "$f" != "status.json" ] && trades=1
+              # outage.json is the cross-run "have we already alerted" state; it
+              # MUST be committed or the alert backoff cannot survive the process,
+              # but it is not a trade either.
+              case "$f" in status.json|outage.json) ;; *) trades=1 ;; esac
             fi
           done
           if [ -n "$changed" ]; then

@@ -173,6 +173,91 @@ def send_email(subject, body):
         print(f"  [email failed: {e}]")
 
 
+# ── Outage alerting state ─────────────────────────────────────────────────────
+# "Alpaca unreachable all window" used to email on EVERY failed run. Each Actions
+# run is a fresh process, so the in-process latch used for the crypto entitlement
+# (5b55bb7) cannot work here: a real outage sent ~26 identical emails a day, and it
+# did so exactly when Devon most needs one clear signal instead of wallpaper.
+#
+# State cannot live in status.json: that file is written inside run_bot(), which is
+# the very call that raises when Alpaca is unreachable, so during an outage it is
+# never updated. Hence its own tiny committed file.
+#
+# The rule is alert-then-backoff, never silence: first blind window alerts at once,
+# repeats stay quiet for OUTAGE_REALERT_H, and recovery always sends one note with
+# the duration so an outage has a visible end and not just a beginning.
+OUTAGE_F         = "outage.json"
+OUTAGE_REALERT_H = 2.0
+
+
+def _outage_load():
+    try:
+        with open(OUTAGE_F) as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _outage_save(d):
+    try:
+        with open(OUTAGE_F, "w") as f:
+            json.dump(d, f, indent=1)
+    except Exception as e:
+        print(f"  [outage state not saved: {e}]")
+
+
+def _hours_since(iso):
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return (datetime.now(timezone.utc) - t).total_seconds() / 3600.0
+    except Exception:
+        return None       # unparseable = treat as unknown, and alert rather than skip
+
+
+def outage_note_blind():
+    """One blind window recorded. Emails on the first, then backs off. Never silent."""
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    st  = _outage_load()
+    since = st.get("unreachable_since") or now
+    last  = st.get("last_alert_utc")
+    gap   = _hours_since(last) if last else None
+
+    # gap is None when there has been no alert yet OR the stamp is corrupt. Both
+    # mean "we cannot prove Devon was told", so both alert. Fail loud, not quiet.
+    due = (gap is None) or (gap >= OUTAGE_REALERT_H)
+    dur = _hours_since(since)
+    if due:
+        send_email(
+            f"Alpaca bot ({MODE}) - Alpaca unreachable all window",
+            "Every attempt this window failed to reach Alpaca (full cycle and every "
+            "protective pass). No orders were placed; positions are unwatched until a "
+            "run gets through. Nothing is wrong with the bot - check "
+            "https://status.alpaca.markets" + (
+                f"{chr(10)}{chr(10)}Unreachable for about {dur:.1f}h so far."
+                if dur is not None and dur >= OUTAGE_REALERT_H else "") + (
+                f"{chr(10)}Repeats are suppressed for {OUTAGE_REALERT_H:.0f}h at a time; "
+                "you will get one more if it is still down then, and one when it clears."))
+        st["last_alert_utc"] = now
+    else:
+        print(f"  [outage alert suppressed: already alerted {gap:.1f}h ago, "
+              f"re-alerting after {OUTAGE_REALERT_H:.0f}h]")
+    st["unreachable_since"] = since
+    _outage_save(st)
+
+
+def outage_note_contact():
+    """Contact made. If we were mid-outage, close it out with a single note."""
+    st = _outage_load()
+    if not st.get("unreachable_since"):
+        return
+    dur = _hours_since(st["unreachable_since"])
+    send_email(f"Alpaca bot ({MODE}) - Alpaca reachable again",
+               "Contact with Alpaca is restored and protective passes are running."
+               + (f" It was unreachable for about {dur:.1f}h." if dur is not None else ""))
+    _outage_save({})
+
+
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
 # NYSE/NASDAQ full-closure holidays (observed dates). Hardcoded for verifiable
 # correctness; refresh every couple of years (the weekly audit can top it up).
@@ -1734,15 +1819,14 @@ if __name__ == "__main__":
                 except Exception as _e:
                     print(f"  [fast pass error (loop continues): {_e}]")
             print(f"  [fast loop done: {passes} pass(es), orders={'yes' if acted else 'no'}]")
-            if not reached:
+            if not (reached or cycle_ok):
                 # An entire window with ZERO contact means stops are not being
                 # watched. The job exits 0 (nothing to fix in the code), but that
-                # blind spot deserves a real alert, not silence.
-                send_email(f"Alpaca bot ({MODE}) - Alpaca unreachable all window",
-                           "Every attempt this window failed to reach Alpaca (full cycle and "
-                           "every protective pass). No orders were placed; positions are "
-                           "unwatched until a run gets through. If this repeats next window, "
-                           "check https://status.alpaca.markets — nothing is wrong with the bot.")
+                # blind spot deserves a real alert, not silence. Alert-then-backoff
+                # rather than one email per run: see OUTAGE_F above.
+                outage_note_blind()
+            else:
+                outage_note_contact()
     except Exception:
         import traceback
         tb = traceback.format_exc()
