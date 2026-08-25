@@ -164,19 +164,34 @@ def decide(state, fast=False):
     # ── INDEX CORE: equal-weight SPY/QQQ/IWM ─────────────────────────────────
     # INDEX_TARGET_PCT is ours; bot.INDEX_CORE_PCT is the hybrid's 50% and would
     # leave half the account permanently in cash under an index-only strategy.
-    index_pct = INDEX_TARGET_PCT if INDEX_ONLY else bot.INDEX_CORE_PCT
-    per_tgt = equity * index_pct / len(bot.INDEX_ETFS)
-    for etf in bot.INDEX_ETFS:
-        h = held.get(etf)
-        val = (h["live"] * h["qty"]) if h else 0.0
-        if val > per_tgt * 1.25 and h:                # overweight -> trim back to target
-            _sell(etf, round((val - per_tgt) / h["live"], 6), f"INDEX-TRIM to ${per_tgt:.2f}")
-        elif val < per_tgt - equity * 0.01:           # underweight -> buy toward target
-            amt = min(per_tgt - val, budget)
-            if amt >= MIN_ORDER:
-                orders.append({"action": "buy", "symbol": etf, "notional": round(amt, 2),
-                               "reason": f"INDEX-CORE toward ${per_tgt:.2f}"})
-                budget -= amt
+    #
+    # QUOTE-GAP GUARD. `held` only contains symbols whose _quote() returned a
+    # price, and equity is summed over `held`, so ONE failed Yahoo quote silently
+    # values that holding at zero. per_tgt then collapses and the ETFs that DID
+    # quote breach the 1.25x overweight test, emitting real INDEX-TRIM market
+    # sells. Reproduced against the live book: dropping a single ETF quote
+    # understated equity 239.67 -> 159.81 and generated ~$53 of sells, about 22%
+    # of the account, on nothing but a transient data failure. Selling on data we
+    # know is incomplete is never right, so the whole rebalance is skipped for the
+    # pass. Skipping costs a delayed purchase; not skipping costs real shares.
+    missing = [s for s in positions if s not in held]
+    if missing:
+        notes.append(f"index rebalance skipped: no quote for {sorted(missing)}, "
+                     f"equity would be understated")
+    else:
+        index_pct = INDEX_TARGET_PCT if INDEX_ONLY else bot.INDEX_CORE_PCT
+        per_tgt = equity * index_pct / len(bot.INDEX_ETFS)
+        for etf in bot.INDEX_ETFS:
+            h = held.get(etf)
+            val = (h["live"] * h["qty"]) if h else 0.0
+            if val > per_tgt * 1.25 and h:            # overweight -> trim back to target
+                _sell(etf, round((val - per_tgt) / h["live"], 6), f"INDEX-TRIM to ${per_tgt:.2f}")
+            elif val < per_tgt - equity * 0.01:       # underweight -> buy toward target
+                amt = min(per_tgt - val, budget)
+                if amt >= MIN_ORDER:
+                    orders.append({"action": "buy", "symbol": etf, "notional": round(amt, 2),
+                                   "reason": f"INDEX-CORE toward ${per_tgt:.2f}"})
+                    budget -= amt
 
     # ── ACTIVE ENTRIES: same sleeve routing, theme cap, guards ───────────────
     # Skipped entirely under INDEX_ONLY. Relying on zero sleeve room to block
