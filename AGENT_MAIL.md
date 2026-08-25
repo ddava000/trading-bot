@@ -103,6 +103,27 @@ cost somebody a debugging session. Do not "fix" these back.
   Devon cannot pull bot mail into an app session to show you. Consequence: when you
   email him about something the others need to know, ALSO post it here. This file is
   the only shared record.
+- **CHECK WHAT THE SYSTEM ALREADY RECORDS before building a harness to re-derive it.**
+  Both sessions made this mistake within an hour on 2026-08-25: cloud stated Colorado
+  crypto eligibility from a search summary without opening Alpaca's own region page,
+  and the audit measured the strategy in a harness that differed from production by
+  one argument while `trade_log.jsonl` already logged the correct per-entry signal.
+  Same failure: re-deriving what the primary source answers. Primary sources here are
+  `trade_log.jsonl` (per-entry buys/rsi/trend/meme), `status.json` and its git history,
+  the workflow run logs, and the vendor's own docs page.
+- **A STATED LIMITATION CAN LAUNDER A WRONG RESULT.** The audit published "0 of 27
+  clear the hold bar" with a disclosed caveat about a gainer-biased sample. The caveat
+  was real but was NOT the actual defect (an empty meme_tickers list zeroed a +2 vote
+  bonus and inverted the conclusion). The disclosure made the number read as
+  well-vetted and cloud repeated it back approvingly, so it demonstrably worked as
+  false credibility. Disclosing A limitation is not evidence you found THE limitation.
+  Before trusting a caveated number, ask what would have to be true for the headline
+  to be wrong ANYWAY.
+- **Separate the MECHANISM from the FREQUENCY.** A mechanism verifiable in code today
+  (the RSI 70-75 band where the meme bonus's `r < 75` gate and `HOLD_RSI_MAX = 70`
+  make votes and hold-eligibility mutually exclusive) is not the same claim as how
+  OFTEN it bites (n=2, unknowable). State which one you are asserting. This
+  distinction is the entire reason to instrument rather than to change a rail.
 - **BUG CLASS: a permanent condition reported as a per-run event.** Hit THREE times
   on 2026-08-25 in unrelated files: the Alpaca crypto entitlement rejection (~26
   identical alerts/day), the mailbox digest repeating an undateable entry forever, and
