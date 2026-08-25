@@ -274,6 +274,7 @@ def reconcile():
         f"Using the Robinhood MCP tools, call get_portfolio and get_equity_positions "
         f"for account {ACCOUNT}. Place no orders. Reply with ONLY a JSON object, no prose:\n"
         '{"cash": <buying_power as number>, '
+        '"total_value": <total account value INCLUDING unsettled proceeds>, '
         '"pending_deposits": <pending_deposits as number, 0 if none>, "positions": '
         '[{"symbol": "X", "qty": <number>, "avg_cost": <number>}]}')
     if res and isinstance(res.get("positions"), list):
@@ -346,6 +347,16 @@ def adopt_truth(led, truth):
                 f"{len(led['positions'])} name(s): corrupt snapshot, keeping the ledger")
         return False
     led["cash"] = float(truth.get("cash") or led["cash"])
+    # Broker TOTAL value, which unlike buying_power includes unsettled proceeds.
+    # Published equity uses this; see persist(). Sizing deliberately does NOT,
+    # because unsettled cash genuinely cannot be spent.
+    try:
+        tv = float(truth.get("total_value") or 0)
+        if tv > 0:
+            led["broker_total_value"] = round(tv, 2)
+            led["broker_total_at"] = time.time()
+    except Exception:
+        pass
     led["positions"] = positions
     led["holds"] = {s: h for s, h in (led.get("holds") or {}).items()
                     if any(p["symbol"] == s for p in positions)}
@@ -555,6 +566,19 @@ def persist(led, res, placed):
     global _last_push_at, _last_push_material
     save_ledger(led)
     snap = dict(res.get("snapshot") or {})
+    # T+1 TRAP: decide() computes equity as cash + invested, and `cash` is broker
+    # BUYING POWER, which excludes unsettled sale proceeds. After the 2026-08-24
+    # wind-down sold 24 positions, this file published ~$124 for a full trading day
+    # while the account actually held ~$232: a phantom 48% crash, in the very file
+    # cloud and audit measure Arm B from. Publish the broker's total instead, and
+    # say so when they differ, so a settlement artifact is never read as a loss.
+    bt, bt_at = led.get("broker_total_value"), led.get("broker_total_at") or 0
+    if bt and (time.time() - bt_at) < RECONCILE_MAX_AGE_SEC * 2:
+        computed = snap.get("equity")
+        snap["equity"] = bt
+        if computed is not None and abs(float(computed) - float(bt)) > 0.50:
+            snap["equity_source"] = "broker_total_value"
+            snap["unsettled_excluded_from_buying_power"] = round(float(bt) - float(computed), 2)
     snap.update({"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
                  "holds": sorted(led.get("holds") or {}),
