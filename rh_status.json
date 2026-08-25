@@ -6,18 +6,12 @@
   "QQQ",
   "SPY"
  ],
- "hold": 0,
  "holds": [],
- "index": 233.76,
  "orders_today": 4,
  "positions": {
   "IWM": 0.266868,
   "QQQ": 0.112444,
   "SPY": 0.104382
  },
- "regime": "risk-off",
- "risk": 0.4,
- "settled": 5.86,
- "trade": 0.0,
- "ts": "2026-08-25T10:09"
+ "ts": "2026-08-25T10:24"
 }
