@@ -39,7 +39,7 @@ jobs:
         if: ${{ inputs.smoke_test }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: claude -p "Reply with exactly: CLOUD AUDIT OK" --model claude-opus-4-8
+        run: 'claude -p "Reply with exactly - CLOUD AUDIT OK" --model claude-opus-4-8'
 
       - name: Run weekly audit
         if: ${{ !inputs.smoke_test }}
