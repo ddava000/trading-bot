@@ -3,12 +3,14 @@
   "risk_scale": 0.4,
   "avoid_symbols": [
     "NVDA",
+    "MRVL",
     "MU",
     "SNDK",
     "AAPL",
     "META",
     "QQQ",
     "MSTR",
+    "SMCI",
     "WMT",
     "TGT",
     "AZI",
@@ -21,11 +23,12 @@
     "CNMD"
   ],
   "favor_symbols": [
-    "SPY"
+    "SPY",
+    "IWM"
   ],
-  "notes": "Holding 0.4 risk-off: NVDA earnings and a key inflation print land later this week with Jackson Hole aftermath, keeping chip-heavy tech vulnerable (QQQ hold -1.7%). VIX calm at 15.8 and futures edge higher, but the loaded event calendar and thin $117 cash argue for defense.",
-  "journal_entry": "Tue 8/25 09:25: Staying 0.4 risk-off \u2014 futures firmer but NVDA print/inflation report still ahead; tech and crypto-linked MSTR remain on avoid. Watching for post-event clarity before easing toward neutral.",
+  "notes": "Holding 0.4 risk-off with NVDA reporting tomorrow and a key inflation print this week keeping chip-heavy tech (QQQ hold -1.9%, MRVL/SMCI) vulnerable; VIX calm at 15.6 and yields easing help, but the loaded event calendar and thin $88 cash demand defense. Added MRVL (earnings ~7 days) to avoid.",
+  "journal_entry": "Tue 8/25 12:08: Stayed 0.4 risk-off \u2014 tape mixed, chips bid ahead of NVDA but binary event tomorrow plus inflation data keep me cautious; added MRVL to avoid for pending earnings, kept SMCI on avoid (down on news). Watching NVDA print and CPI before easing toward neutral.",
   "date": "2026-08-25",
-  "mode": "MORNING",
-  "updated_at": "2026-08-25T09:25 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-08-25T12:08 ET"
 }
