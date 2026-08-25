@@ -1312,3 +1312,9 @@
 - avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
 - notes: Holding 0.4 risk-off: NVDA earnings land this week plus a key inflation print and Powell/Jackson Hole aftermath, keeping chip-heavy tech vulnerable (QQQ hold -1.7%). VIX calm at 15.8 and futures firmer, but the loaded event calendar and thin $117 cash argue for defense.
 - journal: Tue 8/25 09:00: Kept 0.4 risk-off into the NVDA-earnings/inflation week; futures edged higher overnight but tech and MSTR (crypto-linked) still on avoid. Watching NVDA print, the inflation report, and whether indexes stabilize before easing toward neutral.
+
+### 2026-08-25T09:25 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off: NVDA earnings and a key inflation print land later this week with Jackson Hole aftermath, keeping chip-heavy tech vulnerable (QQQ hold -1.7%). VIX calm at 15.8 and futures edge higher, but the loaded event calendar and thin $117 cash argue for defense.
+- journal: Tue 8/25 09:25: Staying 0.4 risk-off — futures firmer but NVDA print/inflation report still ahead; tech and crypto-linked MSTR remain on avoid. Watching for post-event clarity before easing toward neutral.
