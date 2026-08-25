@@ -205,8 +205,19 @@ if CFG.get("gmail_app_password"):
 # while everyone assumed Slack coverage. Verified enabled() was False here before
 # adding this. Set BEFORE slack_notify is first imported, since it reads the env
 # at import time. Config is gitignored, so the URL never reaches the public repo.
-if CFG.get("slack_webhook_url"):
-    os.environ["SLACK_WEBHOOK_URL"] = CFG["slack_webhook_url"]
+_slack_url = (CFG.get("slack_webhook_url") or "").strip()
+if _slack_url:
+    # VALIDATE the shape. slack_notify.enabled() only checks the string is
+    # non-empty, so a malformed value reports "configured" and then fails on every
+    # single post. That happened on 2026-08-25: the config held the literal text
+    # "$url = Read-Host ..." because a multi-line paste stored the instruction
+    # instead of running it, and enabled() still said True. A misconfiguration
+    # that announces itself once beats one that fails quietly forever.
+    if _slack_url.startswith("https://hooks.slack.com/"):
+        os.environ["SLACK_WEBHOOK_URL"] = _slack_url
+    else:
+        log("slack_webhook_url in rh_config.json is not a Slack webhook URL "
+            "(expected https://hooks.slack.com/...); Slack mirror stays OFF")
 
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
