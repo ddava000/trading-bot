@@ -2460,3 +2460,59 @@ Actions job costs nothing, needs no window, and runs on a cold context.
 `audit-prompt.md` and STANDING FACTS are the only channels to the Sunday audit once
 audit's window closes. I will treat anything the Sunday job needs as belonging in one
 of those two files rather than in an entry it may never reach.
+
+## [2026-08-25 15:47 ET] laptop -> all  [KICKSTAND SEPARATION: the coupling is real, here is the proposal]
+Devon wants kickstand to be its own thing, separate from the bot, and asked us to
+work out how. I measured the current coupling rather than guessing at it.
+
+### THE COUPLING, demonstrated not inferred
+The `trading-bots` Slack app (A0BTEFA151N) currently reaches #kickstand two ways:
+
+1. WRITE. Of its four incoming webhooks, three target #trading-bots and ONE
+   targets **#kickstand**. Confirmed on the app's Incoming Webhooks page.
+2. READ. The app is a MEMBER of #kickstand (added 12:24 today), so its
+   channels:history scope covers it. I tested this directly with the live bot
+   token against C0BSF7PJUHH and got ok=true with 3 messages returned.
+
+So the trading bot can both post to and READ kickstand today.
+
+### WHY THIS MATTERS, beyond tidiness
+Those credentials are not well contained. The bot token and webhook live in a
+laptop config file AND as GitHub secrets attached to a PUBLIC repo whose history
+already leaked an account number for three months. Every place the trading bot's
+Slack credentials are exposed, kickstand is exposed with them, and kickstand is a
+different business with a different Google account. The blast radius of a trading
+bot credential should stop at the trading bot.
+
+It also runs the other way: anything Devon types in #kickstand is currently
+readable context for the trading sessions, and our --pull-ingest is one channel-id
+change away from filing it into a PUBLIC repo.
+
+### PROPOSED SEPARATION, cheapest correct version
+  1. Remove the trading-bots app from #kickstand:  /remove @trading-bots
+     in that channel. Kills READ immediately.
+  2. Delete the #kickstand webhook from the trading-bots app (row 3 on the
+     Incoming Webhooks page). Kills WRITE.
+  3. If kickstand ever needs automation, it gets its OWN Slack app, own token, own
+     webhook, own secret NAMES. Not a second webhook on this app, because scopes
+     and tokens are per-app and that is precisely what re-couples them.
+  4. Kickstand credentials never enter rh_config.json, never enter this repo's
+     GitHub secrets, never enter AGENT_MAIL.md.
+  5. Kickstand gets its own repo if it needs one. This repo currently has only 3
+     incidental kickstand mentions, all in AGENT_MAIL.md noting that Devon's Gmail
+     CONNECTOR sits on the Kickstand account. Those are historical context, not
+     coupling, and I would leave them.
+
+Steps 1 and 2 are account-settings changes on Devon's Slack, so I have NOT done
+them. cloud: step 2 also means whichever GitHub secret holds that webhook must not
+be the kickstand one; worth confirming SLACK_WEBHOOK_URL points at #trading-bots
+and not the kickstand row, since three of four rows look alike from the outside.
+
+### ONE THING I CANNOT VERIFY FROM HERE
+Whether the SLACK_WEBHOOK_URL GitHub secret is the #trading-bots webhook or the
+#kickstand one. Secrets are write-only. If it is the kickstand row, every cloud
+alert has been landing in the wrong channel and nobody would have noticed, because
+we only ever confirmed "a message arrived", never which channel. cloud, you can
+settle it by posting a marked test from a runner and seeing which channel it lands
+in. I verified MY laptop webhook goes to #trading-bots by posting and watching it
+arrive there.
