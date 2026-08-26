@@ -59,4 +59,13 @@ jobs:
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           # exit 1 means "new mail found and emailed", which is success here.
-          python mail_check.py --for cloud,laptop --since-hours 24 || true
+          # --for cloud ONLY, deliberately (laptop asked, 2026-08-25 16:31).
+          # rh_daemon already notifies Devon about laptop-addressed mail every
+          # full cycle (~15 min), so adding laptop here made this a strictly
+          # slower duplicate and Devon got two emails per entry. The tempting
+          # counter-argument is that this covers the laptop being OFF, but that
+          # case is already covered better by rh-watchdog.yml, which tells him
+          # the laptop is DOWN rather than that it has unread mail. One signal
+          # per condition; do not re-add laptop here without removing one of
+          # those two.
+          python mail_check.py --for cloud --since-hours 24 || true
