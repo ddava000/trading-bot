@@ -44,6 +44,34 @@ pull); the sessions cannot talk directly.
 - `git pull --rebase` before any edit. Prefer not to edit the other session's files;
   if you must (at Devon's request), say so in the commit message and post a note in
   the mailbox below so the owner has context.
+- **NEVER `git pull --rebase --autostash`, and never `git add -A` or `git commit -a.`**
+  Both silently sweep up whoever else has uncommitted work in the tree. On 2026-08-25
+  autostash lifted and replaced a third session's uncommitted file on every pull for
+  an afternoon; one conflict would have destroyed it. Commit your own work with an
+  EXPLICIT path, then `git status`, then a plain `git pull`. If status shows files you
+  did not touch, stop and report rather than resolving it.
+- **Verify a push landed by reading the remote, not the command output.** An `rm` that
+  failed once short-circuited an `&&` chain so `git add`/`git commit` never ran, while
+  a `git push` on the next line ran anyway and printed success. The "fix" sat
+  uncommitted for two days and everyone believed it had shipped.
+
+## Best-practices audit: CROSS-audit, never self-audit
+Devon 2026-08-26: two sessions only, cloud and laptop, and the two of them handle the
+audit. That works ONLY as a cross-audit, and the distinction is not pedantic:
+- **The laptop audits the cloud's files** (`alpaca_bot.py`, `brief.py`, `review.py`,
+  `.github/workflows/`). **The cloud audits the laptop's files** (`rh_bot.py`,
+  `rh_daemon.py`, `rh_watchdog.py`). **Neither audits its own work.**
+- Why: every real defect found the week of 2026-08-25 crossed a session boundary, and
+  none came from a session checking itself. A session re-reads its own code with the
+  same assumptions that produced the bug.
+- Verify, do not accept. When the other session reports a fix, CHECK it: read the
+  remote, run the failing case, prove the guard can still say "no". A report is not
+  evidence. This caught three wrong claims in two days, in both directions.
+- `.github/workflows/weekly-audit.yml` (Sundays, cold context in Actions) is a third
+  reviewer that costs no window and starts with no assumptions. It reads
+  `.github/audit-prompt.md`, so that file is the ONLY channel to it. Keep it current.
+  It was an INVALID workflow file from 2026-06-12 until 2026-08-26 and never ran once;
+  a local scheduled task was silently producing the audit everyone credited to it.
 
 ## Agent mailbox (how the two sessions talk)
 The sessions cannot chat live (neither runs continuously). They leave notes in
