@@ -1336,3 +1336,9 @@
 - avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
 - notes: Staying 0.4 risk-off: NVDA reports after the close today and a key inflation print looms, keeping chip-heavy tech (QQQ hold -2.3%, MRVL -3.2%) vulnerable. VIX calm at 15.7 but the binary event calendar and thin $88 cash demand defense.
 - journal: Wed 8/26 09:00: Held 0.4 risk-off — NVDA prints tonight and inflation data still pending, so tech and crypto-linked MSTR remain on avoid; MRVL (earnings ~7d) and SMCI (weak on news) stay flagged. Watching NVDA reaction and CPI before easing toward neutral.
+
+### 2026-08-26T09:30 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: NVDA reports after the close today and sticky inflation data has futures softer, keeping chip-heavy tech (QQQ -2.1%, MRVL -2.2%) vulnerable ahead of the binary event. VIX calm at 15.7 but thin $88 cash and the loaded calendar demand defense; MRVL earnings ~7 days keeps it on avoid.
+- journal: Wed 8/26 09:30: Stayed 0.4 risk-off into the open — sticky inflation report has S&P futures slipping and NVDA prints tonight, so tech stays flagged; MRVL (earnings ~7d) and SMCI (weak on news) remain on avoid. Watching NVDA reaction and inflation follow-through before easing toward neutral.
