@@ -8,3 +8,4 @@ rh_daemon.log
 
 # per-runner mailbox watcher state (each session tracks what IT has seen)
 .mail_check_state.json
+setup.ps1
