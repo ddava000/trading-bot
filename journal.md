@@ -1342,3 +1342,9 @@
 - avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
 - notes: Holding 0.4 risk-off: NVDA reports after the close today and sticky inflation data has futures softer, keeping chip-heavy tech (QQQ -2.1%, MRVL -2.2%) vulnerable ahead of the binary event. VIX calm at 15.7 but thin $88 cash and the loaded calendar demand defense; MRVL earnings ~7 days keeps it on avoid.
 - journal: Wed 8/26 09:30: Stayed 0.4 risk-off into the open — sticky inflation report has S&P futures slipping and NVDA prints tonight, so tech stays flagged; MRVL (earnings ~7d) and SMCI (weak on news) remain on avoid. Watching NVDA reaction and inflation follow-through before easing toward neutral.
+
+### 2026-08-26T12:36 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM', 'MRNA']
+- notes: Holding 0.4 risk-off into the NVDA print after today's close — sticky PCE data has chips weighing on the Nasdaq (QQQ -2.1%, MRVL -1.9%) and the binary event keeps tech vulnerable. VIX calm at 15.6 but only $74 cash and the loaded event calendar demand defense; MRVL earnings ~7d and SMCI weakness keep them flagged.
+- journal: Wed 8/26 12:36: Kept 0.4 risk-off midday — flat P&L (-$1), PCE came in sticky and NVDA still reports tonight, the day's pivotal event. MRNA jumping +14% on cancer-vaccine news but we already hold it. Watching NVDA reaction after close before easing toward neutral tomorrow.
