@@ -29,6 +29,23 @@ MAILBOX = os.path.join(os.path.dirname(os.path.abspath(__file__)), "AGENT_MAIL.m
 # the wrapper text we add around long mailbox entries.
 MAX_CHARS = 3500
 
+# The ONLY channel this bot may read or ingest from. Pinned in CODE, not taken from
+# config, at laptop's request (AGENT_MAIL 2026-08-26 10:41) and for a reason worth
+# stating: `--pull-ingest` files Slack content into AGENT_MAIL.md, which lives in a
+# PUBLIC repo. The trading-bots Slack app is currently also a member of #kickstand,
+# a different business whose channel carries END-USER FEEDBACK WITH REAL NAMES from
+# outside testers who never agreed to anything involving this repo.
+#
+# Nothing in the code prevented publishing that to the internet; only the current
+# value of a config field did. A config field is not a safety mechanism: it can be
+# changed by anyone with repo settings access, silently, with no review. Changing
+# the channel now requires a CODE change, which is reviewable and shows up in a diff.
+#
+# This is deliberately a HARD refusal rather than a warning, and it fails LOUD rather
+# than returning empty, because a silent no-op here is indistinguishable from a quiet
+# channel -- the exact failure mode this repo has been bitten by four times.
+INGEST_CHANNEL = "C0BSHTPCQ22"        # #trading-bots in Devon's Workspace
+
 
 def enabled():
     return bool(WEBHOOK)
@@ -137,8 +154,22 @@ _HEADING_RE = re.compile(r"^(#{1,6})\s", re.M)
 _FENCE = "`" * 3
 
 
+def channel_allowed():
+    """True only if the configured channel is the one this bot may touch.
+
+    Prints on refusal. Callers must not treat a refusal as "nothing to read".
+    """
+    if CHANNEL_ID and CHANNEL_ID != INGEST_CHANNEL:
+        print("  [slack REFUSED: SLACK_CHANNEL_ID is %s, but this bot may only read "
+              "%s (#trading-bots). Reading or ingesting another channel could publish "
+              "third-party data into a public repo. Change INGEST_CHANNEL in code if "
+              "this is genuinely intended.]" % (CHANNEL_ID, INGEST_CHANNEL))
+        return False
+    return True
+
+
 def can_read():
-    return bool(BOT_TOKEN and CHANNEL_ID)
+    return bool(BOT_TOKEN and CHANNEL_ID) and channel_allowed()
 
 
 def _api(method, params):
@@ -159,16 +190,22 @@ def _api(method, params):
 
 
 def read_channel(limit=25, oldest=None):
-    """Newest-last list of {ts, user, text} from the channel. [] if unconfigured."""
+    """Newest-last list of {ts, user, text}.
+
+    Returns None if the channel COULD NOT be read (unconfigured, refused, or an API
+    failure) and [] if the read succeeded and there was simply nothing new. Those two
+    were previously identical, which made the caller's exit code meaningless: a
+    healthy quiet channel and a dead token both came back empty.
+    """
     if not can_read():
-        print("  [slack read skipped - SLACK_BOT_TOKEN / SLACK_CHANNEL_ID not set]")
-        return []
+        print("  [slack read unavailable - token/channel unset, or channel refused]")
+        return None
     params = {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))}
     if oldest:
         params["oldest"] = str(oldest)
     d = _api("conversations.history", params)
     if not d:
-        return []
+        return None                     # API said no: a real failure, not an empty room
     msgs = []
     for m in d.get("messages", []):
         sub = m.get("subtype") or ""
@@ -212,10 +249,12 @@ def pull(limit=25, ingest=False):
     """
     since = _last_ingested_ts()
     msgs = read_channel(limit=limit, oldest=since)
+    if msgs is None:
+        return None                     # could not read; caller should treat as failure
     if since:
         msgs = [m for m in msgs if float(m["ts"] or 0) > float(since)]
     if not msgs:
-        print("  [slack: no new channel messages]")
+        print("  [slack: read OK, no new channel messages]")
         return []
     for m in msgs:
         print("  [slack %s] <%s> %s" % (m["ts"], m["user"], m["text"][:200]))
@@ -257,7 +296,13 @@ if __name__ == "__main__":
         sys.exit(0 if post(" ".join(sys.argv[2:])) else 1)
     if arg in ("--pull", "--pull-ingest"):
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 25
-        sys.exit(0 if pull(n, ingest=(arg == "--pull-ingest")) else 1)
+        # Exit 1 ONLY when the channel could not be read. "Read fine, nothing new"
+        # is the COMMON healthy case -- the bot ingests every 15 min, so a manual
+        # read almost always finds nothing. Failing on that turned every routine
+        # check RED and emailed Devon, and worse, made RED carry no information at
+        # all: a missing token and a quiet channel looked identical. The alarm only
+        # means something if the healthy case is green.
+        sys.exit(1 if pull(n, ingest=(arg == "--pull-ingest")) is None else 0)
     print(__doc__)
     print("usage: slack_notify.py [--test | --mail-latest | --mail-recent N |"
           " --say TEXT | --pull N | --pull-ingest N]")
