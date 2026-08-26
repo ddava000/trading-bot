@@ -65,6 +65,12 @@ STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (over
 TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (≈2:1 R:R)
 RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
 HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
+HOLD_MIN_VOTES   = 4      # votes a name needs before the hold sleeve considers it
+MEME_RSI_MAX     = 75.0   # meme +2 vote bonus is gated below this (see compute_signals).
+                          # NOTE the gap: 70-75 is a band where a meme name can EARN the
+                          # votes that qualify it and be disqualified from hold at the
+                          # same time. Deliberate as far as anyone knows; instrumented
+                          # via HOLD-GATE lines rather than changed.
 MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity...
 MIN_ORDER_ABS    = 5.00   # ...and never under $5 flat. A crumb order can't move the
                           # needle but still spams a rejection email when a nearly-full
@@ -365,7 +371,7 @@ def compute_signals(sym, closes, vols, live, meme_tickers):
         v5 = 1 if delta > 0.003 else (-1 if delta < -0.003 else 0)
 
     bb     = 1 if pctb < 0.10 else (-1 if pctb > 0.90 else 0)
-    meme_b = 2 if sym in meme_tickers and r < 75 and delta > 0 else 0
+    meme_b = 2 if sym in meme_tickers and r < MEME_RSI_MAX and delta > 0 else 0
 
     buys  = sum(1 for v in [v1,v2,v3,v4,v5] if v==1)  + meme_b + (bb if bb==1  else 0)
     sells = sum(1 for v in [v1,v2,v3,v4,v5] if v==-1) + (abs(bb) if bb==-1 else 0)
@@ -1351,10 +1357,31 @@ def run_bot():
                 if sym in holds and sig["rsi"] > HOLD_RSI_MAX:
                     print(f"  SKIP {sym} hold-add (RSI {sig['rsi']:.0f} > {HOLD_RSI_MAX:.0f})")
                     continue
+            # HOLD-GATE OBSERVABILITY (2026-08-25). The hold sleeve has sat at 0
+            # against a 25% target since the strategy swap, and we could not say
+            # whether the bar is SLOW (nothing has qualified yet) or UNREACHABLE
+            # (the rails cannot jointly be satisfied). Both 4-vote names so far died
+            # on RSI, one by a single point, inside the 70-75 band where the meme
+            # bonus (gated r<75) and the hold cap (rsi<=70) are mutually exclusive.
+            # That band is verifiable in code; how OFTEN it binds is not, at n=2.
+            # So log the reason per name. Pure logging, no behaviour change; in two
+            # weeks this answers the question with data instead of argument.
+            if sig["buys"] >= HOLD_MIN_VOTES:
+                _why = []
+                if sig["trend"] != "up":          _why.append("trend")
+                if sig["rsi"] > HOLD_RSI_MAX:     _why.append(f"rsi>{HOLD_RSI_MAX:.0f}")
+                if sym in movers_today:           _why.append("mover")
+                if not risk_on:                   _why.append("risk_off")
+                if sym in positions:              _why.append("already-held")
+                print(f"  HOLD-GATE {sym} buys={sig['buys']} rsi={sig['rsi']:.1f} "
+                      f"meme={bool(sig.get('meme'))} band70_75="
+                      f"{HOLD_RSI_MAX < sig['rsi'] < MEME_RSI_MAX} -> "
+                      + ("QUALIFIES" if not _why else "rejected: " + ",".join(_why)))
+
             # Hold entries demand QUALITY, not just strength: 4+ votes in an uptrend,
             # a calm entry (RSI<=70), and never a daily-spike movers name — those are
             # trade material, not buy-and-hold material (pump risk).
-            strong   = (sig["buys"] >= 4 and sig["trend"] == "up"
+            strong   = (sig["buys"] >= HOLD_MIN_VOTES and sig["trend"] == "up"
                         and sig["rsi"] <= HOLD_RSI_MAX and sym not in movers_today
                         and risk_on)               # no NEW holds into a weak tape
             use_hold = (sym in holds) or (strong and sym not in positions
