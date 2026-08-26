@@ -9,10 +9,24 @@
   "name": "Alpaca LIVE \u2014 HYBRID day-trader",
   "real_money": true,
   "start_equity": 247.91,
-  "config": "index 50 / hold 25 / trade 15 / crypto 5",
+  "config": "index 50 / hold 25 / trade 20 / crypto 0 (from 2026-08-26)",
   "account": "live \u20268736",
   "selected_by": "STRATEGY_INDEX_ONLY=false in .github/workflows/alpaca-bot.yml",
-  "execution": "Alpaca REST API \u2014 months at ~100%, 60s protective loop"
+  "execution": "Alpaca REST API \u2014 months at ~100%, 60s protective loop",
+  "config_history": [
+   {
+    "from": "2026-08-24",
+    "to": "2026-08-26",
+    "config": "index 50 / hold 25 / trade 15 / crypto 5",
+    "note": "The crypto 5% NEVER TRADED. Alpaca does not offer crypto in Colorado, so every crypto order was rejected on entitlement and that 5% sat in cash for the whole period."
+   },
+   {
+    "from": "2026-08-26",
+    "config": "index 50 / hold 25 / trade 20 / crypto 0",
+    "note": "Devon reallocated the dead crypto 5% into the active TRADING sleeve. Deployed TARGET is unchanged at 95% with a 5% cash buffer; what changed is that the 5% can now actually be deployed. Chose trade over hold because the hold sleeve was already unfilled at its 25% target, so adding room there would have parked the same cash twice."
+   }
+  ],
+  "known_confound": "Between 2026-08-24 and 2026-08-26 Arm A ran ~65% deployed against a ~100% deployed Arm B: 5 points dead crypto plus an unfilled hold sleeve. Any underperformance in that window is partly a DEPLOYMENT effect, not a strategy effect. The crypto half is fixed as of 08-26; the hold half is being measured via HOLD-GATE logging (commit 0f14492) rather than guessed at."
  },
  "arm_B": {
   "name": "Robinhood \u2014 INDEX ETFs (buy and hold)",

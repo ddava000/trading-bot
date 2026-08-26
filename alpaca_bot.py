@@ -52,7 +52,9 @@ _INDEX_ONLY = os.environ.get("STRATEGY_INDEX_ONLY", "").strip().lower() == "true
 
 LOSS_CAP_PCT     = 0.10
 LOSS_CAP_FLOOR   = 20.00
-MAX_INVESTED_PCT = 0.00 if _INDEX_ONLY else 0.15   # active TRADING sleeve
+MAX_INVESTED_PCT = 0.00 if _INDEX_ONLY else 0.20   # active TRADING sleeve
+                                                   # 0.15 -> 0.20 on 2026-08-26 (Devon):
+                                                   # absorbs the dead crypto 5%. See CRYPTO_PCT.
 HOLD_PCT         = 0.00 if _INDEX_ONLY else 0.25   # active HOLD sleeve
 HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% — thesis broken)
 HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
@@ -110,7 +112,16 @@ DANGER_WORDS = ["bankrupt", "chapter 11", "fraud", "sec investigation", "sec pro
 
 # Crypto sleeve — spot, long-only, cash-only (no margin/futures). Brackets are
 # wider than stocks because 5-10% daily swings are normal here.
-CRYPTO_PCT       = 0.00 if _INDEX_ONLY else 0.05   # crypto slice (active trading)
+CRYPTO_PCT       = 0.00   # RETIRED 2026-08-26 (Devon). Alpaca does not offer crypto in
+                          # COLORADO, so this sleeve could never fill and its 5% sat in
+                          # cash, leaving Arm A ~65% deployed against a ~100% deployed
+                          # Arm B and biasing the A/B against the arm being tested.
+                          # Reallocated to MAX_INVESTED_PCT (trade), not HOLD: the hold
+                          # sleeve is already unfilled at its 25% target, so adding room
+                          # there would have parked the cash a second time and changed
+                          # nothing. Zero for BOTH arms now, hence no _INDEX_ONLY branch.
+                          # This is a residency restriction, not an unsigned agreement:
+                          # do not 're-enable' it. See STANDING FACTS.
 CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
 CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
 CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
