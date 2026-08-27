@@ -78,14 +78,23 @@ def alert(msg, urgent=False):
         print("email SKIPPED: GMAIL_USER is unset/blank here - set the repo secret; "
               "deliberately NOT falling back to a hardcoded address")
 
-    # RECIPIENT still has a fallback, deliberately, and removing it would break
-    # alerting everywhere. Checked before touching it: NO workflow passes ALERT_TO
-    # or ALERT_EMAIL - only GMAIL_USER - so this literal is what every email in the
-    # system actually resolves to. Removing it without first adding the secret AND
-    # wiring it into rh-watchdog.yml, alpaca-bot.yml and mail-check.yml would kill
-    # email silently in Actions, which is worse than the exposure it fixes.
-    to = (os.environ.get("ALERT_EMAIL") or os.environ.get("ALERT_TO")
-          or "devondavasher@gmail.com").strip()
+    # RECIPIENT from secrets only. Devon set ALERT_EMAIL 2026-08-27 and it is wired
+    # into rh-watchdog.yml, so the hardcoded address is gone from this public repo.
+    # LAST RESORT is the sender, never a literal: if ALERT_EMAIL is missing or
+    # mistyped the mail still goes to an inbox Devon owns, carrying a line saying
+    # why, instead of vanishing. Deleting the fallback outright would have made a
+    # typo in a write-only secret indistinguishable from silence, in Actions, where
+    # the loud print goes to a log nobody reads.
+    to = (os.environ.get("ALERT_EMAIL") or os.environ.get("ALERT_TO") or "").strip()
+    misrouted = False
+    if not to and frm:
+        to, misrouted = frm, True
+        print("ALERT_EMAIL unset/blank - falling back to the SENDER address so this "
+              "still reaches an inbox; set the repo secret to fix routing")
+    if misrouted:
+        msg = ("[ALERT_EMAIL is not set, so this went to the sender address instead "
+               "of Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
+               + chr(10) + chr(10) + msg)
 
     # Email — subject carries no emoji; Devon prints mail to PDF by subject.
     if pw and frm and to:
