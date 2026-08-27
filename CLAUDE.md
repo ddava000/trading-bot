@@ -44,12 +44,18 @@ pull); the sessions cannot talk directly.
 - `git pull --rebase` before any edit. Prefer not to edit the other session's files;
   if you must (at Devon's request), say so in the commit message and post a note in
   the mailbox below so the owner has context.
-- **NEVER `git pull --rebase --autostash`, and never `git add -A` or `git commit -a.`**
-  Both silently sweep up whoever else has uncommitted work in the tree. On 2026-08-25
-  autostash lifted and replaced a third session's uncommitted file on every pull for
-  an afternoon; one conflict would have destroyed it. Commit your own work with an
-  EXPLICIT path, then `git status`, then a plain `git pull`. If status shows files you
-  did not touch, stop and report rather than resolving it.
+- **Never `git add -A` or `git commit -a`.** Commit EXPLICIT paths. A broad add
+  sweeps up whoever else is mid-edit.
+- **Never autostash on a tree that may contain work that is not yours.** On a SHARED
+  tree: commit your own work by explicit path, `git status`, then a plain `git pull`,
+  and if status shows files you did not touch, STOP and report rather than resolving
+  it. On 2026-08-25 autostash lifted and replaced a third session's uncommitted file
+  on every pull for an afternoon; one conflict would have destroyed it.
+  On a SINGLE-SESSION tree autostash is fine, and is specifically fine for a generated
+  file the local process owns. (Corrected 2026-08-26 after laptop showed the blanket
+  ban was unworkable: `rh_status.json` is TRACKED and its daemon rewrites it every
+  pass, so that tree is never clean and a plain pull would refuse during market hours.
+  The hazard is other people's work, not dirtiness as such.)
 - **Verify a push landed by reading the remote, not the command output.** An `rm` that
   failed once short-circuited an `&&` chain so `git add`/`git commit` never ran, while
   a `git push` on the next line ran anyway and printed success. The "fix" sat
@@ -67,6 +73,21 @@ audit. That works ONLY as a cross-audit, and the distinction is not pedantic:
 - Verify, do not accept. When the other session reports a fix, CHECK it: read the
   remote, run the failing case, prove the guard can still say "no". A report is not
   evidence. This caught three wrong claims in two days, in both directions.
+- **A cross-audit is CODE REVIEW, not behavioural verification, and saying "audited"
+  when you mean "read" is how a wrong result gets believed.** Neither session can run
+  the other's code where it actually runs: cloud has no laptop, no broker bridge and
+  no live ledger; laptop has no Alpaca keys, by design. The laptop's quote-gap money
+  bug was only findable by REPRODUCING it against a live ledger, and a careful reader
+  would have called that code correct. So when a finding depends on RUNTIME behaviour,
+  say so and ask the owner to run the case, rather than reporting it as established
+  either way.
+- **Shared files** (`slack_notify.py`, `mail_check.py`, `CLAUDE.md`,
+  `.github/audit-prompt.md`, `experiment.json`, `rh_deposits.json`) are
+  write-by-either, audit-by-both. Owners for tie-breaks: cloud owns `slack_notify.py`
+  and `mail_check.py`; laptop owns `rh_deposits.json` (its daemon writes it). Any
+  change to `audit-prompt.md`, `experiment.json` or `rh_deposits.json` must be
+  announced in AGENT_MAIL in the SAME commit: those three decide what Sunday's audit
+  knows, what the experiment claims, and whether Arm B's number is real.
 - `.github/workflows/weekly-audit.yml` (Sundays, cold context in Actions) is a third
   reviewer that costs no window and starts with no assumptions. It reads
   `.github/audit-prompt.md`, so that file is the ONLY channel to it. Keep it current.
