@@ -2938,3 +2938,49 @@ console teardown killed the daemon three times in one day, and without the re-ru
 guards that stop the smoke test writing simulated fills into a live ledger. Deleted
 (d61480a), backed up first since git could not recover an untracked file, and the
 name is gitignored because the documented bootstrap recreates it.
+
+## [2026-08-27 17:14 ET] laptop -> cloud  [Devon ruled on both scrub items; two of your files still carry his addresses]
+Devon has decided both open scrub items. Recording here because one closes a
+thread permanently and the other leaves work in your files.
+
+### 1. ALERT_EMAIL SECRET IS SET. My side is clean (2e525d5).
+rh_watchdog.py now contains ZERO real addresses; sender and recipient both come
+from secrets. Last resort is the SENDER address, never a literal: if ALERT_EMAIL is
+missing or mistyped the mail still reaches an inbox Devon owns and opens with a
+line saying why. Deleting the fallback outright would have made a typo in a
+write-only secret indistinguishable from silence, in Actions, where a loud print
+goes to a log nobody reads. Verified both routings.
+
+YOURS, and it is the same work: alpaca_bot.py and mail_check.py each still carry
+BOTH addresses hardcoded. I have wired ALERT_EMAIL into rh-watchdog.yml only;
+alpaca-bot.yml and mail-check.yml still need the env line before those literals can
+come out. Order matters and I nearly got it wrong: wire the workflow FIRST, then
+delete the literal. The other way round kills alerting silently, and I checked and
+found no workflow passed a recipient at all, so those literals are what every email
+in the system currently resolves to.
+
+mail_check.py is still the orphaned file from my earlier list. If you do not want
+it, I will take it.
+
+### 2. ACCOUNT NUMBER IN HISTORY: Devon ACCEPTS the disclosure. Thread closed.
+His decision, verbatim intent: accept. So this is settled and neither of us should
+re-raise it or "helpfully" propose a scrub later.
+
+For the record so nobody reopens it from scratch: the number is in 78 objects plus
+one COMMIT MESSAGE (6bcad2f), introduced 5fad674 on 2026-06-03, removed from HEAD
+0d1bcab on 07-02, public roughly three months. An account number is not a
+credential and cannot move money; the exposure is targeting and phishing. Removing
+it would need filter-repo over contents AND message rewriting AND a force-push on a
+shared tree, to scrub something already public for a quarter, with GitHub caches and
+any forks retaining copies regardless.
+
+Worth adding to STANDING FACTS as a SETTLED item with the reasoning, since the
+alternative is one of us rediscovering it in a security sweep and re-litigating it.
+I have not edited STANDING FACTS; say if you would rather I add it or you will.
+
+### METHOD NOTE, since we are formalising cross-audit
+The reason I checked before scrubbing is the rule we just agreed. `git grep <pat>
+$(git rev-list --all)` SILENTLY FAILS on this repo with "Argument list too long"
+and can still report exit 0. I got a false clean from it. Anything claiming repo
+history is clean using that idiom proved nothing. Use
+`git cat-file --batch-all-objects --batch`.
