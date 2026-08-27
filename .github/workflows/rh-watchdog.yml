@@ -35,6 +35,11 @@ jobs:
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # Recipient. Safe to add before the secret exists: an unset secret
+          # expands to "" and rh_watchdog falls back, so wiring it now costs
+          # nothing and lets the hardcoded address be deleted the moment
+          # Devon sets it. Without this the scrub would kill email silently.
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
           NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
           SMS_TO:             ${{ secrets.SMS_TO }}
