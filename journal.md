@@ -1360,3 +1360,9 @@
 - avoid: ['MRVL', 'BZ', 'SMCI', 'MRNA'] | favor: ['SPY', 'QQQ', 'IWM']
 - notes: NVDA cleared with a positive reaction — Nasdaq futures up and chips lifting, VIX calm at 15.1, so the binary event that kept us defensive has passed and we can ease toward neutral. Still trimming size ($64 cash, CPI next week looms); MRVL (earnings ~7d), BZ (earnings-quality doubts) and SMCI weakness stay flagged.
 - journal: Thu 8/27 09:00: NVDA print landed well, futures higher and tech recovering, so lifted from 0.4 risk-off to 0.6 neutral. Trimmed the avoid list now that the event is behind us; watching next week's CPI and MRVL's upcoming report before pushing risk higher.
+
+### 2026-08-27T18:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 and NVDA's guidance rally is lifting chips, so the tape is constructive but jobs report next week and only $31 cash keep me at moderate risk. CXM (earnings ~7d), MRVL (post-print weakness -7.4%) and BZ (-5.2%, earnings-quality doubts) stay flagged; NBIS added on -3.2% drift.
+- journal: Thu 8/27 18:26: Held 0.6 neutral into the close — NVDA cleared well and indexes finished mixed-to-higher with VIX easing to 14.5. Cash is down to $31 so new buys are minimal regardless; added CXM (earnings within a week) and NBIS to the avoid list, watching next week's jobs/inflation before pushing higher.
