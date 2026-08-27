@@ -1,35 +1,20 @@
 {
-  "regime": "risk-off",
-  "risk_scale": 0.4,
+  "regime": "neutral",
+  "risk_scale": 0.6,
   "avoid_symbols": [
-    "NVDA",
     "MRVL",
-    "MU",
-    "SNDK",
-    "AAPL",
-    "META",
-    "QQQ",
-    "MSTR",
+    "BZ",
     "SMCI",
-    "WMT",
-    "TGT",
-    "AZI",
-    "GTM",
-    "SHOP",
-    "SPSC",
-    "BMNR",
-    "ETHUSD",
-    "SOLUSD",
-    "CNMD"
+    "MRNA"
   ],
   "favor_symbols": [
     "SPY",
-    "IWM",
-    "MRNA"
+    "QQQ",
+    "IWM"
   ],
-  "notes": "Holding 0.4 risk-off into the final hour ahead of NVDA's after-close print \u2014 the binary chip event keeps tech-heavy QQQ (-1.7%) vulnerable and sticky PCE limits upside. VIX calm at 15.4 but thin $64 cash and the loaded event demand defense; MRVL earnings ~7d stays flagged.",
-  "journal_entry": "Wed 8/26 15:27: Kept 0.4 risk-off into the close \u2014 flat day (+$1), NVDA prints tonight and is the pivotal event; BHVN (+11%) and MRNA (+14% earlier) our winners but we already hold. Watching NVDA reaction after close to reassess toward neutral tomorrow.",
-  "date": "2026-08-26",
-  "mode": "INTRADAY",
-  "updated_at": "2026-08-26T15:27 ET"
+  "notes": "NVDA cleared with a positive reaction \u2014 Nasdaq futures up and chips lifting, VIX calm at 15.1, so the binary event that kept us defensive has passed and we can ease toward neutral. Still trimming size ($64 cash, CPI next week looms); MRVL (earnings ~7d), BZ (earnings-quality doubts) and SMCI weakness stay flagged.",
+  "journal_entry": "Thu 8/27 09:00: NVDA print landed well, futures higher and tech recovering, so lifted from 0.4 risk-off to 0.6 neutral. Trimmed the avoid list now that the event is behind us; watching next week's CPI and MRVL's upcoming report before pushing risk higher.",
+  "date": "2026-08-27",
+  "mode": "MORNING",
+  "updated_at": "2026-08-27T09:00 ET"
 }
