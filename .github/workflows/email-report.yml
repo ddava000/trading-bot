@@ -27,5 +27,7 @@ jobs:
       - name: Send report
         env:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python send_report.py "${{ inputs.path }}"

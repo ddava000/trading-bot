@@ -37,6 +37,8 @@ jobs:
           ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
           ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python brief.py
 

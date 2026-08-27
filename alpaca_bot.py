@@ -144,8 +144,17 @@ ALPACA_HDRS   = {"APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SE
 MODE          = "PAPER" if "paper-api" in ALPACA_BASE else "LIVE"
 
 # Email alerts — sent from GitHub's cloud so they arrive even with the PC asleep.
-ALERT_TO     = os.environ.get("ALERT_TO",   "devondavasher@gmail.com")  # you receive
-GMAIL_USER   = os.environ.get("GMAIL_USER", "devonsdummy@gmail.com")    # bot sends as
+# NO ADDRESS LITERALS: this repo is PUBLIC and these are Devon's personal addresses.
+# Recipient comes from the ALERT_EMAIL secret (set 2026-08-27); ALERT_TO is kept as a
+# legacy alias so nothing breaks if an old workflow still passes it.
+#
+# LAST RESORT is the SENDER address, never a literal. Deleting the fallback outright
+# would make a typo in a write-only secret indistinguishable from silence, and the
+# only complaint would be a print in an Actions log nobody reads. Falling back to an
+# inbox Devon owns, with a line saying why, fails loudly instead.
+GMAIL_USER   = (os.environ.get("GMAIL_USER") or "").strip()            # bot sends as
+ALERT_TO     = (os.environ.get("ALERT_EMAIL")
+                or os.environ.get("ALERT_TO") or "").strip()           # you receive
 GMAIL_APP_PW = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 
@@ -174,18 +183,29 @@ def send_email(subject, body):
     if not GMAIL_APP_PW:
         print("  [email skipped — GMAIL_APP_PASSWORD not set]")
         return
+    if not GMAIL_USER:
+        # Every mail-sending workflow passes GMAIL_USER as of 2026-08-27. If it is
+        # blank the SMTP login would 535-fail anyway; say so plainly instead.
+        print("  [email SKIPPED: GMAIL_USER unset/blank — set the repo secret]")
+        return
+    to = ALERT_TO or GMAIL_USER
+    if not ALERT_TO:
+        print("  [ALERT_EMAIL unset/blank — sending to the SENDER address instead]")
+        body = ("[ALERT_EMAIL is not set, so this went to the sender address rather "
+                "than Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
+                + chr(10) + chr(10) + body)
     try:
         import smtplib
         from email.mime.text import MIMEText
         msg = MIMEText(body)
         msg["Subject"] = subject
         msg["From"]    = GMAIL_USER
-        msg["To"]      = ALERT_TO
+        msg["To"]      = to
         with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as s:
             s.starttls()
             s.login(GMAIL_USER, GMAIL_APP_PW)
-            s.sendmail(GMAIL_USER, [ALERT_TO], msg.as_string())
-        print(f"  [email sent → {ALERT_TO}: {subject}]")
+            s.sendmail(GMAIL_USER, [to], msg.as_string())
+        print(f"  [email sent → {to}: {subject}]")
     except Exception as e:
         print(f"  [email failed: {e}]")
 

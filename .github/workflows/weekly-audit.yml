@@ -46,6 +46,8 @@ jobs:
         env:
           ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
           GH_TOKEN:           ${{ github.token }}   # lets the audit read run history via gh
           # The audit only reads market data and edits code — it gets NO Alpaca

@@ -88,8 +88,17 @@ def send(subject, body):
     pw = os.environ.get("GMAIL_APP_PASSWORD") or ""
     if not pw:
         print("[email skipped — GMAIL_APP_PASSWORD not set]"); return False
-    frm = os.environ.get("GMAIL_USER") or "devonsdummy@gmail.com"
-    to  = os.environ.get("ALERT_TO")   or "devondavasher@gmail.com"
+    # No address literals: this repo is PUBLIC. Same pattern as alpaca_bot and
+    # rh_watchdog -- recipient from ALERT_EMAIL, last resort is the SENDER, never a
+    # literal, so a mistyped write-only secret cannot look like silence.
+    frm = (os.environ.get("GMAIL_USER") or "").strip()
+    to  = (os.environ.get("ALERT_EMAIL") or os.environ.get("ALERT_TO") or "").strip()
+    if not frm:
+        print("[mail_check: GMAIL_USER unset/blank - cannot send, set the repo secret]")
+        return
+    if not to:
+        print("[mail_check: ALERT_EMAIL unset/blank - sending to the sender address]")
+        to = frm
     try:
         msg = MIMEText(body); msg["Subject"] = subject; msg["From"] = frm; msg["To"] = to
         with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as s:
