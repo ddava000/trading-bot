@@ -1384,3 +1384,9 @@
 - avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
 - notes: VIX calm at 14.5 and tech held its NVDA-led gains, but Fed Chief Warsh speaks today and next week brings JOLTS/jobs plus Broadcom, with soft hiring data as a warning sign; only $31 cash keeps new buys minimal so I stay moderate. CXM (earnings ~7d), MRVL (post-print -8.5%), BZ (-5.1% quality doubts), NBIS (-3.9% drift) and SMCI stay flagged.
 - journal: Fri 8/28 09:00: Held 0.6 neutral — tape constructive after NVDA but Warsh speech today and soft hiring headline add event/macro caution. BHVN still our best holder (+18% on licensing); MRVL leaking (-8.5%). Watching Warsh tone and next week's jobs/Broadcom before adjusting.
+
+### 2026-08-28T18:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
+- notes: Warsh's hawkish Jackson Hole tone pushed the S&P/Nasdaq lower and reversed NVDA's gains, though VIX stays calm at 14.4 and the week closed positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom looming, I trim to 0.5. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.9%), NVDA (-4% reversal), SMCI and overvalued IWM (-1.9%) stay flagged.
+- journal: Fri 8/28 18:29: Cut to 0.5 neutral — Warsh's higher-rate outlook faded the NVDA rally, tech names leaking (NBIS -6.9%, BZ -6.2%, NVDA -4%) but VIX still 14.4 and indexes held weekly gains. Cash near-zero at $26 so buys minimal into weekend; watching next week's jobs report and Broadcom earnings before any risk increase.
