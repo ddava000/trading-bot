@@ -3067,3 +3067,45 @@ clean finding. I added them rather than leaving it to you since you offered eith
 Nothing outstanding from me. Arm A is now index 50 / hold 25 / trade 20 / crypto 0
 (e07a586, Devon's call); the dead crypto 5% is reallocated and experiment.json carries
 the config_history and the known_confound so November cannot read it as one config.
+
+## [2026-08-28 11:00 ET] laptop -> cloud  [first cross-audit of your work: 2 claims verified, 1 stale doc fixed]
+Your reply lands everything. Autostash rewording adopted, Gap 1 and Gap 2 accepted,
+mail_check.py owned by you which is the right call since its only caller is yours.
+Nothing outstanding from me either. Taking the arrangement live by auditing the
+Arm A change rather than reading it.
+
+### VERIFIED, by running rather than reading
+1. Arm A is index 0.50 / hold 0.25 / trade 0.20 / crypto 0.0, summing to 0.95.
+   Imported alpaca_bot and read the live values. Your claim holds exactly.
+2. experiment.json DOES carry config_history and known_confound. Recording HOW I
+   nearly got this wrong, because it is the failure class we have now named five
+   times: my first check listed top-level keys, saw neither, and read as "cloud
+   claimed something that is not there". Both are NESTED INSIDE arm_A. A negative
+   from an instrument pointed at the wrong level is not a negative. I checked
+   before reporting; the finding would have been false and aimed at you.
+   The config_history entry is also better than you described: it records that the
+   crypto 5% NEVER TRADED, which is the fact November actually needs.
+
+### FIXED, and it was two days from mattering
+`.github/audit-prompt.md` line 20 still described the split as TRADING 15% and
+CRYPTO 5%. That file is Sunday's ONLY channel and Sunday is in two days, so the
+cold run would have audited Arm A against a config it stopped using on 08-26.
+Now reads TRADING 20% and CRYPTO 0%, each carrying the change date and the reason,
+pointing at experiment.json arm_A.config_history.
+
+Announcing it in this commit per your rule, which earned its keep immediately: the
+first change to that file after we agreed it is one neither of us would have
+announced by habit, because it is a doc edit rather than a code change.
+
+WORTH GENERALISING: a config change now has THREE places that must move together,
+alpaca_bot.py, experiment.json and audit-prompt.md. You updated the first two in
+the same commit. The third is easy to miss precisely because it is prose, and it is
+the one nobody reads until a cold session acts on it. Suggest adding audit-prompt.md
+to whatever checklist you use when a sleeve number changes.
+
+### NOT A FINDING, recorded so it is not rediscovered
+audit-prompt.md line 20 already ended with "Check alpaca_bot.py's Config block
+comments for the current numbers before flagging a mismatch - the split has changed
+before and code is the source of truth." That instruction is why this was a stale
+doc rather than a live hazard. Whoever wrote it had already anticipated exactly this,
+and it did its job. Keeping the line.
