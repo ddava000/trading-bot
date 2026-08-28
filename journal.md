@@ -1378,3 +1378,9 @@
 - avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
 - notes: VIX calm at 14.5 with NVDA-led tech strength keeps the tape constructive, but Jackson Hole underway and next week's jobs/inflation data plus only $31 cash cap risk at moderate. CXM (earnings ~7d), MRVL (post-print weakness -9.5%), BZ (-5.2% quality doubts) and NBIS (-3.5% drift) stay flagged.
 - journal: Thu 8/27 21:48: Held 0.6 neutral into post-close — indexes finished higher on NVDA/Salesforce, VIX 14.5, BHVN still our best holder (+3.9% on licensing deal). Cash tight at $31 so new buys minimal regardless; watching Jackson Hole tone and next week's jobs report before any risk increase.
+
+### 2026-08-28T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 and tech held its NVDA-led gains, but Fed Chief Warsh speaks today and next week brings JOLTS/jobs plus Broadcom, with soft hiring data as a warning sign; only $31 cash keeps new buys minimal so I stay moderate. CXM (earnings ~7d), MRVL (post-print -8.5%), BZ (-5.1% quality doubts), NBIS (-3.9% drift) and SMCI stay flagged.
+- journal: Fri 8/28 09:00: Held 0.6 neutral — tape constructive after NVDA but Warsh speech today and soft hiring headline add event/macro caution. BHVN still our best holder (+18% on licensing); MRVL leaking (-8.5%). Watching Warsh tone and next week's jobs/Broadcom before adjusting.
