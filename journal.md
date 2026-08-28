@@ -1372,3 +1372,9 @@
 - avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
 - notes: VIX calm at 14.5 with NVDA-led tech strength keeps the tape constructive, but Jackson Hole underway and next week's jobs report plus only $31 cash cap risk at moderate. CXM (earnings ~7d), MRVL (post-print weakness -8.8%), BZ (-4.4%, quality doubts) and NBIS (-3.4% drift) stay flagged.
 - journal: Thu 8/27 20:30: Steady at 0.6 neutral — indexes closed higher on NVDA/Salesforce, VIX 14.5, BHVN still our winner (+3.9% on licensing deal). Cash tight at $31 so new buys minimal; watching Jackson Hole tone and next week's jobs report before any risk increase.
+
+### 2026-08-27T21:48 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 with NVDA-led tech strength keeps the tape constructive, but Jackson Hole underway and next week's jobs/inflation data plus only $31 cash cap risk at moderate. CXM (earnings ~7d), MRVL (post-print weakness -9.5%), BZ (-5.2% quality doubts) and NBIS (-3.5% drift) stay flagged.
+- journal: Thu 8/27 21:48: Held 0.6 neutral into post-close — indexes finished higher on NVDA/Salesforce, VIX 14.5, BHVN still our best holder (+3.9% on licensing deal). Cash tight at $31 so new buys minimal regardless; watching Jackson Hole tone and next week's jobs report before any risk increase.
