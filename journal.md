@@ -1396,3 +1396,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
 - notes: Warsh's hawkish tone pressured indexes into the close and reversed NVDA, but VIX stays calm at 14.4 and the week finished positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom looming, I hold 0.5 into the weekend. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.6%), NVDA (-4% reversal), SMCI and overvalued IWM (-1.9%) stay flagged.
 - journal: Fri 8/28 20:03: Held 0.5 neutral into the close/weekend — tech leaked on Warsh's higher-rate outlook (NBIS -6.6%, BZ -6.2%, NVDA -4%), VIX still 14.4, indexes kept weekly gains. Cash near-zero at $26 so buys minimal; watching next week's jobs report and Broadcom earnings before adjusting risk.
+
+### 2026-08-28T21:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
+- notes: Market closed for the weekend after Warsh's hawkish tone faded tech into Friday's close, though VIX stays calm at 14.4 and the week finished positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom earnings looming, I hold 0.5 neutral. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.6%), NVDA (-4% reversal), SMCI and overvalued IWM stay flagged.
+- journal: Fri 8/28 21:12: Held 0.5 neutral into the weekend — no change since 20:03 as tech leaked on Warsh's higher-rate outlook, VIX still 14.4, weekly gains intact. Cash near-zero at $26 keeps buys minimal; watching next week's JOLTS/jobs report and Broadcom earnings before adjusting risk.
