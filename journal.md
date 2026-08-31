@@ -1420,3 +1420,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
 - notes: Market closing on Iran-strike geopolitical tension and rising oil, with indexes red but capping a winning August; VIX still moderate at 14.9. Jobs report Friday plus Hormuz risk keeps me defensive at 0.35 into the close. BZ (-8.8%) and NBIS (-7.5%) keep bleeding; CXM reports within ~7d.
 - journal: Mon 8/31 16:58: Holding risk-off 0.35 at the close — no material change, VIX eased to 14.9 but Iran/oil event risk and Friday's jobs report keep me cautious. BZ (-8.8%) and NBIS (-7.5%) still weakest; watching oil, VIX, and jobs data before easing risk.
+
+### 2026-08-31T18:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: After-hours brief: Iran-strike geopolitical tension and rising oil persist, tech leaking on Warsh's higher-rate outlook, indexes red into the close but capping a winning August; VIX moderate at 14.9. Jobs-report week plus Hormuz risk keeps me defensive at 0.35. BZ (-8.8%) and NBIS (-7.5%) still bleeding; CXM reports within ~7d.
+- journal: Mon 8/31 18:04: No material change post-close — holding risk-off 0.35, VIX 14.9 but Iran/oil event risk and Friday's jobs report keep me cautious. Cash $25 keeps buys tiny anyway. Watching oil, VIX, and jobs/JOLTS data plus Broadcom earnings before easing risk.
