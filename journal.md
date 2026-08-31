@@ -1402,3 +1402,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
 - notes: Market closed for the weekend after Warsh's hawkish tone faded tech into Friday's close, though VIX stays calm at 14.4 and the week finished positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom earnings looming, I hold 0.5 neutral. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.6%), NVDA (-4% reversal), SMCI and overvalued IWM stay flagged.
 - journal: Fri 8/28 21:12: Held 0.5 neutral into the weekend — no change since 20:03 as tech leaked on Warsh's higher-rate outlook, VIX still 14.4, weekly gains intact. Cash near-zero at $26 keeps buys minimal; watching next week's JOLTS/jobs report and Broadcom earnings before adjusting risk.
+
+### 2026-08-31T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM', 'SPCX'] | favor: ['MSFT', 'SPY']
+- notes: US strikes on Iran have futures falling and Brent topping $90, with rate-hike bets jumping ahead of a jobs-report week — a genuine geopolitical event, so I cut to 0.35 risk-off despite a still-moderate VIX (15.4). CXM reports within ~7d and tech names (NBIS -8.3%, BZ -5.8%, NVDA -3.8%, SMCI) keep leaking.
+- journal: Mon 8/31 09:00: Shifted neutral->risk-off, 0.5->0.35 on the Iran strike/oil spike and jump in rate-hike odds; VIX only 15.4 but event risk plus a jobs-report week warrants defense. Cash $26 keeps buys tiny anyway; watching oil, VIX, and Friday's jobs data before easing back.
