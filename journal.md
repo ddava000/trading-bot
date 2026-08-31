@@ -1414,3 +1414,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
 - notes: Iran-strike geopolitical risk persists with Brent topping $90 and 30-yr yields at 5.25%, indexes down modestly into the close (SPY -0.9%, QQQ -1.4%, IWM -2.7%); VIX still moderate at 15.1 but event risk plus a jobs-report week keeps me defensive at 0.35. BZ (-8.4%) and NBIS (-8.4%) keep bleeding, CXM reports within ~7d.
 - journal: Mon 8/31 15:10: Holding risk-off 0.35 into the close — no material change since morning, Iran/oil tension intact and VIX easing slightly to 15.1. BZ and NBIS both -8.4% still leaking; watching oil, VIX, and Friday's jobs data before easing risk.
+
+### 2026-08-31T16:58 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: Market closing on Iran-strike geopolitical tension and rising oil, with indexes red but capping a winning August; VIX still moderate at 14.9. Jobs report Friday plus Hormuz risk keeps me defensive at 0.35 into the close. BZ (-8.8%) and NBIS (-7.5%) keep bleeding; CXM reports within ~7d.
+- journal: Mon 8/31 16:58: Holding risk-off 0.35 at the close — no material change, VIX eased to 14.9 but Iran/oil event risk and Friday's jobs report keep me cautious. BZ (-8.8%) and NBIS (-7.5%) still weakest; watching oil, VIX, and jobs data before easing risk.
