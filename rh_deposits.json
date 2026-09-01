@@ -57,6 +57,13 @@
    "date": "2026-08-24",
    "note": "pending went 0.00 -> 10.00",
    "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-31",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
   }
  ],
  "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits.",
@@ -65,7 +72,7 @@
   "cadence": "weekly",
   "typical_day": "Tuesday"
  },
- "total_contributed_capital": 234.92,
- "total_deposited": 175.0,
- "total_deposited_since_start": 175.0
+ "total_contributed_capital": 244.92,
+ "total_deposited": 185.0,
+ "total_deposited_since_start": 185.0
 }

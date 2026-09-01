@@ -605,7 +605,16 @@ def _push_status(reason):
     the old ~390s, and it now runs a couple of dozen times a day rather than ~370.
     """
     try:
-        subprocess.run(["git", "add", STATUS_F, LOG_F], capture_output=True, timeout=15)
+        # DEPOSITS_F rides along deliberately. record_deposit() writes it and its
+        # docstring calls it "the COMMITTED rh_deposits.json", but nothing here ever
+        # staged it, so every deposit after the file was created lived on this laptop
+        # alone. It looked fine only because I hand-committed it twice while fixing
+        # other things. Cloud and the weekly audit read the COMMITTED copy, so an
+        # unpushed deposit is counted as Arm B profit by the one number November
+        # decides on: at $10 unpushed on a $245 account that reads +5.4% instead of
+        # the true +1.1%, a 5x overstatement from a missing filename.
+        subprocess.run(["git", "add", STATUS_F, LOG_F, DEPOSITS_F],
+                       capture_output=True, timeout=15)
         if subprocess.run(["git", "diff", "--cached", "--quiet"],
                           capture_output=True, timeout=15).returncode == 0:
             return False                      # nothing staged, nothing to say
