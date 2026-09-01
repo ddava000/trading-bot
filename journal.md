@@ -1444,3 +1444,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'PLTR'] | favor: ['MSFT', 'SPY', 'QQQ']
 - notes: September stays under pressure — indexes red on Iran/Hormuz oil spike, surging Treasury yields and rising crude; holdings broadly leaking (NBIS -11%, BZ -7.7%, NVDA -4.6%, IWM -3.7%). VIX moderate at 16.2 but jobs report Friday plus geopolitical event risk keeps me defensive at 0.35; CXM reports within ~7d.
 - journal: Tue 9/1 14:43: No material change into the afternoon — held risk-off 0.35. NBIS worst at -11%, BZ and IWM still bleeding; VIX ticked up to 16.2. Watching oil, yields, and Friday jobs before easing; cash $30 keeps buys tiny anyway.
+
+### 2026-09-01T16:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'PLTR'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: End of day stays defensive — bond selloff intensifying with 10yr at 20-month high on Iran/Hormuz oil-driven inflation fears; holdings broadly red (NBIS -11%, BZ -7.5%, NVDA -4.1%, IWM -3.7%). VIX moderate at 16.5 but Friday jobs report and geopolitical event risk keep me at 0.35; CXM reports within ~7d.
+- journal: Tue 9/1 16:12: Holding risk-off 0.35 into the close. Bond selloff intensified (yields 20-mo high) on Middle East oil spike; NBIS worst at -11%, BZ still bleeding. VIX 16.5. Watching yields, oil, and Friday's jobs report before easing; cash $30 keeps buys tiny anyway.
