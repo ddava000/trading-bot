@@ -68,6 +68,10 @@ TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still sa
 RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
 HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
 HOLD_MIN_VOTES   = 4      # votes a name needs before the hold sleeve considers it
+EXPERIMENT_START = "2026-08-24"   # A/B window opened; capital moved after this
+                                  # date contaminates Arm A the way pre-window
+                                  # deposits contaminate Arm B. Keep in step
+                                  # with experiment.json arm_A.
 MEME_RSI_MAX     = 75.0   # meme +2 vote bonus is gated below this (see compute_signals).
                           # NOTE the gap: 70-75 is a band where a meme name can EARN the
                           # votes that qualify it and be disqualified from hold at the
@@ -714,6 +718,54 @@ def alpaca_open_orders():
                 if o.get("symbol")}
     except Exception:
         return set()
+
+# ── Contributed-capital detector ──────────────────────────────────────────────
+# Arm A had NO deposit handling at all until 2026-09-01, when laptop asked whether
+# this side carried the bug it had just fixed twice on its own. It was a fair
+# question and the honest answer was "we cannot tell": money moved into Alpaca after
+# the baseline was set would be counted as RETURN, with no detector, no record, and
+# nothing to notice it. On the Robinhood side that bug is at least subtle, because
+# the broker exposes pending_deposits. Here it would have been SILENT, and it biases
+# in favour of the arm this session owns, which is exactly why it needs a detector
+# rather than an assurance.
+#
+# Cash movements only. DIV and INT are deliberately EXCLUDED: dividends and interest
+# are RETURN, not contributed capital, and folding them in here would understate
+# performance instead of overstating it.
+CAPITAL_ACTIVITY_TYPES = "CSD,CSW,JNLC,ACATC,ACATS"
+
+
+def alpaca_capital_flows(after_iso):
+    """Net cash moved IN/OUT since after_iso. Returns (net, [events]) or (None, []).
+
+    None means COULD NOT DETERMINE -- unreachable API, unexpected shape -- and is
+    deliberately distinct from 0.0 meaning "checked, nothing moved". A detector that
+    reports "no deposits" when it actually failed is worse than no detector.
+    """
+    try:
+        d = alpaca_get("/v2/account/activities?activity_types=%s&after=%s"
+                       % (CAPITAL_ACTIVITY_TYPES, after_iso))
+    except Exception as e:
+        print(f"  [capital-flow check failed: {e}]")
+        return None, []
+    if not isinstance(d, list):
+        # A dict here is an API error object; anything else is unexpected.
+        msg = (d or {}).get("message", d) if isinstance(d, dict) else d
+        print(f"  [capital-flow check unavailable: {msg}]")
+        return None, []
+    events, net = [], 0.0
+    for a in d:
+        try:
+            amt = float(a.get("net_amount") or a.get("amount") or 0)
+        except (TypeError, ValueError):
+            continue
+        if not amt:
+            continue
+        net += amt
+        events.append({"date": (a.get("date") or a.get("transaction_time") or "")[:10],
+                       "type": a.get("activity_type"), "amount": round(amt, 2)})
+    return round(net, 2), events
+
 
 def alpaca_positions():
     pos = {}
@@ -1803,6 +1855,18 @@ if __name__ == "__main__":
               f"trade {MAX_INVESTED_PCT:.0%} / crypto {CRYPTO_PCT:.0%})")
         print(f"  rails    : cash-only, no leverage/shorting/options; "
               f"stop {1-STOP_LOSS_PCT:.0%}, loss-halt {LOSS_CAP_PCT:.0%}, VIX halt >35")
+        _net, _ev = alpaca_capital_flows(EXPERIMENT_START)
+        if _net is None:
+            print(f"  capital  : COULD NOT DETERMINE flows since {EXPERIMENT_START} "
+                  f"- treat Arm A's return as UNVERIFIED, not as clean")
+        elif _net == 0:
+            print(f"  capital  : $0.00 moved in/out since {EXPERIMENT_START} - "
+                  f"start_equity is a complete basis, nothing to adjust")
+        else:
+            print(f"  capital  : ${_net:+,.2f} moved since {EXPERIMENT_START} - "
+                  f"Arm A's raw return is CONTAMINATED by this much")
+            for e in _ev:
+                print(f"             {e['date']}  {e['type']}  ${e['amount']:+,.2f}")
         raise SystemExit(0)
 
     # Order-path test: `gh workflow run alpaca-bot.yml -f order_test=true`
