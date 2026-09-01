@@ -66,6 +66,13 @@
    "source": "broker pending_deposits (rising edge)"
   }
  ],
+ "experiment_window": {
+  "adjusted_basis": 251.3,
+  "deposits_in_window": 20.0,
+  "how_to_use": "For the A/B decision use THIS block, not total_contributed_capital: arm_B return = current_total_value - adjusted_basis. The totals above measure the bot since 2026-07-23 inception, which is a different question and a different sign.",
+  "start_equity": 231.3,
+  "window_opened": "2026-08-24"
+ },
  "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits.",
  "recurring": {
   "amount": 10.0,

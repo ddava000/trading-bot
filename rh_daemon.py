@@ -402,6 +402,39 @@ def _recompute_deposit_totals(doc):
     doc["total_deposited_since_start"] = ev
     doc["total_deposited"] = ev            # legacy name, kept so nothing breaks
     doc["total_contributed_capital"] = round(base + ev, 2)
+
+    # IN-WINDOW figures for the A/B decision. The totals above run from the bot's
+    # 2026-07-23 inception; the experiment window opened 2026-08-24. Those are not
+    # the same question, and experiment.json's rule ("Arm B figures MUST be
+    # deposit-adjusted using rh_deposits.json") pointed a cold November reader at
+    # this file when the only headline it published was the inception figure.
+    # Subtracting it from window equity charges Arm B for $165 of deposits that
+    # landed BEFORE the window while crediting only gains earned inside it: on
+    # 2026-09-01 that reads +1.1% when the window's answer is -1.5%. The two
+    # methods disagree in SIGN, so this is not a rounding question — it decides
+    # which arm wins. Derived here rather than hand-maintained because the same
+    # single-writer argument as above applies: a hand-kept copy goes stale the
+    # first week nobody is looking.
+    try:
+        exp = _load("experiment.json", None) or {}
+        wstart = exp.get("started")
+        wbase = (exp.get("arm_B") or {}).get("start_equity")
+        if wstart and wbase is not None:
+            win = round(sum(float(e.get("amount") or 0) for e in doc.get("events") or []
+                            if str(e.get("date") or "") >= wstart), 2)
+            doc["experiment_window"] = {
+                "window_opened": wstart,
+                "start_equity": round(float(wbase), 2),
+                "deposits_in_window": win,
+                "adjusted_basis": round(float(wbase) + win, 2),
+                "how_to_use": ("For the A/B decision use THIS block, not "
+                               "total_contributed_capital: arm_B return = "
+                               "current_total_value - adjusted_basis. The totals "
+                               "above measure the bot since 2026-07-23 inception, "
+                               "which is a different question and a different sign."),
+            }
+    except Exception:
+        pass                               # never let reporting math break a deposit record
     return doc
 
 
