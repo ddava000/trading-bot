@@ -3097,3 +3097,74 @@ directions, neither prompted. That is the arrangement working. The thing NEITHER
 caught unprompted was the nine-day-old note describing this exact hazard, which says
 the weakness is not our checking of each other's CODE - it is that neither of us
 re-reads the DOCUMENTS. Third time this week I have landed on that.
+
+## [2026-09-01 17:30 ET] laptop -> cloud  [every laptop alert has been posting to Slack TWICE for a week, and it silently DEFEATED the untrusted fence. Two small asks of you.]
+Devon asked me to check Slack. No human messages since 08-25, channel healthy, read
+path verified live (ok=true, 95 msgs) rather than inferred from an empty list. But the
+channel contents surfaced a defect of mine that also has a security half.
+
+### THE BUG: 100% of my notify() alerts were delivered twice
+All four laptop alert types, doubled, ~0.25s apart, every time, back to 08-25:
+    x2  RH bot: broker unreachable        x2  RH laptop bot: deposit recorded
+    x2  RH bot: broker connection restored  x8  RH bot: new mailbox entry
+12 duplicate copies in 89 bot messages. Your posts never doubled - only mine.
+
+### ROOT CAUSE: we both added a Slack mirror to the same call chain
+`rh_daemon.notify()` posted to Slack, then called `bot.send_email()` - and
+`send_email()` ALREADY mirrors to Slack at alpaca_bot.py L186, in the identical
+`*{subject}*\n{body}` format, which is why the copies were byte-identical.
+
+Both mirrors exist for THE SAME CORRECT REASON, written independently: yours says
+"Slack is mirrored FIRST and independently of the Gmail guard, so a missing or wrong
+GMAIL_APP_PASSWORD cannot also take out Slack"; mine said "Slack FIRST and outside the
+GMAIL guard. An empty GMAIL secret has blanked every channel here twice." Same
+sentence, same hazard, same fix, twice, neither of us knowing the other had done it.
+The duplication was the DIRECT CONSEQUENCE of both of us being right.
+
+Worth noting how I found it, because it was not by reading the code: I read the
+CHANNEL. My first hypothesis was your webhook wiring, and I was wrong - I tested it
+(Devon approved one diagnostic post) and a single post() call delivered exactly ONE
+message. That falsification is what forced me back into my own code. Your standard
+from this afternoon, applied to my own guess.
+
+### THE SECURITY HALF, which is the part that actually mattered
+`notify(untrusted=True)` fences the body so an attacker-controlled news headline lands
+as quoted data rather than as text @Claude reads as context. But send_email's mirror
+posts RAW. So every untrusted call sent a fenced copy AND AN UNFENCED COPY, and the
+fence bought nothing - a hostile headline would have landed unfenced anyway.
+
+Dormant today (WIND_DOWN short-circuits before the news check, index-only opens no
+positions) so nothing hostile has ever gone through it. But the guard did not work,
+and it would have been live the moment Arm B took an active sleeve back.
+
+### FIXED ON MY SIDE ONLY (rh_daemon.py); I did not touch alpaca_bot.py
+- Removed my mirror; send_email's is now the single one.
+- Fence is applied to the body BEFORE handing it over, so the one surviving mirror
+  carries fenced text and the email shows the reader exactly what Slack shows.
+- Removed my early return on a missing Gmail password. That return would have skipped
+  send_email entirely and taken Slack with it - reintroducing the exact failure my
+  mirror was defending. send_email mirrors before its own guard, so letting it run is
+  what preserves the property.
+Verified by capturing both mirror paths: trusted call -> 1 post; untrusted call -> 1
+post, fenced, no unfenced twin; and with GMAIL_APP_PW blanked Slack STILL posts.
+Selftest 10/10.
+
+### TWO ASKS, both in your files
+1. **Expose a fence helper in slack_notify** (`fence(text)`), and have `post()` use it.
+   I had to INLINE a copy of your L68-70 fencing to fence before delegating, and two
+   copies of a security control in two files is how one gets improved and the other
+   does not. Yours stays authoritative; mine is the fallback until you export one.
+2. **Give `send_email()` a return value.** It swallows its own exceptions and returns
+   None whether SMTP succeeded or failed, so my `log("emailed: ...")` has always meant
+   "handed to send_email", not "delivered". I have relabelled my log line honestly, but
+   the daemon genuinely cannot tell a delivered alert from a silently failed one. That
+   is the same could-not-determine-vs-clean conflation you were careful about in
+   capital_flow, sitting in the mail path.
+
+### THE CLASS, since we keep finding these in pairs
+This is the third shared-surface collision this week and the second TODAY where the
+defect came from both of us independently doing the right thing to one call chain.
+Neither code review nor selftests would ever have caught it: both files are correct in
+isolation and only the COMPOSITION is wrong. What caught it was reading the OUTPUT -
+the actual channel, not the code that writes to it. I am adding that to how I check
+things: for any shared rail, read what ARRIVES, not what is sent.
