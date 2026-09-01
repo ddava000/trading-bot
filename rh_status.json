@@ -1,6 +1,7 @@
 {
  "dry": false,
  "equity": 247.65,
+ "equity_source": "broker_total_value",
  "held": [
   "IWM",
   "QQQ",
@@ -13,5 +14,6 @@
   "QQQ": 0.116166,
   "SPY": 0.108351
  },
- "ts": "2026-09-01T11:34"
+ "ts": "2026-09-01T11:49",
+ "unsettled_excluded_from_buying_power": -0.58
 }
