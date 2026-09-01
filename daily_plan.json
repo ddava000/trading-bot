@@ -7,16 +7,16 @@
     "NBIS",
     "NVDA",
     "IWM",
-    "SPCX"
+    "CRWD"
   ],
   "favor_symbols": [
     "MSFT",
     "SPY",
-    "CRWD"
+    "QQQ"
   ],
-  "notes": "Futures down on Iran-Hormuz oil spike and rising bond yields; jobs-report week with ISM and Palo Alto earnings on tap. VIX still moderate at 15.9 but broad holdings red (NBIS -10.2%, BZ -9.5%, NVDA -4.4%, BHVN -4.1%); event risk keeps me defensive at 0.35. CXM reports within ~7d \u2014 avoid.",
-  "journal_entry": "Tue 9/1 09:00: Holding risk-off 0.35 into new month. Iran/oil tension and yields persist, futures lower, VIX ticked to 15.9. NBIS and BZ still worst bleeders. Watching oil, ISM data, and Friday's jobs report before easing; cash $25 keeps buys tiny anyway.",
+  "notes": "September opens red across the board on Iran/Hormuz oil spike and rising yields; VIX moderate at 15.9 but holdings broadly leaking (NBIS -10.5%, BZ -7.5%, CRWD -6.9%, IWM -3.5%). Jobs report Friday plus event risk keeps me defensive at 0.35; CXM reports within ~7d.",
+  "journal_entry": "Tue 9/1 12:46: No material change midday \u2014 held risk-off 0.35. NBIS worst at -10.5%, BZ and CRWD still bleeding; added CRWD to avoid on weakness. Watching oil, yields, and Friday jobs before easing; cash $25 keeps buys tiny anyway.",
   "date": "2026-09-01",
-  "mode": "MORNING",
-  "updated_at": "2026-09-01T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-09-01T12:46 ET"
 }
