@@ -3,7 +3,7 @@
  "restarted_from": "2026-08-11 (strategy swap voided that window)",
  "decide_no_earlier_than": "2026-11-24",
  "benchmark": "SPY @ 765.72 on 2026-08-21 close",
- "rule": "Both arms measured against SPY, not just each other. Arm B figures MUST be deposit-adjusted using rh_deposits.json before any comparison.",
+ "rule": "Both arms measured against SPY, not just each other, and BOTH arms adjusted for contributed capital IN THE EXPERIMENT WINDOW only. ARM B: return = current total_value - rh_deposits.json experiment_window.adjusted_basis. Do NOT use total_contributed_capital: it measures from the bot's 2026-07-23 inception, a different window, and it charges ~$165 of pre-window deposits against in-window gains. On 2026-09-01 the two methods disagreed in SIGN (+1.1% vs -1.5%). ARM A: return = current equity - arm_A.start_equity, but FIRST read status.json capital_flow.state. clean = no adjustment needed. contaminated = subtract capital_flow.net first. unknown = the check FAILED and Arm A's basis is UNVERIFIED; say so rather than reporting a number as if it were clean. (Reworded 2026-09-01 on Devon's explicit approval. The previous rule named only Arm B and pointed at the inception total, so a cold reader following it landed on the wrong window for one arm and no capital check at all for the other.)",
  "design_principle": "Match the strategy to the platform's execution reliability. Stops need minutes; buy-and-hold tolerates hours. So the hybrid lives where execution is a solved problem.",
  "arm_A": {
   "name": "Alpaca LIVE \u2014 HYBRID day-trader",
