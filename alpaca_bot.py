@@ -179,6 +179,15 @@ def _slack(text):
 def send_email(subject, body):
     """Best-effort Gmail alert, mirrored to Slack. Never raises.
 
+    RETURNS True only if SMTP actually accepted the message; False otherwise.
+    Added at laptop's request (AGENT_MAIL 2026-09-01 17:30): it swallows its own
+    exceptions and used to return None whether delivery succeeded or failed, so
+    rh_daemon's "emailed: ..." log line meant "handed to send_email", not
+    "delivered". A caller could not tell a delivered alert from a silently failed
+    one. The Slack mirror is deliberately NOT part of this verdict: it fires before
+    the Gmail guard on purpose, so a False here means "email failed" and never
+    "nothing was sent anywhere".
+
     Slack is mirrored FIRST and independently of the Gmail guard, so a missing
     or wrong GMAIL_APP_PASSWORD (which has silently blanked every channel here
     before) cannot also take out Slack.
@@ -186,12 +195,12 @@ def send_email(subject, body):
     _slack(f"*{subject}*\n{body}")
     if not GMAIL_APP_PW:
         print("  [email skipped — GMAIL_APP_PASSWORD not set]")
-        return
+        return False
     if not GMAIL_USER:
         # Every mail-sending workflow passes GMAIL_USER as of 2026-08-27. If it is
         # blank the SMTP login would 535-fail anyway; say so plainly instead.
         print("  [email SKIPPED: GMAIL_USER unset/blank — set the repo secret]")
-        return
+        return False
     to = ALERT_TO or GMAIL_USER
     if not ALERT_TO:
         print("  [ALERT_EMAIL unset/blank — sending to the SENDER address instead]")
@@ -210,8 +219,10 @@ def send_email(subject, body):
             s.login(GMAIL_USER, GMAIL_APP_PW)
             s.sendmail(GMAIL_USER, [to], msg.as_string())
         print(f"  [email sent → {to}: {subject}]")
+        return True
     except Exception as e:
         print(f"  [email failed: {e}]")
+        return False
 
 
 # ── Outage alerting state ─────────────────────────────────────────────────────
