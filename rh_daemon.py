@@ -72,9 +72,11 @@ BROKER_FAIL_ALERT  = 3      # consecutive failed broker snapshots before alertin
 BROKER_REALERT_SEC = 3600   # re-alert hourly while the broker stays unreachable
 
 RECONCILE_BACKOFF_MAX = 900   # cap retry spacing at 15 min during an outage
+DEGRADED_PUSH_SEC  = 300    # min spacing between degraded git pushes; see publish_degraded
 
 _reconcile_fails, _broker_alert_at = 0, 0.0
 _next_reconcile_try = 0.0
+_degraded_push_at   = 0.0   # last degraded git push; throttles the outage heartbeat
 _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
@@ -791,11 +793,29 @@ def persist(led, res, placed):
 def publish_degraded(led, reason, passes):
     """Heartbeat while the broker is unreachable, naming the reason.
 
-    Costs no agent turn, so it is safe to run on every pass even mid-outage. This
-    is what lets monitoring tell a dead BROKER from a dead LAPTOP: without it the
-    daemon simply went quiet and the watchdog reported the machine down, sending
-    Devon to check hardware that was fine.
+    This is what lets monitoring tell a dead BROKER from a dead LAPTOP: without it
+    the daemon simply went quiet and the watchdog reported the machine down,
+    sending Devon to check hardware that was fine.
+
+    The STATUS WRITE runs every pass; the GIT PUSH is throttled. The original said
+    "costs no agent turn, so it is safe to run on every pass", which priced the
+    call against the Claude quota the backoff above protects and stopped there. It
+    is free of quota and it is not free: each call commits and pushes to a public
+    repo. The 2026-09-01 session-limit outage ran 91 minutes and produced ~90
+    commits, one per fast pass, while the retries it sat beside were correctly
+    backing off to 15-minute spacing. I throttled the expensive thing and left the
+    "free" thing firing every 60 seconds.
+
+    The real damage was not bandwidth, it was the shared record: those commits
+    buried the one substantive commit either session made that afternoon, in the
+    log both sessions and the Sunday cold audit read to find out what happened.
+
+    First degraded pass still pushes IMMEDIATELY - monitoring has to learn at once
+    that the broker died and the laptop did not, which is this function's whole
+    reason to exist. After that, DEGRADED_PUSH_SEC. The watchdog polls every 30 min
+    against STALE_MIN 30, so it cannot tell 5-minute pushes from 1-minute ones.
     """
+    global _degraded_push_at
     prev = _load(STATUS_F, {}) or {}
     snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
             "equity": prev.get("equity"),   # last known, so monitoring keeps a number
@@ -807,7 +827,10 @@ def publish_degraded(led, reason, passes):
             "orders_today": led.get("orders_today", 0),
             "dry": DRY}
     _save(STATUS_F, snap)
-    _push_status("degraded")
+    now = time.time()
+    if passes <= 1 or (now - _degraded_push_at) >= DEGRADED_PUSH_SEC:
+        _degraded_push_at = now
+        _push_status("degraded")
 
 
 MAIL_F = "AGENT_MAIL.md"
@@ -1121,7 +1144,7 @@ def main():
                                RECONCILE_BACKOFF_MAX)
                     _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
-                        f"trading nothing this pass and retrying next minute")
+                        f"trading nothing this pass, next try in {int(wait)}s")
                     save_ledger(led)
                     publish_degraded(led, "broker_unreachable", _reconcile_fails)
                     if (_reconcile_fails >= BROKER_FAIL_ALERT and
