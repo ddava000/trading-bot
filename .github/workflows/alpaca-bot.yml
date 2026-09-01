@@ -19,6 +19,9 @@ on:
         description: "READ-ONLY connection check (safe on live) and exit"
         type: boolean
         default: false
+      capital_since:
+        description: "account_test only: capital-flow window (YYYY-MM-DD). Early date proves the detector can report non-zero."
+        default: ""
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -90,6 +93,7 @@ jobs:
           EMAIL_TEST:         ${{ inputs.email_test }}
           ORDER_TEST:         ${{ inputs.order_test }}
           ACCOUNT_TEST:       ${{ inputs.account_test }}
+          CAPITAL_SINCE:      ${{ inputs.capital_since }}
         run: python alpaca_bot.py
 
       # The watchdog's own workflow uses GitHub-native cron, which skips slots

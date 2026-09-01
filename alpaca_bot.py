@@ -1855,15 +1855,21 @@ if __name__ == "__main__":
               f"trade {MAX_INVESTED_PCT:.0%} / crypto {CRYPTO_PCT:.0%})")
         print(f"  rails    : cash-only, no leverage/shorting/options; "
               f"stop {1-STOP_LOSS_PCT:.0%}, loss-halt {LOSS_CAP_PCT:.0%}, VIX halt >35")
-        _net, _ev = alpaca_capital_flows(EXPERIMENT_START)
+        # CAPITAL_SINCE overrides the window so the detector can be FALSIFIED.
+        # A detector that has only ever printed "$0.00 clean" has not been shown
+        # to be capable of printing anything else, and "absent" is not evidence
+        # until you have seen it say "present". Run with an early date to make it
+        # report the account's original funding.
+        _since = os.environ.get("CAPITAL_SINCE", "").strip() or EXPERIMENT_START
+        _net, _ev = alpaca_capital_flows(_since)
         if _net is None:
-            print(f"  capital  : COULD NOT DETERMINE flows since {EXPERIMENT_START} "
+            print(f"  capital  : COULD NOT DETERMINE flows since {_since} "
                   f"- treat Arm A's return as UNVERIFIED, not as clean")
         elif _net == 0:
-            print(f"  capital  : $0.00 moved in/out since {EXPERIMENT_START} - "
+            print(f"  capital  : $0.00 moved in/out since {_since} - "
                   f"start_equity is a complete basis, nothing to adjust")
         else:
-            print(f"  capital  : ${_net:+,.2f} moved since {EXPERIMENT_START} - "
+            print(f"  capital  : ${_net:+,.2f} moved since {_since} - "
                   f"Arm A's raw return is CONTAMINATED by this much")
             for e in _ev:
                 print(f"             {e['date']}  {e['type']}  ${e['amount']:+,.2f}")
