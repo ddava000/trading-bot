@@ -14,6 +14,9 @@ STEP 2 — SCORE THE WEEK
 - Read holds.json (current holds, basis vs notional).
 - Latest Friday review: `gh run list --workflow alpaca-review.yml --limit 1`, then `gh run view <id> --log` for the vs-SPY summary.
 - Bot health: `gh run list --workflow alpaca-bot.yml --limit 20` — investigate any failures.
+- READING THE COMMIT LOG: ~97% of commits are automated heartbeats, so a plain `git log` buries the handful that matter (measured 2026-09-01: 190 of the last 200 were automated; a single 91-minute broker outage alone emitted 85 identical `(degraded)` commits). Do NOT conclude "a lot changed this week" from commit volume, and do not read a quiet log as a quiet week. Filter first:
+  `git log --format="%h %an %ad %s" --date=format:"%m-%d %H:%M" -200 | grep -vE " (rh bot [0-9T:-]+ ET \((degraded|heartbeat|change)\)|status heartbeat |brief |trade log |journal )"`
+  That keeps `rh bot ... (trade)` on purpose — a real fill IS substantive. Verified on 2026-09-01: 200 commits reduce to 10, and the 10 are the genuine ones.
 
 STEP 3 — AUDIT vs DESIGN PHILOSOPHY (invariants; NEVER loosen without overwhelming evidence — recommend instead)
 - Cash-only, NO leverage, NO shorting, NO options; crypto is SPOT long-only.
