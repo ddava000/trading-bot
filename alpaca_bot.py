@@ -1732,6 +1732,36 @@ def run_bot():
                 status["vs_baseline_pct"] = round((equity / float(base["equity"]) - 1) * 100, 2)
         except Exception:
             pass
+        # CONTRIBUTED CAPITAL, persisted (laptop's cross-audit, 2026-09-01 16:20).
+        # The detector shipped in faadfce had exactly one call site, inside the
+        # manual ACCOUNT_TEST branch, which exits before trading. So nothing on any
+        # schedule could ever produce the answer, and the answer it did produce went
+        # to an Actions console log that EXPIRES. laptop's framing is right and it is
+        # the same defect it fixed on itself six hours earlier: A CORRECT NUMBER THAT
+        # DOES NOT PROPAGATE IS INDISTINGUISHABLE FROM NO NUMBER, and it fails
+        # silently precisely because the computation works.
+        #
+        # Now runs on every scheduled cycle and lands in the committed snapshot.
+        # `state` is explicit rather than inferred from `net`, because an ABSENT block
+        # and a ZEROED block must not look alike -- the same None-vs-0.0 conflation
+        # avoided in memory would otherwise come straight back on disk.
+        try:
+            _cnet, _cev = alpaca_capital_flows(EXPERIMENT_START)
+            status["capital_flow"] = {
+                "window_opened": EXPERIMENT_START,
+                "state": "unknown" if _cnet is None else
+                         ("clean" if _cnet == 0 else "contaminated"),
+                "net": _cnet,
+                "events": _cev,
+                "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "how_to_use": ("state=clean means start_equity is a complete basis. "
+                               "contaminated means subtract net before computing Arm A "
+                               "return. unknown means the check FAILED and Arm A's "
+                               "basis is UNVERIFIED -- do not read it as clean."),
+            }
+        except Exception as e:
+            status["capital_flow"] = {"state": "unknown", "net": None, "events": [],
+                                      "error": str(e)[:200]}
         with open("status.json", "w") as f:
             json.dump(status, f, indent=1, sort_keys=True)
     except Exception as e:
