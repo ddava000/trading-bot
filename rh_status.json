@@ -1,11 +1,8 @@
 {
+ "degraded": "broker_unreachable",
+ "degraded_since_passes": 1,
  "dry": false,
  "equity": 247.97,
- "held": [
-  "IWM",
-  "QQQ",
-  "SPY"
- ],
  "holds": [],
  "orders_today": 0,
  "positions": {
@@ -13,5 +10,5 @@
   "QQQ": 0.116166,
   "SPY": 0.108351
  },
- "ts": "2026-09-02T11:41"
+ "ts": "2026-09-02T11:42"
 }
