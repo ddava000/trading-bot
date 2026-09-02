@@ -1456,3 +1456,9 @@
 - avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'PLTR', 'IWM'] | favor: ['MSFT', 'SPY', 'QQQ']
 - notes: Escalation to actual US strikes on Iran with oil above $95 and yields at fresh highs is a genuine event-risk landmine; Dow -370 with ADP today and jobs Friday. VIX still only 16.2 but headline/geopolitical risk plus broadly red holdings (NBIS -11.8%, BZ -7.7%, PLTR -5.2%) keeps me pinned defensive at 0.30.
 - journal: Wed 9/2 09:00: Trimmed to 0.30 as Iran conflict went kinetic (US strikes, oil >$95, yields up); tape gapping down. NBIS still worst bleeder, CXM already reported Q2 (keep avoiding weak name). Watching oil, yields, ADP today and Friday jobs before easing; cash $30 keeps buys tiny regardless.
+
+### 2026-09-02T12:42 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: Iran-strike geopolitical overhang persists with oil elevated and bond selloff deepening; holdings broadly red (NBIS -10.5%, PLTR -10%, BZ -8.5%, IWM -2.8%) even as VIX eased to 15.4. ADP/Beige Book today and jobs Friday keep me pinned defensive at 0.30.
+- journal: Wed 9/2 12:42: Held risk-off 0.30 midday — VIX cooled to 15.4 but tape still leaking and event risk (jobs Fri, geopolitics) intact. Biggest bleeders PLTR -10%, NBIS -10.5%, BZ -8.5%; cash $43 keeps buys tiny anyway. Watching yields, oil, Friday jobs before easing.
