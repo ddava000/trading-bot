@@ -1468,3 +1468,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
 - notes: VIX calm at 15.2 and a modest bounce attempt after four down sessions, but the Iran/oil geopolitical overhang and bond selloff persist with holdings still deeply red (PLTR -9.8%, BZ -8.6%, NBIS -8.5%, IWM -2.5%). Friday jobs report ahead keeps me pinned defensive at 0.30.
 - journal: Wed 9/2 14:51: Held risk-off 0.30 into the afternoon — tape trying to stabilize (VIX 15.2, stocks up for first time in four sessions) but geopolitics and Friday jobs keep me cautious. Worst bleeders unchanged (PLTR -9.8%, BZ -8.6%, NBIS -8.5%); cash $43 keeps buys tiny. Watching oil, yields, and Friday's report before easing.
+
+### 2026-09-02T16:10 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: End-of-day print with VIX low at 15.3 but geopolitical (Iran/oil) overhang and a deepening bond selloff (10yr at 2023 highs) keep the tape leaky; holdings still deeply red (PLTR -9.1%, NBIS -8.7%, BZ -8.5%, IWM -2.6%). Friday jobs report is a major event landmine ahead, so I stay pinned defensive at 0.30.
+- journal: Wed 9/2 16:10: Closed the day risk-off 0.30 — VIX calm at 15.3 but yields at 20-month highs and Iran/oil still overhanging; worst bleeders unchanged (PLTR -9.1%, NBIS -8.7%, BZ -8.5%). Cash $43 keeps buys tiny anyway. Watching Friday's jobs report, yields and oil before easing.
