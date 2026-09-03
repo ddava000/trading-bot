@@ -1480,3 +1480,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
 - notes: Tape stabilized — Dow +300, yields cooling, VIX calm at 15.1 after snapping a 3-day skid, but Friday's jobs report is a major event landmine one day out and holdings remain deeply red (BZ -10.1%, NBIS -8.5%, PLTR -8.5%). Nudging risk up slightly to 0.35 while staying pinned defensive into the print.
 - journal: Thu 9/3 09:00: Eased marginally to 0.35 from 0.30 — conditions improved (yields slipped, oil selloff paused, VIX 15.1, stocks bounced) but I stay defensive with Friday jobs report dead ahead. BZ now worst bleeder (-10.1%) with an officer selling 300k ADS — keep avoiding. Watching jobs report tomorrow and yields before easing further.
+
+### 2026-09-03T12:33 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL']
+- notes: Strong constructive tape — Dow +600, yields falling, Big Tech rallying, VIX low at 14.6 — but Friday's jobs report is a major event landmine one day out and several holdings remain deeply red (BZ -11.1% with insider selling, NBIS -7.2%). Nudging risk to 0.40 while staying pinned defensive into the print.
+- journal: Thu 9/3 12:33: Eased to 0.40 from 0.35 as tape firmed sharply (Dow +600, yields retreating on Waller, VIX 14.6) but held risk-off with jobs report tomorrow. BZ still worst bleeder (-11.1%) — keep avoiding; NBIS -7.2%. Watching Friday's jobs print before easing further.
