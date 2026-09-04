@@ -1498,3 +1498,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'SNDK', 'CRK'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL']
 - notes: Tape held constructive into the close (VIX 14.3, yields easing on Waller, Big Tech firm), but Friday's jobs report is a major event landmine one session out and BZ (-11.2%, insider selling), NBIS (-5.7%) stay deep in the red. Holding risk-off at 0.40 into the print.
 - journal: Thu 9/3 16:11: Held 0.40 risk-off into the close, day P&L +$3, VIX ticked to 14.3. Everything hinges on tomorrow's jobs report — that's the key event before I ease. BZ still worst bleeder (-11.2%), NBIS -5.7%; added CRK to avoid as it drifts. Cash $20 keeps buys tiny regardless.
+
+### 2026-09-04T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'SNDK', 'HOOG'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL', 'NVDA']
+- notes: Jobs report is today's big event — futures mixed at 09:00 ahead of the open, so I stay pinned defensive until the market digests the print and yields settle. VIX low at 14.2 and tape firm into the week, but BZ (-10.6%, insider selling), NBIS (-6.9%), PLTR and IWM remain deep red landmines.
+- journal: Fri 9/4 09:00: Jobs report day — held risk-off 0.40 into the open with futures mixed. VIX 14.2, tape constructive but I won't ease until the print's reaction settles. BZ still worst bleeder (-10.6%), NBIS -6.9%; kept CRK/SNDK/HOOG on avoid. Cash $20 keeps buys tiny regardless. Watching yields and the market's read on the jobs number.
