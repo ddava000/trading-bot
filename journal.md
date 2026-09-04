@@ -1510,3 +1510,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Hot August jobs (162k vs est) revived rate-hike fears — yields ticking up, indices choppy/red intraday even as VIX stays calm at 14.0. The event is now digested but the rate-hike overhang keeps me defensive; BZ (-10.6%, insider selling), NBIS (-3.4%), PLTR (-6.4%) remain landmines and ASND sits red near LULU-style retail weakness.
 - journal: Fri 9/4 12:29: Jobs print landed hot — rate-hike fears back, yields up, tape mixed to lower despite VIX 14.0. Nudged risk_scale to 0.45; still risk-off until yields settle. BZ worst bleeder, PLTR -6.4%, NBIS -3.4%; SMMT/SNDK/HOOG green. Watching whether afternoon holds or fades on rate worry.
+
+### 2026-09-04T14:31 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Hot jobs print keeps rate-hike overhang alive — yields up, indices red intraday (QQQ -1.0%, IWM -2.0%) despite calm VIX 14.1. Staying defensive into the weekend; BZ (-10.7%), PLTR (-6.4%), NBIS (-2.0%) remain landmines and ASND/CRK stay soft on rate sensitivity.
+- journal: Fri 9/4 14:31: Afternoon holding mixed-to-lower, VIX 14.1, day P&L +$1. Kept risk-off 0.45 into the close ahead of the weekend — no reason to reach with tape red and rate worry lingering. SMMT/SNDK/HOOG green; BZ still worst bleeder. Watching whether yields settle before easing next week.
