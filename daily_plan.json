@@ -1,25 +1,24 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.4,
+  "risk_scale": 0.45,
   "avoid_symbols": [
     "BZ",
     "NBIS",
     "PLTR",
     "IWM",
     "CRK",
-    "SNDK",
-    "HOOG"
+    "ASND"
   ],
   "favor_symbols": [
     "MSFT",
-    "SPY",
     "QQQ",
-    "AAPL",
-    "NVDA"
+    "SPY",
+    "NVDA",
+    "SNDK"
   ],
-  "notes": "Jobs report is today's big event \u2014 futures mixed at 09:00 ahead of the open, so I stay pinned defensive until the market digests the print and yields settle. VIX low at 14.2 and tape firm into the week, but BZ (-10.6%, insider selling), NBIS (-6.9%), PLTR and IWM remain deep red landmines.",
-  "journal_entry": "Fri 9/4 09:00: Jobs report day \u2014 held risk-off 0.40 into the open with futures mixed. VIX 14.2, tape constructive but I won't ease until the print's reaction settles. BZ still worst bleeder (-10.6%), NBIS -6.9%; kept CRK/SNDK/HOOG on avoid. Cash $20 keeps buys tiny regardless. Watching yields and the market's read on the jobs number.",
+  "notes": "Hot August jobs (162k vs est) revived rate-hike fears \u2014 yields ticking up, indices choppy/red intraday even as VIX stays calm at 14.0. The event is now digested but the rate-hike overhang keeps me defensive; BZ (-10.6%, insider selling), NBIS (-3.4%), PLTR (-6.4%) remain landmines and ASND sits red near LULU-style retail weakness.",
+  "journal_entry": "Fri 9/4 12:29: Jobs print landed hot \u2014 rate-hike fears back, yields up, tape mixed to lower despite VIX 14.0. Nudged risk_scale to 0.45; still risk-off until yields settle. BZ worst bleeder, PLTR -6.4%, NBIS -3.4%; SMMT/SNDK/HOOG green. Watching whether afternoon holds or fades on rate worry.",
   "date": "2026-09-04",
-  "mode": "MORNING",
-  "updated_at": "2026-09-04T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-09-04T12:29 ET"
 }
