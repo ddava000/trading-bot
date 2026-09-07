@@ -1528,3 +1528,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: New week opens with rate-hike overhang from Friday's hot 162k jobs print still live, plus renewed Middle East headlines; VIX ticked up to 15.2 from 14.3. Staying defensive — BZ (-10.8%), PLTR (-6.7%) remain landmines, while SMMT/SNDK/HOOG hold firmly green.
 - journal: Mon 9/7 09:00: Weekend passed, tape still digesting rate-hike fears and fresh Middle East hostilities; VIX nudged up to 15.2. Held risk-off 0.45 — cash $20 keeps buys tiny anyway. Watching yields and whether the jobs-driven rate worry fades this week.
+
+### 2026-09-07T13:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Rate-hike overhang from Friday's hot jobs print persists, Middle East hostilities linger, and VIX ticked up to 15.3. Adding AAPL to avoid ahead of its product-launch event (event risk); ASND has trial data due this week, another landmine. BZ (-10.8%) and PLTR (-6.7%) remain the worst bleeders.
+- journal: Mon 9/7 13:47: Tape still soft on rate worry, VIX 15.3, day P&L flat. Held risk-off 0.45 and added AAPL to avoid list (product event) plus flagged ASND trial-data risk. Cash $20 keeps buys tiny anyway; watching yields and AAPL event outcome.
