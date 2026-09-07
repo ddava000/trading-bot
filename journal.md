@@ -1522,3 +1522,9 @@
 - avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Final hour on jobs-day Friday: hot 162k print keeps rate-hike overhang alive, yields up and indices red (IWM -1.8%, QQQ -0.8%) despite calm VIX 14.3. No reason to reach into the weekend close; BZ (-11%), PLTR (-6.7%) remain landmines while SMMT/SNDK/HOOG hold green.
 - journal: Fri 9/4 15:56: Into the close, tape mixed-to-lower, VIX 14.3, day P&L +$1. Held risk-off 0.45 — kept defensive posture over the weekend with rate-hike worry lingering. BZ still worst bleeder, PLTR -6.7%; watching whether yields settle before easing next week.
+
+### 2026-09-07T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: New week opens with rate-hike overhang from Friday's hot 162k jobs print still live, plus renewed Middle East headlines; VIX ticked up to 15.2 from 14.3. Staying defensive — BZ (-10.8%), PLTR (-6.7%) remain landmines, while SMMT/SNDK/HOOG hold firmly green.
+- journal: Mon 9/7 09:00: Weekend passed, tape still digesting rate-hike fears and fresh Middle East hostilities; VIX nudged up to 15.2. Held risk-off 0.45 — cash $20 keeps buys tiny anyway. Watching yields and whether the jobs-driven rate worry fades this week.
