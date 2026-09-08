@@ -1552,3 +1552,9 @@
 - avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Tuesday open into a shortened week: futures lower as oil climbs on renewed Middle East hostilities, and Friday's hot jobs print keeps rate-hike/Fed worry live; VIX 15.5. Holding defensive 0.45 — BZ (-12.1%) and PLTR (-7.1%) still bleeding, AAPL flagged for its product event, ASND has trial data due this week.
 - journal: Tue 9/8 09:00: Oil spiking on Middle East escalation pressures futures; VIX nudged to 15.5, rate worry unchanged. Kept risk-off 0.45, avoid list intact (AAPL event, ASND trial data, BZ/PLTR bleeders). Cash $20 keeps buys tiny; watching oil, yields, and AAPL event outcome.
+
+### 2026-09-08T12:45 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Midday: oil spiking on Saudi attack/Middle East escalation pressures indexes, US-Canada trade friction adds noise, and Friday's hot jobs print keeps Fed rate-hike worry live; VIX calm at 15.3 but tape soft. Holding defensive 0.45 — BZ (-11.9%) and PLTR (-8.2%) still bleeding, AAPL near product event, ASND trial data due.
+- journal: Tue 9/8 12:45: VIX eased to 15.3 but oil surge and trade-war headlines keep tape heavy; day P&L flat +$1. NBIS/SNDK/SMMT green, BZ/PLTR still landmines. Kept risk-off 0.45, avoid list intact; watching oil, yields, AAPL event.
