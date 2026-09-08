@@ -1564,3 +1564,9 @@
 - avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Afternoon: Dow down ~600 as oil climbs toward $100 (Brent) and US-Canada trade war escalates; hot jobs print keeps Fed rate-hike risk live into a shortened week. VIX still calm at 15.3 but breadth soft — holding defensive 0.45.
 - journal: Tue 9/8 14:52: Tape deteriorated, Dow -600 on rising oil and trade-war escalation; day P&L +$1. BZ (-11.9%) and PLTR (-8.7%) still bleeding, NBIS/SNDK/SMMT green. Kept risk-off 0.45, avoid list intact; watching oil toward $100, yields, and AAPL product event.
+
+### 2026-09-08T16:22 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Near close: Dow -400/-600 on oil spike (Iran/Saudi strikes) and US-Canada trade war; hot jobs print keeps Fed rate-hike risk live into a shortened week. VIX 15.8 and climbing, breadth soft — staying defensive 0.45.
+- journal: Tue 9/8 16:22: Day closed roughly flat, VIX ticked up to 15.8 as oil surge and geopolitical/trade headlines kept tape heavy. BZ (-12.4%) and PLTR (-8.8%) still bleeding; NBIS/SNDK/SMMT green. Kept risk-off 0.45, avoid list intact; watching oil toward $100, yields, Fed decision, AAPL event fallout.
