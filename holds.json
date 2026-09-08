@@ -14,8 +14,8 @@
  "NBIS": {
   "basis": 223.54,
   "notional": 14.84,
-  "peak": 236.505,
-  "peak_saved": 236.505,
+  "peak": 248.54,
+  "peak_saved": 248.54,
   "ts": "2026-08-27T09:45"
  },
  "NVDA": {
@@ -33,7 +33,7 @@
  "SNDK": {
   "basis": 1585.4,
   "notional": 7.2,
-  "peak": 1751.5,
+  "peak": 1783.16,
   "peak_saved": 1751.5,
   "ts": "2026-09-02T09:45"
  }
