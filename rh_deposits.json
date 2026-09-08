@@ -64,11 +64,18 @@
    "date": "2026-08-31",
    "note": "pending went 0.00 -> 10.00",
    "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-09-08",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
   }
  ],
  "experiment_window": {
-  "adjusted_basis": 251.3,
-  "deposits_in_window": 20.0,
+  "adjusted_basis": 261.3,
+  "deposits_in_window": 30.0,
   "how_to_use": "For the A/B decision use THIS block, not total_contributed_capital: arm_B return = current_total_value - adjusted_basis. The totals above measure the bot since 2026-07-23 inception, which is a different question and a different sign.",
   "start_equity": 231.3,
   "window_opened": "2026-08-24"
@@ -79,7 +86,7 @@
   "cadence": "weekly",
   "typical_day": "Tuesday"
  },
- "total_contributed_capital": 244.92,
- "total_deposited": 185.0,
- "total_deposited_since_start": 185.0
+ "total_contributed_capital": 254.92,
+ "total_deposited": 195.0,
+ "total_deposited_since_start": 195.0
 }
