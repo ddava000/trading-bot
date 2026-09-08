@@ -17,9 +17,9 @@
     "NVDA",
     "SNDK"
   ],
-  "notes": "Post-close on 9/7: rate-hike overhang from Friday's hot jobs print still dominates with Middle East headlines lingering; VIX steady at 15.3, tape soft (IWM -1.8%, QQQ -0.8%). Holding defensive 0.45 \u2014 BZ (-10.8%) and PLTR (-6.7%) remain the worst bleeders, AAPL flagged for its product-launch event, ASND for trial data due this week.",
-  "journal_entry": "Mon 9/7 16:50: Day closed flat, VIX 15.3, rate-hike worry still live into a Fed-focused week. Kept risk-off 0.45 with cash at $20 keeping buys tiny. Watching AAPL product event and whether yields settle as Fed decision approaches.",
-  "date": "2026-09-07",
-  "mode": "INTRADAY",
-  "updated_at": "2026-09-07T16:50 ET"
+  "notes": "Tuesday open into a shortened week: futures lower as oil climbs on renewed Middle East hostilities, and Friday's hot jobs print keeps rate-hike/Fed worry live; VIX 15.5. Holding defensive 0.45 \u2014 BZ (-12.1%) and PLTR (-7.1%) still bleeding, AAPL flagged for its product event, ASND has trial data due this week.",
+  "journal_entry": "Tue 9/8 09:00: Oil spiking on Middle East escalation pressures futures; VIX nudged to 15.5, rate worry unchanged. Kept risk-off 0.45, avoid list intact (AAPL event, ASND trial data, BZ/PLTR bleeders). Cash $20 keeps buys tiny; watching oil, yields, and AAPL event outcome.",
+  "date": "2026-09-08",
+  "mode": "MORNING",
+  "updated_at": "2026-09-08T09:00 ET"
 }
