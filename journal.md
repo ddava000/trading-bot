@@ -1576,3 +1576,9 @@
 - avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Brent over $100 on US-Iran/Middle East tensions, AI-software worries hitting the tape, and a hot jobs print plus a hotter-headline CPI preview keeping Fed rate-hike risk live; VIX up to 16.3. Staying defensive 0.40.
 - journal: Wed 9/9 09:00: Oil crossed $100 on US-Iran escalation, AI/software selling and hot jobs+CPI-hike worry pressuring futures; VIX 16.3. BZ (-12.4%) and PLTR (-8.2%) still bleeders, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching CPI print, oil, yields, AAPL event fallout.
+
+### 2026-09-09T12:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Dow off 400+ as oil tops $101 and Treasury yields jump on a hot jobs print reviving Fed rate-hike risk; VIX 16.5 and breadth soft. Holding defensive 0.40 — broad indices and rate-sensitive names under pressure.
+- journal: Wed 9/9 12:47: Tape still heavy, Dow -400 on oil >$101 and jumping yields; day P&L -$2. BZ (-14.3%) and PLTR (-8.7%) remain landmines, NBIS/SMMT/SNDK green. Kept risk-off 0.40, avoid list intact (dropped AAPL post-event); watching oil, yields, and Fed hike chatter.
