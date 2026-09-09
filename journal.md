@@ -1582,3 +1582,9 @@
 - avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
 - notes: Dow off 400+ as oil tops $101 and Treasury yields jump on a hot jobs print reviving Fed rate-hike risk; VIX 16.5 and breadth soft. Holding defensive 0.40 — broad indices and rate-sensitive names under pressure.
 - journal: Wed 9/9 12:47: Tape still heavy, Dow -400 on oil >$101 and jumping yields; day P&L -$2. BZ (-14.3%) and PLTR (-8.7%) remain landmines, NBIS/SMMT/SNDK green. Kept risk-off 0.40, avoid list intact (dropped AAPL post-event); watching oil, yields, and Fed hike chatter.
+
+### 2026-09-09T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Tape stays heavy: Dow down ~400, oil above $101 and Treasury yields jumping on a hot jobs print keeping Fed rate-hike risk live; VIX 16.2. Holding defensive 0.40 as rate-sensitive names and broad indices remain under pressure.
+- journal: Wed 9/9 14:47: No relief into the afternoon, Dow still -400 on oil >$101 and elevated yields; day P&L -$2. BZ (-15.6%) and PLTR (-8.8%) still deepest landmines, NBIS/SMMT/SNDK green. Kept risk-off 0.40, avoid list intact; watching oil, yields, and Fed-hike chatter into close.
