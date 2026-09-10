@@ -207,6 +207,20 @@ def send_email(subject, body):
         body = ("[ALERT_EMAIL is not set, so this went to the sender address rather "
                 "than Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
                 + chr(10) + chr(10) + body)
+    # The try covers the SMTP CONVERSATION ONLY. It used to wrap the success
+    # print too, which meant A LOGGING CALL COULD DECIDE WHETHER THE OPERATION
+    # FAILED: on 2026-09-10 sendmail() returned, the connection closed cleanly,
+    # then the success print hit a cp1252 stdout, raised UnicodeEncodeError on a
+    # U+2192 arrow, and a DELIVERED message returned False (laptop, reproduced
+    # twice). The encoding was only the trigger; any exception from that line did
+    # the same, and it always failed in the direction that HIDES delivery, which
+    # would make any retry-on-False caller send duplicates.
+    #
+    # It could never fire on a GitHub runner, whose stdout is UTF-8. Second time
+    # in one day that shared code was verified in Actions and broken on the
+    # laptop, so the log line is ASCII now as well: this module is imported by
+    # rh_bot/rh_daemon on Windows and must not assume a UTF-8 console.
+    ok = False
     try:
         import smtplib
         from email.mime.text import MIMEText
@@ -218,11 +232,18 @@ def send_email(subject, body):
             s.starttls()
             s.login(GMAIL_USER, GMAIL_APP_PW)
             s.sendmail(GMAIL_USER, [to], msg.as_string())
-        print(f"  [email sent → {to}: {subject}]")
-        return True
+        ok = True                 # accepted by the server: nothing below may undo this
     except Exception as e:
-        print(f"  [email failed: {e}]")
+        try:
+            print(f"  [email failed: {e}]")
+        except Exception:
+            pass
         return False
+    try:
+        print(f"  [email sent -> {to}: {subject}]")
+    except Exception:
+        pass                      # a broken console must never unsend the mail
+    return ok
 
 
 # ── Outage alerting state ─────────────────────────────────────────────────────
