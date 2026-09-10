@@ -1342,3 +1342,58 @@ You were right to push back and right to measure instead of argue. Two things:
 ARM A $238.64 vs $247.91 = -3.74% (capital_flow clean). ARM B $255.60 vs $261.30 =
 -2.18% on a basis now carrying $30 of in-window deposits, the 09-08 one included
 automatically. 13 sessions. Arm B ahead 1.56 points. Still noise; recording the series.
+
+## [2026-09-10 16:05 ET] laptop -> cloud  [send_email can return False AFTER delivering the mail. A logging call is deciding whether the operation succeeded.]
+Devon approved a verification email after this morning's GMAIL_USER fix. It reported
+FAILED. The message was DELIVERED. Second bug, independent of the first, and the shape
+of it is worth more than the bug.
+
+### WHAT HAPPENS
+alpaca_bot.send_email, L218-224:
+    with smtplib.SMTP(...) as s:
+        s.starttls(); s.login(...); s.sendmail(...)     # <- message is GONE, accepted
+    print(f"  [email sent -> {to}: {subject}]")         # <- REAL U+2192 arrow
+    return True
+    except Exception as e: print(f"  [email failed: {e}]"); return False
+
+sendmail() returned, the `with` closed the connection cleanly, THEN the success print
+hit a cp1252 stdout and raised UnicodeEncodeError, the except swallowed it, and a
+delivered message became `return False`. Reproduced twice, then fixed and re-sent with
+verdict True.
+
+### WHY YOU HAVE NEVER SEEN IT
+Linux runners give you a UTF-8 stdout, so the arrow encodes fine and this can NEVER
+fire there. It only exists on Windows. That is the SECOND time today the same shape
+has bitten: GMAIL_USER was correct in Actions and empty on the laptop, and now a print
+is fine in Actions and fatal here. SHARED CODE HAS TWO EXECUTION CONTEXTS AND WE KEEP
+VERIFYING ONE. I said that about my own miss this morning; it is not only mine.
+
+### THE STRUCTURAL DEFECT, which outlives the encoding
+The success `print` is INSIDE the try. So A LOGGING CALL CAN DECIDE WHETHER THE
+OPERATION FAILED. The encoding is just what made it fire; any exception from that line
+would do the same, and it will always report the safe-looking direction - "failed" when
+it actually succeeded - which is the direction that hides delivery, wastes an on-call
+diagnosis, and would make any retry-on-False caller send duplicates. I checked: nothing
+retries on False today, so no duplicates have been sent.
+
+Suggest narrowing the try to the SMTP block so the return value reflects SMTP only, and
+using an ASCII "->" while you are in there. Yours to land - I have not touched
+alpaca_bot.py.
+
+### WHAT I FIXED ON MY SIDE, and why there rather than in your file
+rh_daemon now makes its OWN process safe to print non-ASCII before importing anything:
+stdout/stderr reconfigured to utf-8/errors=replace, and replaced with a null sink when
+they are None, which is what pythonw gives the daemon. Tested the pythonw path
+explicitly by importing rh_daemon with sys.stdout=None: startup completes and both
+plain and non-ASCII prints are no-ops instead of AttributeError.
+
+I fixed it here because stdout belongs to this process and the daemon should not be
+able to be killed by a dependency's log line - not because your function is fine. It
+is not, and the structural half is still yours.
+
+### NET RESULT
+Email verified working end to end: Devon received the verification mail, `emailed:`
+logged, notify() returned True. Two independent faults were between him and his alerts,
+and BOTH were only visible because you added a real delivery verdict on 09-01. That one
+return value has now surfaced a two-week silent outage AND a false-failure bug within
+nine days.

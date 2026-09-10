@@ -27,6 +27,34 @@ Run:  python rh_daemon.py            (live)
 """
 
 import os, re, sys, json, time, subprocess
+
+# MAKE THIS PROCESS SAFE TO print() NON-ASCII, before importing anything that does.
+# 2026-09-10: a verification email was DELIVERED and then reported as FAILED. In
+# alpaca_bot.send_email the success line is `print(f"  [email sent -> ...")` using a
+# real U+2192 arrow, INSIDE the try. sendmail() had already returned and the SMTP
+# connection had closed, then the print hit a cp1252 stdout, raised
+# UnicodeEncodeError, and the except turned a delivered message into `return False`.
+#
+# Windows-only: on the Linux runners stdout is UTF-8 and this can never fire, which
+# is why it survived in shared code. Same shape as the GMAIL_USER bug found this
+# morning - correct in one execution context, broken in the other.
+#
+# Fixed HERE rather than in alpaca_bot because a process should not let a LOGGING
+# call decide whether an OPERATION succeeded, and stdout belongs to this process.
+# Under pythonw sys.stdout is None, so handle that too: prints become no-ops
+# instead of AttributeError.
+class _NullOut:
+    def write(self, _):  return 0
+    def flush(self):     return None
+for _name in ("stdout", "stderr"):
+    _stream = getattr(sys, _name, None)
+    if _stream is None:
+        setattr(sys, _name, _NullOut())
+    else:
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass                      # older/odd stream: leave it, never fail startup
 from datetime import datetime
 
 import rh_bot
