@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AGENT_MAIL.md daily watcher — tells Devon when a session has unread mail.
+AGENT_MAIL.md daily watcher - tells Devon when a session has unread mail.
 
 WHY THIS EXISTS. Three Claude sessions coordinate through AGENT_MAIL.md, but none
 of them runs continuously, so an entry only gets read when that session next opens.
@@ -87,7 +87,7 @@ def send(subject, body):
     default alone (that is what 535-failed every alert channel once)."""
     pw = os.environ.get("GMAIL_APP_PASSWORD") or ""
     if not pw:
-        print("[email skipped — GMAIL_APP_PASSWORD not set]"); return False
+        print("[email skipped - GMAIL_APP_PASSWORD not set]"); return False
     # No address literals: this repo is PUBLIC. Same pattern as alpaca_bot and
     # rh_watchdog -- recipient from ALERT_EMAIL, last resort is the SENDER, never a
     # literal, so a mistyped write-only secret cannot look like silence.
@@ -103,7 +103,7 @@ def send(subject, body):
         msg = MIMEText(body); msg["Subject"] = subject; msg["From"] = frm; msg["To"] = to
         with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as s:
             s.starttls(); s.login(frm, pw); s.sendmail(frm, [to], msg.as_string())
-        print(f"[email sent → {to}: {subject}]"); return True
+        print(f"[email sent -> {to}: {subject}]"); return True
     except Exception as e:
         print(f"[email failed: {e}]"); return False
 
@@ -131,7 +131,7 @@ def main():
 
     all_e = entries(text)
     if not all_e:
-        print("no entries parsed — mailbox format may have changed"); return 2
+        print("no entries parsed - mailbox format may have changed"); return 2
 
     # Stateless path: entries newer than N hours. No state file, so a fresh CI
     # runner behaves identically every time.
@@ -168,7 +168,7 @@ def main():
             print(f"[{aged_out} undateable entr(y/ies) older than the newest "
                   f"{UNPARSED_TAIL} - aged out, not reported]")
         if unparsed:
-            print(f"[{unparsed} entr(y/ies) had an unparseable timestamp — included rather than skipped]")
+            print(f"[{unparsed} entr(y/ies) had an unparseable timestamp - included rather than skipped]")
         buckets = {w: [e for e in new
                        if addressed_to(e, w) and not (w and e["from"] == w)] for w in whos}
         return _report(buckets, quiet, f"in the last {since:g}h")
@@ -181,13 +181,13 @@ def main():
     # First run adopts the backlog silently rather than emailing weeks of history.
     if not seen:
         json.dump({"last_hdr": all_e[-1]["hdr"]}, open(STATE, "w"), indent=1)
-        print(f"first run — adopted backlog of {len(all_e)} entries, no email sent")
+        print(f"first run - adopted backlog of {len(all_e)} entries, no email sent")
         return 0
 
     idx = next((i for i, e in enumerate(all_e) if e["hdr"] == seen), None)
     new = all_e[idx + 1:] if idx is not None else all_e
     if idx is None:
-        print("last-seen entry not found (rewritten?) — reporting only the newest")
+        print("last-seen entry not found (rewritten?) - reporting only the newest")
         new = all_e[-1:]
 
     # A session's own entries are not mail TO it.

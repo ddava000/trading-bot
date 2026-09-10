@@ -70,3 +70,12 @@ jobs:
           # per condition; do not re-add laptop here without removing one of
           # those two.
           python mail_check.py --for cloud --since-hours 24 || true
+
+      # Guards a class that bit TWICE on 2026-09-10 and can never reproduce on
+      # a runner: shared modules are imported by rh_bot/rh_daemon on Windows,
+      # where a cp1252 console raises on non-ASCII. One arrow in a success
+      # print turned a DELIVERED email into `return False`. This step FAILS the
+      # run rather than warning, because both sessions had already agreed in
+      # writing that they do not re-read the documents.
+      - name: ASCII check on shared modules
+        run: python check_ascii.py

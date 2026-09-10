@@ -31,7 +31,7 @@ STALE_MIN = 30    # heartbeat is 15 min, so >30 = ~2 missed pushes = likely down
 GRACE_MIN = 5     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
-                  # laptop's own first heartbeat — so a no-show laptop is caught by
+                  # laptop's own first heartbeat - so a no-show laptop is caught by
                   # then without false-alarming before it has had a chance to push.
 
 
@@ -96,7 +96,7 @@ def alert(msg, urgent=False):
                "of Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
                + chr(10) + chr(10) + msg)
 
-    # Email — subject carries no emoji; Devon prints mail to PDF by subject.
+    # Email - subject carries no emoji; Devon prints mail to PDF by subject.
     if pw and frm and to:
         try:
             subject = ("ALERT: RH laptop bot needs attention" if urgent
@@ -106,7 +106,7 @@ def alert(msg, urgent=False):
         except Exception as e:
             print("email failed:", e)
 
-    # SMS — SMS_TO is a full carrier email-to-SMS address (e.g. 5551234567@vtext.com),
+    # SMS - SMS_TO is a full carrier email-to-SMS address (e.g. 5551234567@vtext.com),
     # set by Devon as a secret so his number never lands in this public repo.
     sms = os.environ.get("SMS_TO")
     if pw and frm and sms and urgent:
@@ -116,7 +116,7 @@ def alert(msg, urgent=False):
         except Exception as e:
             print("sms failed:", e)
 
-    # ntfy push — unguessable topic kept in a secret, not committed.
+    # ntfy push - unguessable topic kept in a secret, not committed.
     topic = os.environ.get("NTFY_TOPIC")
     if topic and urgent:
         try:
@@ -143,12 +143,12 @@ def main():
     et = datetime.now(bot.ET_TZ)
     open_now, _ = bot.check_market()
     if not open_now:
-        print("market closed, weekend, or holiday — nothing to check")
+        print("market closed, weekend, or holiday - nothing to check")
         return 0
 
     since_open = (et - et.replace(hour=9, minute=30, second=0, microsecond=0)).total_seconds() / 60
     if since_open < GRACE_MIN:
-        print(f"within {GRACE_MIN}m grace after the open — skipping")
+        print(f"within {GRACE_MIN}m grace after the open - skipping")
         return 0
 
     try:
@@ -163,7 +163,7 @@ def main():
 
     stale = (et - ts).total_seconds() / 60
     if stale < STALE_MIN:
-        print(f"bot healthy — last heartbeat {int(stale)}m ago ({status['ts']} ET)")
+        print(f"bot healthy - last heartbeat {int(stale)}m ago ({status['ts']} ET)")
         return 0
 
     alert(chr(10).join([
