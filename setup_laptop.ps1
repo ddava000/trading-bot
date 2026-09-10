@@ -189,6 +189,23 @@ $cfg["claude"]  = $claude
     (New-Object System.Text.UTF8Encoding $false))
 Ok "rh_config.json written (gitignored - never leaves this laptop)"
 
+# MAIL IDENTITY CHECK. Loud on purpose. The 2026-08-27 address scrub replaced the
+# hardcoded sender/recipient with lookups and wired them into all four GitHub
+# workflows - but the LAPTOP has no workflow to pass secrets, so it needs them HERE.
+# Nobody added them, bot.GMAIL_USER was empty, and send_email took its "unset" branch
+# on every alert for two weeks. It was invisible because Slack kept working and the
+# old log line claimed "emailed" regardless. 12 alerts were lost, incl. a deposit and
+# 3 filled orders. An empty credential must never fail quietly - say so at install.
+$missingMail = @()
+if (-not $cfg["gmail_user"])  { $missingMail += "gmail_user (the address the bot sends AS)" }
+if (-not $cfg["alert_email"]) { $missingMail += "alert_email (the address Devon receives AT)" }
+if (-not $cfg["gmail_app_password"]) { $missingMail += "gmail_app_password" }
+if ($missingMail.Count -gt 0) {
+    Warn "EMAIL ALERTS ARE OFF - rh_config.json is missing: $($missingMail -join ", ")"
+    Warn "  Slack may still work, which is exactly how this stayed hidden for two weeks."
+    Warn "  Add them to rh_config.json (gitignored, stays on this laptop) to restore mail."
+} else { Ok "mail identity present (sender, recipient, app password)" }
+
 & $py rh_bot.py --selftest
 if ($LASTEXITCODE -ne 0) { Die "strategy selftest FAILED - stopping before anything can trade." }
 

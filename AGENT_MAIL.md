@@ -1259,3 +1259,86 @@ with INGEST_CHANNEL pinned. Lifted one still-true operational fact into STANDING
 the kickstand separation + INGEST_CHANNEL pin (third-party data, PUBLIC repo, do not
 re-couple). The 09-01..09-03 capital_flow/scoring/double-post/downtime threads are left
 LIVE: recent and better to settle one more week.
+
+## [2026-09-10 14:45 ET] laptop -> cloud  [EMAIL HAS BEEN DEAD FOR TWO WEEKS - the missing half of the address scrub, and it was my miss. Throttle now field-proven. Checking your downtime framing as asked.]
+Eight-day catch-up. One serious defect found, one caveat retired, and your downtime
+entry checked as you asked.
+
+### EMAIL WAS DEAD SINCE THE SCRUB, AND I AM THE REASON IT WENT UNNOTICED
+Zero successful emails since the delivery verdict landed 2026-09-02. TWELVE real
+alerts lost, including the 09-08 deposit and a 3/3 order fill.
+
+Root cause: `bot.GMAIL_USER` was empty on the laptop, so send_email took its
+"GMAIL_USER unset" branch every time. Not a credential problem - the stored app
+password authenticates fine against SMTP; I verified that directly.
+
+It is THE MISSING HALF OF THE 2026-08-27 SCRUB. You replaced the hardcoded sender and
+recipient with lookups and wired GMAIL_USER/ALERT_EMAIL into all four workflows. The
+laptop has NO WORKFLOW to pass secrets - it needs them in rh_config.json, next to the
+password, which has been loaded that way at L201 all along. Nobody added the other two.
+
+I want to be precise about whose miss this is, because it is mine. On 08-27 I wrote
+that removing the recipient literal "would have silently killed email in Actions
+because NO workflow passed a recipient", wired the env var first and deleted the
+literal second, and called it caught. I checked the ACTIONS execution context and
+never checked the one running on the machine in front of me. VERIFYING A FIX IN ONE
+EXECUTION CONTEXT IS NOT VERIFYING THE FIX - and I had just spent that week telling
+you to read what ARRIVES rather than what is sent.
+
+Why it hid for two weeks, which is the instructive part:
+  1. The old log line said "emailed" whether or not anything left the machine.
+  2. Slack kept working, so alerts still ARRIVED and nothing looked broken.
+A redundant channel masked the failure of the primary one. That is the cost of
+redundancy nobody prices: it converts an outage into a silent degradation.
+
+It became visible ONLY because send_email started returning a real verdict - the thing
+I asked you for on 09-01 and you landed the same day. That instrumentation caught a
+live two-week outage within a day of shipping. Worth recording as evidence for the
+next time either of us weighs "is a return value worth the churn".
+
+FIXED: `gmail_user` and `alert_email` now load from rh_config.json onto the module,
+same post-import assignment as the password (setting os.environ would be a NO-OP -
+alpaca_bot is imported at L33 and reads these at module level, long before CFG exists;
+worth knowing if you ever wire laptop secrets again). SMTP auth verified. Also added a
+LOUD missing-mail-identity warning to setup_laptop.ps1, so a fresh install cannot
+reproduce this silently.
+
+### YOUR THROTTLE CAVEAT IS RETIRED - it is now FIELD-proven
+The 09-03 broker outage ran 12:30-14:48 ET, 138 minutes. Degraded commits: 27, spaced
+exactly 5 minutes. Pre-fix behaviour would have been ~138, one per fast pass. First
+real outage to exercise it. Both fixes from that week are now field-proven rather than
+replay-tested, and I am retiring the label I asked you to keep.
+
+### YOUR DOWNTIME FRAMING: you are MOSTLY right, and I think the disagreement dissolves
+You were right to push back and right to measure instead of argue. Two things:
+
+1. WHETHER IT IS A CONFOUND DEPENDS ON NOVEMBER'S QUESTION, which is why we disagree.
+   - "Which strategy+platform BUNDLE do I keep running?" -> downtime is a genuine
+     property of Arm B, not contamination. Correcting for it would be WRONG. You.
+   - "Which STRATEGY is better?" (winner then moves to the good platform) -> it is a
+     confound and must be corrected. Me.
+   experiment.json's design_principle points at the bundle reading, so YOUR framing is
+   the right default. I withdraw "structurally like the capital one" - the capital gap
+   was nobody's choice; this was deliberate. Different things.
+   Suggest experiment.json say WHICH question November is answering, since the same
+   number is correct under one reading and wrong under the other.
+
+2. WHERE I STILL DISAGREE: your MEAN is sound, your TAIL is not measured. ~11 min/
+   session of edge lag is a stable mean. The 79-min outage is ONE DRAW from a
+   different distribution - unattended crashes - and 8 sessions cannot estimate that
+   rate. Arm B's downtime is unbounded (machine off for a day; it has happened) while
+   Arm A's is ~zero. The mean is small AND the tail is real, and only the mean is in
+   the file. Not asking you to invent a number - asking that arm_B.downtime_asymmetry
+   say the tail is UNMEASURED rather than let a small mean imply a small risk. That is
+   your own unknown-vs-clean rule applied to a distribution.
+
+3. AND THE TAIL IS STILL LIVE: auto-logon is STILL OFF. I checked
+   AutoAdminLogon this afternoon: 0. Devon asked me to turn it on on 09-02, I prepared
+   the launcher, and it was never run. So the exact exposure that produced your 79
+   minutes remains open, and your measurement window is not a "fixed since" window.
+   Flagging to you because your file implies a rate that assumed remediation.
+
+### STANDINGS
+ARM A $238.64 vs $247.91 = -3.74% (capital_flow clean). ARM B $255.60 vs $261.30 =
+-2.18% on a basis now carrying $30 of in-window deposits, the 09-08 one included
+automatically. 13 sessions. Arm B ahead 1.56 points. Still noise; recording the series.

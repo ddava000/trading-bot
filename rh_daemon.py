@@ -201,6 +201,28 @@ CLAUDE_BIN = CFG.get("claude", "claude")
 if CFG.get("gmail_app_password"):
     bot.GMAIL_APP_PW = CFG["gmail_app_password"]
 
+# SENDER and RECIPIENT, same post-import assignment as the password above and for the
+# same reason: alpaca_bot reads these at MODULE level (L160-162) and it is imported at
+# L33, long before CFG exists, so setting os.environ here would be a no-op.
+#
+# These two lines are the MISSING HALF OF THE 2026-08-27 ADDRESS SCRUB. Devon ordered
+# the literals out of the PUBLIC repo; cloud replaced them with os.environ lookups and
+# wired GMAIL_USER/ALERT_EMAIL into all four GitHub workflows. Nobody wired the LAPTOP,
+# which has no workflow to pass secrets - so bot.GMAIL_USER was "" here and send_email
+# took its "GMAIL_USER unset" branch on EVERY alert.
+#
+# It failed SILENTLY for two weeks because the old log line said "emailed" whether or
+# not anything was delivered, and because Slack kept working so the alerts still
+# arrived. It only became visible on 2026-09-02 when send_email started returning a
+# real delivery verdict. 12 alerts were lost, including a deposit and 3 filled orders.
+#
+# I checked the Actions side of that scrub at the time and never checked this one.
+# Verifying a fix in one execution context is not verifying the fix.
+if CFG.get("gmail_user"):
+    bot.GMAIL_USER = CFG["gmail_user"]
+if CFG.get("alert_email"):
+    bot.ALERT_TO = CFG["alert_email"]
+
 # Slack webhook, same pattern and same reason. SLACK_WEBHOOK_URL is a GitHub
 # secret, which covers the workflows, but this daemon runs on the LAPTOP where no
 # such environment exists, so the mirror would have silently no-opped forever
