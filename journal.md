@@ -1612,3 +1612,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
 - notes: Hot PPI lifted Fed rate-hike odds with oil above $100 and Treasury yields surging; indices extending losses, breadth negative, VIX 17.7. Staying defensive at 0.40 with Fed meeting next week as looming event risk.
 - journal: Thu 9/10 14:37: Tape still heavy into afternoon \u2014 oil >$100, yields jump, indices red; day P&L -$3. BZ (-13%) and PLTR (-11%) remain deepest landmines; NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching oil, yields, and rising Fed-hike odds ahead of next week's meeting.
+
+### 2026-09-10T16:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Into the close the tape stayed heavy — oil ~$100, Treasury yields at 52wk highs and rising Fed rate-hike odds ahead of next week's meeting; VIX 18.0, breadth negative. Holding defensive 0.40 with BZ and PLTR the deepest landmines.
+- journal: Thu 9/10 16:08: Day closes red, day P&L -$3; oil >$100 and jumping yields kept indices lower with Fed-hike odds climbing. BZ (-13.5%) and PLTR (-11.1%) remain worst; NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching oil, yields, and next week's Fed decision as key event risk.
