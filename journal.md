@@ -1600,3 +1600,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'ASND', 'NVDA', 'QQQ'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
 - notes: Inflation data (PPI/CPI) is the day's event risk with Nasdaq futures sinking, Brent near/over $100 and yields rising; VIX 17.7 and breadth negative. Holding defensive 0.40 into the print — trimmed favor on rate-sensitive tech and added NVDA/QQQ to avoid given AI-software selling.
 - journal: Thu 9/10 09:00: Overnight tape softened — Nasdaq futures sink on rising oil and yields ahead of inflation data; VIX up to 17.7. BZ (-15.2%) and PLTR (-11.3%) remain deepest landmines; NBIS/SMMT/SNDK green with NBIS lifted by Palantir team-up. Held risk-off 0.40, avoid list intact; watching CPI/PPI print, oil, yields.
+
+### 2026-09-10T12:33 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Oil above $100 and Treasury yields jumping keep Fed rate-hike risk live with CPI in focus; broad indices red (SPY/QQQ/IWM), VIX 17.7 and breadth negative. Holding defensive 0.40 — BZ and PLTR remain deep landmines while NBIS/SMMT/SNDK stay green.
+- journal: Thu 9/10 12:33: Midday tape still heavy — oil >$100, yields up, indices red; day P&L -$2. BZ (-13%) and PLTR (-11%) remain worst; NBIS/SMMT/SNDK green (NBIS lifted by Palantir team-up). Held risk-off 0.40, avoid list intact; watching CPI reaction, oil, yields and Fed-hike odds.
