@@ -308,7 +308,25 @@ if ($isAdmin) {
             -ErrorAction Stop | Out-Null
         $registered = $true
         Ok "task '$taskName' registered - starts at logon, restarts if it dies"
-        Warn "boot trigger present but inert until login (see CAVEAT above): enable auto-logon for unattended reboot coverage"
+        # Report what unattended coverage ACTUALLY exists rather than assuming none.
+        # The -AtStartup trigger cannot fire before a session exists (LogonType
+        # Interactive, needed because the Claude bridge requires a real user session).
+        # With auto-logon ON, Windows creates that session itself after a reboot and the
+        # LOGON trigger provides the coverage - the boot trigger stays inert either way.
+        # Devon enabled auto-logon 2026-09-10 after an unattended crash on 09-02 left the
+        # bot down 8.5h, sitting at a login screen nobody was there to clear.
+        $autoLogon = 0
+        try {
+            $autoLogon = [int](Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" `
+                -Name AutoAdminLogon -ErrorAction Stop).AutoAdminLogon
+        } catch { }
+        if ($autoLogon -eq 1) {
+            Ok "auto-logon is ON - an unattended reboot signs in and the logon trigger starts the bot"
+        } else {
+            Warn "NO unattended reboot coverage: the boot trigger cannot fire before login, and"
+            Warn "  auto-logon is OFF. After a crash the bot stays down until someone signs in."
+            Warn "  Fix: netplwiz, untick the password requirement. Security trade-off is real."
+        }
     } catch {
         Warn "boot-trigger registration failed ($($_.Exception.Message)) - trying logon-only"
     }
