@@ -1618,3 +1618,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
 - notes: Into the close the tape stayed heavy — oil ~$100, Treasury yields at 52wk highs and rising Fed rate-hike odds ahead of next week's meeting; VIX 18.0, breadth negative. Holding defensive 0.40 with BZ and PLTR the deepest landmines.
 - journal: Thu 9/10 16:08: Day closes red, day P&L -$3; oil >$100 and jumping yields kept indices lower with Fed-hike odds climbing. BZ (-13.5%) and PLTR (-11.1%) remain worst; NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching oil, yields, and next week's Fed decision as key event risk.
+
+### 2026-09-11T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Hot August CPI (3.4% vs est) landed above expectations with oil >$100 and yields at 52wk highs, keeping Fed rate-hike risk live into next week's meeting; indices down four straight days, VIX 16.6 but breadth weak. Staying defensive at 0.40 with BZ and PLTR the deepest landmines.
+- journal: Fri 9/11 09:00: CPI printed hot at 3.4% (above est), futures wobbling; four-day losing streak, oil >$100, yields high, Fed decision looms next week. VIX eased to 16.6 but tape stays heavy — BZ (-13.5%) and PLTR (-9.8%) worst, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching CPI reaction, oil, yields.
