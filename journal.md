@@ -1624,3 +1624,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
 - notes: Hot August CPI (3.4% vs est) landed above expectations with oil >$100 and yields at 52wk highs, keeping Fed rate-hike risk live into next week's meeting; indices down four straight days, VIX 16.6 but breadth weak. Staying defensive at 0.40 with BZ and PLTR the deepest landmines.
 - journal: Fri 9/11 09:00: CPI printed hot at 3.4% (above est), futures wobbling; four-day losing streak, oil >$100, yields high, Fed decision looms next week. VIX eased to 16.6 but tape stays heavy — BZ (-13.5%) and PLTR (-9.8%) worst, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching CPI reaction, oil, yields.
+
+### 2026-09-11T12:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
+- notes: Tape improved sharply — Dow +500, oil retreating and VIX easing to 15.7 as traders shake off sticky CPI; the four-day slide is pausing. Nudging up to 0.55 (neutral) but keeping Fed-hike risk into next week's meeting in mind, with BZ (-12.6%) and PLTR (-10.9%) still the deepest landmines to avoid.
+- journal: Fri 9/11 12:38: Sentiment flipped constructive — Dow +500, oil pulling back, VIX 15.7, day P&L +$1 after four red days. Softened from risk-off 0.40 to neutral 0.55; trimmed avoid list to worst laggards (BZ, PLTR, IWM, NVDA). Watching whether the bounce holds and Fed-hike odds ahead of next week's decision.
