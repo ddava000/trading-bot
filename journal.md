@@ -1630,3 +1630,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
 - notes: Tape improved sharply — Dow +500, oil retreating and VIX easing to 15.7 as traders shake off sticky CPI; the four-day slide is pausing. Nudging up to 0.55 (neutral) but keeping Fed-hike risk into next week's meeting in mind, with BZ (-12.6%) and PLTR (-10.9%) still the deepest landmines to avoid.
 - journal: Fri 9/11 12:38: Sentiment flipped constructive — Dow +500, oil pulling back, VIX 15.7, day P&L +$1 after four red days. Softened from risk-off 0.40 to neutral 0.55; trimmed avoid list to worst laggards (BZ, PLTR, IWM, NVDA). Watching whether the bounce holds and Fed-hike odds ahead of next week's decision.
+
+### 2026-09-11T14:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
+- notes: Constructive tape holding into the afternoon — Dow up 500+, oil retreating and VIX steady at 15.7 as traders shake off the hot 3.4% CPI; day P&L flat-positive after four red days. Staying neutral at 0.55 while respecting live Fed-hike risk into next week's meeting; BZ (-13%) and PLTR (-10.5%) remain the deepest landmines.
+- journal: Fri 9/11 14:42: Bounce is holding into the afternoon — VIX 15.7, oil easing, indices green. Maintaining neutral 0.55 with same avoid list (BZ, PLTR, IWM, NVDA). Watching whether gains stick into the close and Fed-hike odds ahead of next week's decision; weekend gap risk noted.
