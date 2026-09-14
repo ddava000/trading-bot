@@ -1642,3 +1642,9 @@
 - avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
 - notes: Bounce held into the Friday close — Dow up 500+, oil retreating and VIX calm at 15.9 after traders shook off the hot 3.4% CPI. Trimming slightly to 0.50 into the close given weekend gap risk and a live Fed-hike case ahead of next week's meeting; BZ (-13.4%) and PLTR (-10.6%) remain the deepest landmines.
 - journal: Fri 9/11 16:07: Constructive tape stuck into the close — VIX 15.9, oil easing, day P&L +$1. Nudged risk to 0.50 ahead of the weekend/Fed-decision gap risk, same avoid list (BZ, PLTR, IWM, NVDA). Watching Fed-hike odds and oil/yields into next week's meeting.
+
+### 2026-09-14T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM', 'MSFT', 'QQQ'] | favor: ['SMMT', 'NBIS', 'ELV']
+- notes: Ugly Monday open — futures fall on AI-slowdown fears (Anthropic warning hitting MSFT/tech), oil spikes on Saudi pipeline closure, and the Fed-hike case builds after hot 3.4% CPI with VIX up to 17.7. Cutting to risk-off 0.40; adding MSFT/QQQ to the avoid list given the AI-tape damage while BZ (-14.9%) and PLTR (-9.4%) stay the deepest landmines.
+- journal: Mon 9/14 09:00: Friday's bounce reversed over the weekend — AI-slowdown fears plus oil spike and rising Fed-hike odds push futures down, VIX 17.7. Dropped from neutral 0.50 to risk-off 0.40, expanded avoid to include MSFT/QQQ (tech under pressure). NBIS/CRWV surging premarket but I'm not chasing; watching oil, yields, and whether AI selloff deepens into the Fed meeting.
