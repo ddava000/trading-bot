@@ -1654,3 +1654,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
 - notes: Dangerous tape — 10-year yield hit the 5% threshold, oil surging, and AI names sliding on Anthropic's slowdown warning while the Fed-hike case builds after hot 3.4% CPI; VIX easing to 16.7 but yields/oil are the real risk. Holding risk-off at 0.35, avoiding tech/AI (NVDA -6.4%, PLTR -7.4%, NBIS -2.5%) and index ETFs, keeping BZ (-18.1%) as the deepest landmine.
 - journal: Mon 9/14 14:06: Selloff persisting — 10Y yield tagged 5%, oil jumping, AI complex still under pressure. Cut risk further to 0.35 and expanded avoid to NBIS/SPY given yield shock. Watching whether 5% yield holds and if the AI slide deepens into the Fed meeting; SMMT (+9%) and defensive ELV the only green spots.
+
+### 2026-09-14T15:54 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
+- notes: Six minutes to close on a rough Monday — 10Y yield tagged 5%, oil elevated, and AI names still soft despite the tape paring losses off session lows; VIX contained at 16.9 but the yield/inflation backdrop and building Fed-hike case keep this defensive. Holding risk-off 0.35 into the bell, avoiding AI/tech and index ETFs with BZ (-18.8%) the deepest landmine.
+- journal: Mon 9/14 15:54: Selloff moderated into the close (stocks off worst levels, oil pressure easing) but 10Y still near 5% and AI-slowdown worry lingers. Keeping risk-off 0.35, same avoid list; day P&L -$2. Watching whether the 5% yield holds overnight and AI names stabilize ahead of the Fed meeting.
