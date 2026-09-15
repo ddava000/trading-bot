@@ -1672,3 +1672,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'IWM', 'MSFT', 'QQQ', 'SPY', 'NBIS'] | favor: ['SMMT', 'ELV', 'SNDK', 'INSP']
 - notes: Tuesday open still dangerous — 10Y yield breached 5%, oil surging, and a Fed-hike case builds after hot 3.4% CPI while chip stocks slide on AI warnings; VIX contained at 17.0 but yields/inflation are the real risk. Holding risk-off 0.35, avoiding AI/tech and index ETFs; BZ (-18.3%) remains the deepest landmine. NBIS spiked on Nvidia's 9% stake but stays on avoid as a volatile AI name.
 - journal: Tue 9/15 09:00: Overnight yield held at/above 5% and futures slipped again; AI complex still soft though NBIS popped on Nvidia stake news. Kept risk-off 0.35 and same avoid list, added INSP to favor (undervalued defensive med-tech). Watching whether 5% yield holds, oil, and any Fed-hike escalation.
+
+### 2026-09-15T13:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Midday Tuesday tape still hostile — 10Y yield touched 5% (19-yr high), oil surging, and a Fed-hike case builds after hot 3.4% CPI; VIX ticked up to 17.5 as chip/AI names slide on the AI-slowdown warning. Holding risk-off 0.35, avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-20.6%) is the deepest landmine, and SNDK moved to avoid on continued weakness.
+- journal: Tue 9/15 13:09: No relief — yields pinned near 5%, oil elevated, VIX crept to 17.5; NVDA/NBIS/PLTR still bleeding and IWM (-5.4%) hardest hit on rate fear. Day P&L -$3. Kept risk-off 0.35, moved SNDK to avoid; defensives SMMT/ELV/INSP the only steady names. Watching the 5% yield, oil, and Fed-hike escalation.
