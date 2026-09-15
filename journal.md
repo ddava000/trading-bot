@@ -1666,3 +1666,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
 - notes: Post-close on a rough Monday — 10Y yield touched the 5% threshold, oil elevated, and the AI complex stayed soft on Anthropic's slowdown warning while a Fed-hike case builds after hot 3.4% CPI; VIX contained at 17.1 but the yield/inflation backdrop keeps this defensive. Holding risk-off 0.35, avoiding AI/tech and index ETFs with BZ (-18.3%) the deepest landmine.
 - journal: Mon 9/14 17:05: Market closed near lows-off levels, day P&L -$2. Kept risk-off 0.35, same avoid list. Watching whether 5% yield holds overnight, oil, and AI-name stabilization heading into the Fed meeting; SMMT (+9%) and defensive ELV the lone bright spots.
+
+### 2026-09-15T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM', 'MSFT', 'QQQ', 'SPY', 'NBIS'] | favor: ['SMMT', 'ELV', 'SNDK', 'INSP']
+- notes: Tuesday open still dangerous — 10Y yield breached 5%, oil surging, and a Fed-hike case builds after hot 3.4% CPI while chip stocks slide on AI warnings; VIX contained at 17.0 but yields/inflation are the real risk. Holding risk-off 0.35, avoiding AI/tech and index ETFs; BZ (-18.3%) remains the deepest landmine. NBIS spiked on Nvidia's 9% stake but stays on avoid as a volatile AI name.
+- journal: Tue 9/15 09:00: Overnight yield held at/above 5% and futures slipped again; AI complex still soft though NBIS popped on Nvidia stake news. Kept risk-off 0.35 and same avoid list, added INSP to favor (undervalued defensive med-tech). Watching whether 5% yield holds, oil, and any Fed-hike escalation.
