@@ -1702,3 +1702,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP']
 - notes: Fed decision lands at 2pm ET with a live hike case after hot 3.4% CPI and the 10Y yield near a 19-year high ~5%; VIX 16.8 is deceptively calm ahead of a binary event less than an hour out. Holding risk-off 0.3 into the announcement, avoiding AI/tech and rate-sensitive ETFs; ADPT added on insider selling, BZ (-21.2%) still the deepest landmine.
 - journal: Wed 9/16 13:09: ~1hr before Fed decision, tape flattish (day P&L +$1), yields still pinned near 5%; NVDA/PLTR/QQQ soft, defensives SMMT/SPCX green. Kept 0.3 and added ADPT to avoid on insider sale. Watching the 2pm statement/presser and whether 5% yield breaks either direction.
+
+### 2026-09-16T15:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Post-Fed tape is sharply negative — SPY -2.4%, QQQ -2.7%, IWM -6%, NVDA -5.7%, PLTR -7.5% — consistent with a hawkish outcome amid the live-hike case and 10Y near 5%; VIX 16.7 understates the selling. Holding risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs into the close; BZ (-21.6%) remains the deepest landmine.
+- journal: Wed 9/16 15:00: Fed is out and the reaction is ugly — broad index/AI selloff (IWM -6%, NVDA/PLTR/QQQ deep red) while defensives SMMT/SPCX/INSP hold green. Kept risk-off 0.3, same avoid list. Watching the last hour for stabilization or capitulation and whether 5% yield breaks.
