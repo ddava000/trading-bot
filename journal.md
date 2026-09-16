@@ -1690,3 +1690,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
 - notes: Closing bell Tuesday — tape stayed hostile all session with 10Y yield pinned near a 19-year-high 5%, oil above $106, and a Fed-hike case building after hot 3.4% CPI; VIX 17.2 as AI/chip names bled on slowdown warnings. Staying risk-off 0.35, avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-20.8%) remains the deepest landmine.
 - journal: Tue 9/15 16:30: End of a rough day — yields near 5%, oil high, day P&L -$3; NVDA/NBIS/PLTR/IWM finished weak while defensives SMMT/ELV/INSP held. Kept risk-off 0.35 and same avoid list. Watching whether the 5% yield holds, oil, and any Fed-hike escalation into tomorrow's open.
+
+### 2026-09-16T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Fed decision day with a live hike risk after hot 3.4% CPI, 10Y yield near a 19-year high ~5%, and oil surging; VIX 16.9 but event risk is binary this afternoon. Staying risk-off 0.3 into the announcement — avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-19.7%) remains the deepest landmine.
+- journal: Wed 9/16 09:00: Fed decision day — futures edging higher but yields pinned near 5% and a hike is on the table; VIX eased to 16.9. Trimmed risk to 0.3 ahead of the 2pm event, same avoid list, defensives SMMT/ELV/INSP still the steady names. Watching the Fed statement/presser and whether the 5% yield breaks either way.
