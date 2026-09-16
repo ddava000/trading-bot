@@ -16,11 +16,12 @@
   "favor_symbols": [
     "SMMT",
     "ELV",
-    "INSP"
+    "INSP",
+    "SPCX"
   ],
-  "notes": "Post-Fed tape is sharply negative \u2014 SPY -2.4%, QQQ -2.7%, IWM -6%, NVDA -5.7%, PLTR -7.5% \u2014 consistent with a hawkish outcome amid the live-hike case and 10Y near 5%; VIX 16.7 understates the selling. Holding risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs into the close; BZ (-21.6%) remains the deepest landmine.",
-  "journal_entry": "Wed 9/16 15:00: Fed is out and the reaction is ugly \u2014 broad index/AI selloff (IWM -6%, NVDA/PLTR/QQQ deep red) while defensives SMMT/SPCX/INSP hold green. Kept risk-off 0.3, same avoid list. Watching the last hour for stabilization or capitulation and whether 5% yield breaks.",
+  "notes": "Into the close on a hawkish-Fed selloff day \u2014 broad indices deep red (IWM -5.9%, NVDA -5.6%, QQQ/SPY -2.5%) while defensives SMMT/SPCX hold green; VIX 17.7. Staying risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs; BZ (-21.2%) still the deepest landmine.",
+  "journal_entry": "Wed 9/16 16:29: Closing an ugly post-Fed session \u2014 broad selloff held into the bell, defensives SMMT/SPCX the only green. Kept risk-off 0.3 and same avoid list. Watching tomorrow's open for stabilization vs. follow-through and whether the 5% 10Y yield resolves.",
   "date": "2026-09-16",
   "mode": "INTRADAY",
-  "updated_at": "2026-09-16T15:00 ET"
+  "updated_at": "2026-09-16T16:29 ET"
 }
