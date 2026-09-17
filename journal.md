@@ -1732,3 +1732,9 @@
 - avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
 - notes: Late-day tape holding the post-Fed recovery — VIX steady at 15.6, oil and yields easing, tech bouncing; but breadth stays weak (IWM -5.1%) and one more hike/3.4% inflation keeps risk elevated. Holding neutral 0.5, still avoiding BZ (-21% landmine) and the laggard AI/small-cap names into the last hour.
 - journal: Thu 9/17 15:10: Recovery held through the afternoon — VIX 15.6, defensives green, but small-caps/AI still soft. Kept neutral 0.5 and same avoid list. Watching the close for whether the bounce sticks or fades, and how 10Y yield settles.
+
+### 2026-09-17T16:37 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
+- notes: Session closing with the post-Fed recovery holding — VIX calm at 15.4, oil/yields easing, tech-led rally into the bell. But breadth stayed negative (IWM -5.4%) and one more hike with 3.4% inflation keeps a lid on risk; holding neutral 0.5 and still avoiding the BZ landmine (-21%) plus laggard small-cap/AI names.
+- journal: Thu 9/17 16:37: Recovery held into the close — VIX 15.4, defensives (SMMT/SPCX) green, but small-caps/AI still weak. Kept neutral 0.5 and same avoid list. Watching overnight for whether the bounce carries into Friday or fades on rate/inflation follow-through.
