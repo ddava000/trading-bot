@@ -1714,3 +1714,9 @@
 - avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP', 'SPCX']
 - notes: Into the close on a hawkish-Fed selloff day — broad indices deep red (IWM -5.9%, NVDA -5.6%, QQQ/SPY -2.5%) while defensives SMMT/SPCX hold green; VIX 17.7. Staying risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs; BZ (-21.2%) still the deepest landmine.
 - journal: Wed 9/16 16:29: Closing an ugly post-Fed session — broad selloff held into the bell, defensives SMMT/SPCX the only green. Kept risk-off 0.3 and same avoid list. Watching tomorrow's open for stabilization vs. follow-through and whether the 5% 10Y yield resolves.
+
+### 2026-09-17T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM'] | favor: ['SMMT', 'SPCX', 'ELV', 'INSP']
+- notes: Post-Fed dust settling — futures up, VIX back down to 15.5 from 17.7, suggesting yesterday's hawkish selloff is stabilizing. Nudging to neutral 0.5 but staying cautious given one more hike signaled and 10Y near 5%; still avoiding the deepest landmine BZ (-21%) and the weakest AI/small-cap names.
+- journal: Thu 9/17 09:00: Fed event is behind us and tape is trying to bounce (futures green, VIX 15.5). Upgraded risk-off 0.3 -> neutral 0.5, trimmed avoid list to worst offenders. Watching whether the open holds the bounce or fades back into rate-driven selling.
