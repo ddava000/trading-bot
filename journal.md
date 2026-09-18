@@ -1750,3 +1750,9 @@
 - avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SNDK', 'INSP', 'SPCX']
 - notes: Midday tape is fading again as Treasury yields tick up and the S&P heads for a losing week; VIX still calm at 15.4 but breadth is negative (IWM -6.2%, SPY -1.8%). Holding neutral 0.5, avoiding the BZ landmine (-21%) and rate-sensitive small-cap/AI laggards into a Friday afternoon.
 - journal: Fri 9/18 12:34: Post-Fed bounce is rolling over intraday — yields rising, indices red into the weekly close, but VIX still tame. Kept neutral 0.5 and same avoid list; SNDK (+9.4%) and SMMT/INSP holding green. Watching for a Friday-afternoon fade/profit-taking and how 10Y settles into the weekend.
+
+### 2026-09-18T14:36 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SNDK', 'SMMT', 'INSP', 'SPCX']
+- notes: Last hour of a losing week — 10Y yields backing up toward 5% and indices red, but VIX still tame at 15.2 and no fresh landmine in holdings. Holding neutral 0.5, avoiding the BZ blowup (-21.5%) and rate-sensitive small-cap/AI laggards into the weekend.
+- journal: Fri 9/18 14:36: Tape still soft into the close — yields rising, SPY/QQQ red, breadth weak (IWM -6%), but VIX calm. SNDK (+9.6%) and SMMT/INSP green. Kept neutral 0.5 and same avoid list; watching the final hour for a Friday fade and weekend gap risk.
