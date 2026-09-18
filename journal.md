@@ -1744,3 +1744,9 @@
 - avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
 - notes: Post-Fed bounce carried overnight — VIX calm at 15.5, oil easing, tech extending its rally, but 3.4% inflation and hawkish hint keep a lid on risk. Holding neutral 0.5, still avoiding the BZ landmine (-22%) and the weakest rate-sensitive/AI names into a Friday session.
 - journal: Fri 9/18 09:00: Recovery carried into Friday — VIX steady 15.5, oil slipping, tech leading. Kept neutral 0.5 and same avoid list. Watching for Friday fade/profit-taking after the multi-day bounce and whether small-caps/AI stabilize.
+
+### 2026-09-18T12:34 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SNDK', 'INSP', 'SPCX']
+- notes: Midday tape is fading again as Treasury yields tick up and the S&P heads for a losing week; VIX still calm at 15.4 but breadth is negative (IWM -6.2%, SPY -1.8%). Holding neutral 0.5, avoiding the BZ landmine (-21%) and rate-sensitive small-cap/AI laggards into a Friday afternoon.
+- journal: Fri 9/18 12:34: Post-Fed bounce is rolling over intraday — yields rising, indices red into the weekly close, but VIX still tame. Kept neutral 0.5 and same avoid list; SNDK (+9.4%) and SMMT/INSP holding green. Watching for a Friday-afternoon fade/profit-taking and how 10Y settles into the weekend.
