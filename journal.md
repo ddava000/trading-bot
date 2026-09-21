@@ -1768,3 +1768,9 @@
 - avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SNDK', 'SMMT', 'INSP', 'SPCX']
 - notes: Fresh week opens with VIX calm at 14.8 and no headline landmine in holdings, but last week's 5% 10Y and hot 3.4% inflation keep the tape rate-sensitive. Holding neutral 0.5, still avoiding the BZ blowup (-23.6%) and rate-sensitive small-cap/AI laggards.
 - journal: Mon 9/21 09:00: New week, VIX steady 14.8, no gap disaster over weekend. Kept neutral 0.5 and same avoid list; SNDK (+14%) and SMMT (+10%) leading, BZ still the deep loser. Watching whether the 5% 10Y/hawkish inflation pressures tech/small-caps Monday.
+
+### 2026-09-21T14:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'INSP', 'NVDA']
+- notes: Constructive tape today — S&P +1%, AI/chip rally, oil and yields sliding, VIX calm at 15.1. But hot 3.4% inflation and rising Fed-hike odds cap enthusiasm, so nudging to 0.6 rather than full risk-on. Added NBIS to avoid on fresh Rothschild 'Sell' call; still avoiding the BZ blowup (-24%) and rate-sensitive small-caps.
+- journal: Mon 9/21 14:14: Yields/oil reversed lower and AI stocks are ripping (QQQ +2.1%, NBIS +5.7%, SNDK +10.6%), a shift from last week's soft rate-pressured tape. Nudged risk 0.5->0.6. New landmine: NBIS got a Sell rating so added to avoid despite green. Watching whether the Fed-hike narrative resurfaces to fade this rally.
