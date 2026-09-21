@@ -13,9 +13,9 @@
     "INSP",
     "SPCX"
   ],
-  "notes": "Market close on a losing week \u2014 10Y yield near 5% and hot 3.4% inflation raising Fed-hike odds, but VIX still tame at 14.9 and no fresh holding landmine. Holding neutral 0.5 into the weekend, avoiding the BZ blowup (-22%) and rate-sensitive small-cap/AI laggards.",
-  "journal_entry": "Fri 9/18 16:02: Week closes soft \u2014 yields backing to 5%, indices mixed-to-red, but VIX calm. SNDK (+13%) and SMMT/INSP green; BZ still the landmine (-22%). Kept neutral 0.5 and same avoid list. Watching weekend gap risk and whether the 5% 10Y and hawkish inflation print pressure the tape Monday.",
-  "date": "2026-09-18",
-  "mode": "INTRADAY",
-  "updated_at": "2026-09-18T16:02 ET"
+  "notes": "Fresh week opens with VIX calm at 14.8 and no headline landmine in holdings, but last week's 5% 10Y and hot 3.4% inflation keep the tape rate-sensitive. Holding neutral 0.5, still avoiding the BZ blowup (-23.6%) and rate-sensitive small-cap/AI laggards.",
+  "journal_entry": "Mon 9/21 09:00: New week, VIX steady 14.8, no gap disaster over weekend. Kept neutral 0.5 and same avoid list; SNDK (+14%) and SMMT (+10%) leading, BZ still the deep loser. Watching whether the 5% 10Y/hawkish inflation pressures tech/small-caps Monday.",
+  "date": "2026-09-21",
+  "mode": "MORNING",
+  "updated_at": "2026-09-21T09:00 ET"
 }
