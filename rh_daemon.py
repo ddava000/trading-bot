@@ -105,6 +105,7 @@ DEGRADED_PUSH_SEC  = 300    # min spacing between degraded git pushes; see publi
 _reconcile_fails, _broker_alert_at = 0, 0.0
 _next_reconcile_try = 0.0
 _degraded_push_at   = 0.0   # last degraded git push; throttles the outage heartbeat
+_last_agent_error   = ""   # bridge's own failure text; classifies the outage in alerts
 _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
@@ -291,13 +292,22 @@ for _key, _env, _prefix in (
 # asymmetry should be visible rather than inferred from the absence of a line.
 _slack_post = bool(os.environ.get("SLACK_WEBHOOK_URL"))
 _slack_read = bool(os.environ.get("SLACK_BOT_TOKEN") and os.environ.get("SLACK_CHANNEL_ID"))
-log(f"slack: post {'ON' if _slack_post else 'off'} | read "
-    f"{'ON' if _slack_read else 'off'}"
-    + ("" if (_slack_post and _slack_read) else
-       "  (missing values go in rh_config.json: "
-       + ", ".join(k for k, ok in (("slack_webhook_url", _slack_post),
-                                   ("slack_bot_token+slack_channel_id", _slack_read))
-                   if not ok) + ")"))
+# Only the RUNNING DAEMON writes this. At module level __name__ is "rh_daemon" on
+# import and "__main__" only when the daemon is actually started, so a diagnostic
+# `import rh_daemon` no longer appends to the operational log. I kept doing exactly
+# that while debugging, and on 2026-09-10 two of my test lines landed in rh_daemon.log
+# reading "NOT emailed ... no gmail_app_password set" - FALSE as operational history,
+# in the committed file this session, cloud and the Sunday audit read to reconstruct
+# incidents. I said then that I would route diagnostics away from this log and did
+# not; this is that fix. A shared record must not be writable as a side effect.
+if __name__ == "__main__":
+    log(f"slack: post {'ON' if _slack_post else 'off'} | read "
+        f"{'ON' if _slack_read else 'off'}"
+        + ("" if (_slack_post and _slack_read) else
+           "  (missing values go in rh_config.json: "
+           + ", ".join(k for k, ok in (("slack_webhook_url", _slack_post),
+                                       ("slack_bot_token+slack_channel_id", _slack_read))
+                       if not ok) + ")"))
 
 
 # ── Execution bridge: one short headless agent turn, MCP tools only ──────────
@@ -362,6 +372,8 @@ def agent(prompt):
                     "this pass rather than acting on missing data")
                 return None
             return res
+        global _last_agent_error
+        _last_agent_error = out[:200]
         log(f"agent returned no JSON: {out[:200]}")
     except Exception as e:
         log(f"agent call failed: {e}")
@@ -1225,15 +1237,53 @@ def main():
                     publish_degraded(led, "broker_unreachable", _reconcile_fails)
                     if (_reconcile_fails >= BROKER_FAIL_ALERT and
                             (time.time() - _broker_alert_at) >= BROKER_REALERT_SEC):
-                        notify("RH bot: broker unreachable (not urgent)", chr(10).join([
+                        # CLASSIFY THE OUTAGE. Every cause used to send the identical subject,
+                        # "broker unreachable (not urgent)". By 2026-09-21 Devon had received seven
+                        # of those from Claude USAGE-LIMIT outages, which reset on a timer and always
+                        # healed themselves. Then the CLI OAuth login expired - a state that NEVER
+                        # recovers without a human - and it sent the same words, telling him to fix it
+                        # "when convenient". Being trained by true-but-unimportant alerts to ignore the
+                        # one that matters is how alerting dies. The subject line has to carry the
+                        # difference, because that is all that is visible in an inbox.
+                        _err = (_last_agent_error or "").lower()
+                        _needs_human = ("oauth" in _err or "authenticate" in _err
+                                        or "session expired" in _err or "auth" in _err)
+                        _self_heals = ("session limit" in _err or "usage limit" in _err
+                                       or "rate limit" in _err)
+                        if _needs_human:
+                            _subject = "RH bot: LOGIN EXPIRED - will NOT recover on its own"
+                            _impact = ["IMPACT: THIS ONE NEEDS YOU. The bot's Claude login has expired",
+                                       "and cannot refresh itself. It will stay down - today and every",
+                                       "day after - until someone signs in. It is NOT the usage limit;",
+                                       "that resets on a timer, this does not.",
+                                       "",
+                                       "FIX, about thirty seconds:",
+                                       "    claude auth login",
+                                       "Signing into the Claude desktop app does NOT fix this: the bot",
+                                       "uses a separate install with its own login.",
+                                       "",
+                                       "Nothing is at risk while it is down (index-only, no stops), but a",
+                                       "deposit that goes pending AND settles while the bot is blind can",
+                                       "be missed, and a missed deposit reads as profit."]
+                        elif _self_heals:
+                            _subject = "RH bot: broker paused (usage limit - self-healing)"
+                            _impact = ["IMPACT: NOT URGENT and NO ACTION NEEDED. The shared Claude quota",
+                                       "is exhausted; it resets on a timer and the bot resumes by itself.",
+                                       "Only worth acting on if it is still down after the stated reset."]
+                        else:
+                            _subject = "RH bot: broker unreachable (cause unknown)"
+                            _impact = ["IMPACT: cause NOT recognised, so it is unknown whether this",
+                                       "recovers on its own. Treat as needing a look. Index-only means no",
+                                       "stops are waiting to fire.",
+                                       "",
+                                       "The bridge said: " + (_last_agent_error or "(nothing captured)")[:160]]
+                        notify(_subject, chr(10).join([
                             "The laptop is UP and the daemon is running. The problem is the",
                             "Robinhood connection, not the machine.",
                             "",
                             f"{_reconcile_fails} consecutive failed broker snapshots.",
                             "",
-                            "IMPACT: NOT URGENT. Robinhood is index-only buy-and-hold, so",
-                            "there are no stops waiting to fire. Deposits and rebalancing",
-                            "just sit until the bridge is back. Fix it when convenient.",
+                        ] + _impact + [
                             "",
                             "DIAGNOSE with this, NOT with `claude mcp list`, which reported",
                             "Connected while the bridge could not authenticate at all:",
@@ -1241,9 +1291,6 @@ def main():
                             "If that fails the CLI login lapsed:  claude auth login",
                             "If it succeeds but Robinhood tools are missing, reconnect that",
                             "connector:  claude mcp login \"claude.ai Robinhood\"",
-                            "",
-                            "FIX: reconnect the Robinhood connector in claude.ai settings,",
-                            "then the bot recovers on its own within a minute.",
                         ]))
                         _broker_alert_at = time.time()
                     if "--once" in sys.argv:
