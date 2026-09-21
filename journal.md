@@ -1780,3 +1780,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'INSP']
 - notes: Strong close — Nasdaq record, AI/chip rally, oil and yields lower, VIX calm at 14.8. But hot 3.4% inflation and building Fed-hike odds cap conviction, so holding neutral 0.6 rather than full risk-on; still avoiding the BZ blowup, Sell-rated NBIS and rate-sensitive small-caps.
 - journal: Mon 9/21 16:05: Day finished constructive — indices at/near records on AI strength, SNDK +11.7% and NBIS +4.1% but NBIS stays on avoid due to Rothschild Sell. Kept neutral 0.6, same avoid list. Watching whether the Fed-hike/hot-inflation narrative resurfaces to fade this AI rally tomorrow.
+
+### 2026-09-21T17:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'INSP']
+- notes: Post-close on a record day — Nasdaq +2%, AI/chip strength, oil and yields lower, VIX calm at 14.9. But hot 3.4% inflation and building Fed-hike odds keep me from going full risk-on, so holding neutral 0.6; still avoiding the BZ blowup, Sell-rated NBIS and rate-sensitive small-caps.
+- journal: Mon 9/21 17:16: Session closed strong with indices at records on AI momentum; posture unchanged at neutral 0.6 with same avoid list. Watching whether the hot-inflation/Fed-hike narrative resurfaces to fade this rally into Tuesday, plus any BZ/NBIS follow-through.
