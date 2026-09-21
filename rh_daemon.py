@@ -353,6 +353,24 @@ except Exception:
     BRIDGE_CWD = None       # fall back to default cwd rather than crash
 
 
+def _remember_alerts(led, **kw):
+    """Persist alert dampeners ON THE LEDGER so a restart cannot unmute them.
+
+    These four lived in module globals, so every restart reset them. Two real
+    consequences, both observed: an outage alert whose ALL-CLEAR was swallowed
+    because _reconcile_fails went back to 0 (the log showed 7 alerts against 2
+    all-clears), and hourly/daily re-alert dampeners silently rearmed, so a
+    restart mid-outage could immediately re-alert. Wall-clock timestamps survive
+    a restart correctly on their own; what was missing was somewhere to keep them.
+
+    I flagged all of this weeks ago as "state that must survive a restart is kept
+    in memory" and said I would move it onto the ledger. This is that.
+    """
+    a = led.setdefault("alerts", {})
+    a.update({k: v for k, v in kw.items()})
+    save_ledger(led)
+
+
 def agent(prompt):
     """Run a headless Claude turn and return the JSON object it printed."""
     try:
@@ -429,6 +447,7 @@ def check_deposit_overdue(led):
             if since < DEPOSIT_REALERT_DAYS:
                 return
         _deposit_alert_on = today.isoformat()
+        _remember_alerts(led, deposit_alert_on=_deposit_alert_on)
         log(f"deposit overdue: {gap} days since {last}, asking Devon to confirm")
         notify("RH bot: is a weekly deposit missing?", chr(10).join([
             f"No deposit recorded since {last}, which is {gap} days ago. The weekly "
@@ -981,7 +1000,7 @@ def check_mail(led):
 
 
 # ── Code sync: inherit cloud-bot improvements, but verify before trusting ───
-def sync_code():
+def sync_code(led=None):
     """Pull upstream changes and prove they work before running on them.
 
     rh_bot.py imports its rails straight from alpaca_bot, so a strategy fix made
@@ -1058,6 +1077,9 @@ def sync_code():
                            "rh_HALT in the repo folder.",
                        ]))
                 _selftest_alert_at = time.time()
+                if led is not None:
+                    _remember_alerts(led, selftest_alert_at=_selftest_alert_at,
+                                     selftest_fails=_selftest_fails)
             return False
         if _selftest_fails:
             log(f"upstream selftest recovered after {_selftest_fails} failure(s)")
@@ -1067,6 +1089,8 @@ def sync_code():
                        f"{_selftest_fails} rejection(s). The laptop is restarting "
                        f"into {head[:7]} and inheriting cloud changes normally.")
             _selftest_fails, _selftest_alert_at = 0, 0.0
+            if led is not None:
+                _remember_alerts(led, selftest_alert_at=0.0, selftest_fails=0)
         log("new code passed selftest - restarting to load it")
         return True
     except Exception as e:
@@ -1151,6 +1175,7 @@ def main():
     # Pin the commit our just-loaded modules were built from, so sync_code can tell
     # when the live CODE has drifted from disk no matter which git path advanced HEAD.
     global _run_head, _reconcile_fails, _broker_alert_at, _next_reconcile_try
+    global _selftest_fails, _selftest_alert_at, _deposit_alert_on
     try:
         _run_head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
                                    text=True, timeout=30).stdout.strip() or None
@@ -1159,6 +1184,21 @@ def main():
         log(f"could not capture running HEAD ({e}); code-sync will use pull deltas")
 
     led = _load(LEDGER_F, fresh_ledger())
+    # Restore the alert state this daemon left behind. Absolute timestamps are
+    # valid across a restart; an expired one simply reads as "dampener elapsed".
+    # _reconcile_fails is restored ONLY when an alert is still unpaired, which is
+    # what lets the all-clear fire for an outage that began before the restart.
+    _a = (led.get("alerts") or {})
+    _broker_alert_at   = float(_a.get("broker_alert_at") or 0.0)
+    _selftest_alert_at = float(_a.get("selftest_alert_at") or 0.0)
+    _deposit_alert_on  = _a.get("deposit_alert_on") or None
+    if _broker_alert_at:
+        _reconcile_fails = int(_a.get("reconcile_fails") or 0)
+    if _selftest_alert_at:
+        _selftest_fails = int(_a.get("selftest_fails") or 0)
+    if _broker_alert_at or _selftest_alert_at or _deposit_alert_on:
+        log(f"restored alert state from the ledger: broker_fails={_reconcile_fails} "
+            f"selftest_fails={_selftest_fails} deposit_alert_on={_deposit_alert_on}")
     last_full = 0.0
     while True:
         if os.path.exists(HALT_F):
@@ -1210,6 +1250,7 @@ def main():
                                    "The Robinhood connection is working again. "
                                    "Normal trading and stop enforcement have resumed.")
                         _reconcile_fails, _broker_alert_at = 0, 0.0
+                        _remember_alerts(led, broker_alert_at=0.0, reconcile_fails=0)
                     _next_reconcile_try = 0.0
                     led["needs_reconcile"] = False
                 elif DRY:
@@ -1228,6 +1269,7 @@ def main():
                     # authorization. Wrong diagnosis costs time that positions do
                     # not have, since selling needs this same bridge.
                     _reconcile_fails += 1
+                    _remember_alerts(led, reconcile_fails=_reconcile_fails)
                     wait = min(FAST_PASS_SEC * (2 ** min(_reconcile_fails - 1, 4)),
                                RECONCILE_BACKOFF_MAX)
                     _next_reconcile_try = time.time() + wait
@@ -1293,6 +1335,8 @@ def main():
                             "connector:  claude mcp login \"claude.ai Robinhood\"",
                         ]))
                         _broker_alert_at = time.time()
+                        _remember_alerts(led, broker_alert_at=_broker_alert_at,
+                                         reconcile_fails=_reconcile_fails)
                     if "--once" in sys.argv:
                         return 0
                     time.sleep(FAST_PASS_SEC)
@@ -1300,7 +1344,7 @@ def main():
             if full:
                 check_mail(led)   # surface new mailbox entries for this session
                 check_deposit_overdue(led)   # ask, never invent, a missed deposit
-            if full and sync_code():
+            if full and sync_code(led):
                 save_ledger(led)          # ledger is the source of truth across restarts
                 # Do NOT execv on Windows: it spawns rather than replaces, which is
                 # how three daemons ended up running at once. Exit non-zero and let
