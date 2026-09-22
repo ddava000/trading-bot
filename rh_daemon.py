@@ -55,7 +55,7 @@ for _name in ("stdout", "stderr"):
             _stream.reconfigure(encoding="utf-8", errors="replace")
         except Exception:
             pass                      # older/odd stream: leave it, never fail startup
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import rh_bot
 import alpaca_bot as bot
@@ -191,6 +191,48 @@ def keep_awake():
     except Exception as e:
         log(f"keep-awake unavailable ({e}) - laptop can still enter Modern Standby")
         return False
+
+
+# "You've hit your session limit - resets 2:10pm (America/Chicago)". Formats seen
+# live: "1pm", "2pm", "12:30pm", "1:40pm", "6:40pm". Hour-only has no colon.
+_RESET_RE = re.compile(r"resets\s+(\d{1,2})(?::(\d{2}))?\s*([ap])m\s*\(([^)]+)\)", re.I)
+
+
+def quota_reset_wait(err):
+    """Seconds to wait until the quota reset the BRIDGE ITSELF named, or None.
+
+    Claude usage limits are the single largest source of this bot's blindness -
+    852 of 1484 blind market-minutes as measured 2026-09-22. The blind backoff
+    that handles them is deliberately ignorant: on 2026-09-22 the bridge said
+    "resets 2:10pm", the quota came back at 2:10, and the daemon sat in a 900s
+    backoff until 2:20 because nothing read the sentence it had just logged.
+    Ten minutes of avoidable blindness, and it needed a human to shorten it.
+
+    Retrying BEFORE the stated reset cannot succeed, and retrying long after it
+    wastes market time, so the reset time is strictly better information than any
+    exponential curve. Guarded: a parse that lands in the past, more than 6h out,
+    or names a timezone this machine does not know returns None and the caller
+    keeps its normal backoff. Never returns something that parks the bot longer
+    than the bridge asked for.
+    """
+    m = _RESET_RE.search(err or "")
+    if not m:
+        return None
+    try:
+        from zoneinfo import ZoneInfo
+        hh = int(m.group(1)) % 12
+        if m.group(3).lower() == "p":
+            hh += 12
+        tz = ZoneInfo(m.group(4).strip())
+        now = datetime.now(tz)
+        target = now.replace(hour=hh, minute=int(m.group(2) or 0),
+                             second=0, microsecond=0)
+        if target <= now:                 # e.g. "resets 1pm" seen at 2pm -> tomorrow
+            target += timedelta(days=1)
+        wait = (target - now).total_seconds() + 30      # clear the boundary
+    except Exception:
+        return None
+    return wait if 0 < wait <= 6 * 3600 else None
 
 
 def now_et():
@@ -1313,9 +1355,16 @@ def main():
                     _remember_alerts(led, reconcile_fails=_reconcile_fails)
                     wait = min(FAST_PASS_SEC * (2 ** min(_reconcile_fails - 1, 4)),
                                RECONCILE_BACKOFF_MAX)
+                    # Prefer the reset time the bridge NAMED over a blind curve. Usage limits are
+                    # the largest single source of this bot's blindness, and the exact moment the
+                    # quota returns is sitting in the error text we already logged.
+                    _reset_wait = quota_reset_wait(_last_agent_error)
+                    if _reset_wait is not None:
+                        wait = _reset_wait
                     _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
-                        f"trading nothing this pass, next try in {int(wait)}s")
+                        f"trading nothing this pass, next try in {int(wait)}s"
+                        f"{' (quota reset time)' if _reset_wait is not None else ''}")
                     save_ledger(led)
                     publish_degraded(led, "broker_unreachable", _reconcile_fails)
                     if (_reconcile_fails >= BROKER_FAIL_ALERT and
