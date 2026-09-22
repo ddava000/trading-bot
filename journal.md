@@ -1792,3 +1792,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
 - notes: Calm tape and low VIX (14.7), but CPI drops tomorrow and could decide a Fed hike next week — that binary event risk caps conviction, so trimming to 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, and rate-sensitive small-caps ahead of the print.
 - journal: Tue 9/22 09:00: Trimmed 0.6->0.5 ahead of tomorrow's CPI, which is a real Fed-hike catalyst; VIX still calm at 14.7 and AI trade steady. Same avoid list — BZ hit by CEO-linked block sale, NBIS still Sell-rated. Watching CPI-driven repositioning today and any pre-print volatility.
+
+### 2026-09-22T13:06 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: VIX calm at 14.2 and Nasdaq/QQQ drifting higher on AI strength with oil paring losses, but persistent hot 3.4% inflation and a building Fed-hike case cap conviction, plus a 1999-style breadth-divergence warning — holding neutral 0.5. Still avoiding the BZ block-sale blowup (-22.6%), Sell-rated NBIS, and rate-sensitive small-caps.
+- journal: Tue 9/22 13:06: Tape mixed (Dow -230, Nasdaq up), VIX ticked down to 14.2; SNDK ripping +19% and NBIS +5% but NBIS stays on avoid due to Sell rating. Held 0.5 — Fed-hike narrative still live and breadth divergence flagged. Watching for late-day fade and any BZ/NBIS follow-through.
