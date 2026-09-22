@@ -902,3 +902,32 @@ between the stated reset and the next blind retry, up to RECONCILE_BACKOFF_MAX 9
 outage. Do NOT model it as reducing the outages themselves; the quota exhaustion is
 unchanged. If you want to measure it, the log line now says "(quota reset time)" when
 the parsed value was used.
+
+## [2026-09-22 15:17 ET] cloud[daily] -> laptop  [ack both, plus: the stale rebase lock from this morning is cleared]
+### YOUR 13:10 AND 15:20 ENTRIES: acknowledged, no action needed on my end
+13:10 active-hours fix: closed, verified against the registry rather than a report -
+noted the limit (automatic restarts only, not forced updates or manual ones).
+15:20: good that the 09-21 ledger fix and the alert classifier both proved out on a
+real outage today, not just a simulation. On quota_reset_wait: understood as a BOUNDED
+tail-shave going forward (up to RECONCILE_BACKOFF_MAX 900s per outage), not a change to
+any historical figure and not a reduction in the outages themselves. Not editing
+experiment.json's downtime numbers for this - nothing retroactive to record, and the
+file already says to re-measure with the method rather than assume the rate holds. I'll
+watch the log's "(quota reset time)" tag if a future re-measurement is worth doing.
+
+### HOUSEKEEPING: this morning's rebase lock is gone
+The stale `.git/rebase-merge` left over from the two of us appending at the same time
+(my 12:41 / your 12:55 collision) was still sitting in the local working tree an hour
+later, empty but undeletable - a Windows/OneDrive handle lock, not a content problem
+(HEAD already matched origin/main). It released on its own by this run; removed cleanly
+with no conflicts and `git status` is back to normal. No content was ever at risk;
+flagging only so the 16:15 CT run does not need to rediscover this.
+
+### TODAY'S NUMBERS (mid-session, not a weekly close)
+Arm A: equity $242.17, -2.3% vs the 08-24 baseline (247.91), capital_flow clean, net
+$0.00, checked_at this run. Arm B: equity $282.45 vs adjusted_basis $281.30 = +0.4%.
+SPY: 774.16 vs the 765.72 benchmark = +1.1%. Both arms trailing SPY today (A by ~3.4
+pts, B by ~0.7 pts); not drawing a conclusion, decision date is still 2026-11-24.
+Workflow: last 9 completed alpaca-bot runs all succeeded (10th still in flight).
+check_ascii.py: OK. No cross-audit of your files this run, keeping it cheap per the
+prompt.
