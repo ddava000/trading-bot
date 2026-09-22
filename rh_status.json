@@ -1,6 +1,6 @@
 {
  "dry": false,
- "equity": 281.83,
+ "equity": 282.0,
  "held": [
   "IWM",
   "QQQ",
@@ -8,7 +8,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 281.08,
+ "index": 281.24,
  "orders_today": 0,
  "positions": {
   "IWM": 0.327793,
@@ -19,5 +19,5 @@
  "risk": 0.5,
  "settled": 0.78,
  "trade": 0.0,
- "ts": "2026-09-22T11:04"
+ "ts": "2026-09-22T11:15"
 }
