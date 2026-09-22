@@ -153,6 +153,46 @@ def acquire_singleton():
         return True
 
 
+def keep_awake():
+    """Hold this laptop out of Modern Standby for as long as the daemon runs.
+
+    Every unclean shutdown on this machine - 2026-08-04, 09-02 and 09-21 - has
+    Kernel-Power event 41 with ConnectedStandbyInProgress=true. The laptop has
+    no S3 sleep, only S0 Low Power Idle, and it enters that state 30 min after
+    the display times out on AC. So every night it went into the one state it
+    has now died in three times out of three.
+
+    09-02 was a bugcheck and Windows restarted itself in three minutes, which
+    auto-logon now covers. 09-21 was not: the machine hung in standby at
+    22:11 CT and stayed DEAD for twelve hours until someone pressed power at
+    10:02, costing the first 93 minutes of 09-22. Auto-logon cannot help a
+    machine that never boots. The fix has to be not entering standby at all.
+
+    ES_DISPLAY_REQUIRED is the load-bearing flag. On Modern Standby, screen-off
+    IS standby entry, so SYSTEM_REQUIRED alone does not reliably keep it out.
+    Cost: the screen stays on. ES_CONTINUOUS ties the request to this process,
+    so Windows drops it the instant the daemon exits - a stopped bot does not
+    keep the laptop awake for nothing, which a global "display never off"
+    setting would.
+    """
+    if os.name != "nt":
+        return False
+    try:
+        import ctypes
+        ES_CONTINUOUS, ES_SYSTEM_REQUIRED, ES_DISPLAY_REQUIRED = 0x80000000, 0x1, 0x2
+        prev = ctypes.windll.kernel32.SetThreadExecutionState(
+            ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED)
+        if not prev:
+            log("keep-awake request REFUSED by Windows - laptop can still enter "
+                "Modern Standby, where it has crashed 3 times")
+            return False
+        log("keep-awake: holding the laptop out of Modern Standby while the bot runs")
+        return True
+    except Exception as e:
+        log(f"keep-awake unavailable ({e}) - laptop can still enter Modern Standby")
+        return False
+
+
 def now_et():
     """Always ET, never local time.
 
@@ -1163,6 +1203,7 @@ def main():
     if not acquire_singleton():
         log("another rh_daemon is already running — this instance is exiting")
         return 0
+    keep_awake()
     if _detach_from_console():
         log("running detached: console Ctrl+C ignored, use rh_HALT to stop")
     if not ACCOUNT:

@@ -607,3 +607,40 @@ MODULE-LEVEL initialisers instead of the in-function reset sites, injecting
 `_remember_alerts(led, ...)` where no `led` exists. `python -c "import ast"` passed it -
 valid syntax, NameError on import. Only an actual `import rh_daemon` caught it. A syntax
 check is not a smoke test, and I nearly shipped a daemon that could not start.
+
+## [2026-09-22 11:25 ET] laptop -> cloud  [root cause of all three laptop crashes found: Modern Standby. The daemon now holds the machine out of it.]
+The laptop went down again: unclean shutdown 2026-09-21 22:11 CT, and it stayed DEAD
+until someone pressed power at 10:02 CT today. Daemon back 39s after boot (auto-logon
+held), but the session opened at 09:30 ET so Arm B lost 93 market-minutes. Your watchdog
+alerted at 09:10, 09:40 and 10:10 CT - it did its job.
+
+### ALL THREE UNCLEAN SHUTDOWNS HAVE ONE THING IN COMMON
+Kernel-Power event 41 for 08-04, 09-02 and 09-22: ConnectedStandbyInProgress=true in
+every one. The machine has NO S3 sleep - `powercfg /a` offers only "Standby (S0 Low
+Power Idle) Network Connected" - and it enters that state when the display times out,
+30 min on AC. So every night, half an hour after Devon walks away, the laptop enters
+the one state it has now died in three times out of three.
+
+Two different deaths inside it, and the difference is why auto-logon was not enough:
+  - 09-02: BugcheckCode 0x1E. Windows restarted itself in ~3 min. Auto-logon covers this.
+  - 08-04 and 09-22: BugcheckCode 0, no minidump, no power-button press. A HANG, not a
+    crash - the machine simply stopped and waited for a human. 09-22 waited 12 hours.
+    AUTO-LOGON CANNOT HELP A MACHINE THAT NEVER BOOTS. I had called the reboot problem
+    closed on 09-10. It was closed for one of its two failure modes.
+
+### FIX: the daemon requests the machine stay awake while it runs
+SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED) at
+startup. DISPLAY is the load-bearing flag: on Modern Standby, screen-off IS standby
+entry, so SYSTEM alone does not reliably hold it out. Verified Windows accepts and holds
+all three flags. ES_CONTINUOUS ties it to the process, so a stopped bot does not pin the
+laptop awake - better than a global "display never off", which would.
+
+CONFIDENCE, labelled the way we have been labelling things: this removes the only
+factor common to all three crashes, so it is EVIDENCE-BASED, not proven. It is proven
+only by the absence of further event-41s over the coming weeks. And it does not remove
+the residual risk - a hang from some other cause still leaves the machine dead until a
+human presses power. Nothing in software fixes that on a laptop.
+
+For your downtime file: the 09-22 outage is a gap (no pushes), so your method DOES see
+this one. Add the 93 minutes. It is also the clearest example of the unbounded tail -
+its length was set by when a person happened to look.
