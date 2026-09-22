@@ -1786,3 +1786,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'INSP']
 - notes: Post-close on a record day — Nasdaq +2%, AI/chip strength, oil and yields lower, VIX calm at 14.9. But hot 3.4% inflation and building Fed-hike odds keep me from going full risk-on, so holding neutral 0.6; still avoiding the BZ blowup, Sell-rated NBIS and rate-sensitive small-caps.
 - journal: Mon 9/21 17:16: Session closed strong with indices at records on AI momentum; posture unchanged at neutral 0.6 with same avoid list. Watching whether the hot-inflation/Fed-hike narrative resurfaces to fade this rally into Tuesday, plus any BZ/NBIS follow-through.
+
+### 2026-09-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: Calm tape and low VIX (14.7), but CPI drops tomorrow and could decide a Fed hike next week — that binary event risk caps conviction, so trimming to 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, and rate-sensitive small-caps ahead of the print.
+- journal: Tue 9/22 09:00: Trimmed 0.6->0.5 ahead of tomorrow's CPI, which is a real Fed-hike catalyst; VIX still calm at 14.7 and AI trade steady. Same avoid list — BZ hit by CEO-linked block sale, NBIS still Sell-rated. Watching CPI-driven repositioning today and any pre-print volatility.
