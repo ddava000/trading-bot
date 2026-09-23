@@ -1828,3 +1828,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE'] | favor: ['SNDK', 'NVDA']
 - notes: Yields at 2007 highs pressuring the tape with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close. Holding risk-off 0.35; only $29 cash caps new buys regardless.
 - journal: Wed 9/23 15:09: Late-day, VIX steady 15.0, yields still elevated ahead of CPI print tomorrow. SNDK leading (+14.6%), BZ still deep red (-23.8%), IWM soft (-6.3%). Staying defensive at 0.35 into the print — watching CPI and yield follow-through into Fed next week.
+
+### 2026-09-23T16:44 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE', 'MSFT'] | favor: ['SNDK', 'NVDA']
+- notes: Yields at 2007 highs with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close; MSFT added to avoid ahead of its 9/24 catalyst. Holding risk-off 0.35 with only $29 cash capping buys anyway.
+- journal: Wed 9/23 16:44: Into the close, VIX 15.2, yields still elevated pre-CPI. SNDK still leading (+14.9%), BZ deep red (-24%), IWM soft (-6.5%). Added MSFT to avoid on its 9/24 event; staying defensive at 0.35 — watching CPI print and yield follow-through into Fed next week.
