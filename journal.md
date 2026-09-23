@@ -1816,3 +1816,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'INSP'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
 - notes: VIX calm at 14.3 and Nasdaq at fresh records, but a hot-inflation Fed-hike case with CPI landing tomorrow and a Fed decision next week caps conviction — holding neutral 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, rate-sensitive IWM, and adding INSP which is weak (-6%); only $33 cash limits new buys anyway.
 - journal: Wed 9/23 09:00: Flat overnight (P&L -$1), VIX 14.3, futures mixed with oil/yields ticking up. CPI prints tomorrow and could lock in a rate hike — staying defensive at 0.5. Watching for pre-CPI de-risking and any BZ/NBIS follow-through.
+
+### 2026-09-23T13:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ'] | favor: ['SNDK', 'NVDA']
+- notes: 10-year yield surging to a 2007 high with the Dow off 300 and Nasdaq retreating from record — plus CPI tomorrow that could lock in a Fed hike next week. Rate/event risk is stacked, so dialing down to 0.35 and adding index ETFs to avoid ahead of the print; only $29 cash constrains buys anyway.
+- journal: Wed 9/23 13:19: Tape turned defensive — yields spiked to 2007 highs, indices red, VIX up to 15.3. Cut risk to 0.35 into CPI (tomorrow) and Fed next week; SNDK still leading (+15%), BZ still bleeding (-24%). Watching CPI print and yield follow-through.
