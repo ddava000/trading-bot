@@ -1822,3 +1822,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ'] | favor: ['SNDK', 'NVDA']
 - notes: 10-year yield surging to a 2007 high with the Dow off 300 and Nasdaq retreating from record — plus CPI tomorrow that could lock in a Fed hike next week. Rate/event risk is stacked, so dialing down to 0.35 and adding index ETFs to avoid ahead of the print; only $29 cash constrains buys anyway.
 - journal: Wed 9/23 13:19: Tape turned defensive — yields spiked to 2007 highs, indices red, VIX up to 15.3. Cut risk to 0.35 into CPI (tomorrow) and Fed next week; SNDK still leading (+15%), BZ still bleeding (-24%). Watching CPI print and yield follow-through.
+
+### 2026-09-23T15:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE'] | favor: ['SNDK', 'NVDA']
+- notes: Yields at 2007 highs pressuring the tape with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close. Holding risk-off 0.35; only $29 cash caps new buys regardless.
+- journal: Wed 9/23 15:09: Late-day, VIX steady 15.0, yields still elevated ahead of CPI print tomorrow. SNDK leading (+14.6%), BZ still deep red (-23.8%), IWM soft (-6.3%). Staying defensive at 0.35 into the print — watching CPI and yield follow-through into Fed next week.
