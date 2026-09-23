@@ -1810,3 +1810,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
 - notes: Session closing with VIX calm at 14.2 and Nasdaq at record highs on AI/chip strength, but a live Fed-hike case (hot 3.4% inflation) caps conviction — holding neutral 0.5. Continue avoiding the BZ block-sale blowup, Sell-rated NBIS, and rate-sensitive small-caps; only $33 cash limits new buys regardless.
 - journal: Tue 9/22 16:32: Held 0.5 into the close; day P&L roughly flat (+$1), SNDK still the leader (+19%). Fed-hike/inflation narrative unresolved and thin cash constrains action. Watching whether hot-inflation fear resurfaces Wednesday and any BZ/NBIS follow-through.
+
+### 2026-09-23T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'INSP'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: VIX calm at 14.3 and Nasdaq at fresh records, but a hot-inflation Fed-hike case with CPI landing tomorrow and a Fed decision next week caps conviction — holding neutral 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, rate-sensitive IWM, and adding INSP which is weak (-6%); only $33 cash limits new buys anyway.
+- journal: Wed 9/23 09:00: Flat overnight (P&L -$1), VIX 14.3, futures mixed with oil/yields ticking up. CPI prints tomorrow and could lock in a rate hike — staying defensive at 0.5. Watching for pre-CPI de-risking and any BZ/NBIS follow-through.
