@@ -1,14 +1,23 @@
 {
- "degraded": "broker_unreachable",
- "degraded_since_passes": 1,
  "dry": false,
- "equity": 279.54,
+ "equity": 279.22,
+ "held": [
+  "IWM",
+  "QQQ",
+  "SPY"
+ ],
+ "hold": 0,
  "holds": [],
+ "index": 278.45,
  "orders_today": 0,
  "positions": {
   "IWM": 0.327793,
   "QQQ": 0.125542,
   "SPY": 0.1211
  },
- "ts": "2026-09-23T14:40"
+ "regime": "risk-off",
+ "risk": 0.35,
+ "settled": 0.78,
+ "trade": 0.0,
+ "ts": "2026-09-23T14:41"
 }
