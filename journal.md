@@ -1834,3 +1834,9 @@
 - avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE', 'MSFT'] | favor: ['SNDK', 'NVDA']
 - notes: Yields at 2007 highs with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close; MSFT added to avoid ahead of its 9/24 catalyst. Holding risk-off 0.35 with only $29 cash capping buys anyway.
 - journal: Wed 9/23 16:44: Into the close, VIX 15.2, yields still elevated pre-CPI. SNDK still leading (+14.9%), BZ deep red (-24%), IWM soft (-6.5%). Added MSFT to avoid on its 9/24 event; staying defensive at 0.35 — watching CPI print and yield follow-through into Fed next week.
+
+### 2026-09-24T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE', 'MSFT', 'BAND'] | favor: ['SNDK', 'ADPT']
+- notes: CPI prints today into a 10-year yield above 5.1% (19-year high) and a Fed decision next week — event risk peaks now with markets already selling off. Holding risk-off at 0.3; MSFT kept on avoid for its 9/24 catalyst and only $29 cash caps any buys anyway.
+- journal: Thu 9/24 09:00: CPI day is here — yields spiked to a 19-year high (5.1%+), Dow -300, Nasdaq -1%; VIX 15.9. Cut to 0.3 into the print. SNDK still leading (+12%), ADPT on a 5-day green streak, BZ still deep red (-24%). Watching the CPI reaction and yield follow-through into next week's Fed.
