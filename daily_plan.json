@@ -2,23 +2,22 @@
   "regime": "risk-off",
   "risk_scale": 0.3,
   "avoid_symbols": [
-    "BZ",
-    "NBIS",
     "IWM",
+    "NBIS",
+    "SNDK",
+    "MSFT",
     "PLTR",
     "SPY",
     "QQQ",
-    "NICE",
-    "MSFT",
     "BAND"
   ],
   "favor_symbols": [
-    "SNDK",
-    "ADPT"
+    "ADPT",
+    "NVDA"
   ],
-  "notes": "CPI prints today into a 10-year yield above 5.1% (19-year high) and a Fed decision next week \u2014 event risk peaks now with markets already selling off. Holding risk-off at 0.3; MSFT kept on avoid for its 9/24 catalyst and only $29 cash caps any buys anyway.",
-  "journal_entry": "Thu 9/24 09:00: CPI day is here \u2014 yields spiked to a 19-year high (5.1%+), Dow -300, Nasdaq -1%; VIX 15.9. Cut to 0.3 into the print. SNDK still leading (+12%), ADPT on a 5-day green streak, BZ still deep red (-24%). Watching the CPI reaction and yield follow-through into next week's Fed.",
+  "notes": "CPI landed and yields remain above 5.1% (multi-year highs) with a Fed decision next week \u2014 event risk still elevated even as tape pares losses on Hormuz hopes. Holding risk-off 0.3; IWM deep red (-6.8%), and SNDK/NBIS extended (+11%) so avoiding chase into stretched names.",
+  "journal_entry": "Thu 9/24 13:23: Post-CPI, VIX eased to 15.4 and indices paring losses (QQQ +2.2%) on Hormuz hopes, but 10yr still >5.1% and Fed looms next week. NBIS +10.5% and SNDK +11.5% extended \u2014 added to avoid to prevent chasing; ADPT still green. Staying defensive at 0.3, watching yield follow-through into the Fed.",
   "date": "2026-09-24",
-  "mode": "MORNING",
-  "updated_at": "2026-09-24T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-09-24T13:23 ET"
 }
