@@ -1852,3 +1852,9 @@
 - avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
 - notes: Late-day with 10yr yield >5.1% (19-year high) and a Fed decision next week keeping event risk elevated despite VIX easing to 15.6. IWM crushed (-6.7%) on record small-cap outflows; NBIS/SNDK extended (+10%) so avoiding chase into stretched names.
 - journal: Thu 9/24 15:24: Into the close, VIX 15.6, yields still surging (10yr >5.1%), Dow -300/Nasdaq -1%. NBIS +10.4% and SNDK +9.8% still stretched; IWM deep red on $3.3B outflow. Holding risk-off 0.3 with only $39 cash capping buys — watching yield follow-through into next week's Fed.
+
+### 2026-09-24T16:50 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
+- notes: Final hour with 10yr yield above 5.1% (19-year high) and a Fed decision next week keeping event risk elevated even as VIX eases to 15.7. IWM crushed (-6.7%) on record small-cap outflows; NBIS/SNDK extended (+8-11%) so avoiding chase into stretched names, and only $39 cash caps any new buys anyway.
+- journal: Thu 9/24 16:50: Into the close, VIX 15.7, yields still elevated (10yr >5.1%), tape mixed with Big Tech supporting. NBIS +8.6% and SNDK +10.5% still stretched; IWM deep red. Holding risk-off 0.3 — watching yield follow-through and CPI/Fed setup into next week.
