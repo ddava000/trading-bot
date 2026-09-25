@@ -1864,3 +1864,9 @@
 - avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'BAND'] | favor: ['ADPT', 'NVDA', 'QQQ']
 - notes: Futures flat and VIX eased to 15.2, but the 10yr near 5.1% (multi-year highs) and a heavy week ahead (jobs, PCE, Micron, Fed) keep event risk live; nudging to 0.4 as the tape stabilizes. Avoiding extended names (NBIS +10.5%, SNDK +13.5%) and small-caps (IWM -6.3%) to prevent chasing.
 - journal: Fri 9/25 09:00: VIX down to 15.2 and futures little changed after four losing weeks; yields still elevated but tape steadier, so lifting risk 0.3->0.4. NBIS/SNDK remain stretched, IWM weak. Watching next week's jobs/PCE/Fed and yield follow-through; only $39 cash caps new buys anyway.
+
+### 2026-09-25T13:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'SRZN', 'BAND'] | favor: ['QQQ', 'MSFT', 'ADPT']
+- notes: Constructive Friday tape with VIX back to 15.0, QQQ +2.8% and yields easing off highs as indices head for a winning week; nudging to 0.45 but keeping powder dry with only $17 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.3%, NBIS +6.9%), weak small-caps (IWM -6.4%), and adverse movers (AKAM -4.9%, SRZN -4.7%).
+- journal: Fri 9/25 13:22: Tape turned constructive — VIX 15.0, QQQ +2.8%, MSFT +2.5% on Copilot news, yields slipping and indices on pace for a winning week. Lifted risk 0.4->0.45; SNDK/NBIS still extended so keep on avoid. Watching next week's jobs/PCE/Fed; cash near-zero caps new buys.
