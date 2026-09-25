@@ -1858,3 +1858,9 @@
 - avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
 - notes: Final hour with 10yr yield above 5.1% (19-year high) and a Fed decision next week keeping event risk elevated even as VIX eases to 15.7. IWM crushed (-6.7%) on record small-cap outflows; NBIS/SNDK extended (+8-11%) so avoiding chase into stretched names, and only $39 cash caps any new buys anyway.
 - journal: Thu 9/24 16:50: Into the close, VIX 15.7, yields still elevated (10yr >5.1%), tape mixed with Big Tech supporting. NBIS +8.6% and SNDK +10.5% still stretched; IWM deep red. Holding risk-off 0.3 — watching yield follow-through and CPI/Fed setup into next week.
+
+### 2026-09-25T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'BAND'] | favor: ['ADPT', 'NVDA', 'QQQ']
+- notes: Futures flat and VIX eased to 15.2, but the 10yr near 5.1% (multi-year highs) and a heavy week ahead (jobs, PCE, Micron, Fed) keep event risk live; nudging to 0.4 as the tape stabilizes. Avoiding extended names (NBIS +10.5%, SNDK +13.5%) and small-caps (IWM -6.3%) to prevent chasing.
+- journal: Fri 9/25 09:00: VIX down to 15.2 and futures little changed after four losing weeks; yields still elevated but tape steadier, so lifting risk 0.3->0.4. NBIS/SNDK remain stretched, IWM weak. Watching next week's jobs/PCE/Fed and yield follow-through; only $39 cash caps new buys anyway.
