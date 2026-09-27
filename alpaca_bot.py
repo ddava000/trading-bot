@@ -68,6 +68,11 @@ TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still sa
 RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
 HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
 HOLD_MIN_VOTES   = 4      # votes a name needs before the hold sleeve considers it
+NO_PLAN_RISK     = 0.50   # risk_scale used when daily_plan.json is missing entirely.
+                          # NOT a tuning choice: it is the median of the 79 plan days
+                          # the brief has produced (mean 0.46), chosen so an outage
+                          # lands on normal behaviour rather than on full size. A
+                          # STALE plan does not use this; it holds its own value.
 EXPERIMENT_START = "2026-08-24"   # A/B window opened; capital moved after this
                                   # date contaminates Arm A the way pre-window
                                   # deposits contaminate Arm B. Keep in step
@@ -934,20 +939,43 @@ def load_plan(et):
     risk is clamped to [0,1] - the plan can only scale buys DOWN, never past the
     bot's hard rails. A missing or stale (not-today) plan -> neutral defaults, so the
     bot is unaffected when the brief hasn't run."""
-    neutral = {"regime": "neutral", "risk": 1.0, "avoid": set(), "favor": [], "notes": "no plan"}
+    # A STALE PLAN MUST NEVER RAISE RISK. The old fallback returned risk 1.0 and an
+    # empty avoid list, and its docstring claimed the bot was then "unaffected". That
+    # was false in the dangerous direction: across all 79 recorded plan days the brief
+    # NEVER once allowed full size (mean 0.46, max 0.65, min 0.30), so falling back to
+    # 1.0 moved the bot to a sizing it had never traded at in its history, silently,
+    # because a stale plan looks exactly like a calm one.
+    #
+    # Found 2026-09-27 when the ANTHROPIC_API_KEY credit balance ran out and stopped
+    # brief.py. A BILLING LAPSE MUST NOT BE ABLE TO DOUBLE POSITION SIZING.
+    #
+    # So a stale plan now HOLDS its own last-known risk and avoid list rather than
+    # discarding them. Both are conservative by construction: risk only ever scales
+    # DOWN, and a stale avoid list can only block names, never admit new ones. The
+    # regime is relabelled so the staleness is visible rather than inferred.
+    no_plan = {"regime": "no-plan", "risk": NO_PLAN_RISK, "avoid": set(), "favor": [],
+               "notes": "daily_plan.json missing", "stale": True, "plan_date": None}
     try:
         if not os.path.exists("daily_plan.json"):
-            return neutral
+            return no_plan
         p = json.load(open("daily_plan.json"))
-        if p.get("date") != et.strftime("%Y-%m-%d"):
-            return neutral   # stale plan from a previous day - ignore
         rs = max(0.0, min(1.0, float(p.get("risk_scale", 1.0))))
-        return {"regime": p.get("regime", "neutral"), "risk": rs,
+        pd = p.get("date")
+        stale = pd != et.strftime("%Y-%m-%d")
+        if stale:
+            # Hold the last plan's damper. min() is belt and braces: if some future
+            # plan ever carried 1.0, staleness still could not raise us past the
+            # standing cap.
+            rs = min(rs, NO_PLAN_RISK if rs >= 1.0 else rs)
+        return {"regime": (f"stale:{p.get('regime', 'neutral')}" if stale
+                           else p.get("regime", "neutral")),
+                "risk": rs,
                 "avoid": set(p.get("avoid_symbols", [])),
-                "favor": list(p.get("favor_symbols", [])),
-                "notes": p.get("notes", "")}
-    except Exception:
-        return neutral
+                "favor": [] if stale else list(p.get("favor_symbols", [])),
+                "notes": p.get("notes", ""), "stale": stale, "plan_date": pd}
+    except Exception as e:
+        print(f"  [plan unreadable ({e}) - holding conservative default]")
+        return no_plan
 
 def alpaca_order(payload):
     """POST an order. Returns Alpaca's JSON - has 'id' on success, 'message' on error."""
@@ -1745,6 +1773,8 @@ def run_bot():
                         "hold": round(hold_val, 2), "crypto": round(crypto_val, 2)},
             "holds_pct_vs_basis": hold_pct,
             "regime": "risk-on" if risk_on else "risk-off",
+            "plan": {"date": plan.get("plan_date"), "stale": bool(plan.get("stale")),
+                     "risk": plan["risk"]},
             "vix": round(vix, 1), "halted": halted,
             "orders_this_run": len(trades_log),
             # "live" = the Yahoo crumb handshake worked and the earnings guard is
