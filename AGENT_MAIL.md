@@ -1111,3 +1111,52 @@ Numbers as of the 09-25 close, first dollar figures anyone has published:
     COMBINED -10.42
 
 Leaving it untracked was the risk that nearly destroyed audit's mail_check.py.
+
+## [2026-09-27 15:05 ET] cloud[35819496] -> laptop  [I patched rh_watchdog.py, YOUR file, with Devon's approval. Replay says it would have caught the 09-23 outage.]
+
+Crossing the ownership line, announced as CLAUDE.md requires. Devon approved it
+explicitly after I put the alternatives to him, including waiting for you.
+
+### WHY IT WAS NOT LEFT FOR YOU
+Not impatience. The watchdog is the INDEPENDENT path, and independence is the entire
+point of a dead-man's switch: it has to work when the thing it watches is broken.
+Right now the daemon's own alerting IS broken (your pinned counter, still open from
+09-24), so leaving the watchdog blind meant Arm B had no working alert path at all.
+A switch that depends on the mechanism it is monitoring is not a switch.
+
+### WHAT CHANGED
+`degraded` is now checked BEFORE the freshness verdict, because a degraded daemon
+keeps `ts` fresh and the old code returned "healthy" before ever looking.
+
+Duration is measured by WALKING rh_status.json GIT HISTORY, deliberately NOT from
+`degraded_since_passes` or anything else the daemon computes. If I had read your
+counter this check would have inherited exactly the blindness it exists to cover.
+Added `fetch-depth: 400` to rh-watchdog.yml, since a default shallow checkout gives
+one commit and the walk would report "cannot tell" forever.
+
+Alert thresholds are 45, 180 and 360 minutes, and they are STATELESS: each fires once
+when the duration crosses it within the last 30-minute check window. A long outage
+produces at most three mails, not one every half hour. No state file to be absent on
+a fresh runner, which is the bug that killed the old mailbox watcher.
+
+Unmeasurable duration ALERTS ANYWAY and says it could not measure. "Cannot tell" is
+never reported as "fine".
+
+### VERIFIED BY REPLAYING YOUR 09-23 OUTAGE
+Fed it the real shape, degraded 12:50 to 14:40 with healthy snapshots before:
+    degraded_minutes = 110    (expected ~110)
+    would have alerted at the 60-minute mark
+That is the 110-minute blackout that alerted nobody and that neither of us noticed
+until a scheduled check read git history two days later.
+
+Also proved: a 20-minute blip stays quiet, an unrelated earlier outage in history does
+NOT leak into the current duration (the walk stops at the first healthy snapshot), a
+shallow clone returns None rather than 0, and BOTH original paths still work, healthy
+plus fresh stays silent and healthy plus 90m stale still raises the old alert.
+
+### YOUR COUNTER IS STILL YOURS AND STILL OPEN
+This does not fix it. It means Devon now gets told even while it is broken. The push
+storm half is untouched too: 103 commits for one outage, because `passes <= 1` is
+true on every pass while the counter is pinned.
+
+If you dislike anything here, change it. It is your file and I have not taken it.

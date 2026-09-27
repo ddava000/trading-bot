@@ -15,7 +15,7 @@ Freshness is read from the COMMITTED rh_status.json, i.e. the last state that
 reached GitHub. That is deliberate: a laptop that is alive but cannot push is
 also a monitoring blind spot, and this flags it too.
 """
-import os, sys, json, smtplib, urllib.request
+import os, sys, json, smtplib, subprocess, urllib.request
 from datetime import datetime
 from email.mime.text import MIMEText
 
@@ -28,6 +28,20 @@ import alpaca_bot as bot
 
 STATUS_F  = "rh_status.json"
 STALE_MIN = 30    # heartbeat is 15 min, so >30 = ~2 missed pushes = likely down
+CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots)
+
+# DEGRADED means the daemon is ALIVE and pushing but cannot reach the broker, so it
+# can neither see nor trade the account. It copies the last known equity forward to
+# keep monitoring fed, which means `ts` stays FRESH and the staleness check above
+# reports "healthy". That is how a 110-minute blackout on 2026-09-23 reached nobody:
+# the laptop's own alert counter was pinned at 1 by a separate bug, and this
+# watchdog was never built to look at `degraded` at all. Two independent alert paths,
+# both silent, because FRESHNESS IS NOT HEALTH.
+#
+# Thresholds are stateless on purpose. Each fires ONCE, when the duration crosses it
+# within the last check interval, so a long outage produces at most three mails
+# instead of one every 30 minutes. No state file to go stale on a fresh runner.
+DEGRADED_ALERT_MIN = (45, 180, 360)
 GRACE_MIN = 5     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
@@ -132,6 +146,46 @@ def alert(msg, urgent=False):
     print("sent via:", ", ".join(sent) if sent else "NOTHING (no channels configured)")
 
 
+
+def degraded_minutes(now_et):
+    """How long the COMMITTED status has continuously carried `degraded`.
+
+    Measured by walking git history rather than reading a field the laptop
+    computes. That independence is the whole point: the laptop's own
+    `_reconcile_fails` counter was pinned at 1 on 2026-09-23, so anything derived
+    from it would have inherited the same blindness this check exists to cover.
+
+    Returns None when history is unavailable (a shallow checkout), which the caller
+    must treat as "cannot tell" and NOT as zero.
+    """
+    try:
+        out = subprocess.run(["git", "log", "--format=%H", "-400", "--", STATUS_F],
+                             capture_output=True, text=True, timeout=60)
+        shas = out.stdout.split()
+        if len(shas) < 2:
+            return None                      # shallow clone or no history: cannot tell
+    except Exception as e:
+        print(f"degraded-duration check unavailable: {e}")
+        return None
+    oldest_degraded_ts = None
+    for sha in shas:                          # newest first
+        try:
+            raw = subprocess.run(["git", "show", f"{sha}:{STATUS_F}"],
+                                 capture_output=True, text=True, timeout=30).stdout
+            snap = json.loads(raw)
+        except Exception:
+            continue
+        if not snap.get("degraded"):
+            break                             # first healthy snapshot ends the run
+        try:
+            oldest_degraded_ts = datetime.strptime(
+                snap["ts"], "%Y-%m-%dT%H:%M").replace(tzinfo=bot.ET_TZ)
+        except Exception:
+            continue
+    if oldest_degraded_ts is None:
+        return None
+    return (now_et - oldest_degraded_ts).total_seconds() / 60
+
 def main():
     # Manual test path: verify every channel reaches the phone without waiting
     # for a real outage. Triggered from the Actions tab with force=true.
@@ -159,6 +213,43 @@ def main():
         # A missing or unreadable status file during open market is itself a red flag.
         alert(f"RH watchdog could not read {STATUS_F} ({e}). Check the laptop "
               f"when convenient; Robinhood is index-only so nothing urgent is pending.")
+        return 0
+
+    # DEGRADED comes first: a degraded daemon keeps `ts` fresh, so the staleness
+    # check below would call it healthy and return before ever looking.
+    if status.get("degraded"):
+        why = str(status.get("degraded"))
+        mins = degraded_minutes(et)
+        if mins is None:
+            # Cannot measure duration. Say so and alert anyway rather than infer zero:
+            # a check that reports "fine" when it could not look is the failure this
+            # whole change exists to remove.
+            alert(f"Arm B is DEGRADED ({why}) and the watchdog could not measure how "
+                  f"long, so this may repeat. The laptop is alive and pushing but "
+                  f"cannot reach the broker, so it can neither see nor trade the "
+                  f"account. Not urgent: index-only has no stops waiting to fire.")
+            return 0
+        crossed = [t for t in DEGRADED_ALERT_MIN
+                   if mins >= t > (mins - CHECK_EVERY_MIN)]
+        if crossed:
+            alert(chr(10).join([
+                f"Arm B has been unable to trade for about {int(mins)} minutes "
+                f"({why}), during open market.",
+                "",
+                "The laptop is ALIVE and still pushing status, so its heartbeat looks",
+                "fresh. It just cannot reach the broker. Deposits sit uninvested and",
+                "the ETFs do not rebalance until it is back.",
+                "",
+                "NOT URGENT: Robinhood is index-only, so no stops are going unenforced.",
+                "",
+                "Usually self-heals (a Claude usage limit). If it persists, the CLI",
+                "login has probably expired, which never recovers on its own:",
+                '    claude -p "Reply with exactly: ALIVE"',
+                "and if that fails:  claude auth login",
+            ]))
+        else:
+            print(f"Arm B degraded ({why}) for {int(mins)}m - already alerted, "
+                  f"next threshold not yet crossed")
         return 0
 
     stale = (et - ts).total_seconds() / 60
