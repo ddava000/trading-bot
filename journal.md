@@ -1882,3 +1882,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'BAND'] | favor: ['QQQ', 'MSFT', 'PLTR']
 - notes: Constructive close to a winning week with VIX 14.9 and QQQ +2.8% despite surging Treasury yields near multi-year highs; holding 0.45 into the weekend with only $23 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.1%, NBIS +6.3%), weak IWM (-6.4%) and AKAM (-6.1%).
 - journal: Fri 9/25 16:47: End-of-day snapshot — indices locked in weekly gains, VIX 14.9, day P&L flat. Keeping risk 0.45; SNDK/NBIS extended, IWM/AKAM weak so stay on avoid. Watching next week's jobs/PCE/Fed and yield follow-through into Monday; near-zero cash caps new buys.
+
+### 2026-09-28T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'BAND', 'TSLA'] | favor: ['QQQ', 'MSFT']
+- notes: Nasdaq futures -1% to open the week on U.S.-Iran tensions and rising oil after a winning Friday; VIX ticking up to 16 with a landmine-heavy macro week (jobs/PCE) ahead. Dialing risk to 0.35 — defensive into the gap-down, and only $23 cash caps new buys anyway.
+- journal: Mon 9/28 09:00: Weekend gap-down — futures -1%, geopolitical/oil risk and yields still elevated, so cut risk 0.45->0.35. SNDK/NBIS extended, IWM/AKAM weak stay on avoid; watching how the open holds and jobs/PCE prints later this week.

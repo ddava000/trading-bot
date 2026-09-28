@@ -1,21 +1,21 @@
 {
-  "regime": "neutral",
-  "risk_scale": 0.45,
+  "regime": "risk-off",
+  "risk_scale": 0.35,
   "avoid_symbols": [
     "IWM",
     "SNDK",
     "NBIS",
     "AKAM",
-    "BAND"
+    "BAND",
+    "TSLA"
   ],
   "favor_symbols": [
     "QQQ",
-    "MSFT",
-    "PLTR"
+    "MSFT"
   ],
-  "notes": "Constructive close to a winning week with VIX 14.9 and QQQ +2.8% despite surging Treasury yields near multi-year highs; holding 0.45 into the weekend with only $23 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.1%, NBIS +6.3%), weak IWM (-6.4%) and AKAM (-6.1%).",
-  "journal_entry": "Fri 9/25 16:47: End-of-day snapshot \u2014 indices locked in weekly gains, VIX 14.9, day P&L flat. Keeping risk 0.45; SNDK/NBIS extended, IWM/AKAM weak so stay on avoid. Watching next week's jobs/PCE/Fed and yield follow-through into Monday; near-zero cash caps new buys.",
-  "date": "2026-09-25",
-  "mode": "INTRADAY",
-  "updated_at": "2026-09-25T16:47 ET"
+  "notes": "Nasdaq futures -1% to open the week on U.S.-Iran tensions and rising oil after a winning Friday; VIX ticking up to 16 with a landmine-heavy macro week (jobs/PCE) ahead. Dialing risk to 0.35 \u2014 defensive into the gap-down, and only $23 cash caps new buys anyway.",
+  "journal_entry": "Mon 9/28 09:00: Weekend gap-down \u2014 futures -1%, geopolitical/oil risk and yields still elevated, so cut risk 0.45->0.35. SNDK/NBIS extended, IWM/AKAM weak stay on avoid; watching how the open holds and jobs/PCE prints later this week.",
+  "date": "2026-09-28",
+  "mode": "MORNING",
+  "updated_at": "2026-09-28T09:00 ET"
 }
