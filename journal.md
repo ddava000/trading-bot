@@ -1900,3 +1900,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
 - notes: Late-day tape mixed with QQQ +1.7% and MSFT firm on the Copilot upgrade, but SPY -0.9% and IWM cratering -7.1% as 10-year yields hit 19-year highs on rising oil. Holding risk at 0.4 — tech steadies things, but yield/macro landmine week (jobs/PCE) and only $33 cash keep me defensive.
 - journal: Mon 9/28 17:19: Close snapshot — QQQ/MSFT green, IWM/SPY weak on 19-yr-high yields and oil. Keeping risk 0.40. Added META to avoid (AI-spend selloff, Zuck down $11B); SNDK/NBIS extended, ADPT above fair value, TSLA/BAND weak. Watching yields and this week's jobs/PCE.
+
+### 2026-09-28T18:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: After-hours snapshot confirms a weak session: Dow -300+, 10-year yields at 19-year highs on rising oil, IWM -7.1%, but QQQ +1.8% and MSFT firm on the Copilot upgrade. Holding risk at 0.4 into a landmine-heavy macro week (jobs/PCE) with only $33 cash capping new buys anyway.
+- journal: Mon 9/28 18:40: End-of-day recap unchanged from close — tech (QQQ/MSFT) green, IWM/SPY/small-caps hit by 19-yr-high yields and oil. Keeping risk 0.40, same avoid list (META AI-spend selloff, SNDK/NBIS extended, ADPT rich, TSLA/BAND weak, IWM ugly). Watching yields and jobs/PCE this week.
