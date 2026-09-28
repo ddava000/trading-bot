@@ -1894,3 +1894,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT'] | favor: ['QQQ', 'MSFT']
 - notes: Mixed intraday tape into the close — QQQ recovered to +1.6% and VIX holding 16, but SPY -1.0% and IWM cratering -7.1% on rising Treasury yields and Iran headlines. Nudging risk to 0.4 as tech steadied, but staying defensive with a landmine-heavy macro week (jobs/PCE) ahead and only $33 cash.
 - journal: Mon 9/28 15:44: Gap-down morning stabilized — QQQ climbed back to +1.6%, VIX flat at 16, so eased risk 0.35->0.40. IWM ugly (-7.1%), SNDK (+8%)/NBIS (+4.1%) extended, ADPT flagged above fair value — all on avoid. Watching yields and this week's jobs/PCE prints; near-zero cash caps buys anyway.
+
+### 2026-09-28T17:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: Late-day tape mixed with QQQ +1.7% and MSFT firm on the Copilot upgrade, but SPY -0.9% and IWM cratering -7.1% as 10-year yields hit 19-year highs on rising oil. Holding risk at 0.4 — tech steadies things, but yield/macro landmine week (jobs/PCE) and only $33 cash keep me defensive.
+- journal: Mon 9/28 17:19: Close snapshot — QQQ/MSFT green, IWM/SPY weak on 19-yr-high yields and oil. Keeping risk 0.40. Added META to avoid (AI-spend selloff, Zuck down $11B); SNDK/NBIS extended, ADPT above fair value, TSLA/BAND weak. Watching yields and this week's jobs/PCE.
