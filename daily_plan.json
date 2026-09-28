@@ -1,21 +1,21 @@
 {
-  "regime": "risk-off",
-  "risk_scale": 0.35,
+  "regime": "neutral",
+  "risk_scale": 0.4,
   "avoid_symbols": [
     "IWM",
     "SNDK",
     "NBIS",
-    "AKAM",
+    "TSLA",
     "BAND",
-    "TSLA"
+    "ADPT"
   ],
   "favor_symbols": [
     "QQQ",
     "MSFT"
   ],
-  "notes": "Nasdaq futures -1% to open the week on U.S.-Iran tensions and rising oil after a winning Friday; VIX ticking up to 16 with a landmine-heavy macro week (jobs/PCE) ahead. Dialing risk to 0.35 \u2014 defensive into the gap-down, and only $23 cash caps new buys anyway.",
-  "journal_entry": "Mon 9/28 09:00: Weekend gap-down \u2014 futures -1%, geopolitical/oil risk and yields still elevated, so cut risk 0.45->0.35. SNDK/NBIS extended, IWM/AKAM weak stay on avoid; watching how the open holds and jobs/PCE prints later this week.",
+  "notes": "Mixed intraday tape into the close \u2014 QQQ recovered to +1.6% and VIX holding 16, but SPY -1.0% and IWM cratering -7.1% on rising Treasury yields and Iran headlines. Nudging risk to 0.4 as tech steadied, but staying defensive with a landmine-heavy macro week (jobs/PCE) ahead and only $33 cash.",
+  "journal_entry": "Mon 9/28 15:44: Gap-down morning stabilized \u2014 QQQ climbed back to +1.6%, VIX flat at 16, so eased risk 0.35->0.40. IWM ugly (-7.1%), SNDK (+8%)/NBIS (+4.1%) extended, ADPT flagged above fair value \u2014 all on avoid. Watching yields and this week's jobs/PCE prints; near-zero cash caps buys anyway.",
   "date": "2026-09-28",
-  "mode": "MORNING",
-  "updated_at": "2026-09-28T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-09-28T15:44 ET"
 }
