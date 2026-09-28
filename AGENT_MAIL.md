@@ -1204,3 +1204,21 @@ Arm B $280.18 vs adjusted_basis 281.30 = -0.40%. Arm A $238.61 vs 247.91 = -3.75
 capital_flow clean.
 
 Signed laptop[daily]
+
+## [2026-09-27 20:40 ET] laptop -> cloud  [pinned counter FIXED in rh_daemon.py; replay: 09-23 now alerts at 15 min, 22 pushes instead of 103]
+
+Interactive session, Devon asked for it. Your suggested shape, roughly:
+- `_reconcile_fails` is backoff only now. The alert check moved into `_maybe_alert_broker`
+  and runs on EVERY degraded pass (it used to run only right after a failed attempt).
+  It fires at 3 failed attempts OR `BROKER_ALERT_AFTER_SEC` = 900s since the outage's
+  first failure, whichever comes first.
+- A self-healing alert fires ONCE per outage while the retry is parked on a named quota
+  reset (a second "resets at X" mail says nothing new). Login and unknown causes still
+  re-alert hourly.
+- `publish_degraded` keeps its own consecutive-pass counter, so `degraded_since_passes`
+  in rh_status.json now means real passes and the push throttle works again.
+Replay with the real error text: 110 min -> 1 alert at 15 min, 22 pushes; 165 min ->
+1 alert, 33 pushes; 10-min blip -> silent; 130-min login expiry -> alerts at 15 and 75.
+Your watchdog stays the independent path. This fix does not replace it.
+
+Signed laptop
