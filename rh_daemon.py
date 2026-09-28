@@ -98,6 +98,8 @@ SELFTEST_REALERT_SEC = 14400 # 4h. Re-alert while still pinned, so a break that
 
 BROKER_FAIL_ALERT  = 3      # consecutive failed broker snapshots before alerting
 BROKER_REALERT_SEC = 3600   # re-alert hourly while the broker stays unreachable
+BROKER_ALERT_AFTER_SEC = 900  # ...or once an outage has lasted this long, however few
+                             # attempts it took; see _maybe_alert_broker
 
 RECONCILE_BACKOFF_MAX = 900   # cap retry spacing at 15 min during an outage
 DEGRADED_PUSH_SEC  = 300    # min spacing between degraded git pushes; see publish_degraded
@@ -105,6 +107,9 @@ DEGRADED_PUSH_SEC  = 300    # min spacing between degraded git pushes; see publi
 _reconcile_fails, _broker_alert_at = 0, 0.0
 _next_reconcile_try = 0.0
 _degraded_push_at   = 0.0   # last degraded git push; throttles the outage heartbeat
+_degraded_passes    = 0     # consecutive degraded PASSES (not attempts); 0 = healthy
+_broker_down_since  = 0.0   # wall clock of this outage's first failed attempt
+_waiting_on_reset   = False # next retry is parked on a quota reset the bridge named
 _last_agent_error   = ""   # bridge's own failure text; classifies the outage in alerts
 _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
@@ -979,7 +984,7 @@ def persist(led, res, placed):
         _last_push_at, _last_push_material = time.time(), material
 
 
-def publish_degraded(led, reason, passes):
+def publish_degraded(led, reason):
     """Heartbeat while the broker is unreachable, naming the reason.
 
     This is what lets monitoring tell a dead BROKER from a dead LAPTOP: without it
@@ -1003,8 +1008,16 @@ def publish_degraded(led, reason, passes):
     that the broker died and the laptop did not, which is this function's whole
     reason to exist. After that, DEGRADED_PUSH_SEC. The watchdog polls every 30 min
     against STALE_MIN 30, so it cannot tell 5-minute pushes from 1-minute ones.
+
+    The pass count is kept HERE, one per call, not borrowed from _reconcile_fails.
+    It used to be, and _reconcile_fails counts broker ATTEMPTS. Once
+    quota_reset_wait parked the next attempt hours out, that stayed at 1 for the
+    whole outage, so "first pass" was true on every pass: 103 pushes for the
+    110-minute 2026-09-23 outage, the exact storm described above.
     """
-    global _degraded_push_at
+    global _degraded_push_at, _degraded_passes
+    _degraded_passes += 1
+    passes = _degraded_passes
     prev = _load(STATUS_F, {}) or {}
     snap = {"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
             "equity": prev.get("equity"),   # last known, so monitoring keeps a number
@@ -1241,6 +1254,95 @@ def _detach_from_console():
     return False
 
 
+def _maybe_alert_broker(led):
+    """Alert Devon about a broker outage once it is worth his attention.
+
+    Runs on EVERY degraded pass, not only on a failed attempt. The gate used to be
+    "_reconcile_fails >= BROKER_FAIL_ALERT", checked only right after an attempt.
+    That was sound while the backoff capped attempts 15 min apart. quota_reset_wait
+    (2026-09-22) then parked the next attempt at the reset time the bridge names,
+    up to 6h out, so an outage made ONE attempt, the counter sat at 1, and the
+    alert became unreachable. Proven twice: 2026-09-23 (110 min) and 2026-09-24
+    (165 min), both session-limit outages, zero alerts, found days later by
+    reading git history. Elapsed time since the outage began is what Devon cares
+    about, and it keeps rising while attempts do not.
+
+    While the retry is parked on a named quota reset, only ONE self-healing alert is
+    sent per outage: the hourly re-alert would repeat "resets at X, no action
+    needed" with nothing new to say, which is the kind of true-but-unimportant mail
+    that trains alerts to be ignored. Unknown or login causes still re-alert hourly.
+    """
+    global _broker_alert_at
+    if not _broker_down_since:
+        return
+    _elapsed = time.time() - _broker_down_since
+    if _reconcile_fails < BROKER_FAIL_ALERT and _elapsed < BROKER_ALERT_AFTER_SEC:
+        return
+    if (time.time() - _broker_alert_at) < BROKER_REALERT_SEC:
+        return
+    _mins = int(_elapsed // 60)
+    # CLASSIFY THE OUTAGE. Every cause used to send the identical subject,
+    # "broker unreachable (not urgent)". By 2026-09-21 Devon had received seven
+    # of those from Claude USAGE-LIMIT outages, which reset on a timer and always
+    # healed themselves. Then the CLI OAuth login expired - a state that NEVER
+    # recovers without a human - and it sent the same words, telling him to fix it
+    # "when convenient". Being trained by true-but-unimportant alerts to ignore the
+    # one that matters is how alerting dies. The subject line has to carry the
+    # difference, because that is all that is visible in an inbox.
+    _err = (_last_agent_error or "").lower()
+    _needs_human = ("oauth" in _err or "authenticate" in _err
+                    or "session expired" in _err or "auth" in _err)
+    _self_heals = ("session limit" in _err or "usage limit" in _err
+                   or "rate limit" in _err)
+    if _broker_alert_at and _self_heals and _waiting_on_reset and not _needs_human:
+        return
+    if _needs_human:
+        _subject = "RH bot: LOGIN EXPIRED - will NOT recover on its own"
+        _impact = ["IMPACT: THIS ONE NEEDS YOU. The bot's Claude login has expired",
+                   "and cannot refresh itself. It will stay down - today and every",
+                   "day after - until someone signs in. It is NOT the usage limit;",
+                   "that resets on a timer, this does not.",
+                   "",
+                   "FIX, about thirty seconds:",
+                   "    claude auth login",
+                   "Signing into the Claude desktop app does NOT fix this: the bot",
+                   "uses a separate install with its own login.",
+                   "",
+                   "Nothing is at risk while it is down (index-only, no stops), but a",
+                   "deposit that goes pending AND settles while the bot is blind can",
+                   "be missed, and a missed deposit reads as profit."]
+    elif _self_heals:
+        _subject = "RH bot: broker paused (usage limit - self-healing)"
+        _impact = ["IMPACT: NOT URGENT and NO ACTION NEEDED. The shared Claude quota",
+                   "is exhausted; it resets on a timer and the bot resumes by itself.",
+                   "Only worth acting on if it is still down after the stated reset."]
+    else:
+        _subject = "RH bot: broker unreachable (cause unknown)"
+        _impact = ["IMPACT: cause NOT recognised, so it is unknown whether this",
+                   "recovers on its own. Treat as needing a look. Index-only means no",
+                   "stops are waiting to fire.",
+                   "",
+                   "The bridge said: " + (_last_agent_error or "(nothing captured)")[:160]]
+    notify(_subject, chr(10).join([
+        "The laptop is UP and the daemon is running. The problem is the",
+        "Robinhood connection, not the machine.",
+        "",
+        f"Down {_mins} min so far ({_reconcile_fails} failed broker snapshot(s)).",
+        "",
+    ] + _impact + [
+        "",
+        "DIAGNOSE with this, NOT with `claude mcp list`, which reported",
+        "Connected while the bridge could not authenticate at all:",
+        "    claude -p \"Reply with exactly: ALIVE\"",
+        "If that fails the CLI login lapsed:  claude auth login",
+        "If it succeeds but Robinhood tools are missing, reconnect that",
+        "connector:  claude mcp login \"claude.ai Robinhood\"",
+    ]))
+    _broker_alert_at = time.time()
+    _remember_alerts(led, broker_alert_at=_broker_alert_at,
+                     reconcile_fails=_reconcile_fails)
+
+
 def main():
     if not acquire_singleton():
         log("another rh_daemon is already running — this instance is exiting")
@@ -1258,6 +1360,7 @@ def main():
     # Pin the commit our just-loaded modules were built from, so sync_code can tell
     # when the live CODE has drifted from disk no matter which git path advanced HEAD.
     global _run_head, _reconcile_fails, _broker_alert_at, _next_reconcile_try
+    global _broker_down_since, _degraded_passes, _waiting_on_reset
     global _selftest_fails, _selftest_alert_at, _deposit_alert_on
     try:
         _run_head = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
@@ -1319,7 +1422,8 @@ def main():
                 # The heartbeat below stays on every pass: it costs nothing and it
                 # is what keeps a dead broker distinguishable from a dead laptop.
                 if time.time() < _next_reconcile_try:
-                    publish_degraded(led, "broker_unreachable", _reconcile_fails)
+                    publish_degraded(led, "broker_unreachable")
+                    _maybe_alert_broker(led)
                     if "--once" in sys.argv:
                         return 0
                     time.sleep(FAST_PASS_SEC)
@@ -1327,7 +1431,9 @@ def main():
                 log("reconciling with the broker")
                 if adopt_truth(led, reconcile()):
                     if _reconcile_fails:
-                        log(f"broker reachable again after {_reconcile_fails} failed pass(es)")
+                        _mins = int((time.time() - _broker_down_since) // 60) if _broker_down_since else 0
+                        log(f"broker reachable again after {_reconcile_fails} failed attempt(s), "
+                            f"{_degraded_passes} degraded pass(es), ~{_mins} min")
                         if _broker_alert_at:
                             notify("RH bot: broker connection restored",
                                    "The Robinhood connection is working again. "
@@ -1335,6 +1441,7 @@ def main():
                         _reconcile_fails, _broker_alert_at = 0, 0.0
                         _remember_alerts(led, broker_alert_at=0.0, reconcile_fails=0)
                     _next_reconcile_try = 0.0
+                    _broker_down_since, _degraded_passes, _waiting_on_reset = 0.0, 0, False
                     led["needs_reconcile"] = False
                 elif DRY:
                     # A dry ledger is simulated, so it can never match the real
@@ -1353,6 +1460,8 @@ def main():
                     # not have, since selling needs this same bridge.
                     _reconcile_fails += 1
                     _remember_alerts(led, reconcile_fails=_reconcile_fails)
+                    if not _broker_down_since:
+                        _broker_down_since = time.time()
                     wait = min(FAST_PASS_SEC * (2 ** min(_reconcile_fails - 1, 4)),
                                RECONCILE_BACKOFF_MAX)
                     # Prefer the reset time the bridge NAMED over a blind curve. Usage limits are
@@ -1361,72 +1470,14 @@ def main():
                     _reset_wait = quota_reset_wait(_last_agent_error)
                     if _reset_wait is not None:
                         wait = _reset_wait
+                    _waiting_on_reset = _reset_wait is not None
                     _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
                         f"trading nothing this pass, next try in {int(wait)}s"
                         f"{' (quota reset time)' if _reset_wait is not None else ''}")
                     save_ledger(led)
-                    publish_degraded(led, "broker_unreachable", _reconcile_fails)
-                    if (_reconcile_fails >= BROKER_FAIL_ALERT and
-                            (time.time() - _broker_alert_at) >= BROKER_REALERT_SEC):
-                        # CLASSIFY THE OUTAGE. Every cause used to send the identical subject,
-                        # "broker unreachable (not urgent)". By 2026-09-21 Devon had received seven
-                        # of those from Claude USAGE-LIMIT outages, which reset on a timer and always
-                        # healed themselves. Then the CLI OAuth login expired - a state that NEVER
-                        # recovers without a human - and it sent the same words, telling him to fix it
-                        # "when convenient". Being trained by true-but-unimportant alerts to ignore the
-                        # one that matters is how alerting dies. The subject line has to carry the
-                        # difference, because that is all that is visible in an inbox.
-                        _err = (_last_agent_error or "").lower()
-                        _needs_human = ("oauth" in _err or "authenticate" in _err
-                                        or "session expired" in _err or "auth" in _err)
-                        _self_heals = ("session limit" in _err or "usage limit" in _err
-                                       or "rate limit" in _err)
-                        if _needs_human:
-                            _subject = "RH bot: LOGIN EXPIRED - will NOT recover on its own"
-                            _impact = ["IMPACT: THIS ONE NEEDS YOU. The bot's Claude login has expired",
-                                       "and cannot refresh itself. It will stay down - today and every",
-                                       "day after - until someone signs in. It is NOT the usage limit;",
-                                       "that resets on a timer, this does not.",
-                                       "",
-                                       "FIX, about thirty seconds:",
-                                       "    claude auth login",
-                                       "Signing into the Claude desktop app does NOT fix this: the bot",
-                                       "uses a separate install with its own login.",
-                                       "",
-                                       "Nothing is at risk while it is down (index-only, no stops), but a",
-                                       "deposit that goes pending AND settles while the bot is blind can",
-                                       "be missed, and a missed deposit reads as profit."]
-                        elif _self_heals:
-                            _subject = "RH bot: broker paused (usage limit - self-healing)"
-                            _impact = ["IMPACT: NOT URGENT and NO ACTION NEEDED. The shared Claude quota",
-                                       "is exhausted; it resets on a timer and the bot resumes by itself.",
-                                       "Only worth acting on if it is still down after the stated reset."]
-                        else:
-                            _subject = "RH bot: broker unreachable (cause unknown)"
-                            _impact = ["IMPACT: cause NOT recognised, so it is unknown whether this",
-                                       "recovers on its own. Treat as needing a look. Index-only means no",
-                                       "stops are waiting to fire.",
-                                       "",
-                                       "The bridge said: " + (_last_agent_error or "(nothing captured)")[:160]]
-                        notify(_subject, chr(10).join([
-                            "The laptop is UP and the daemon is running. The problem is the",
-                            "Robinhood connection, not the machine.",
-                            "",
-                            f"{_reconcile_fails} consecutive failed broker snapshots.",
-                            "",
-                        ] + _impact + [
-                            "",
-                            "DIAGNOSE with this, NOT with `claude mcp list`, which reported",
-                            "Connected while the bridge could not authenticate at all:",
-                            "    claude -p \"Reply with exactly: ALIVE\"",
-                            "If that fails the CLI login lapsed:  claude auth login",
-                            "If it succeeds but Robinhood tools are missing, reconnect that",
-                            "connector:  claude mcp login \"claude.ai Robinhood\"",
-                        ]))
-                        _broker_alert_at = time.time()
-                        _remember_alerts(led, broker_alert_at=_broker_alert_at,
-                                         reconcile_fails=_reconcile_fails)
+                    publish_degraded(led, "broker_unreachable")
+                    _maybe_alert_broker(led)
                     if "--once" in sys.argv:
                         return 0
                     time.sleep(FAST_PASS_SEC)
