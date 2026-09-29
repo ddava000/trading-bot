@@ -1906,3 +1906,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
 - notes: After-hours snapshot confirms a weak session: Dow -300+, 10-year yields at 19-year highs on rising oil, IWM -7.1%, but QQQ +1.8% and MSFT firm on the Copilot upgrade. Holding risk at 0.4 into a landmine-heavy macro week (jobs/PCE) with only $33 cash capping new buys anyway.
 - journal: Mon 9/28 18:40: End-of-day recap unchanged from close — tech (QQQ/MSFT) green, IWM/SPY/small-caps hit by 19-yr-high yields and oil. Keeping risk 0.40, same avoid list (META AI-spend selloff, SNDK/NBIS extended, ADPT rich, TSLA/BAND weak, IWM ugly). Watching yields and jobs/PCE this week.
+
+### 2026-09-29T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: VIX calm at 15.9 and futures edging higher as oil retreats, but yields still pressuring the tape (Dow -300 Monday) and a landmine-heavy macro week (jobs/PCE) looms. Holding risk at 0.4 with only $33 cash capping new buys anyway.
+- journal: Tue 9/29 09:00: Overnight steadier — oil retreating, futures green, VIX 15.9. Keeping risk 0.40 into jobs/PCE week. Avoid unchanged: META (AI-spend selloff), SNDK/NBIS extended, ADPT rich, TSLA/BAND weak, IWM ugly (-7%). Watching yields and this week's inflation/jobs prints.
