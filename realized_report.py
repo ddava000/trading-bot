@@ -8,11 +8,13 @@ status.json and the reports carry, and a disagreement between them would be a bu
 Before it prints a total it tries to falsify the machinery, because this repo has been
 fooled repeatedly by checks that could only ever say "fine":
   1. PAGINATION: the full history is fetched twice with different page sizes. The two id
-     sets must be identical, or the pager is dropping or repeating fills.
-  2. TRANSFER/SPLIT CHECK: the same query path is run for a type KNOWN to exist (the
-     account's original cash deposit) and must find it. A check that has never been seen
-     to report "present" proves nothing when it reports "absent".
-  3. RECONCILIATION: quantities implied by the fills must equal the broker's positions.
+     sets must be identical, or the pager is dropping or repeating activities.
+  2. POSITIVE CONTROL: the event-type inventory must contain the account's original cash
+     deposit. A check never seen to report "present" proves nothing when it says "absent".
+  3. POSITIONS: quantities implied by the fills must equal the broker's positions.
+  4. ACCOUNTING IDENTITY: cash + market value - contributions - income must equal FIFO
+     realized + (market value - open-lot cost). This is the one that would catch a wrong
+     price or a wrong closed lot, which share counts cannot.
 """
 import os
 import sys
@@ -27,38 +29,56 @@ def main():
     print("=== REALIZED REPORT, Arm A (%s) ===" % bot.MODE)
     failures = []
 
-    a = bot.alpaca_fill_history(page_size=100)
-    b = bot.alpaca_fill_history(page_size=7)
+    a = bot.alpaca_activity_history(page_size=100)
+    b = bot.alpaca_activity_history(page_size=7)
     if a is None or b is None:
-        print("FAIL: could not fetch the full fill history")
+        print("FAIL: could not fetch the full activity history")
         return 1
-    ida, idb = [f["id"] for f in a], [f["id"] for f in b]
-    ok = (sorted(ida) == sorted(idb)) and len(set(ida)) == len(ida)
-    print("pagination check     : %d fills (page 100) vs %d (page 7), ids identical: %s"
+    ida, idb = [x["id"] for x in a], [x["id"] for x in b]
+    ok = sorted(ida) == sorted(idb) and len(set(ida)) == len(ida)
+    print("pagination check     : %d activities (page 100) vs %d (page 7), identical: %s"
           % (len(a), len(b), ok))
     if not ok:
         failures.append("pagination")
 
-    ctrl = bot.alpaca_activity_count("CSD", bot.REALIZED_SINCE)
-    print("positive control     : cash-deposit query found %s event(s) (must be >= 1)" % ctrl)
-    if not ctrl:
-        failures.append("activity query cannot see a known event")
-    ca = bot.alpaca_activity_count(bot.BREAKS_FIFO_TYPES, bot.REALIZED_SINCE)
-    print("split/transfer check : %s event(s) that would break FIFO (%s)"
-          % ("COULD NOT CHECK" if ca is None else ca, bot.BREAKS_FIFO_TYPES))
+    types = {}
+    for x in a:
+        t = str(x.get("activity_type"))
+        types[t] = types.get(t, 0) + 1
+    print("activity types found : %s" % ", ".join("%s x%d" % kv for kv in sorted(types.items())))
+    print("positive control     : deposit type CSD present %s (must be >= 1)" % types.get("CSD", 0))
+    if not types.get("CSD"):
+        failures.append("cannot see the known cash deposit")
+    hits = {t: n for t, n in types.items() if t in bot.BREAKS_FIFO_SET}
+    print("split/transfer check : %s" % (
+        "NONE of %s present" % ",".join(sorted(bot.BREAKS_FIFO_SET)) if not hits else
+        "FOUND %s" % hits))
 
     block, ledger = bot.alpaca_realized_block()
     if ledger is None:
         print("FAIL: %s" % block.get("reason"))
         return 1
 
-    res_open = ledger["open"]
+    res = R.fifo(bot.fills_from(a))
     live = bot.alpaca_positions_total() or {}
-    bad = R.verify_positions(res_open, live)
-    print("reconciliation       : %d symbol(s) from fills vs %d at the broker, mismatches: %d"
-          % (len(res_open), len(live), len(bad)))
+    bad = R.verify_positions(res["open"], live)
+    print("positions            : %d symbol(s) from fills vs %d at the broker, mismatches: %d"
+          % (len(res["open"]), len(live), len(bad)))
     for m in bad:
         print("   MISMATCH %(symbol)s fills=%(from_fills)s broker=%(broker)s" % m)
+
+    resid, det = bot.realized_identity(a, res)
+    if resid is None:
+        print("accounting identity  : COULD NOT COMPUTE (%s)" % det)
+        failures.append("identity")
+    else:
+        print("accounting identity  : residual %.4f dollars (tolerance %.2f)" % (resid, bot.IDENTITY_TOL))
+        print("   cash %(cash).2f + market value %(market_value).2f - contributions %(contributions).2f"
+              " - income/fees %(other_income_fees).2f" % det)
+        print("   = realized %(realized_raw).4f + (market value %(market_value).2f"
+              " - open cost %(open_cost).2f)" % det)
+        if abs(resid) > bot.IDENTITY_TOL:
+            failures.append("identity residual too large")
 
     print()
     print("CLOSED LOTS (FIFO), oldest first")
@@ -70,7 +90,7 @@ def main():
 
     print()
     print("STILL HELD (open lots by FIFO): %s" % (
-        ", ".join("%s %.4f" % (s, q) for s, q in sorted(res_open.items())) or "none"))
+        ", ".join("%s %.4f" % (s, q) for s, q in sorted(res["open"].items())) or "none"))
     print()
     print("SUMMARY   state=%s" % block["state"])
     if block.get("reason"):

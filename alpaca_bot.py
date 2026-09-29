@@ -818,36 +818,55 @@ REALIZED_SINCE = "2026-01-01"          # before the account was funded (2026-06-
 # Events that make FIFO from fills WRONG (a split changes share counts, a transfer or
 # spinoff creates shares with no buy). Any of these => UNVERIFIED, never a clean number.
 BREAKS_FIFO_TYPES = "ACATS,JNLS,MA,NC,REORG,SC,SSO,SSP"
+BREAKS_FIFO_SET = set(BREAKS_FIFO_TYPES.split(","))   # tested here, never sent as a filter
 
 
-def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
-    """Every FILL since `since`, oldest first, as realized.py fill dicts.
+def alpaca_activity_history(since=REALIZED_SINCE, page_size=100):
+    """EVERY account activity since `since`, oldest first, as raw dicts.
+
+    One unfiltered pass on purpose. The first version asked for the split/transfer
+    events with an activity_types filter, the API rejected a name in that list, and the
+    check could not run at all (it failed SAFE, reporting UNVERIFIED, which is why it
+    was caught). Reading everything and testing membership here removes the dependency
+    on filter names nobody could verify, and one pass serves fills, event types and
+    income together.
 
     Returns None unless the WHOLE history was fetched. A partial history would give a
     confident wrong total, which is worse than no total.
     """
-    fills, seen, token = [], set(), None
+    acts, seen, token = [], set(), None
     for _ in range(100):
-        q = "/v2/account/activities/FILL?after=%s&direction=asc&page_size=%d" % (since, page_size)
+        q = "/v2/account/activities?after=%s&direction=asc&page_size=%d" % (since, page_size)
         if token:
             q += "&page_token=%s" % token
         page = alpaca_get(q)
         if not isinstance(page, list):
-            print("  [fill history unavailable: %s]" % (str(page)[:120],))
+            print("  [activity history unavailable: %s]" % (str(page)[:160],))
             return None
         for a in page:
             aid = a.get("id")
             if aid in seen:
                 continue
             seen.add(aid)
-            fills.append({"t": a.get("transaction_time"), "symbol": str(a.get("symbol", "")).replace("/", ""),
-                          "side": a.get("side"), "qty": a.get("qty"), "price": a.get("price"),
-                          "id": aid})
+            acts.append(a)
         if len(page) < page_size:
-            return fills
+            return acts
         token = page[-1].get("id")
-    print("  [fill history hit the page cap; treating as incomplete]")
+    print("  [activity history hit the page cap; treating as incomplete]")
     return None
+
+
+def fills_from(acts):
+    """realized.py fill dicts from raw activities (FILL rows only)."""
+    return [{"t": a.get("transaction_time"), "symbol": str(a.get("symbol", "")).replace("/", ""),
+             "side": a.get("side"), "qty": a.get("qty"), "price": a.get("price"),
+             "id": a.get("id")} for a in acts if a.get("activity_type") == "FILL"]
+
+
+def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
+    """Fills only, or None if the history is incomplete."""
+    acts = alpaca_activity_history(since, page_size)
+    return None if acts is None else fills_from(acts)
 
 
 def alpaca_positions_total():
@@ -857,6 +876,49 @@ def alpaca_positions_total():
     if not isinstance(d, list):
         return None
     return {str(p.get("symbol", "")).replace("/", ""): float(p.get("qty") or 0) for p in d}
+
+
+CASH_MOVE_TYPES = {"CSD", "CSW", "CSR", "JNLC", "ACATC", "TRANS"}
+IDENTITY_TOL = 0.50     # dollars. Fractional-share price rounding is cents; more is a bug.
+
+
+def realized_identity(acts, res):
+    """Independent proof that the FIFO math is right, from numbers FIFO did not produce.
+
+    For a long-only cash account:
+        cash + market_value - contributions - other_income  ==  realized + (market_value - open_cost)
+    Everything on the left comes from the broker (account cash, live positions, non-fill
+    activities). Everything on the right comes from the fills and FIFO. If a fill price,
+    a lot match or a closed-lot total were wrong, they would not agree. Positions
+    reconciliation cannot catch that: it only proves the SHARE COUNTS line up.
+
+    Returns (residual_dollars, detail) or (None, reason) when it cannot be computed.
+    """
+    acct, pos = alpaca_get("/v2/account"), alpaca_get("/v2/positions")
+    if not isinstance(pos, list) or not isinstance(acct, dict) or "cash" not in acct:
+        return None, "could not read account cash or positions"
+    try:
+        cash = float(acct["cash"])
+        mv = sum(float(p.get("market_value") or 0) for p in pos)
+        contrib = other = 0.0
+        for a in acts:
+            t = a.get("activity_type")
+            if t == "FILL":
+                continue
+            amt = float(a.get("net_amount") or 0)
+            if t in CASH_MOVE_TYPES:
+                contrib += amt
+            else:
+                other += amt
+        realized_raw = sum(l["gain"] for l in res["closed"])
+        open_cost = sum(res["open_basis"].values())
+        lhs = cash + mv - contrib - other
+        rhs = realized_raw + (mv - open_cost)
+    except Exception as e:
+        return None, "identity calculation failed: %s" % e
+    return round(lhs - rhs, 4), {"cash": round(cash, 2), "market_value": round(mv, 2),
+                                 "contributions": round(contrib, 2), "other_income_fees": round(other, 2),
+                                 "realized_raw": round(realized_raw, 4), "open_cost": round(open_cost, 2)}
 
 
 def alpaca_realized_block():
@@ -871,9 +933,10 @@ def alpaca_realized_block():
         import realized as R
     except Exception as e:
         return {"state": "unknown", "reason": "realized.py unavailable: %s" % e}, None
-    fills = alpaca_fill_history()
-    if fills is None:
-        return {"state": "unknown", "reason": "fill history unavailable"}, None
+    acts = alpaca_activity_history()
+    if acts is None:
+        return {"state": "unknown", "reason": "activity history unavailable"}, None
+    fills = fills_from(acts)
     try:
         res = R.fifo(fills)
         summ = R.summarize(res["closed"])
@@ -891,10 +954,10 @@ def alpaca_realized_block():
         bad = R.verify_positions(res["open"], live)
         if bad:
             time.sleep(4)      # a fill can reach positions a moment before activities
-            fills2 = alpaca_fill_history()
+            acts2 = alpaca_activity_history()
             live2 = alpaca_positions_total()
-            if fills2 is not None and live2 is not None:
-                fills, live = fills2, live2
+            if acts2 is not None and live2 is not None:
+                acts, fills, live = acts2, fills_from(acts2), live2
                 res = R.fifo(fills)
                 summ = R.summarize(res["closed"])
                 watch = R.wash_watch(res["closed"], fills)
@@ -903,11 +966,23 @@ def alpaca_realized_block():
                 reasons.append("positions do not reconcile: " + ", ".join(
                     "%s fills=%.4f broker=%.4f" % (b["symbol"], b["from_fills"], b["broker"])
                     for b in bad[:4]))
-    ca = alpaca_activity_count(BREAKS_FIFO_TYPES, REALIZED_SINCE)
-    if ca is None:
-        reasons.append("could not check for splits/transfers/spinoffs")
-    elif ca:
-        reasons.append("%d split/transfer/corporate-action event(s) break FIFO" % ca)
+    types = {}
+    for a in acts:
+        t = str(a.get("activity_type"))
+        types[t] = types.get(t, 0) + 1
+    # Sanity: an activity list with fills in it must contain FILL rows, otherwise the
+    # reader is returning something other than what this code thinks it is.
+    if fills and types.get("FILL", 0) != len(fills):
+        reasons.append("activity types do not match fills; reader is suspect")
+    resid, idetail = realized_identity(acts, res)
+    if resid is None:
+        reasons.append("identity check unavailable: %s" % idetail)
+    elif abs(resid) > IDENTITY_TOL:
+        reasons.append("does not reconcile to the account: residual %.2f dollars" % resid)
+    hits = {t: n for t, n in types.items() if t in BREAKS_FIFO_SET}
+    if hits:
+        reasons.append("split/transfer/corporate-action event(s) break FIFO: "
+                       + ", ".join("%s x%d" % kv for kv in sorted(hits.items())))
 
     last_fill = fills[-1]["t"] if fills else None
     sales = sorted({l["close_date"] for l in res["closed"]})
@@ -918,6 +993,7 @@ def alpaca_realized_block():
         "last_sale": (sales[-1] if sales else None),
         "last_fill": last_fill, "fills": len(fills),
         "wash_watch": R.wash_totals(watch),
+        "reconciliation_residual": resid,
         "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
     })
     if reasons:
@@ -939,7 +1015,10 @@ def alpaca_activity_count(types, since):
     """How many activities of these types since `since`. None = COULD NOT CHECK, which
     is deliberately distinct from 0 = checked and there are none."""
     d = alpaca_get("/v2/account/activities?activity_types=%s&after=%s" % (types, since))
-    return len(d) if isinstance(d, list) else None
+    if not isinstance(d, list):
+        print("  [activity query for %s failed: %s]" % (types, str(d)[:160]))
+        return None
+    return len(d)
 
 
 _RUN_REALIZED = {}

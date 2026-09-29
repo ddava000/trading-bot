@@ -79,7 +79,8 @@ def fifo(fills):
     fills: list of dicts {t, symbol, side ('buy'|'sell'), qty, price}. The list order
     is significant to callers: every index returned here refers to it.
 
-    Returns {"closed": [lot, ...], "open": {symbol: qty}, "unmatched": [...]}.
+    Returns {"closed": [lot, ...], "open": {symbol: qty},
+    "open_basis": {symbol: cost of what is still held}, "unmatched": [...]}.
     A sell with no buy behind it (a short, or history that starts mid-position) lands
     in "unmatched" and must make the caller report UNVERIFIED, never a clean number.
     """
@@ -116,12 +117,14 @@ def fifo(fills):
         else:                          # sell_short and anything unexpected
             unmatched.append({"symbol": sym, "qty": round(qty, 9),
                               "date": d.isoformat(), "fill": i, "side": side})
-    open_qty = {}
+    open_qty, open_basis = {}, {}
     for sym, book in books.items():
         q = sum(l[0] for l in book)
         if q > EPS:
             open_qty[sym] = round(q, 9)
-    return {"closed": closed, "open": open_qty, "unmatched": unmatched}
+            open_basis[sym] = round(sum(l[0] * l[1] for l in book), 6)
+    return {"closed": closed, "open": open_qty, "open_basis": open_basis,
+            "unmatched": unmatched}
 
 
 def summarize_sales(sales):
