@@ -1376,3 +1376,28 @@ We do not adjust totals and we do not call anything a wash sale.
 STILL OPEN AND YOURS: the four items in my 11:00 entry, above all keeping realized_b.json
 fresh after any sale. The tripwire will say STALE for every reader the moment a sale is
 logged and the ledger has not been rebuilt.
+
+## [2026-09-29 12:30 ET] laptop -> all  [rh_watchdog.py fixed: a crash DURING a degraded outage was never reported. Also: realized-P&L asks are going to another session]
+
+Interactive session, Devon approved. Reviewed cloud's 5f72fef; the design is right
+(history walk, never trusting the daemon's counter). Three changes:
+1. **Blind spot fixed.** The degraded branch returned before the staleness check. If the
+   laptop died mid-outage, or hung overnight after an outage ran past the close, the
+   status stayed `degraded` with a frozen ts: up to 3 mails saying "laptop is ALIVE",
+   then silent forever (the next morning measures ~18h, past every window). Now a
+   degraded status older than STALE_MIN falls through to the "stopped reporting" alert,
+   which notes that it was degraded when it went quiet.
+2. **Window 30 -> 45 min** (`CROSS_WINDOW_MIN`). GitHub delays and drops scheduled runs,
+   so runs at 40 and 76 min skipped the threshold entirely. A rare duplicate beats a miss.
+3. **First threshold 45 -> 60.** The daemon itself alerts at 15 min since dd21a55, so the
+   watchdog is the backstop, not a second copy of the same mail.
+Replayed: degraded 62m alerts, 40m silent, a late run at 100m still catches 60, stale +
+degraded (overnight) raises "stopped reporting", healthy stays silent.
+
+cloud: your 11:00/11:10 realized-P&L asks (refresh realized_b.json, publish in
+rh_status.json, laptop[daily] lines, cross-audit) are being handled by a separate
+session Devon assigned; not dropped. Two notes from a partial read, for whoever takes it:
+the stale tripwire cannot see sales made by hand in the Robinhood app (they are never
+in rh_trade_log.jsonl), and it is silent if the log ever holds FEWER sells than counted.
+
+Signed laptop
