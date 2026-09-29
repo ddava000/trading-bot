@@ -804,6 +804,181 @@ def alpaca_capital_flows(after_iso):
     return round(net, 2), events
 
 
+# -- Realized gain/loss, for tax tracking (Devon, 2026-09-29) ------------------
+# Devon wants a RUNNING TOTAL of realized gains versus losses in every report. That is
+# NOT the equity change pnl.py prints: equity includes unrealized paper losses, which
+# are not taxable. Only positions actually SOLD count. The pure math lives in
+# realized.py; this is the Alpaca-specific network half.
+#
+# Recomputed from the FULL fill history every cycle instead of updated incrementally,
+# for the reason the mailbox watcher taught us: a runner starts with an empty disk, so
+# incremental state either double counts or silently stops. A recompute cannot drift.
+REALIZED_F     = "realized_a.json"
+REALIZED_SINCE = "2026-01-01"          # before the account was funded (2026-06-08)
+# Events that make FIFO from fills WRONG (a split changes share counts, a transfer or
+# spinoff creates shares with no buy). Any of these => UNVERIFIED, never a clean number.
+BREAKS_FIFO_TYPES = "ACATS,JNLS,MA,NC,REORG,SC,SSO,SSP"
+
+
+def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
+    """Every FILL since `since`, oldest first, as realized.py fill dicts.
+
+    Returns None unless the WHOLE history was fetched. A partial history would give a
+    confident wrong total, which is worse than no total.
+    """
+    fills, seen, token = [], set(), None
+    for _ in range(100):
+        q = "/v2/account/activities/FILL?after=%s&direction=asc&page_size=%d" % (since, page_size)
+        if token:
+            q += "&page_token=%s" % token
+        page = alpaca_get(q)
+        if not isinstance(page, list):
+            print("  [fill history unavailable: %s]" % (str(page)[:120],))
+            return None
+        for a in page:
+            aid = a.get("id")
+            if aid in seen:
+                continue
+            seen.add(aid)
+            fills.append({"t": a.get("transaction_time"), "symbol": str(a.get("symbol", "")).replace("/", ""),
+                          "side": a.get("side"), "qty": a.get("qty"), "price": a.get("price"),
+                          "id": aid})
+        if len(page) < page_size:
+            return fills
+        token = page[-1].get("id")
+    print("  [fill history hit the page cap; treating as incomplete]")
+    return None
+
+
+def alpaca_positions_total():
+    """Symbol -> TOTAL qty. Not alpaca_positions(): that reports qty_available, which
+    excludes shares tied up in open orders and would fake a mismatch."""
+    d = alpaca_get("/v2/positions")
+    if not isinstance(d, list):
+        return None
+    return {str(p.get("symbol", "")).replace("/", ""): float(p.get("qty") or 0) for p in d}
+
+
+def alpaca_realized_block():
+    """(summary_block, ledger) for Arm A. NEVER raises. ledger is None on failure.
+
+    summary_block.state is one of:
+      ok          reconciles with the broker's live positions, no FIFO-breaking events
+      unverified  a number exists but something does not reconcile; reason says what
+      unknown     could not compute at all
+    """
+    try:
+        import realized as R
+    except Exception as e:
+        return {"state": "unknown", "reason": "realized.py unavailable: %s" % e}, None
+    fills = alpaca_fill_history()
+    if fills is None:
+        return {"state": "unknown", "reason": "fill history unavailable"}, None
+    try:
+        res = R.fifo(fills)
+        summ = R.summarize(res["closed"])
+        watch = R.wash_watch(res["closed"], fills)
+    except Exception as e:
+        return {"state": "unknown", "reason": "calculation failed: %s" % e}, None
+
+    reasons = []
+    if res["unmatched"]:
+        reasons.append("%d sell(s) with no matching buy" % len(res["unmatched"]))
+    live = alpaca_positions_total()
+    if live is None:
+        reasons.append("could not read live positions to reconcile")
+    else:
+        bad = R.verify_positions(res["open"], live)
+        if bad:
+            time.sleep(4)      # a fill can reach positions a moment before activities
+            fills2 = alpaca_fill_history()
+            live2 = alpaca_positions_total()
+            if fills2 is not None and live2 is not None:
+                fills, live = fills2, live2
+                res = R.fifo(fills)
+                summ = R.summarize(res["closed"])
+                watch = R.wash_watch(res["closed"], fills)
+                bad = R.verify_positions(res["open"], live)
+            if bad:
+                reasons.append("positions do not reconcile: " + ", ".join(
+                    "%s fills=%.4f broker=%.4f" % (b["symbol"], b["from_fills"], b["broker"])
+                    for b in bad[:4]))
+    ca = alpaca_activity_count(BREAKS_FIFO_TYPES, REALIZED_SINCE)
+    if ca is None:
+        reasons.append("could not check for splits/transfers/spinoffs")
+    elif ca:
+        reasons.append("%d split/transfer/corporate-action event(s) break FIFO" % ca)
+
+    last_fill = fills[-1]["t"] if fills else None
+    sales = sorted({l["close_date"] for l in res["closed"]})
+    summary = dict(summ)
+    summary.update({
+        "state": "unverified" if reasons else "ok",
+        "since": (R.trade_date(fills[0]["t"]).isoformat() if fills else None),
+        "last_sale": (sales[-1] if sales else None),
+        "last_fill": last_fill, "fills": len(fills),
+        "wash_watch": R.wash_totals(watch),
+        "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
+    })
+    if reasons:
+        summary["reason"] = "; ".join(reasons)
+    ledger = {
+        "arm": "A", "source": "alpaca live /v2/account/activities FILL since " + REALIZED_SINCE,
+        "method": summary["method"],
+        "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are "
+                "an UPPER BOUND for a tax preparer to judge, not an adjustment.",
+        "summary": summary,
+        "closed": res["closed"], "wash_watch": watch, "open": res["open"],
+        "buys": [{"t": R.trade_date(f["t"]).isoformat(), "symbol": f["symbol"],
+                  "qty": float(f["qty"])} for f in fills if str(f["side"]).lower() == "buy"],
+    }
+    return summary, ledger
+
+
+def alpaca_activity_count(types, since):
+    """How many activities of these types since `since`. None = COULD NOT CHECK, which
+    is deliberately distinct from 0 = checked and there are none."""
+    d = alpaca_get("/v2/account/activities?activity_types=%s&after=%s" % (types, since))
+    return len(d) if isinstance(d, list) else None
+
+
+_RUN_REALIZED = {}
+
+
+def realized_for_run():
+    """Arm A's realized block, computed at most ONCE per process and shared by the email
+    body and status.json. On failure it carries the last good ledger forward, marked
+    stale, so one transient API error cannot erase the number (the same lesson as
+    capital_flow: status.json is rewritten every run)."""
+    if "block" in _RUN_REALIZED:
+        return _RUN_REALIZED["block"]
+    try:
+        block, ledger = alpaca_realized_block()
+    except Exception as e:                       # belt and braces: must never break a run
+        block, ledger = {"state": "unknown", "reason": "unexpected: %s" % e}, None
+    if ledger is not None:
+        try:
+            new = json.dumps(ledger, indent=1, sort_keys=True)
+            old = open(REALIZED_F, encoding="utf-8").read() if os.path.exists(REALIZED_F) else ""
+            if new != old:                       # deterministic, so it only changes on new fills
+                with open(REALIZED_F, "w", encoding="utf-8") as f:
+                    f.write(new)
+        except Exception as e:
+            print("  [%s not written: %s]" % (REALIZED_F, e))
+    else:
+        try:
+            last = json.load(open(REALIZED_F, encoding="utf-8"))["summary"]
+            last = dict(last)
+            last.update({"state": "stale", "reason": block.get("reason", "refresh failed"),
+                         "as_of": last.get("last_fill")})
+            block = last
+        except Exception:
+            pass                                 # nothing to carry forward: stay unknown
+    block["checked_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    _RUN_REALIZED["block"] = block
+    return block
+
+
 def alpaca_positions():
     pos = {}
     for p in alpaca_get("/v2/positions"):
