@@ -267,6 +267,14 @@ def combine(*blocks):
     return tot
 
 
+def tax_year():
+    """The current tax year by the NEW YORK date, not the machine's clock. A GitHub runner
+    is on UTC, so at 8pm New York time on December 31 it is already January 1 there and a
+    line would jump to the new year while that evening's trades still belong to the old
+    one. (Without a timezone database this falls back to the local clock.)"""
+    return datetime.now(_ET).year if _ET is not None else datetime.now().year
+
+
 def money(x):
     x = float(x or 0.0)
     return ("-$%s" % format(abs(x), ",.2f")) if x < 0 else ("$%s" % format(x, ",.2f"))
@@ -284,7 +292,7 @@ def report_line(label, s, year=None):
     state = s.get("state", "ok")
     if state == "unknown":
         return "%s: realized total UNKNOWN (%s)" % (label, s.get("reason", "check failed"))
-    yr = str(year or datetime.now().year)
+    yr = str(year or tax_year())
     by = s.get("by_year")
     if by is not None:
         blk = by.get(yr) or {"st": {"gains": 0.0, "losses": 0.0, "net": 0.0, "sales": 0},
@@ -344,7 +352,11 @@ def rh_sells_logged(log_path="rh_trade_log.jsonl"):
                     r = json.loads(ln)
                 except Exception:
                     continue
-                if r.get("action") == "sell" and r.get("status") == "ok":
+                # Count every sell EXCEPT an explicit rejection. The daemon's statuses are
+                # ok, rejected and unknown (the bridge could not confirm), and a sell logged
+                # "unknown" may really have filled. Missing a real sale would leave a
+                # silently wrong tax number; a false alarm costs one cheap refresh.
+                if r.get("action") == "sell" and r.get("status") != "rejected":
                     n += 1
     except OSError:
         return None
@@ -413,7 +425,7 @@ def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl",
 
 def combined_line(a, b, year=None):
     """Both arms, one tax year. Refuses to add a number that is unknown."""
-    yr = str(year or datetime.now().year)
+    yr = str(year or tax_year())
     parts, bad = [], []
     for name, s in (("A", a), ("B", b)):
         if not s or s.get("state") == "unknown" or s.get("by_year") is None:
