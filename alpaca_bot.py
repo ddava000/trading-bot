@@ -860,7 +860,8 @@ def fills_from(acts):
     """realized.py fill dicts from raw activities (FILL rows only)."""
     return [{"t": a.get("transaction_time"), "symbol": str(a.get("symbol", "")).replace("/", ""),
              "side": a.get("side"), "qty": a.get("qty"), "price": a.get("price"),
-             "id": a.get("id")} for a in acts if a.get("activity_type") == "FILL"]
+             "id": a.get("id"), "order": a.get("order_id")}
+            for a in acts if a.get("activity_type") == "FILL"]
 
 
 def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
@@ -993,6 +994,7 @@ def alpaca_realized_block():
         "last_sale": (sales[-1] if sales else None),
         "last_fill": last_fill, "fills": len(fills),
         "wash_watch": R.wash_totals(watch),
+        "by_year": R.summarize_by_year(res["closed"]),
         "reconciliation_residual": resid,
         "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
     })
@@ -1974,6 +1976,13 @@ def run_bot():
                 f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f}", ""]
         body.append("ORDERS THIS RUN:" if events else "No orders this run.")
         body += [f"  * {e}" for e in events]
+        # Running realized gain/loss for tax tracking (Devon, 2026-09-29). Wrapped on its
+        # own: a reporting line must never be able to stop the alert it rides on.
+        try:
+            import realized as _R
+            body += ["", _R.report_line("Arm A", realized_for_run())]
+        except Exception as _e:
+            body += ["", f"Arm A realized total UNAVAILABLE ({_e})"]
         body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
         if any("PLACED" in e for e in events):
             subject = f"Alpaca bot ({MODE}) - ORDER PLACED"
@@ -2078,6 +2087,15 @@ def run_bot():
         except Exception as e:
             status["capital_flow"] = {"state": "unknown", "net": None, "events": [],
                                       "error": str(e)[:200]}
+        # REALIZED GAIN/LOSS for tax tracking (Devon, 2026-09-29). Not the equity change:
+        # only positions actually SOLD count. `state` is ok / unverified / stale /
+        # unknown, and a failed refresh carries the last good ledger forward as stale so
+        # one transient API error cannot erase the number. Kept in its own try so a
+        # failure here cannot cost the snapshot its other fields.
+        try:
+            status["realized"] = realized_for_run()
+        except Exception as e:
+            status["realized"] = {"state": "unknown", "reason": "unexpected: %s" % str(e)[:160]}
         with open("status.json", "w") as f:
             json.dump(status, f, indent=1, sort_keys=True)
     except Exception as e:

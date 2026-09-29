@@ -19,8 +19,12 @@ METHOD, stated so a cold reader can challenge it:
      method was selected.
   2. Trade date is the New York calendar date of the fill.
   3. A lot is LONG term only if sold MORE than one year after it was bought.
-  4. Gains and losses are grouped PER SALE (one sell fill), like a broker's rows, so a
-     sale that closes two lots is netted before it counts as a gain or a loss.
+  4. Gains and losses are grouped PER SALE, like a broker's rows. A sale is one ORDER
+     (fills carry an optional "order" id; without one, each fill is its own sale). A
+     sale that closes two lots, or that executes in two pieces, is netted before it
+     counts as a gain or a loss. This was learned on Robinhood's NOK order, which
+     executed as 1.0 + 0.065359 shares: counting each execution as a sale split one
+     -3.17 loss into -2.97 and -0.19 and disagreed with the broker's own row.
   5. Dividends, interest and fees are excluded. Realized capital gain/loss only.
 
 WASH SALES: a loss is not deductible (yet) if the same security was bought within 30
@@ -106,7 +110,8 @@ def fifo(fills):
                     "open_date": lot[2].isoformat(), "close_date": d.isoformat(),
                     "basis": round(basis, 6), "proceeds": round(proceeds, 6),
                     "gain": round(proceeds - basis, 6), "term": term(lot[2], d),
-                    "open_fill": lot[3], "close_fill": i})
+                    "open_fill": lot[3], "close_fill": i,
+                    "sale": str(f.get("order") or ("fill-%d" % i))})
                 lot[0] -= take
                 need -= take
                 if lot[0] <= EPS:
@@ -153,9 +158,27 @@ def summarize(closed):
     """Summary from FIFO lots, grouped per sale (fill) and per term."""
     per = {}
     for l in closed:
-        k = (l["close_fill"], l["term"])
+        k = (l["sale"], l["term"])
         per[k] = per.get(k, 0.0) + l["gain"]
     return summarize_sales([(k[1], g) for k, g in per.items()])
+
+
+def summarize_by_year(closed):
+    """{year: summary}. Tax is per CALENDAR year, so a single all-time running total
+    would be wrong from January 1. The year is that of the sale's New York trade date."""
+    years = sorted({l["close_date"][:4] for l in closed})
+    return {y: summarize([l for l in closed if l["close_date"][:4] == y]) for y in years}
+
+
+def cross_watch(ledger_x, ledger_y, days=WASH_DAYS):
+    """Loss sales in account X that MAY be wash sales because account Y bought the same
+    symbol within 30 days either side. The rule spans accounts, but a broker only sees
+    its own, so nobody reports these on a 1099-B. Buys come from Y's ledger.
+    Returns the same list shape as wash_watch, all scope 'cross-account'."""
+    buys = [{"t": b["t"], "symbol": b["symbol"], "side": "buy", "qty": b["qty"]}
+            for b in (ledger_y.get("buys") or [])]
+    return [w for w in wash_watch(ledger_x.get("closed") or [], [], buys, days)
+            if w["scope"] == "cross-account"]
 
 
 def wash_watch(closed, fills, other_fills=None, days=WASH_DAYS):
@@ -169,7 +192,7 @@ def wash_watch(closed, fills, other_fills=None, days=WASH_DAYS):
     """
     by_sale = {}
     for l in closed:
-        by_sale.setdefault(l["close_fill"], []).append(l)
+        by_sale.setdefault(l["sale"], []).append(l)
     out = []
     for lots in by_sale.values():
         loss = round(sum(l["gain"] for l in lots), 2)
@@ -242,16 +265,29 @@ def money(x):
     return ("-$%s" % format(abs(x), ",.2f")) if x < 0 else ("$%s" % format(x, ",.2f"))
 
 
-def report_line(label, s):
-    """One line any report can print. Never renders a missing or failed number as zero."""
+def report_line(label, s, year=None):
+    """One line any report can print. Never renders a missing or failed number as zero.
+
+    Reports the CURRENT TAX YEAR (or `year`) when the block carries by_year, because the
+    IRS nets per calendar year and a running total that never resets would mislead after
+    January 1. Falls back to the all-time figures for a block without by_year.
+    """
     if not s:
         return "%s: realized total NOT AVAILABLE (never computed)" % label
     state = s.get("state", "ok")
     if state == "unknown":
         return "%s: realized total UNKNOWN (%s)" % (label, s.get("reason", "check failed"))
-    st, lt = s.get("st") or {}, s.get("lt") or {}
-    line = "%s realized, short-term: gains %s, losses %s, net %s (%d sales)" % (
-        label, money(st.get("gains")), money(st.get("losses")),
+    yr = str(year or datetime.now().year)
+    by = s.get("by_year")
+    if by is not None:
+        blk = by.get(yr) or {"st": {"gains": 0.0, "losses": 0.0, "net": 0.0, "sales": 0},
+                             "lt": {"sales": 0}}
+        tag = "%s realized" % yr
+    else:
+        blk, tag = s, "realized"
+    st, lt = blk.get("st") or {}, blk.get("lt") or {}
+    line = "%s %s, short-term: gains %s, losses %s, net %s (%d sales)" % (
+        label, tag, money(st.get("gains")), money(st.get("losses")),
         money(st.get("net")), st.get("sales", 0))
     if lt.get("sales"):
         line += "; long-term net %s" % money(lt.get("net"))
@@ -273,3 +309,59 @@ def report_line(label, s):
     if flags:
         line += " [" + " | ".join(flags) + "]"
     return line
+
+
+def load_ledger(path):
+    """A committed ledger, or None if missing or unreadable."""
+    import json
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def rh_sells_logged(log_path="rh_trade_log.jsonl"):
+    """Sells the laptop daemon has logged as done. This is the tripwire for a STALE Arm B
+    ledger: its figures come from the broker, so someone has to re-pull them after a
+    sale, and nothing forces that. The log is committed, so ANY session can compare."""
+    import json
+    n = 0
+    try:
+        with open(log_path, encoding="utf-8") as f:
+            for ln in f:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    r = json.loads(ln)
+                except Exception:
+                    continue
+                if r.get("action") == "sell" and r.get("status") == "ok":
+                    n += 1
+    except OSError:
+        return None
+    return n
+
+
+def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl"):
+    """Arm B's realized block, with staleness detected rather than assumed away.
+
+    Arm B is index-only, so it rarely sells and the ledger can sit unchanged for weeks
+    and still be right. That is exactly why it can go silently wrong: when it does sell,
+    nothing in the ledger changes on its own. So compare the sells the daemon has LOGGED
+    against the number the ledger says it had accounted for."""
+    led = load_ledger(ledger_path)
+    if not led or not led.get("summary"):
+        return None
+    s = dict(led["summary"])
+    counted = s.get("rh_log_sells_counted")
+    logged = rh_sells_logged(log_path)
+    if logged is None or counted is None:
+        s["state"] = "stale" if s.get("state") == "ok" else s.get("state", "unverified")
+        s["reason"] = "cannot compare against the sells log; treat as unconfirmed"
+    elif logged > counted:
+        s["state"] = "stale"
+        s["reason"] = ("%d sell(s) logged since this ledger was computed; "
+                       "the laptop must re-pull realized P&L from the broker" % (logged - counted))
+    return s
