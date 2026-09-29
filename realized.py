@@ -351,26 +351,63 @@ def rh_sells_logged(log_path="rh_trade_log.jsonl"):
     return n
 
 
-def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl"):
+def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl",
+                status_path="rh_status.json"):
     """Arm B's realized block, with staleness detected rather than assumed away.
 
     Arm B is index-only, so it rarely sells and the ledger can sit unchanged for weeks
     and still be right. That is exactly why it can go silently wrong: when it does sell,
-    nothing in the ledger changes on its own. So compare the sells the daemon has LOGGED
-    against the number the ledger says it had accounted for."""
+    nothing in the ledger changes on its own. Two INDEPENDENT tripwires, because either
+    one alone has a blind spot (laptop found both, 2026-09-29):
+
+      1. THE SELLS LOG. Compare the sells the daemon has LOGGED against the number the
+         ledger accounted for. More logged means a sale the ledger has not seen. FEWER
+         logged is also a fault, not a clean bill: the log was rewritten or truncated,
+         so this tripwire cannot be trusted. (The first version tested only "more" and
+         would have stayed silent.)
+      2. THE PUBLISHED HOLDINGS. A sale made BY HAND in the Robinhood app never appears
+         in rh_trade_log.jsonl, so tripwire 1 cannot see it. But it lowers the holdings
+         the daemon publishes. Buys and dividend reinvestments only RAISE holdings, so a
+         holding BELOW what the ledger says is still held can only mean a sale the ledger
+         does not know about. Skipped while the status is degraded: those snapshots carry
+         last-known values forward and prove nothing.
+    """
     led = load_ledger(ledger_path)
     if not led or not led.get("summary"):
         return None
     s = dict(led["summary"])
+    reasons = []
+
     counted = s.get("rh_log_sells_counted")
     logged = rh_sells_logged(log_path)
     if logged is None or counted is None:
-        s["state"] = "stale" if s.get("state") == "ok" else s.get("state", "unverified")
-        s["reason"] = "cannot compare against the sells log; treat as unconfirmed"
+        reasons.append("cannot compare against the sells log")
     elif logged > counted:
-        s["state"] = "stale"
-        s["reason"] = ("%d sell(s) logged since this ledger was computed; "
+        reasons.append("%d sell(s) logged since this ledger was computed; "
                        "the laptop must re-pull realized P&L from the broker" % (logged - counted))
+    elif logged < counted:
+        reasons.append("the sells log holds FEWER sells (%d) than the ledger accounted for (%d); "
+                       "it was rewritten or truncated, so that tripwire cannot be trusted"
+                       % (logged, counted))
+
+    st = load_ledger(status_path) or {}
+    pos = st.get("positions")
+    held = led.get("open") or {}
+    if isinstance(pos, dict) and pos and held and not st.get("degraded"):
+        short = ["%s %.6f now vs %.6f in the ledger" % (sym, float(pos.get(sym, 0.0)), float(q))
+                 for sym, q in sorted(held.items())
+                 if float(pos.get(sym, 0.0)) < float(q) - 1e-6 - 1e-6 * abs(float(q))]
+        if short:
+            reasons.append("holdings fell below what the ledger says is held (%s): a sale the "
+                           "ledger does not know about, possibly made by hand in the Robinhood app"
+                           % "; ".join(short[:3]))
+
+    if reasons:
+        if s.get("state") in (None, "ok"):
+            s["state"] = "stale"
+            s["reason"] = "; ".join(reasons)
+        else:
+            s["reason"] = "; ".join(filter(None, [s.get("reason")] + reasons))
     return s
 
 

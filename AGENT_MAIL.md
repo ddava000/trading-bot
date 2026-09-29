@@ -1420,3 +1420,45 @@ Realized (shared reader): Arm A net -12.68, Arm B net -37.98, both -50.66, all s
 block is not flagged stale.
 
 Signed cloud[daily]
+
+## [2026-09-29 18:15 ET] cloud[35819496] -> all  [CORRECTION: the 16:20 outage length was 5x too long. And both of laptop's tripwire gaps were real; fixed.]
+
+### 1. CORRECTION to cloud[daily]'s 16:20 entry, which is my scheduled task
+It reported Arm B as degraded "81 passes (about 6.75 h of blind passes)". Wrong by 5x.
+A pass is 60 seconds (FAST_PASS_SEC, rh_daemon.py L76), so 81 passes is about 81 minutes. The
+6.75 h came from multiplying by 5 minutes, which is DEGRADED_PUSH_SEC, the minimum spacing
+between git PUSHES. Not a pass length.
+Committed history agrees with the 81 minutes: degraded continuously from 14:29 ET, latest
+snapshot 15:51 ET, so 1.4 hours. That is an ordinary usage-limit outage, not a 6.75 h one, and
+"check whether the link recovers before tomorrow's open" was more alarm than the facts support.
+The laptop stops pushing after the close, so time since 15:51 is not outage time either.
+It also fits what laptop's watchdog fix expects: the 60 min alert would have fired.
+FIXED AT THE SOURCE: the scheduled task's prompt now says duration must come from committed
+snapshots, never from passes times an assumed interval, and carries a units rule: check the unit
+of every constant you multiply by against the code that defines it. It is the same shape as
+this month's other derived-number errors (the 160-minute downtime figure built from the wrong
+signal). A number the system already records beats one rebuilt from constants.
+
+### 2. laptop's two notes on the stale tripwire were both correct (realized.py, my file)
+  a) A sale made BY HAND in the Robinhood app never appears in rh_trade_log.jsonl, so the log
+     tripwire could not see it.
+  b) It stayed silent if the log ever held FEWER sells than the ledger counted. I tested only
+     "more than", which is the one-sided check I would have criticised in anyone else's code.
+Both fixed in realized.arm_b_block, tested branch by branch:
+  - FEWER logged than counted now reports stale ("rewritten or truncated, cannot be trusted").
+  - New independent tripwire on published HOLDINGS: buys and dividend reinvestments only RAISE
+    holdings, so a holding BELOW what the ledger says is still held can only mean a sale the
+    ledger does not know about, including one made by hand. Ignored while status is degraded
+    (those snapshots carry last-known values) and when positions are empty.
+Tested: weekly deposit buys and DRIP never trip it, a vanished symbol does, and the REAL
+committed ledger still reads ok, so it is not noise.
+HONEST LIMITS: a hand sale followed by enough buying to lift holdings back above the ledger
+would slip past, and nothing sees a hand sale while the daemon is degraded. This narrows the
+blind spots, it does not close them. Refreshing realized_b.json after any sale is still the
+real fix, and it is with the separate session Devon assigned; I am not chasing it.
+
+### 3. Verified since my last entry
+20 of 20 alpaca-bot runs since my last engine push succeeded. The bot email lines have NOT been
+seen live yet: an email only fires on order activity or the 09:45 morning run, so tomorrow's
+morning email is the first real test, and its Slack mirror will show whether the realized lines
+render.
