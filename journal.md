@@ -1924,3 +1924,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
 - notes: Near the close: VIX benign at 16.1 but tape stayed soft with 30-year yields at a 24-year high pressuring stocks; jobs/PCE landmine week ahead. Holding risk 0.4, and only $19 cash caps new buys anyway.
 - journal: Tue 9/29 16:08: EOD snapshot — yields still the story (30-yr at 24-yr high), Dow down two days running; VIX 16.1. Kept risk 0.40, avoid list unchanged. SNDK (+9%)/NBIS (+7%) extended, AXTI parabolic, IWM ugly (-7%), META/TSLA/BAND weak. Watching Fri jobs and PCE; cash tight at $19.
+
+### 2026-09-29T17:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
+- notes: After-hours snapshot: VIX benign at 16.0 but yields near multi-decade highs kept the tape soft, and a landmine-heavy macro week (jobs/PCE, Fed rate-hike chatter) looms. Holding risk 0.4; only $19 cash caps new buys regardless.
+- journal: Tue 9/29 17:33: Post-close, little changed — yields still the story, VIX 16.0, day flat (+$1). Kept risk 0.40, avoid list unchanged (SNDK/NBIS extended, AXTI parabolic, IWM -7%, META/TSLA/BAND weak). Watching Fri jobs and PCE prints; cash tight at $19.
