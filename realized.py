@@ -372,3 +372,68 @@ def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl"):
         s["reason"] = ("%d sell(s) logged since this ledger was computed; "
                        "the laptop must re-pull realized P&L from the broker" % (logged - counted))
     return s
+
+
+def combined_line(a, b, year=None):
+    """Both arms, one tax year. Refuses to add a number that is unknown."""
+    yr = str(year or datetime.now().year)
+    parts, bad = [], []
+    for name, s in (("A", a), ("B", b)):
+        if not s or s.get("state") == "unknown" or s.get("by_year") is None:
+            return "BOTH ARMS %s realized: NOT AVAILABLE (Arm %s has no usable figure)" % (yr, name)
+        parts.append(s["by_year"].get(yr) or {"st": {}, "lt": {}})
+        if s.get("state") in ("stale", "unverified"):
+            bad.append("%s=%s" % (name, s["state"]))
+    t = combine(*parts)
+    line = "BOTH ARMS %s realized, short-term: gains %s, losses %s, net %s (%d sales)" % (
+        yr, money(t["st"]["gains"]), money(t["st"]["losses"]), money(t["st"]["net"]),
+        t["st"]["sales"])
+    if t["lt"]["sales"]:
+        line += "; long-term net %s" % money(t["lt"]["net"])
+    if bad:
+        line += " [component not confirmed: %s]" % ", ".join(bad)
+    return line
+
+
+def cross_totals(ledger_a, ledger_b):
+    """Loss-sale exposure BETWEEN the accounts, upper bound, both directions."""
+    if not ledger_a or not ledger_b:
+        return None
+    ab = cross_watch(ledger_a, ledger_b)      # A's losses vs B's later/earlier buys
+    ba = cross_watch(ledger_b, ledger_a)
+    return {"a_losses_vs_b_buys": {"sales": len(ab), "upper_bound": round(sum(w["upper_bound"] for w in ab), 2)},
+            "b_losses_vs_a_buys": {"sales": len(ba), "upper_bound": round(sum(w["upper_bound"] for w in ba), 2)}}
+
+
+def repo_report_lines(a_block=None, year=None, status_path="status.json",
+                      a_ledger="realized_a.json", b_ledger="realized_b.json",
+                      log_path="rh_trade_log.jsonl"):
+    """THE ONE PLACE every report gets its realized-gain/loss lines from.
+
+    Devon (2026-09-29) asked for a running realized total in every report, to track tax
+    implications. Every report calls this rather than formatting the numbers itself, so
+    the bot email, the weekly review, the daily checks, the audit and pnl.py cannot
+    drift apart. Reads COMMITTED files only, so it works from any session or runner.
+
+    a_block lets the bot pass its fresh in-memory block instead of last cycle's.
+    """
+    la, lb = load_ledger(a_ledger), load_ledger(b_ledger)
+    if a_block is None:
+        st = load_ledger(status_path) or {}
+        a_block = st.get("realized") or ((la or {}).get("summary"))
+    b_block = arm_b_block(b_ledger, log_path)
+    lines = [report_line("Arm A (Alpaca)", a_block, year),
+             report_line("Arm B (Robinhood)", b_block, year),
+             combined_line(a_block, b_block, year)]
+    x = cross_totals(la, lb)
+    if x:
+        a, b = x["a_losses_vs_b_buys"], x["b_losses_vs_a_buys"]
+        if a["sales"] or b["sales"]:
+            lines.append(
+                "Cross-account wash-sale watch (upper bound; no broker reports these): "
+                "Arm A losses up to %s (%d sales), Arm B losses up to %s (%d sales)"
+                % (money(abs(a["upper_bound"])), a["sales"], money(abs(b["upper_bound"])), b["sales"]))
+    lines.append("Realized = positions actually SOLD, not the equity change. Not a tax "
+                 "document: the broker 1099-B is authoritative, and wash sales are for "
+                 "your tax preparer to decide.")
+    return lines

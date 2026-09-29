@@ -92,6 +92,18 @@ def main():
         L.append("  → As more trades accumulate, this section will show which setups")
         L.append("    (RSI band, trend, meme vs not) actually produced winners.")
 
+    # REALIZED gain/loss for tax tracking (Devon, 2026-09-29). The equity change above
+    # includes unrealized paper P&L; only positions actually SOLD are taxable. Both arms,
+    # one shared reader so every report prints the same numbers.
+    try:
+        import realized as _R
+        L.append("")
+        L.append("REALIZED GAIN/LOSS (sold positions only, unlike the equity change above):")
+        L += ["  " + ln for ln in _R.repo_report_lines(a_block=bot.realized_for_run())]
+    except Exception as _e:
+        L.append("")
+        L.append("Realized gain/loss totals UNAVAILABLE (%s)" % _e)
+
     if bot.MODE == "PAPER":
         L.append(""); L.append("(Paper account — validation run, not real money.)")
 

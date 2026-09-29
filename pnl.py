@@ -181,6 +181,17 @@ def main():
           % (last_b["b_pl"], last_b["date"], last_b["b_equity"], last_b["b_deposits"]))
     print("COMBINED:                %+8.2f dollars" % (last_a["a_pl"] + last_b["b_pl"]))
     print()
+    # The dollars above are EQUITY change, which includes unrealized paper P&L. Tax only
+    # cares about positions actually SOLD, which is a different and usually smaller
+    # number, so print both and label them. (Devon, 2026-09-29)
+    print("REALIZED, sold positions only (this is the taxable number, not the equity change):")
+    try:
+        import realized as _R
+        for _ln in _R.repo_report_lines():
+            print("  " + _ln)
+    except Exception as _e:
+        print("  realized totals UNAVAILABLE (%s)" % _e)
+    print()
     print("No conclusion before 2026-11-24. Deposits are basis, not profit.")
 
     if "--audit" in sys.argv:

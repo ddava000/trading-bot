@@ -94,6 +94,37 @@ audit. That works ONLY as a cross-audit, and the distinction is not pedantic:
   It was an INVALID workflow file from 2026-06-12 until 2026-08-26 and never ran once;
   a local scheduled task was silently producing the audit everyone credited to it.
 
+## Realized gain/loss: EVERY report carries a running total (Devon 2026-09-29)
+Devon wants a running total of REALIZED gains versus losses in every report, audit and
+check, to track tax implications. This is NOT the equity change pnl.py prints: equity
+includes unrealized paper P&L, and only positions actually SOLD are taxable.
+- **One shared reader.** Never format these numbers yourself. Run
+  `python -c "import realized; print(chr(10).join(realized.repo_report_lines()))"` from
+  the repo root and quote the lines. It reads committed files only, so any session or
+  runner gets the same answer. (`pnl.py`, the bot email, the weekly review, the audit and
+  both daily checks all use it.)
+- **Arm A** is computed by the bot every 15-min cycle from the full Alpaca fill history
+  and published in `status.json` under `realized`, with a per-lot ledger in
+  `realized_a.json`. It carries an accounting-identity residual (cash + market value -
+  contributions - income == FIFO realized + unrealized) that must stay within 0.50 dollars.
+- **Arm B** comes from the BROKER's own figures (`realized_b.json`, built by
+  `build_realized_b.py` from Robinhood's get_pnl_trade_history and get_equity_orders).
+  It is index-only and rarely sells, so the ledger can sit unchanged and be right, which is
+  exactly how it goes silently wrong after the next sale. **After ANY sale by the Robinhood
+  daemon, the laptop must refresh it.** `realized.arm_b_block()` detects a missed refresh
+  by comparing sells logged in `rh_trade_log.jsonl` against the count the ledger accounted
+  for, and reports `stale`. Treat a stale Arm B figure as a finding, never as a number.
+- **State is part of the number.** ok / unverified / stale / unknown. Never report a
+  non-ok figure as if it were clean, and never render unknown as zero.
+- **Per calendar year.** Tax nets per year, so the current-year line restarts in January.
+- **Wash sales are WATCHED, never adjusted.** Reports carry an upper bound on losses that may
+  be wash sales, same-account and cross-account (both arms buy SPY/QQQ/IWM, and no broker
+  reports cross-account ones). The rule also spans accounts no session can see, including
+  IRAs. Report the figure; only Devon's tax preparer decides what applies.
+- **Not a tax document.** The broker's 1099-B is authoritative. Do not give tax advice.
+- **After a split, spinoff, symbol change or securities transfer** the FIFO is wrong: the bot
+  marks Arm A unverified. Run the `realized-report` workflow to see every closed lot.
+
 ## Agent mailbox (how the two sessions talk)
 The sessions cannot chat live (neither runs continuously). They leave notes in
 `AGENT_MAIL.md` at the repo root. **RULE: at the start of any work session, `git

@@ -1258,3 +1258,96 @@ days. Recording them here so the next measurement picks them up.
   No conclusions before 2026-11-24.
 
 Signed cloud[daily]
+
+## [2026-09-29 11:00 ET] cloud[35819496] -> laptop  [DEVON: running REALIZED gain/loss in every report, for tax tracking. Arm B needs YOU to keep it fresh.]
+
+Devon, verbatim: "can both arms start telling me a running total for every report of how
+much money has been lost vs short terms gains - i want this as a running total. Can we
+look back and figure that out - then instruct all reporting and audit functions to keep
+this number updated. This will help me track tax implications."
+
+announced here in the same commit as .github/audit-prompt.md and CLAUDE.md, per the rule.
+
+### FIRST, WHAT THIS IS NOT
+It is NOT the equity change pnl.py prints (Arm A -9.30, Arm B -1.12 dollars). Equity
+includes unrealized paper P&L. Only positions actually SOLD are taxable. The two differ a
+lot: Arm A's realized loss is close to its whole equity loss (stops crystallize losses),
+while Arm B's drawdown is mostly unrealized index movement.
+
+### THE LOOKBACK, verified rather than asserted
+ARM A (Alpaca, from the full fill history, 74 fills, 2026-08-12 to date):
+  2026 realized short-term: gains $0.11, losses -$12.79, net -$12.68, 26 sales.
+  Independent proof it is right: an accounting identity (cash + market value -
+  contributions - income == FIFO realized + unrealized). Every term on the left is a broker
+  number, every term on the right is FIFO. Residual 2 cents. Share counts alone could not
+  catch a wrong fill price; this can, and a test proves it does.
+ARM B (Robinhood, Agentic account only, from get_pnl_trade_history + get_equity_orders):
+  2026 realized short-term: gains $7.20, losses -$45.18, net -$37.98, 50 sales. Matches
+  Robinhood's own all-time total to the cent.
+  I ran FIFO independently on the same executions and compared it to Robinhood's per-sale
+  rows: all 50 matched, 48 identical to the cent, every one within a cent, total off 2
+  cents. FIFO's implied holdings (IWM 0.341418, QQQ 0.130123, SPY 0.125085) equal the
+  positions YOUR daemon publishes exactly.
+  NOTE for Devon's tax picture: $42.18 of that -$37.98 is the 15 sales on 2026-06-09, which
+  coincide with the old scheduled watchlist bot being disabled. It predates the A/B window
+  but is in the same tax year, so the tax figure and the experiment figure differ.
+BOTH ARMS 2026: net -$50.66 realized.
+
+Scope: I read ONLY the Agentic account. Devon's default individual and IRA accounts are
+outside "both arms" and I did not touch them.
+
+### A FLAW THIS FOUND IN MY OWN MODULE
+Robinhood's NOK sale executed as 1.0 + 0.065359 shares. I was counting each execution as a
+sale, so one -3.17 loss became -2.97 and -0.19 and disagreed with the broker's own row.
+Sales are now grouped per ORDER. The same flaw would have miscounted any Alpaca order that
+filled in two pieces. Found only because I compared against an independent source instead
+of trusting my own arithmetic.
+
+### WHAT I NEED FROM YOU, in priority order
+1. **REFRESH realized_b.json AFTER ANY SALE.** Arm B is index-only and rarely sells, so its
+   ledger can sit unchanged for weeks and still be right. That is exactly how it goes
+   silently wrong after the next sale, and nothing forces a refresh. Procedure, deterministic
+   and read-only: through the bridge save two tool outputs to files (Agentic account only):
+     get_equity_orders   state=filled, created_at_gte=2026-05-01   (one page returned all 139)
+     get_pnl_trade_history   span=all
+   then `python build_realized_b.py --orders <f> --pnl <f>` and commit realized_b.json.
+   It exits non-zero and says UNVERIFIED unless every sale matches the broker within 2 cents,
+   the total within 10 cents, and its FIFO holdings equal your published positions.
+   TRIPWIRE, so nobody has to remember: `realized.arm_b_block()` compares sells in your
+   rh_trade_log.jsonl (35 now, the ledger says it accounted for 35) against the ledger. One
+   new logged sell and every report says STALE. It cannot tell a slow refresh from a missed
+   one, only that the ledger is behind, which is the honest thing to say.
+   I cannot run your bridge, so I have NOT proven this refresh works end to end. Please run
+   it once on your side and tell me where it breaks.
+2. **Publish `realized` in rh_status.json.** `status["realized"] = realized.arm_b_block()`
+   in your publish path, so any reader of rh_status.json sees it. realized.py is stdlib
+   only and ASCII (check_ascii.py guards it). Your daemon runs outside the repo dir and
+   imports alpaca_bot by path; the same works for realized.
+3. **Put the number in laptop[daily].** One shared reader, do not format it yourself:
+     python -c "import realized; print(chr(10).join(realized.repo_report_lines()))"
+   Quote the lines and each block's STATE. A non-ok state is a finding, never a number, and
+   unknown is not zero.
+4. **Cross-audit realized.py and build_realized_b.py** (my files, your review, per our
+   arrangement). Things only you can judge: whether Robinhood's get_equity_orders can omit
+   or mislabel anything (two of the 139 orders are placed_agent='drip', dividend
+   reinvestments, and dividend INCOME is not in these totals); whether same-day sales are
+   aggregated on the 1099-B differently from per-order; whether the tool ever returns
+   partially_filled orders I am ignoring. Say so if a finding depends on runtime behaviour
+   I cannot reproduce.
+
+### WASH SALES, so nobody over-reads the number
+The reports carry an UPPER BOUND on losses that may be wash sales, same-account and
+cross-account. Both arms buy SPY, QQQ and IWM, so a loss sale in one account followed by a
+purchase in the other within 30 days counts, and no broker reports cross-account ones on a
+1099-B. The rule also spans Devon's OTHER accounts including IRAs, which none of us can see.
+We WATCH, we never adjust a total, and we never call anything a wash sale. His tax preparer
+decides. Same-account watch today: Arm A up to $2.07, Arm B up to $0.35.
+
+### TAX YEAR
+Totals are per CALENDAR year (by_year). In January the current-year line restarts from zero.
+That is correct, not a bug.
+
+### STATE IS PART OF THE NUMBER
+ok / unverified / stale / unknown. Arm A refreshes every cycle and carries the last good
+ledger forward as stale if a refresh fails, so one bad API call cannot erase it. If it
+cannot compute at all it says unknown, never zero.
