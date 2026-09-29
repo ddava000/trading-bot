@@ -62,7 +62,14 @@ def trade_date(t):
             return date.fromisoformat(s)
         s = _FRAC.sub(r"\1", s.replace("Z", "+00:00"))   # nanoseconds break fromisoformat
         dt = datetime.fromisoformat(s)
-    if dt.tzinfo is not None and _ET is not None:
+    if dt.tzinfo is not None:
+        if _ET is None:
+            # NEVER fall back to the UTC date. A trade at 8pm New York time is already
+            # tomorrow in UTC, so guessing would put it on the wrong day and could move
+            # it across a tax-year boundary. Refusing makes the block report UNKNOWN,
+            # which is honest, instead of a confident total with a wrong date in it.
+            raise RuntimeError("timezone database unavailable (install tzdata); "
+                               "refusing to guess the New York trade date")
         dt = dt.astimezone(_ET)
     return dt.date()
 
