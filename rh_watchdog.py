@@ -29,6 +29,10 @@ import alpaca_bot as bot
 STATUS_F  = "rh_status.json"
 STALE_MIN = 30    # heartbeat is 15 min, so >30 = ~2 missed pushes = likely down
 CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots)
+# GitHub delays and drops scheduled runs, so the runs do not tile 30-min windows.
+# A threshold counts as crossed if it fell in the last CROSS_WINDOW_MIN: wider than
+# the cadence so a late run cannot skip it. A rare duplicate beats a missed alert.
+CROSS_WINDOW_MIN = 45
 
 # DEGRADED means the daemon is ALIVE and pushing but cannot reach the broker, so it
 # can neither see nor trade the account. It copies the last known equity forward to
@@ -41,7 +45,9 @@ CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots)
 # Thresholds are stateless on purpose. Each fires ONCE, when the duration crosses it
 # within the last check interval, so a long outage produces at most three mails
 # instead of one every 30 minutes. No state file to go stale on a fresh runner.
-DEGRADED_ALERT_MIN = (45, 180, 360)
+# First threshold 60, not 45: since dd21a55 the daemon itself alerts at 15 min, so
+# this is the independent BACKSTOP, not a second copy of the same mail.
+DEGRADED_ALERT_MIN = (60, 180, 360)
 GRACE_MIN = 5     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
@@ -217,7 +223,13 @@ def main():
 
     # DEGRADED comes first: a degraded daemon keeps `ts` fresh, so the staleness
     # check below would call it healthy and return before ever looking.
-    if status.get("degraded"):
+    stale = (et - ts).total_seconds() / 60
+    # A degraded status that has also gone STALE means the daemon stopped pushing
+    # (crash, or a Modern Standby hang overnight after an outage ran past the close).
+    # That is a dead laptop, not a live one waiting on the broker: fall through to the
+    # stale alert below. Without this the degraded branch returned early forever and
+    # the watchdog went permanently silent, saying "the laptop is ALIVE".
+    if status.get("degraded") and stale < STALE_MIN:
         why = str(status.get("degraded"))
         mins = degraded_minutes(et)
         if mins is None:
@@ -230,7 +242,7 @@ def main():
                   f"account. Not urgent: index-only has no stops waiting to fire.")
             return 0
         crossed = [t for t in DEGRADED_ALERT_MIN
-                   if mins >= t > (mins - CHECK_EVERY_MIN)]
+                   if mins >= t > (mins - CROSS_WINDOW_MIN)]
         if crossed:
             alert(chr(10).join([
                 f"Arm B has been unable to trade for about {int(mins)} minutes "
@@ -252,14 +264,15 @@ def main():
                   f"next threshold not yet crossed")
         return 0
 
-    stale = (et - ts).total_seconds() / 60
     if stale < STALE_MIN:
         print(f"bot healthy - last heartbeat {int(stale)}m ago ({status['ts']} ET)")
         return 0
 
     alert(chr(10).join([
         f"The RH laptop bot has stopped reporting. Last heartbeat {status['ts']} ET, "
-        f"about {int(stale)} min ago, during open market.",
+        f"about {int(stale)} min ago, during open market."
+        + (f" It was already DEGRADED ({status.get('degraded')}) when it went quiet."
+           if status.get("degraded") else ""),
         "",
         "NOT URGENT. Robinhood is index-only buy-and-hold, so there are no stops",
         "waiting to fire. The cost of downtime is that deposits sit uninvested and",
