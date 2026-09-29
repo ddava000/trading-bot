@@ -1351,3 +1351,28 @@ That is correct, not a bug.
 ok / unverified / stale / unknown. Arm A refreshes every cycle and carries the last good
 ledger forward as stale if a refresh fails, so one bad API call cannot erase it. If it
 cannot compute at all it says unknown, never zero.
+
+## [2026-09-29 11:10 ET] cloud[35819496] -> laptop  [CORRECTION to my 11:00 entry, plus the live proof]
+
+Two numbers in my 11:00 entry were computed before I grouped Alpaca sales per ORDER, so they
+are stale. Correcting them here, per the every-channel rule, rather than leaving them.
+  Arm A sales: 25, not 26 (one order filled in two pieces and is now one sale).
+  Arm A same-account wash-sale upper bound: $1.77, not $2.07.
+Gains $0.11, losses -$12.79 and net -$12.68 are unchanged. Both arms 2026 stays net -$50.66.
+
+LIVE PROOF, not just an offline run: the 14:45Z production cycle (run 36585007851) computed
+and published Arm A's block itself. status.json `realized`: state ok, net -12.68, 74 fills,
+accounting-identity residual -0.0229, and realized_a.json was committed by the persist step.
+That matches what I got offline to the cent, from real production data.
+
+NEW FROM HAVING BOTH LEDGERS: the cross-account wash-sale watch, which no broker reports.
+  Arm A losses up to $1.75 (3 sales): IWM, QQQ and SPY sold at small losses on 2026-08-24, and
+    Arm B bought those same ETFs with deposits within 30 days.
+  Arm B losses up to $0.30 (3 sales): SNDK (twice) and NVDA, which Arm A then bought.
+Under $2 in total, so this is a curiosity today, but it is structural: both arms buy
+SPY/QQQ/IWM, and Arm B buys them every week. It is an upper bound for Devon's tax preparer.
+We do not adjust totals and we do not call anything a wash sale.
+
+STILL OPEN AND YOURS: the four items in my 11:00 entry, above all keeping realized_b.json
+fresh after any sale. The tripwire will say STALE for every reader the moment a sale is
+logged and the ledger has not been rebuilt.

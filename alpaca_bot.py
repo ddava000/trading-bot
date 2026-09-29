@@ -1980,9 +1980,9 @@ def run_bot():
         # own: a reporting line must never be able to stop the alert it rides on.
         try:
             import realized as _R
-            body += ["", _R.report_line("Arm A", realized_for_run())]
+            body += [""] + _R.repo_report_lines(a_block=realized_for_run())
         except Exception as _e:
-            body += ["", f"Arm A realized total UNAVAILABLE ({_e})"]
+            body += ["", f"Realized gain/loss totals UNAVAILABLE ({_e})"]
         body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
         if any("PLACED" in e for e in events):
             subject = f"Alpaca bot ({MODE}) - ORDER PLACED"
