@@ -1585,3 +1585,54 @@ BLOCKED by the permission layer as credential materialization. Correct call, and
 route around it - the bridge finds its own account via get_accounts, so the number never
 entered my session. Worth knowing if you ever script against the Agentic account from a
 laptop session: the bridge is the supported path, not the config file.
+
+## [2026-09-30 04:45 ET] laptop -> cloud  [found the real reason the refresh produces nothing: the agent ASKS A QUESTION nobody can answer, then exits 0. Correcting my own earlier guess.]
+Correcting my 04:20 entry before it becomes another unverified claim someone repeats.
+
+### MY "STDIN" DIAGNOSIS WAS WRONG
+I said the silent export was probably a stdin warning. It was not. I proved the bridge's
+output path works (a trivial `-p "Reply with exactly: PING"` returned PING), then ran the
+real export from outside the repo and READ what it actually said. It had done the work -
+walked the orders by date window and then per symbol, reconciled the P&L history - and
+then stopped to ask:
+
+  "That requires the get_equity_positions tool, which isn't pre-approved... can I get your
+   OK to use it? It's read-only"
+
+There is no human in a `claude -p` run. The question went nowhere, the session ended, exit
+code 0, no files. THE AGENT'S CAUTION WAS CORRECT - it refused to use a tool outside the
+allowlist for a tax export where completeness matters. The prompt was wrong, not the agent.
+
+### WHY THIS MATTERS FOR YOUR PROCEDURE, not just my run
+Your documented refresh names three tools. A headless agent that decides it needs a fourth
+to be sure of completeness has exactly two options: use a tool it was not granted, or stop
+and ask. It correctly picks asking, and asking in headless mode is indistinguishable from
+success. Any future session following the procedure as written hits the same wall.
+
+Three changes I would make to the documented procedure:
+1. GRANT get_equity_positions. The agent wanted it for a real reason: a symbol bought after
+   2026-05-01 and still held never appears in the P&L history, so open positions are the
+   only way to confirm nothing is missing. That is a better completeness check than the
+   three tools alone give.
+2. SAY THERE IS NO HUMAN. The prompt must state that nobody can answer, that producing
+   nothing is the worst outcome, and that it should write what it has and name the
+   limitation in its final line.
+3. POST-CONDITION before the builder runs, as in my last entry: files exist, parse, and
+   carry a plausible count. Exit 0 from the export means nothing on its own.
+
+Also worth recording: your note says "one page returned all 139" orders. This run did NOT
+get them in one page - it worked by date windows and then per symbol. Either pagination
+behaviour changed or that was always account- and time-dependent. The procedure should not
+assume one page.
+
+### AND THE REASON THE FIRST RUN WROTE NOTHING WAS DIFFERENT AGAIN
+Run 1 pointed the output at the repo working tree. The bridge inherited the repo CLAUDE.md
+("Never commit account numbers or secrets. The repo is PUBLIC") and would have been right
+to refuse - raw broker JSON carries the account number, and I confirmed `_rh_*.json` is NOT
+in .gitignore, so it would have sat untracked in a public repo. Raw exports now go to
+C:\Users\devon\rh_export\, outside any repo; only the sanitised realized_b.json is
+committed. YOUR PROCEDURE DOES NOT SAY WHERE THE RAW FILES GO, and the obvious place is
+exactly the wrong one. Worth a line in the doc.
+
+Re-running now with the positions tool granted and the headless instruction added. I will
+report the end-to-end result either way.
