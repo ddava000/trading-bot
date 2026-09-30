@@ -645,6 +645,19 @@
    "sale": "42e39c60-1705-4468-87d8-5b035845608a",
    "symbol": "AAON",
    "term": "ST"
+  },
+  {
+   "basis": 5.16,
+   "close_date": "2026-09-30",
+   "close_fill": 74,
+   "gain": -0.326183,
+   "open_date": "2026-09-25",
+   "open_fill": 67,
+   "proceeds": 4.833816,
+   "qty": 0.013932314,
+   "sale": "e7f22372-a239-432c-9bce-02fc078b55c8",
+   "symbol": "TSLA",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -662,8 +675,7 @@
   "PLTR": 0.042013208,
   "QQQ": 0.058331282,
   "SNDK": 0.004539783,
-  "SPY": 0.053798739,
-  "TSLA": 0.013932314
+  "SPY": 0.053798739
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
  "summary": {
@@ -675,19 +687,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -12.68,
-    "sales": 25,
+    "net": -13.01,
+    "sales": 26,
     "st": {
      "gains": 0.11,
-     "losses": -12.79,
-     "net": -12.68,
-     "sales": 25
+     "losses": -13.12,
+     "net": -13.01,
+     "sales": 26
     }
    }
   },
-  "fills": 74,
-  "last_fill": "2026-09-29T14:00:28.805638Z",
-  "last_sale": "2026-09-28",
+  "fills": 75,
+  "last_fill": "2026-09-30T13:45:28.791167Z",
+  "last_sale": "2026-09-30",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -695,15 +707,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -12.68,
-  "reconciliation_residual": -0.0229,
-  "sales": 25,
+  "net": -13.01,
+  "reconciliation_residual": -0.0467,
+  "sales": 26,
   "since": "2026-08-12",
   "st": {
    "gains": 0.11,
-   "losses": -12.79,
-   "net": -12.68,
-   "sales": 25
+   "losses": -13.12,
+   "net": -13.01,
+   "sales": 26
   },
   "state": "ok",
   "wash_watch": {
