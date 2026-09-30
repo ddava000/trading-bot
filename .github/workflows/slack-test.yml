@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       text:
-        description: "For mode=say only: the message to post into the channel."
+        description: "mode=say: the message to post. mode=peek: a regex; only matching lines of recent BOT alerts are printed."
         default: ""
       mode:
-        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side)."
+        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side). peek = print only the lines of recent bot alerts that match text (what did an alert actually say)."
         type: choice
-        options: [test, mail, alert, read, say]
+        options: [test, mail, alert, read, say, peek]
         default: test
 
 jobs:
@@ -43,6 +43,8 @@ jobs:
             python slack_alert_probe.py
           elif [ "${{ inputs.mode }}" = "say" ]; then
             python -c "import os,sys,slack_notify; sys.exit(0 if slack_notify.post(os.environ['SAY_TEXT']) else 1)"
+          elif [ "${{ inputs.mode }}" = "peek" ]; then
+            python slack_notify.py --peek "$SAY_TEXT"
           elif [ "${{ inputs.mode }}" = "read" ]; then
             python slack_notify.py --pull 25
           else

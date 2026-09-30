@@ -300,6 +300,42 @@ def pull(limit=25, ingest=False):
         print("  [slack: could not write mailbox: %s]" % e)
     return msgs
 
+def peek_bot(pattern, limit=20):
+    """Read-only: the lines of recent BOT alerts that match `pattern`, newest first.
+
+    Returns [(ts, first_line, [matching lines])] or None if the channel cannot be read.
+
+    read_channel() deliberately DROPS our own posts so a bot never ingests itself. That leaves a
+    blind spot: an alert email body is otherwise invisible to every session, so nobody can check
+    what an alert actually SAID. On 2026-09-30 that was the only way to confirm the realized
+    gain/loss lines really rendered in a live alert. This is the opposite view and it is narrow
+    on purpose: only messages posted by a bot, only the matching lines (never whole messages),
+    and only from the one channel this bot is allowed to read. A HUMAN's message with the same
+    text is never returned, so this cannot be used to read what Devon typed.
+    """
+    if not can_read():
+        print("  [slack peek unavailable - token/channel unset, or channel refused]")
+        return None
+    d = _api("conversations.history",
+             {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))})
+    if not d:
+        return None
+    try:
+        rx = re.compile(pattern, re.I)
+    except re.error as e:
+        print("  [slack peek: bad pattern: %s]" % e)
+        return None
+    out = []
+    for m in d.get("messages", []):
+        if not (m.get("bot_id") or m.get("subtype") == "bot_message"):
+            continue
+        lines = (m.get("text") or "").splitlines()
+        hits = [ln.strip() for ln in lines if rx.search(ln)]
+        if hits:
+            first = next((ln.strip() for ln in lines if ln.strip()), "")
+            out.append((m.get("ts", ""), first[:80], hits[:12]))
+    return out
+
 if __name__ == "__main__":
     arg = sys.argv[1] if len(sys.argv) > 1 else "--test"
     if arg == "--test":
@@ -311,6 +347,21 @@ if __name__ == "__main__":
         sys.exit(0 if post_mail(n) else 1)
     if arg == "--say":
         sys.exit(0 if post(" ".join(sys.argv[2:])) else 1)
+    if arg == "--peek":
+        pat = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else "realized"
+        res = peek_bot(pat)
+        if res is None:
+            sys.exit(1)
+        for ts, subj, hits in res[:5]:
+            try:
+                when = datetime.fromtimestamp(float(ts), ZoneInfo("America/New_York")).strftime("%m-%d %H:%M ET")
+            except (ValueError, TypeError):
+                when = "?"
+            print("  [%s] %s" % (when, subj.encode("ascii", "replace").decode()))
+            for h in hits:
+                print("      " + h[:220].encode("ascii", "replace").decode())
+        print("  [peek: %d bot message(s) matched %r]" % (len(res), pat))
+        sys.exit(0)
     if arg in ("--pull", "--pull-ingest"):
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 25
         # Exit 1 ONLY when the channel could not be read. "Read fine, nothing new"
@@ -322,5 +373,5 @@ if __name__ == "__main__":
         sys.exit(1 if pull(n, ingest=(arg == "--pull-ingest")) is None else 0)
     print(__doc__)
     print("usage: slack_notify.py [--test | --mail-latest | --mail-recent N |"
-          " --say TEXT | --pull N | --pull-ingest N]")
+          " --say TEXT | --pull N | --pull-ingest N | --peek PATTERN]")
     sys.exit(2)
