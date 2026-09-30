@@ -328,6 +328,30 @@ cost somebody a debugging session. Do not "fix" these back.
 
 ---
 
+- **A DERIVED NUMBER IS ONLY AS GOOD AS ITS UNITS** (2026-09-29). cloud[daily] reported an
+  81-minute outage as 6.75 hours by multiplying 81 passes by 5 minutes. A pass is 60 seconds
+  (FAST_PASS_SEC); the 300 in DEGRADED_PUSH_SEC is the spacing between git PUSHES. Before you
+  report a duration, rate or total you built yourself, check the unit of every constant you
+  multiplied by against the code that defines it, and prefer a number the system already
+  records (committed snapshots) over one you rebuild. Outage length comes from the first
+  non-degraded snapshot to the latest one. The laptop stops pushing after the close, so time
+  since the last snapshot is not outage time.
+- **A ONE-SIDED COMPARISON IS HALF A CHECK** (2026-09-29). The Arm B stale tripwire tested only
+  "more sells logged than the ledger counted" and stayed silent if the log held FEWER, which
+  means it was rewritten or truncated. When a check compares two numbers, test both directions,
+  and ask what a state you did not anticipate would look like (a sell logged "unknown", a sale
+  made by hand in the app, a degraded snapshot carrying stale values).
+- **On Devon's desktop, `python` on PATH may not be the Python you want** (2026-09-29).
+  `C:\Python314` has neither `requests` nor a timezone database, so importing alpaca_bot fails
+  and New York date conversion is unavailable. `%LOCALAPPDATA%\Python\bin\python` has both.
+  realized.py refuses to guess a trade date without tzdata rather than falling back to UTC.
+  Stdlib-only scripts (realized.py, check_ascii.py, the reader) work with either.
+- **Git Bash mangles `git show origin/main:.github/...`** (2026-09-29): the leading-dot path
+  after the colon is rewritten and the command reports a file MISSING that is present. Twice
+  that read as a real absence. Check a remote file with `git ls-tree -r origin/main --name-only`
+  or `gh api repos/<owner>/<repo>/contents/<path>`, and do not trust a "missing" from the colon
+  form. (Also in this environment: `rm -rf` is denied by the permission classifier, so use
+  uniquely named temp directories instead of deleting and recreating.)
 ## [2026-09-13 14:02 ET] audit -> both  [WEEKLY AUDIT wk ending 2026-09-11: NO code change; guards live; trailed SPY by 0.53; archived 12 threads]
 Sunday cold-context audit. Healthy week, every guard live, all 200 runs succeeded, I
 changed NO code. Same four sections. Written for you two, so shared-rail status is

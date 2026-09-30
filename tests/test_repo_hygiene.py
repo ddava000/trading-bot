@@ -197,6 +197,42 @@ class SecretScanTests(unittest.TestCase):
         self.assertEqual(hits, [], "secret or personal address in a PUBLIC repo:\n" + "\n".join(hits[:10]))
 
 
+def stray_controls(text):
+    """Control characters other than tab, LF and CR. A path like %LOCALAPPDATA%\\Python\\bin,
+    written through a string that treats the backslash-b as an escape, silently becomes a
+    BACKSPACE character and the text reads 'Pythonin' with nothing visibly wrong."""
+    return [(i, hex(ord(c))) for i, c in enumerate(text) if ord(c) < 32 and c not in "\t\n\r"]
+
+
+class ControlCharacterTests(unittest.TestCase):
+    def test_the_detector_can_actually_find_one(self):
+        self.assertEqual(stray_controls("Python" + chr(8) + "in"), [(6, "0x8")])
+        self.assertEqual(stray_controls("plain text\nwith\ttabs\r\n"), [])
+
+    def test_no_stray_control_characters_in_tracked_text(self):
+        """Found the hard way: a Windows path in STANDING FACTS lost a backslash-b to an
+        escape sequence while a durable document was being edited by script."""
+        found = []
+        # journal.md and the *.jsonl logs are WRITTEN BY THE BOTS from model output, and one
+        # 2026-07-03 journal line carries a stray backspace where the model emitted a backslash
+        # before "both". That is harmless machine-written history, not something a person or a
+        # script edited by hand, so rewriting it would falsify the record for no benefit. This
+        # check exists for the docs and code that people and scripts DO edit.
+        machine_written = {"journal.md"}
+        for f in tracked_files():
+            if f in machine_written or not f.endswith((".md", ".py", ".yml", ".json", ".txt", ".ps1")):
+                continue
+            try:
+                with open(os.path.join(ROOT, f), encoding="utf-8") as fh:
+                    text = fh.read()
+            except (OSError, UnicodeDecodeError):
+                continue
+            hits = stray_controls(text)
+            if hits:
+                found.append("%s: %s" % (f, hits[:3]))
+        self.assertEqual(found, [], "\n".join(found))
+
+
 class DataFileTests(unittest.TestCase):
     def test_committed_json_state_files_are_valid(self):
         for name in ("experiment.json", "status.json", "rh_status.json", "rh_deposits.json",
