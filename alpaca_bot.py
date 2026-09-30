@@ -1040,7 +1040,10 @@ def realized_for_run():
     if ledger is not None:
         try:
             new = json.dumps(ledger, indent=1, sort_keys=True)
-            old = open(REALIZED_F, encoding="utf-8").read() if os.path.exists(REALIZED_F) else ""
+            old = ""
+            if os.path.exists(REALIZED_F):
+                with open(REALIZED_F, encoding="utf-8") as _rf:
+                    old = _rf.read()
             if new != old:                       # deterministic, so it only changes on new fills
                 with open(REALIZED_F, "w", encoding="utf-8") as f:
                     f.write(new)
@@ -1048,7 +1051,8 @@ def realized_for_run():
             print("  [%s not written: %s]" % (REALIZED_F, e))
     else:
         try:
-            last = json.load(open(REALIZED_F, encoding="utf-8"))["summary"]
+            with open(REALIZED_F, encoding="utf-8") as _rf:
+                last = json.load(_rf)["summary"]
             last = dict(last)
             last.update({"state": "stale", "reason": block.get("reason", "refresh failed"),
                          "as_of": last.get("last_fill")})

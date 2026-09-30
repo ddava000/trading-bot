@@ -26,7 +26,8 @@ STRINGISH = {"STRING", "FSTRING_MIDDLE"}
 def offenders(path):
     out = []
     try:
-        src = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            src = fh.read()
     except OSError:
         return out
     for t in tokenize.generate_tokens(io.StringIO(src).readline):

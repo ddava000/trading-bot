@@ -17,12 +17,18 @@ rails before doing anything.
 - **Backtests are hypothetical by default.** Running `backtest.py` touches nothing
   live. Never apply a backtest finding to a live bot without Devon saying so.
 
-## The two bots
-- **Cloud bot** (`alpaca_bot.py`): Alpaca PAPER money. Runs in GitHub Actions every
-  15 min with a 60s protective loop. The main validation experiment.
-- **Robinhood laptop bot** (`rh_bot.py` decision engine, `rh_daemon.py` runner):
-  REAL money, ~$120, on an always-on Windows laptop. `rh_bot.py` imports every rail
-  from `alpaca_bot` so the two strategies cannot drift.
+## The two bots (both trade REAL money; corrected 2026-09-30, this section used to say paper)
+- **Arm A, the cloud bot** (`alpaca_bot.py`): Alpaca LIVE, ~$240, the HYBRID: index 50 /
+  hold 25 / trade 20 / crypto 0. Runs in GitHub Actions every 15 min (triggered by
+  cron-job.org) with a 60s protective loop. Crypto is PERMANENTLY retired: Alpaca does not
+  offer it in Colorado, so do not "re-enable" it.
+- **Arm B, the Robinhood laptop bot** (`rh_bot.py` decision engine, `rh_daemon.py` runner):
+  ~$280, plain INDEX ETFs buy-and-hold (SPY/QQQ/IWM, no stops), on an always-on Windows
+  laptop. `rh_bot.py` imports every rail from `alpaca_bot` so the mechanics cannot drift,
+  but its sleeve allocation is set explicitly (index-only) and is NOT inherited.
+- **They are an A/B experiment.** Window opened 2026-08-24, decision no earlier than
+  2026-11-24. Read `experiment.json` (`rule`, `question_being_answered`) before comparing
+  them, and do not draw conclusions early.
 
 > IMPORTANT, learned the hard way (2026-07-28): the `rh_daemon` order EXECUTOR (a
 > headless `claude -p` turn) is SANCTIONED, approved automation, not a rogue agent
@@ -39,8 +45,17 @@ rails before doing anything.
 Two Claude sessions may work here at once. Coordinate through the repo (commit +
 pull); the sessions cannot talk directly.
 - **Cloud session owns:** `alpaca_bot.py`, `brief.py`, `review.py`, `backtest.py`,
-  `.github/workflows/`.
-- **Laptop session owns:** `rh_bot.py`, `rh_daemon.py`, `setup_laptop.ps1`.
+  `.github/workflows/`, `realized.py`, `realized_report.py`, `build_realized_b.py`,
+  `pnl.py`, `check_ascii.py`, `slack_notify.py`, `mail_check.py`, and `tests/`.
+- **Laptop session owns:** `rh_bot.py`, `rh_daemon.py`, `rh_watchdog.py`,
+  `setup_laptop.ps1`, `rh_deposits.json`, and refreshing `realized_b.json`.
+- **Tests and CI.** Run `python -m unittest discover -s tests` before pushing code.
+  `.github/workflows/ci.yml` runs it on any push that touches code, workflows, tests or
+  the mailbox, and a red run is a finding, not noise. It validates every workflow file (an
+  invalid one once never ran for ten weeks), syntax-checks their shell, scans for
+  credentials and personal email addresses in this PUBLIC repo, and covers the realized
+  gain/loss code that feeds Devon's tax number. Every check that hunts for something also
+  proves it can find it.
 - `git pull --rebase` before any edit. Prefer not to edit the other session's files;
   if you must (at Devon's request), say so in the commit message and post a note in
   the mailbox below so the owner has context.

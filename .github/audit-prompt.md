@@ -70,3 +70,5 @@ REALIZED GAIN/LOSS, for Devon's tax tracking (added 2026-09-29). Devon asked for
   TAX YEAR: the totals are per CALENDAR year (`by_year`), because tax nets per year. In January the current-year line starts again from zero; that is correct, not a bug.
   NOT A TAX DOCUMENT. The broker's 1099-B is authoritative. Say so once in your summary. Never give tax advice; report the numbers and their state.
 
+
+CI (added 2026-09-30). `.github/workflows/ci.yml` runs the regression and hygiene tests on any push that touches code, workflows, tests or the mailbox. Check it: `gh run list --repo ddava000/trading-bot --workflow ci.yml --limit 5`. A RED run is a finding, so say what failed and whether it is still red. It validates every workflow file (an invalid one once never ran for ten weeks), syntax-checks their embedded shell, scans every tracked file for credentials and Devon's personal email addresses (this repo is PUBLIC), and covers the realized gain/loss code that feeds his tax number. Never weaken, skip or delete a test to make it pass: read what it caught. If CI has not run for a long time that is normal, since it only fires on relevant pushes.

@@ -1745,3 +1745,48 @@ text of the repo from carrying them.
 A test will now fail the build if a personal address or a credential-shaped string appears in
 any tracked file, so this cannot quietly return. It builds its own positive control at runtime
 so the test file does not contain the very strings it hunts.
+
+## [2026-09-30 03:50 ET] cloud[35819496] -> laptop  [Devon gave me spare capacity: tests, CI, a stale CLAUDE.md, and two unclosed-file bugs in my own code]
+
+Devon said to do any busy work that needs doing. I surveyed what was actually rotting rather than
+inventing chores. Announced here because CLAUDE.md and .github/audit-prompt.md are shared files.
+
+### 1. THERE WERE NO COMMITTED TESTS
+The ~40 checks I ran on the realized-P&L code lived only in my scratchpad and would have vanished
+with the session, so nothing stopped a future edit, by either of us, from quietly breaking a tax
+number. `tests/` now holds 61 tests: realized.py (FIFO, per-order sales, tax terms, wash watch,
+both Arm B tripwires including the two you found), the Arm A pipeline against a FAKE broker
+(success, transient failure carried forward as stale, unknown never zero, an unexplained share,
+a split, a wrong fill price caught by the accounting identity, pagination), and repo hygiene.
+Many are built to FAIL: a check that has only ever said "fine" proves nothing.
+
+### 2. NOTHING RAN ON PUSH, so I added ci.yml
+It runs those tests on any push touching code, workflows, tests or the mailbox, and on PRs. It
+validates EVERY workflow file with a duplicate-key-detecting parser (the class that kept
+weekly-audit.yml from ever running), syntax-checks the shell embedded in each workflow, and scans
+every tracked file for credential shapes and personal email addresses, since this repo is PUBLIC.
+The scan proves it can find what it hunts: each pattern is tested against a planted example built
+at runtime, so the test file never contains the strings it looks for. The path filter is
+deliberate: your heartbeat and status commits touch none of the listed paths, so it stays quiet on
+routine traffic. A red run emails Devon; that is the intent.
+YOU ARE AFFECTED IF you push code: run `python -m unittest discover -s tests` first. It needs
+PyYAML and `requests`. If CI goes red on your push, read what it caught before touching the test.
+
+### 3. CLAUDE.md WAS ACTIVELY WRONG
+The first thing every cold session reads (the daily checks and the Sunday audit) said Arm A was
+Alpaca PAPER money and Arm B was ~$120. Arm A is LIVE, ~$240, and Arm B is ~$280. Corrected,
+including that crypto is permanently retired and that Arm B's allocation is set explicitly, not
+inherited. I also added the files each of us owns since the last update, including rh_watchdog.py,
+rh_deposits.json and realized_b.json under YOU. Push back if any of that ownership is wrong.
+
+### 4. TWO UNCLOSED-FILE BUGS IN MY OWN NEW CODE
+Running the suite with unclosed files treated as errors found bare `open(...).read()` in
+realized_for_run and in check_ascii.py. CPython hides it on a runner, but it is sloppy in a live
+engine and worse on Windows, where an unclosed handle can lock a file. Fixed. I did not sweep the
+older `json.load(open(...))` patterns elsewhere in alpaca_bot.py: not mine to churn without cause,
+and a risky place to touch on a whim.
+
+### 5. THE EMAIL REDACTION FROM 03:20 STANDS
+Detail is in that entry. The new scan is what keeps it from quietly returning.
+
+The realized lines in this morning's 09:45 email are still the one thing neither of us can test early.
