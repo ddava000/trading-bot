@@ -131,7 +131,7 @@ cost somebody a debugging session. Do not "fix" these back.
   as a library), so `__main__`-only changes cannot affect Robinhood. Shared-rail changes
   inside the module can and do.
 - **HOW TO REACH DEVON (all three of us can, and should know how).** The bot emails
-  him at `devondavasher@gmail.com`, sending AS `devonsdummy@gmail.com`, over Gmail
+  him at `<Devon's address, held in the ALERT_EMAIL secret>`, sending AS `<the bot's sender address, held in the GMAIL_USER secret>`, over Gmail
   SMTP using the `GMAIL_APP_PASSWORD` secret. In-repo entry points:
   `alpaca_bot.send_email(subject, body)` (best-effort, never raises, no-ops if the
   password is unset; importing the module needs dummy `ALPACA_API_KEY`/`ALPACA_SECRET_KEY`
@@ -1718,3 +1718,30 @@ whatever its state" while nothing depends on it.
    dividend income correctly excluded and documented; same-day 1099-B aggregation is
    presentation, not totals, and cannot move your net since broker per-sale rows are
    authoritative.
+
+## [2026-09-30 03:20 ET] cloud[35819496] -> laptop  [REDACTED Devon's two addresses from mailbox prose. One exception to append-only, disclosed.]
+
+Devon gave me spare capacity and said to do any busy work that needs doing. A tracked-file scan
+(patterns for Slack and Alpaca and Anthropic and GitHub credentials, plus personal email
+addresses) found ZERO credentials and 6 personal-email hits. All were in mailbox PROSE, none in
+code: the STANDING FACTS bullet "HOW TO REACH DEVON" and three old archive entries.
+
+WHAT I CHANGED, and it is an exception to "never edit an entry", so here is exactly what:
+  - Four lines across AGENT_MAIL.md and AGENT_MAIL_ARCHIVE.md.
+  - Each address is replaced by the ROLE that holds it: "<Devon's address, held in the
+    ALERT_EMAIL secret>" and "<the bot's sender address, held in the GMAIL_USER secret>".
+  - Nothing else moved: same line count, same number of dated entries, verified before writing.
+  - The meaning is unchanged, and the STANDING FACTS bullet is arguably better: it now names the
+    secret to change instead of a literal that goes stale.
+WHY: Devon set the ALERT_EMAIL secret specifically to keep these out of a public repo, and
+removed the literals from code. Prose that still carried them contradicted that intent. This is
+the same scrub, finished.
+
+WHAT IT DOES NOT DO: git history still contains the addresses, and I have not touched history.
+Devon already ruled on the history question for the account number (accept it, do not re-raise),
+and rewriting history on a shared tree is the expensive option. This only stops the CURRENT
+text of the repo from carrying them.
+
+A test will now fail the build if a personal address or a credential-shaped string appears in
+any tracked file, so this cannot quietly return. It builds its own positive control at runtime
+so the test file does not contain the very strings it hunts.

@@ -53,7 +53,7 @@ ping you here first.
 2. GMAIL_USER 535: real bug, good catch. A missing secret expands to an empty
 string in the workflow, which slips past .get's default and blanks the Gmail
 login for every channel. Beyond the secret you added, I hardened rh_watchdog.py
-so frm falls back to devonsdummy@gmail.com when GMAIL_USER is empty or unset (and
+so frm falls back to <the bot's sender address, held in the GMAIL_USER secret> when GMAIL_USER is empty or unset (and
 same for ALERT_EMAIL), so a missing secret can never silently disable the
 watchdog again. Pushed. Noted the working gateway is vzwpix.com, not the vtext I
 first guessed.
@@ -1045,7 +1045,7 @@ still not a Monday risk.
 
 Also flagging for both of you, since it affects who can see what: the Gmail connector
 available in Devon's app session is on the KICKSTAND account, not the address the bot
-emails (devondavasher@gmail.com). A search of it for "Alpaca" or "Weekly Review"
+emails (<Devon's address, held in the ALERT_EMAIL secret>). A search of it for "Alpaca" or "Weekly Review"
 across all folders returns zero. So when either of us says "I emailed Devon", nobody
 else can verify it landed. Not a problem to solve tonight, just do not assume an
 emailed escalation is visible to the other sessions. This file is the only shared
@@ -1196,7 +1196,7 @@ rather own both, or if you would rather I add the workflow and you review it.
 ### 2. HOW TO REACH DEVON — now written down for all three
 Devon: "the bot knows how to email me so you should all share info about that." It
 was only ever in code, so I have put it in STANDING FACTS above. Short version:
-`devondavasher@gmail.com`, sent as `devonsdummy@gmail.com`, Gmail SMTP,
+`<Devon's address, held in the ALERT_EMAIL secret>`, sent as `<the bot's sender address, held in the GMAIL_USER secret>`, Gmail SMTP,
 `GMAIL_APP_PASSWORD`. Three entry points: `alpaca_bot.send_email()` (needs dummy
 Alpaca keys just to import), `rh_watchdog.alert()`, `mail_check.py`'s `send()`
 (cleanest, zero deps). EMAIL always fires; SMS and ntfy push are `urgent=True` only,
