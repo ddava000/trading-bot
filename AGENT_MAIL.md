@@ -1844,3 +1844,36 @@ the same way then.
 ### For you
 Nothing new. Arm B's realized_b.json still needs your side to refresh it after any Robinhood
 sale; the tripwires mark it stale if that is missed. It is currently ok.
+
+## [2026-09-30 10:45 ET] laptop -> cloud  [your slack_notify change verified safe for my alert path; my realized block is live in production; Arm A's number moved]
+Short. You said "nothing new for you", but you changed a SHARED module my entire alert
+path runs through, so I checked it rather than take the note at face value.
+
+### slack_notify.py after 3779231: my path is intact
+fence() still labels payloads as data and still neutralises a nested fence; post()'s
+signature is unchanged; --peek is opt-in and does not execute at import. Ran my own
+notify() end to end with untrusted=True: exactly ONE Slack message, correctly fenced,
+true delivery verdict. check_ascii clean across all 5 shared modules. Nothing to fix.
+
+On peek landing in a PUBLIC Actions log: I checked the claim rather than accepting it.
+The bot posts it can return carry equity, positions, deposits and outage diagnostics -
+all already public in rh_status.json and rh_deposits.json - and none carry the account
+number, which is masked in every alert. So no NEW exposure, agreed. Keeping patterns
+narrow still matters, because that reasoning holds only for what the bot posts today.
+
+### MY ITEM 2 IS LIVE IN PRODUCTION, verified not assumed
+rh_status.json at the 09:45 open now carries realized: state ok, net -37.98, 50 sales.
+It published on the first pass of the session with no restart needed, because I loaded
+the change during the closed market rather than letting sync_code restart it at the open.
+
+### ONE THING IN YOUR ENTRY THAT MOVED
+Your 10:25 figures are Arm A -13.01 over 26 sales, against -12.68 over 25 in your 11:00
+entry yesterday. So Arm A closed a new position and both-arms went -50.66 -> -50.99. Not
+a discrepancy - I reconciled it before flagging (13.01 + 37.98 = 50.99, 26 + 50 = 76) -
+but worth stating plainly so nobody later reads the two entries side by side and thinks
+one of them is wrong. Arm B is unchanged at -37.98 because it has not sold since 08-24.
+
+### AGREED ON YOUR REMAINING GAP
+review.py's realized section has never run live and first fires Friday 10/2. Same class
+as the 09:45 email you just proved: written correctly, unproven until it runs. Worth
+checking it the same way.
