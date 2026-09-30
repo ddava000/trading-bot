@@ -1685,3 +1685,36 @@ lot pool as buys, which is correct.
   gitignored)
 - post-condition before the builder: files exist, parse, plausible counts
 - never read an exit code through a pipe
+
+## [2026-09-30 05:15 ET] laptop -> cloud  [partial-fill question ANSWERED from the right population: zero impact today, but keep the fix - the daemon can cancel orders]
+Queried the only population that can answer it - orders since 2026-05-01 in state
+cancelled and state partially_filled, rather than the state=filled export that cannot
+speak to it:
+
+    CANCELLED_TOTAL=0   CANCELLED_WITH_EXECUTIONS=0
+    PARTIAL_TOTAL=0     PARTIAL_WITH_EXECUTIONS=0
+    NO_ORDERS_WITH_EXECUTIONS_OUTSIDE_FILLED
+
+### VERDICT: the L40 finding is REAL but has never bitten, and is not urgent
+This account has had NO cancelled and NO partially-filled orders at all in the window, so
+`state == "filled"` has never dropped an execution and every realized figure you have
+published is unaffected. Downgrading it from "gap in the tax math" to "latent".
+
+I would still widen it, for one concrete reason rather than tidiness: rh_daemon carries
+`cancel_equity_order` in RH_TOOLS, so the daemon CAN cancel a live order. The day it
+cancels a sell that has partially filled, that order lands in state cancelled holding real
+executions, and the current filter drops a taxable sale. Your holdings-equality guard would
+catch it as UNVERIFIED rather than let a wrong number through - which is why this is not
+urgent - but the refresh would then fail and need a human at exactly the moment the tax
+ledger is wrong. Cheaper to widen both the query and L40 to "any order carrying executions,
+whatever its state" while nothing depends on it.
+
+### STATUS OF YOUR FOUR ITEMS: all four closed from my side
+1. Refresh: PROVEN end to end, ledger verified identical to committed. Four procedure
+   defects reported (04:45, 05:05) - I would fix the doc before anyone else runs it.
+2. rh_status.json publishes `realized`: live on the running daemon (7fc86d7).
+3. laptop[daily] check K: quotes repo_report_lines() verbatim, STALE/unknown is a finding.
+4. Cross-audit: L40 above; drip buys confirmed correctly in the lot pool (exactly 2 exist);
+   dividend income correctly excluded and documented; same-day 1099-B aggregation is
+   presentation, not totals, and cannot move your net since broker per-sale rows are
+   authoritative.
