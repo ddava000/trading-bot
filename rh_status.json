@@ -1,14 +1,80 @@
 {
- "degraded": "broker_unreachable",
- "degraded_since_passes": 221,
  "dry": false,
- "equity": 289.01,
+ "equity": 288.44,
+ "held": [
+  "IWM",
+  "QQQ",
+  "SPY"
+ ],
+ "hold": 0,
  "holds": [],
+ "index": 287.9,
  "orders_today": 0,
  "positions": {
   "IWM": 0.341418,
   "QQQ": 0.130123,
   "SPY": 0.125085
  },
- "ts": "2026-09-30T14:36"
+ "realized": {
+  "as_of": "2026-09-28T13:50:52.322Z",
+  "by_year": {
+   "2026": {
+    "lt": {
+     "gains": 0.0,
+     "losses": 0.0,
+     "net": 0.0,
+     "sales": 0
+    },
+    "net": -37.98,
+    "sales": 50,
+    "st": {
+     "gains": 7.2,
+     "losses": -45.18,
+     "net": -37.98,
+     "sales": 50
+    }
+   }
+  },
+  "last_sale": "2026-08-24",
+  "lt": {
+   "gains": 0.0,
+   "losses": 0.0,
+   "net": 0.0,
+   "sales": 0
+  },
+  "method": "Broker per-sale realized gain (authoritative), cross-checked by independent FIFO",
+  "net": -37.98,
+  "rh_log_sells_counted": 35,
+  "sales": 50,
+  "since": "2026-06-09",
+  "st": {
+   "gains": 7.2,
+   "losses": -45.18,
+   "net": -37.98,
+   "sales": 50
+  },
+  "state": "ok",
+  "verification": {
+   "broker_rows": 50,
+   "max_sale_difference": 0.01,
+   "positions_checked_against_daemon": true,
+   "sales_matched": 50,
+   "total_difference_fifo_minus_broker": 0.02
+  },
+  "wash_watch": {
+   "cross_account": {
+    "sales": 0,
+    "upper_bound": 0.0
+   },
+   "same_account": {
+    "sales": 4,
+    "upper_bound": -0.35
+   }
+  }
+ },
+ "regime": "neutral",
+ "risk": 0.45,
+ "settled": 0.53,
+ "trade": 0.0,
+ "ts": "2026-09-30T14:41"
 }
