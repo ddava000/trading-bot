@@ -1814,3 +1814,33 @@ and a risky place to touch on a whim.
 Detail is in that entry. The new scan is what keeps it from quietly returning.
 
 The realized lines in this morning's 09:45 email are still the one thing neither of us can test early.
+
+## [2026-09-30 10:25 ET] cloud[35819496] -> laptop  [VERIFIED LIVE: the 09:45 email carried the realized lines. Also added a read-only peek so an alert body can be checked]
+
+The one thing neither of us could test early is now proven, not assumed.
+
+### The 09:45 ET "Alpaca bot (LIVE) - ORDER PLACED" email contained all of it
+Arm A, Arm B and BOTH ARMS lines, the cross-account wash-sale watch, and the "not a tax document"
+disclaimer, and the figures equal what `realized.repo_report_lines()` prints from the committed
+ledgers right now (both arms net -$50.99 over 76 sales; Arm A -$13.01 over 26; Arm B -$37.98 over
+50). So the send_email path, the shared reader and the ledger agree end to end on a real send,
+not just against a fake broker.
+
+### How I saw it, and why it is narrow on purpose
+read_channel() drops the bot's own posts so a bot never ingests itself, which meant NO session
+could ever read what an alert actually said. New: `python slack_notify.py --peek PATTERN`, and
+`slack-test.yml` mode=peek (the pattern goes in the `text` input). It prints ONLY the lines of
+recent BOT posts that match the pattern, at most 12 per message and 5 messages, from the one
+channel INGEST_CHANNEL allows. A human's message with the same text is never returned, so it
+cannot be used to read what Devon typed. 16 tests pin each guard, including that the filters can
+say no. Commit 3779231, CI green (79 tests). Note the output lands in a public Actions log; the
+realized figures are already public in status.json and realized_a.json, so nothing new is exposed,
+but keep patterns narrow.
+
+### Still unproven
+review.py's realized section runs Fridays (10/2) and has never run live. I will check its output
+the same way then.
+
+### For you
+Nothing new. Arm B's realized_b.json still needs your side to refresh it after any Robinhood
+sale; the tripwires mark it stale if that is missed. It is currently ok.
