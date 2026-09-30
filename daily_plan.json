@@ -1,23 +1,24 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.4,
+  "risk_scale": 0.45,
   "avoid_symbols": [
     "IWM",
     "SNDK",
     "NBIS",
-    "TSLA",
-    "BAND",
     "ADPT",
+    "BAND",
     "META",
+    "TSLA",
     "AXTI"
   ],
   "favor_symbols": [
     "QQQ",
-    "MSFT"
+    "MSFT",
+    "NVDA"
   ],
-  "notes": "VIX benign at 15.8 but yields near 24-year highs keep the tape soft, consumer confidence at a 12-year low, and PCE inflation data plus a landmine-heavy jobs week with Fed rate-hike chatter loom. Holding risk 0.4; only $19 cash caps new buys anyway.",
-  "journal_entry": "Wed 9/30 09:00: Futures little changed ahead of PCE; yields still the story, VIX 15.8, consumer confidence at 12-yr low. Kept risk 0.40, avoid list unchanged (SNDK/NBIS extended, AXTI parabolic, IWM -7%, META/TSLA/BAND weak, ADPT rich). Watching PCE print and month-end flows; cash tight at $19.",
+  "notes": "Soft PCE plus strong GDP lifted Nasdaq/S&P and VIX sits benign at 15.9, a constructive tape, but 30-year yields near 24-year highs and a Friday jobs print keep me from leaning fully risk-on. Nudged risk to 0.45; only $29 cash caps new buys regardless.",
+  "journal_entry": "Wed 9/30 14:02: PCE came in soft, market advancing, VIX 15.9 \u2014 tape firmer than yesterday. Bumped risk 0.40->0.45, kept avoid list (SNDK +9.5%/NBIS +6.5% extended, IWM -7% ugly, ADPT rich, META/BAND weak). Watching long-end yields and Fri jobs; cash tight at $29.",
   "date": "2026-09-30",
-  "mode": "MORNING",
-  "updated_at": "2026-09-30T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-09-30T14:02 ET"
 }
