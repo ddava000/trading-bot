@@ -960,6 +960,25 @@ def persist(led, res, placed):
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
                  "holds": sorted(led.get("holds") or {}),
                  "orders_today": led.get("orders_today", 0), "dry": DRY})
+
+    # REALIZED (taxable) gain/loss, for Devon's tax tracking. Devon asked both arms to
+    # carry a running realized total; cloud built the shared reader and asked the laptop
+    # to publish Arm B's here so every reader of rh_status.json sees it, not just
+    # whoever runs a report. Equity change is NOT this: equity includes unrealized
+    # paper movement, and only positions actually SOLD are taxable.
+    #
+    # Imported LAZILY and wrapped: this is a REPORTING field on a live-money trading
+    # daemon. A missing file, a bad parse or an exception inside realized.py must never
+    # be able to stop a pass from publishing, let alone from trading. On any failure we
+    # publish an explicit unknown rather than omitting the key, because an ABSENT block
+    # and a ZERO block must not look alike to a reader - the same distinction cloud was
+    # careful about with capital_flow, and that this repo has got wrong before.
+    try:
+        import realized
+        snap["realized"] = realized.arm_b_block()
+    except Exception as e:
+        snap["realized"] = {"state": "unknown", "error": str(e)[:160],
+                            "note": "realized block could not be built; NOT zero, unknown"}
     _save(STATUS_F, snap)                     # local write every pass: free, instant
     traded = False
     if placed or res.get("orders"):
