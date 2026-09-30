@@ -1,6 +1,7 @@
 {
  "dry": false,
  "equity": 289.01,
+ "equity_source": "broker_total_value",
  "held": [
   "IWM",
   "QQQ",
@@ -8,7 +9,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 288.52,
+ "index": 287.93,
  "orders_today": 0,
  "positions": {
   "IWM": 0.341418,
@@ -76,5 +77,6 @@
  "risk": 0.4,
  "settled": 0.53,
  "trade": 0.0,
- "ts": "2026-09-30T10:20"
+ "ts": "2026-09-30T10:36",
+ "unsettled_excluded_from_buying_power": 0.55
 }
