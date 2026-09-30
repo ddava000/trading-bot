@@ -1942,3 +1942,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: Soft PCE plus strong GDP lifted Nasdaq/S&P and VIX sits benign at 15.9, a constructive tape, but 30-year yields near 24-year highs and a Friday jobs print keep me from leaning fully risk-on. Nudged risk to 0.45; only $29 cash caps new buys regardless.
 - journal: Wed 9/30 14:02: PCE came in soft, market advancing, VIX 15.9 — tape firmer than yesterday. Bumped risk 0.40->0.45, kept avoid list (SNDK +9.5%/NBIS +6.5% extended, IWM -7% ugly, ADPT rich, META/BAND weak). Watching long-end yields and Fri jobs; cash tight at $29.
+
+### 2026-09-30T16:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: EOD close: soft PCE and upward GDP revision kept Nasdaq/S&P green and VIX benign at 16.4, a constructive tape, but 30-year yields at a 24-year high and Friday's jobs print cap enthusiasm. Holding risk 0.45; only $29 cash limits new buys regardless.
+- journal: Wed 9/30 16:12: Month-end close, indices firm on soft PCE, VIX 16.4. Kept risk 0.45. Added BE to avoid (slumped on Fremont news); SNDK +9.7%/NBIS +5.6% extended, IWM -7.9% ugly, ADPT rich, META weak on OpenAI-Muse worry. Watching long-end yields and Fri jobs; cash tight at $29.
