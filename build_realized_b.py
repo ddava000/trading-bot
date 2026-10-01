@@ -37,7 +37,10 @@ def _ts(x):
 
 
 def build(orders, trades, status=None, rh_log="rh_trade_log.jsonl"):
-    filled = [o for o in orders if o.get("state") == "filled" and o.get("executions")]
+    # Any order that carries executions, WHATEVER its final state. A sell cancelled after a
+    # partial fill still sold shares and is still taxable; filtering on state == "filled" would
+    # drop it and silently understate the lots sold. An order with no executions never traded.
+    filled = [o for o in orders if o.get("executions")]
     fills = [{"t": e["timestamp"], "symbol": o["symbol"], "side": o["side"], "qty": e["quantity"],
               "price": e["price"], "order": o["id"], "agent": o.get("placed_agent")}
              for o in filled for e in o["executions"]]
