@@ -1972,3 +1972,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: Session closing constructive: indices rallied as Treasury yields eased from 24-year highs and chips gained, VIX benign at 16.5. But Friday's jobs report and persistent Fed rate-hike chatter keep me neutral at 0.45; $28 cash caps new buys regardless.
 - journal: Thu 10/1 16:25: Day flat into close, VIX 16.5, tape finished green on easing yields and chip rally. Kept risk 0.45 and avoid list intact (SNDK +12.6% very extended, NBIS +4.2% extended, IWM -7.3% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching tomorrow's jobs print and long-end yields; cash tight at $28.
+
+### 2026-10-01T18:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: After-hours wrap: indices closed slightly higher on easing yields from 24-year highs and a chip rally, VIX benign at 16.4. Friday's jobs report plus Fed rate-hike chatter are the key overnight risks, so I hold neutral at 0.45; $28 cash caps new buys anyway.
+- journal: Thu 10/1 18:02: Day finished flat, VIX 16.4, tape green on easing long-end yields and chip strength. Kept risk 0.45 and avoid list intact (SNDK +12.4% very extended, NBIS +4.4% extended, IWM -7.3% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching Friday's jobs print and long-end yields; cash tight at $28.
