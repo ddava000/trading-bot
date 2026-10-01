@@ -58,9 +58,10 @@ def main():
     # ── Logged entry context (the "why") ──────────────────────────────────────
     log = []
     if os.path.exists("trade_log.jsonl"):
-        for line in open("trade_log.jsonl"):
-            try: log.append(json.loads(line))
-            except Exception: pass
+        with open("trade_log.jsonl", encoding="utf-8") as _lf:
+            for line in _lf:
+                try: log.append(json.loads(line))
+                except Exception: pass
     wk_log    = [t for t in log if t.get("ts", "") >= (et - timedelta(days=7)).strftime("%Y-%m-%d")]
     log_buys  = [t for t in wk_log if t.get("side") == "buy"]
     meme_buys = [t for t in log_buys if t.get("meme")]

@@ -132,16 +132,23 @@ def main():
     ap.add_argument("--rh-log", default="rh_trade_log.jsonl")
     ap.add_argument("--out", default="realized_b.json")
     a = ap.parse_args()
-    orders = json.load(open(a.orders, encoding="utf-8"))["data"]["orders"]
-    trades = json.load(open(a.pnl, encoding="utf-8"))["data"]["trades"]
-    status = json.load(open(a.status, encoding="utf-8")) if os.path.exists(a.status) else None
+    def _load(path):
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    orders = _load(a.orders)["data"]["orders"]
+    trades = _load(a.pnl)["data"]["trades"]
+    status = _load(a.status) if os.path.exists(a.status) else None
     led = build(orders, trades, status, a.rh_log)
     new = json.dumps(led, indent=1, sort_keys=True)
-    old = open(a.out, encoding="utf-8").read() if os.path.exists(a.out) else ""
+    old = ""
+    if os.path.exists(a.out):
+        with open(a.out, encoding="utf-8") as fh:
+            old = fh.read()
     if new != old:                       # deterministic: only changes when the data does
-        open(a.out, "w", encoding="utf-8").write(new)
+        with open(a.out, "w", encoding="utf-8") as fh:
+            fh.write(new)
     s = led["summary"]
-    print(R.report_line("Arm B", s))
+    print(R.report_line("Arm B", s, watch=led["wash_watch"]))
     print("state=%s  %s" % (s["state"], s.get("reason", "")))
     print("verification:", json.dumps(s["verification"]))
     return 0 if s["state"] == "ok" else 1

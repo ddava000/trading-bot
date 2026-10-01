@@ -326,5 +326,113 @@ class ReaderTests(unittest.TestCase):
         self.assertNotIn("$0.00", text)
 
 
+class YearBoundaryTests(unittest.TestCase):
+    """January 1 is when the running total restarts and when a December loss can meet a
+    January repurchase. None of this can be observed live for three months, so it is pinned now."""
+
+    DEC_LOSS = [F("2026-12-01T15:00:00Z", "IWM", "buy", 10, 10.0, "b1"),
+                F("2026-12-28T15:00:00Z", "IWM", "sell", 10, 9.0, "s1"),     # -10.00, sold in 2026
+                F("2027-01-05T15:00:00Z", "IWM", "buy", 10, 9.0, "b2")]      # repurchase in 2027
+
+    def test_a_december_loss_with_a_january_repurchase_is_flagged_and_stays_in_2026(self):
+        closed = R.fifo(self.DEC_LOSS)["closed"]
+        watch = R.wash_watch(closed, self.DEC_LOSS)
+        self.assertEqual(len(watch), 1)                         # the 30-day window crosses the year end
+        self.assertEqual(watch[0]["sale_date"], "2026-12-28")
+        self.assertEqual(R.wash_totals(R.watch_for_year(watch, 2026))["same_account"]["upper_bound"], -10.0)
+        self.assertEqual(R.wash_totals(R.watch_for_year(watch, 2027))["same_account"]["sales"], 0)
+
+    def test_the_year_filter_can_say_no(self):
+        """Positive control: a year with no sales yields nothing, and a missing list is not an error."""
+        watch = R.wash_watch(R.fifo(self.DEC_LOSS)["closed"], self.DEC_LOSS)
+        self.assertEqual(R.watch_for_year(watch, 2025), [])
+        self.assertEqual(R.watch_for_year(None, 2026), [])
+
+    def test_the_new_years_line_does_not_inherit_last_years_wash_flag(self):
+        closed = R.fifo(self.DEC_LOSS)["closed"]
+        watch = R.wash_watch(closed, self.DEC_LOSS)
+        blk = {"state": "ok", "by_year": R.summarize_by_year(closed)}
+        self.assertIn("possibly wash-sale", R.report_line("A", blk, 2026, watch))
+        line27 = R.report_line("A", blk, 2027, watch)
+        self.assertIn("(0 sales)", line27)
+        self.assertNotIn("wash", line27)
+
+    def test_without_the_list_all_time_totals_are_labelled_all_years(self):
+        """A status block carries only all-time wash totals. Across years that must say so,
+        not pass last year's exposure off as this year's."""
+        closed = R.fifo(self.DEC_LOSS)["closed"]
+        blk = {"state": "ok", "by_year": R.summarize_by_year(closed),
+               "wash_watch": R.wash_totals(R.wash_watch(closed, self.DEC_LOSS))}
+        self.assertIn("(all years)", R.report_line("A", blk, 2027))
+        self.assertNotIn("(all years)", R.report_line("A", blk, 2026))     # the only year: nothing to disclaim
+
+    def test_yearly_totals_add_up_to_the_all_time_total(self):
+        fills = self.DEC_LOSS[:2] + [F("2027-01-05T15:00:00Z", "IWM", "buy", 10, 9.0, "b2"),
+                                     F("2027-01-20T15:00:00Z", "IWM", "sell", 10, 12.0, "s2")]
+        closed = R.fifo(fills)["closed"]
+        by = R.summarize_by_year(closed)
+        allt = R.summarize(closed)
+        self.assertEqual(sorted(by), ["2026", "2027"])
+        self.assertAlmostEqual(sum(b["st"]["net"] for b in by.values()), allt["st"]["net"], places=2)
+        self.assertEqual(sum(b["st"]["sales"] for b in by.values()), allt["st"]["sales"])
+
+    def test_the_sale_year_is_the_new_york_year_not_the_utc_year(self):
+        """9pm New York on Dec 31 is already Jan 1 in UTC; the sale is a 2026 sale."""
+        buy = F("2026-12-30T15:00:00Z", "X", "buy", 1, 10.0, "b")
+        late_dec = R.fifo([buy, F("2027-01-01T02:30:00Z", "X", "sell", 1, 11.0, "s")])["closed"]
+        self.assertEqual(sorted(R.summarize_by_year(late_dec)), ["2026"])
+        new_year = R.fifo([buy, F("2027-01-01T06:30:00Z", "X", "sell", 1, 11.0, "s")])["closed"]
+        self.assertEqual(sorted(R.summarize_by_year(new_year)), ["2027"])
+
+    def _ledgers(self, d):
+        """A 2026 December loss in Arm A, and Arm B buying the same symbol in January."""
+        p = lambda n: os.path.join(d, n)
+        closed = R.fifo(self.DEC_LOSS)["closed"]
+        by_a = R.summarize_by_year(closed)
+        z = {"st": {"gains": 0.0, "losses": 0.0, "net": 0.0, "sales": 0},
+             "lt": {"gains": 0, "losses": 0, "net": 0, "sales": 0}}
+        def dump(name, obj):
+            with open(p(name), "w", encoding="utf-8") as fh:
+                json.dump(obj, fh)
+        dump("realized_a.json", {"summary": {"state": "ok", "by_year": by_a}, "closed": closed,
+                                 "wash_watch": R.wash_watch(closed, self.DEC_LOSS),
+                                 "buys": [], "open": {}})
+        dump("realized_b.json", {"summary": {"state": "ok", "rh_log_sells_counted": 0,
+                                             "by_year": {"2026": z}},
+                                 "closed": [], "wash_watch": [],
+                                 "buys": [{"t": "2027-01-10", "symbol": "IWM", "qty": 1.0}], "open": {}})
+        dump("status.json", {"realized": {"state": "ok", "by_year": by_a}})
+        with open(p("rh_trade_log.jsonl"), "w", encoding="utf-8") as fh:
+            fh.write("")
+        return dict(status_path=p("status.json"), a_ledger=p("realized_a.json"),
+                    b_ledger=p("realized_b.json"), log_path=p("rh_trade_log.jsonl"))
+
+    def test_january_keeps_last_years_final_figures_in_view(self):
+        kw = self._ledgers(tempfile.mkdtemp())
+        text = "\n".join(R.repo_report_lines(today=date(2027, 1, 15), **kw))
+        self.assertIn("Arm A (Alpaca) 2027 realized, short-term: gains $0.00, losses $0.00, net $0.00 (0 sales)", text)
+        self.assertIn("Prior tax year 2026 (still open for filing):", text)
+        prior = text.split("Prior tax year 2026")[1]
+        self.assertIn("Arm A (Alpaca) 2026 realized", prior)
+        self.assertIn("losses -$10.00", prior)
+        self.assertIn("up to $10.00 possibly wash-sale", prior)
+        self.assertIn("Cross-account wash-sale watch 2026", prior)         # Arm A's Dec loss vs Arm B's Jan buy
+        self.assertNotIn("Cross-account", text.split("Prior tax year 2026")[0])   # the new year has none
+
+    def test_prior_year_lines_end_after_the_filing_window(self):
+        kw = self._ledgers(tempfile.mkdtemp())
+        late = "\n".join(R.repo_report_lines(today=date(2027, 11, 15), **kw))
+        self.assertNotIn("Prior tax year", late)
+        self.assertNotIn("2026 realized", late)
+        edge = "\n".join(R.repo_report_lines(today=date(2027, 10, 31), **kw))
+        self.assertIn("Prior tax year 2026", edge)                          # last day still shown
+
+    def test_no_prior_year_block_when_the_prior_year_had_no_sales(self):
+        kw = self._ledgers(tempfile.mkdtemp())
+        text = "\n".join(R.repo_report_lines(today=date(2026, 9, 30), **kw))
+        self.assertNotIn("Prior tax year", text)                            # 2025 had no sales
+        self.assertIn("Arm A (Alpaca) 2026 realized", text)
+
+
 if __name__ == "__main__":
     unittest.main()

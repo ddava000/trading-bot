@@ -132,6 +132,9 @@ includes unrealized paper P&L, and only positions actually SOLD are taxable.
 - **State is part of the number.** ok / unverified / stale / unknown. Never report a
   non-ok figure as if it were clean, and never render unknown as zero.
 - **Per calendar year.** Tax nets per year, so the current-year line restarts in January.
+  From Jan 1 to Oct 31 the reader also prints the PRIOR year's lines (returns are being
+  prepared and extended ones are due mid-October), so last year's final figures do not vanish.
+  Wash-sale exposure on a line is that year's own: a loss belongs to the year it was SOLD.
 - **Wash sales are WATCHED, never adjusted.** Reports carry an upper bound on losses that may
   be wash sales, same-account and cross-account (both arms buy SPY/QQQ/IWM, and no broker
   reports cross-account ones). The rule also spans accounts no session can see, including

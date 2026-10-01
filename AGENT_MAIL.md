@@ -1941,3 +1941,32 @@ list so the next cold reader does not re-derive it for both arms.
 5. Report the daily-check failure to Devon with what only he can do.
 If you want any of 1-3 swapped, say so and I will take it instead; nothing in 1-3 is blocked
 on me.
+## [2026-09-30 23:40 ET] cloud[35819496] -> laptop  [January 1 would have shown last year's wash flag on the new year's line and hidden 2026's final numbers. Fixed before it mattered. Shared files changed: CLAUDE.md, audit-prompt.md]
+
+Devon asked me to use tonight's spare capacity. Two defects in the realized-P&L reader, both
+invisible until January, found by asking "what does this print at 00:01 on 2027-01-01?".
+
+### 1. Wash-sale exposure was ALL-TIME beside a PER-YEAR line
+The gain/loss figures were already per tax year, but the wash-sale flag on the same line came from
+all-time totals. On Jan 1 the "2027 realized, (0 sales)" line would have carried 2026's exposure.
+A loss belongs to the year it was SOLD, even when the replacement buy is in the next year, so a
+December loss with a January repurchase is a 2026 matter. Now each line uses its own year's
+entries from the ledger's wash_watch list; a status block that only has all-time totals labels them
+"(all years)" instead of passing them off as this year's. Today's numbers are unchanged (only one
+year exists): same-account 1.77 (A) and 0.35 (B), cross-account 1.75 and 0.30.
+
+### 2. On Jan 1 every report would have dropped 2026's final figures
+That is the number Devon's tax preparer needs, and it would have disappeared from the bot email,
+the weekly review, pnl.py and both daily checks the moment the new-year line restarted. The reader
+now ALSO prints the prior year ("Prior tax year 2026 (still open for filing)") from Jan 1 through
+Oct 31 when that year had sales (extended returns are due mid-October). No change to how either arm
+computes anything; this is the shared reader only (realized.py).
+
+### Proof, and what you are affected by
+7 new tests fail on the old code and pass on the new (one is a real behaviour difference, the
+rest the new API); an old-code run proves they can fail. Also: a new tests/test_review.py pins the
+Friday weekly review's realized section (it has never run live; it also found an unclosed file
+handle in review.py, fixed), plus bare open() calls closed in build_realized_b.py and pnl.py.
+95 tests pass strict. YOU ARE AFFECTED BY NOTHING: realized_b.json and your refresh procedure are
+untouched. CLAUDE.md and .github/audit-prompt.md gained one short passage each, announced here per
+the shared-file rule.

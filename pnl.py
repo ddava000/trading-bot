@@ -117,7 +117,8 @@ def arm_b():
 
 
 def deposits():
-    d = json.load(open("rh_deposits.json"))
+    with open("rh_deposits.json", encoding="utf-8") as fh:
+        d = json.load(fh)
     w = d["experiment_window"]
     ev = sorted((e["date"], float(e["amount"]), e.get("confidence")) for e in d["events"])
     return float(w["start_equity"]), ev, w

@@ -275,17 +275,34 @@ def tax_year():
     return datetime.now(_ET).year if _ET is not None else datetime.now().year
 
 
+def _today_et():
+    """Today's NEW YORK date (the same clock tax_year uses)."""
+    return datetime.now(_ET).date() if _ET is not None else date.today()
+
+
+def watch_for_year(watch, year):
+    """The wash_watch entries whose SALE fell in `year`. A loss belongs to the year it was
+    sold in, even when the replacement purchase lands in the next one, so a December loss
+    with a January repurchase is a prior-year matter and must not leak into the new year."""
+    y = str(year)
+    return [w for w in (watch or []) if str(w.get("sale_date", ""))[:4] == y]
+
+
 def money(x):
     x = float(x or 0.0)
     return ("-$%s" % format(abs(x), ",.2f")) if x < 0 else ("$%s" % format(x, ",.2f"))
 
 
-def report_line(label, s, year=None):
+def report_line(label, s, year=None, watch=None):
     """One line any report can print. Never renders a missing or failed number as zero.
 
     Reports the CURRENT TAX YEAR (or `year`) when the block carries by_year, because the
     IRS nets per calendar year and a running total that never resets would mislead after
     January 1. Falls back to the all-time figures for a block without by_year.
+
+    watch is the ledger's wash_watch LIST. Given it, the wash-sale flag is that year's own
+    exposure. Without it, a block that spans several years only has all-time wash totals,
+    and those are labelled "all years" rather than passed off as this year's.
     """
     if not s:
         return "%s: realized total NOT AVAILABLE (never computed)" % label
@@ -311,15 +328,19 @@ def report_line(label, s, year=None):
         flags.append("STALE, last good %s" % s.get("as_of", "?"))
     if state == "unverified":
         flags.append("UNVERIFIED: %s" % s.get("reason", "does not reconcile"))
-    w = s.get("wash_watch") or {}
+    spans_years = by is not None and bool(set(by) - {yr})
+    if watch is not None:
+        w, suffix = wash_totals(watch_for_year(watch, yr)), ""
+    else:
+        w, suffix = s.get("wash_watch") or {}, (" (all years)" if spans_years else "")
     same = (w.get("same_account") or {}).get("upper_bound", 0.0)
     cross = (w.get("cross_account") or {}).get("upper_bound", 0.0)
     if same or cross:
         bits = []
         if same:
-            bits.append("up to %s possibly wash-sale" % money(abs(same)))
+            bits.append("up to %s possibly wash-sale%s" % (money(abs(same)), suffix))
         if cross:
-            bits.append("up to %s cross-account" % money(abs(cross)))
+            bits.append("up to %s cross-account%s" % (money(abs(cross)), suffix))
         flags.append("; ".join(bits))
     if flags:
         line += " [" + " | ".join(flags) + "]"
@@ -444,19 +465,35 @@ def combined_line(a, b, year=None):
     return line
 
 
-def cross_totals(ledger_a, ledger_b):
-    """Loss-sale exposure BETWEEN the accounts, upper bound, both directions."""
+def cross_totals(ledger_a, ledger_b, year=None):
+    """Loss-sale exposure BETWEEN the accounts, upper bound, both directions. With `year`,
+    only losses SOLD in that year (see watch_for_year)."""
     if not ledger_a or not ledger_b:
         return None
     ab = cross_watch(ledger_a, ledger_b)      # A's losses vs B's later/earlier buys
     ba = cross_watch(ledger_b, ledger_a)
+    if year is not None:
+        ab, ba = watch_for_year(ab, year), watch_for_year(ba, year)
     return {"a_losses_vs_b_buys": {"sales": len(ab), "upper_bound": round(sum(w["upper_bound"] for w in ab), 2)},
             "b_losses_vs_a_buys": {"sales": len(ba), "upper_bound": round(sum(w["upper_bound"] for w in ba), 2)}}
 
 
+def _has_sales(block, year):
+    by = (block or {}).get("by_year") or {}
+    y = by.get(str(year)) or {}
+    return bool((y.get("st") or {}).get("sales") or (y.get("lt") or {}).get("sales"))
+
+
+# Last day, in the year AFTER the sales, that the prior tax year's lines are still printed.
+# Tax returns are prepared in Jan-Apr and extended ones are due mid-October, so the final prior-year
+# numbers must not vanish from every report on January 1, which is when the current-year lines
+# restart from zero.
+PRIOR_YEAR_THROUGH = (10, 31)
+
+
 def repo_report_lines(a_block=None, year=None, status_path="status.json",
                       a_ledger="realized_a.json", b_ledger="realized_b.json",
-                      log_path="rh_trade_log.jsonl"):
+                      log_path="rh_trade_log.jsonl", today=None):
     """THE ONE PLACE every report gets its realized-gain/loss lines from.
 
     Devon (2026-09-29) asked for a running realized total in every report, to track tax
@@ -465,23 +502,40 @@ def repo_report_lines(a_block=None, year=None, status_path="status.json",
     drift apart. Reads COMMITTED files only, so it works from any session or runner.
 
     a_block lets the bot pass its fresh in-memory block instead of last cycle's.
+
+    Prints the current tax year, and ALSO the prior tax year through PRIOR_YEAR_THROUGH when
+    it had any sales, so last year's final figures stay in view while returns are open.
     """
     la, lb = load_ledger(a_ledger), load_ledger(b_ledger)
     if a_block is None:
         st = load_ledger(status_path) or {}
         a_block = st.get("realized") or ((la or {}).get("summary"))
     b_block = arm_b_block(b_ledger, log_path)
-    lines = [report_line("Arm A (Alpaca)", a_block, year),
-             report_line("Arm B (Robinhood)", b_block, year),
-             combined_line(a_block, b_block, year)]
-    x = cross_totals(la, lb)
-    if x:
-        a, b = x["a_losses_vs_b_buys"], x["b_losses_vs_a_buys"]
-        if a["sales"] or b["sales"]:
-            lines.append(
-                "Cross-account wash-sale watch (upper bound; no broker reports these): "
-                "Arm A losses up to %s (%d sales), Arm B losses up to %s (%d sales)"
-                % (money(abs(a["upper_bound"])), a["sales"], money(abs(b["upper_bound"])), b["sales"]))
+    today = today or _today_et()
+    yr = int(year or today.year)
+    wa, wb = [(led or {}).get("wash_watch") for led in (la, lb)]
+    wa, wb = (wa if isinstance(wa, list) else None), (wb if isinstance(wb, list) else None)
+
+    def year_lines(y):
+        out = [report_line("Arm A (Alpaca)", a_block, y, wa),
+               report_line("Arm B (Robinhood)", b_block, y, wb),
+               combined_line(a_block, b_block, y)]
+        x = cross_totals(la, lb, y)
+        if x:
+            a, b = x["a_losses_vs_b_buys"], x["b_losses_vs_a_buys"]
+            if a["sales"] or b["sales"]:
+                out.append(
+                    "Cross-account wash-sale watch %d (upper bound; no broker reports these): "
+                    "Arm A losses up to %s (%d sales), Arm B losses up to %s (%d sales)"
+                    % (y, money(abs(a["upper_bound"])), a["sales"], money(abs(b["upper_bound"])), b["sales"]))
+        return out
+
+    lines = year_lines(yr)
+    prior = yr - 1
+    if (today.year == yr and (today.month, today.day) <= PRIOR_YEAR_THROUGH
+            and (_has_sales(a_block, prior) or _has_sales(b_block, prior))):
+        lines.append("Prior tax year %d (still open for filing):" % prior)
+        lines += year_lines(prior)
     lines.append("Realized = positions actually SOLD, not the equity change. Not a tax "
                  "document: the broker 1099-B is authoritative, and wash sales are for "
                  "your tax preparer to decide.")

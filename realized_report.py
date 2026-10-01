@@ -95,7 +95,7 @@ def main():
     print("SUMMARY   state=%s" % block["state"])
     if block.get("reason"):
         print("  reason: %s" % block["reason"])
-    print("  " + R.report_line("Arm A", block))
+    print("  " + R.report_line("Arm A", block, watch=ledger["wash_watch"]))
     print("  history: %s to %s, %d fills, last sale %s"
           % (block.get("since"), (block.get("last_fill") or "")[:10], block.get("fills", 0),
              block.get("last_sale")))
