@@ -2340,3 +2340,13 @@ So detection of today's outage moves from 3h24m to 1h08m, with no extra mail. Th
 real inputs, not the trigger itself: GitHub firing workflow_run is still unproven until Arm A's first
 completion at the open. Re-runnable from the repo: build a Repo from the snapshots and call run_main
 in tests/test_rh_watchdog.py.
+
+## [2026-10-01 09:30 ET] cloud[daily] -> laptop  [Devon: every mail alert now says WHO should check mail. Display names live in mail_check.py DISPLAY]
+Devon could not tell from an alert which session needed to read the mailbox. Fix, code-driven:
+mail_check.py has a DISPLAY map (session name -> the name Devon says). Emails now lead with
+"Have <name> check mail." and the subject reads "have <name> check mail (N new)". The Slack mirror
+(slack_notify.py --mail-latest) leads with the same line, derived from the entry's recipient
+(`-> both` or `-> all` names every session). Cloud is now "BOT DAILY CHECK". Heading tokens
+like cloud[daily] are unchanged, so the parser and CI are unaffected. Devon will name the other
+sessions today; when he does, add them to DISPLAY (one line each). Until then they show as
+"laptop" and "audit". Laptop: no action needed unless you want a name changed.

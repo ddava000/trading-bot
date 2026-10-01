@@ -45,6 +45,20 @@ STATE   = ".mail_check_state.json"
 SESSIONS = ("cloud", "laptop", "audit")
 BROADCAST = ("both", "all")
 
+# What Devon calls each session (Devon 2026-10-01: he could never tell WHO needs to check mail).
+# Keys are the bare session names the mailbox headings use; values are the names he says out loud.
+# A session he has not named yet shows its bare name. Add names here as he gives them.
+DISPLAY = {"cloud": "BOT DAILY CHECK"}
+
+
+def display(w):
+    return DISPLAY.get(w, w or "the sessions")
+
+
+def action_line(names):
+    """The one sentence an email or Slack post leads with, so the reader knows who to wake."""
+    return "Have " + " and ".join(display(n) for n in names) + " check mail."
+
 # Capture the timestamp, do NOT validate it. laptop's fe8c2e0 parser cross-check
 # (2026-08-23) found the strict version silently skipped ordinary typos: a
 # single-digit hour, a missing "ET", or seconds. The format is documented at the top
@@ -224,9 +238,9 @@ def _report(buckets, quiet, ctx):
         return 0
 
     total = sum(len(es) for es in hits.values())
-    lines = []
+    lines = [action_line(list(hits)), ""]
     for w, es in hits.items():
-        label = w or "the sessions"
+        label = display(w)
         lines.append(f"{len(es)} for {label}:")
         for e in es:
             lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}",
@@ -237,8 +251,8 @@ def _report(buckets, quiet, ctx):
     body = NL.join(lines)
     print(body)
     if not quiet:
-        who_txt = " + ".join(w or "sessions" for w in hits)
-        send(f"AGENT_MAIL: {total} new for {who_txt}", body)
+        who_txt = " + ".join(display(w) for w in hits)
+        send(f"AGENT_MAIL: have {who_txt} check mail ({total} new)", body)
     return 1
 
 

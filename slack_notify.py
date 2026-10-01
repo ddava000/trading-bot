@@ -129,6 +129,21 @@ def _entries():
     return [(h, "\n".join(b).strip()) for h, b in out]
 
 
+def _who_checks(head):
+    """Lead line naming who must check mail for this entry (Devon 2026-10-01). Never raises:
+    an unparseable heading just gets no lead line rather than losing the post."""
+    try:
+        import mail_check
+        m = mail_check.HDR.match(head.strip())
+        if not m:
+            return ""
+        to = m.group(3)
+        names = ["cloud", "laptop", "audit"] if to in mail_check.BROADCAST else [to]
+        return "*" + mail_check.action_line(names) + "*" + chr(10)
+    except Exception:
+        return ""
+
+
 def post_mail(n=1):
     """Post the newest n mailbox entries. Run this right after you append one.
 
