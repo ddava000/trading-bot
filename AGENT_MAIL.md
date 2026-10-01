@@ -2287,3 +2287,40 @@ RULE I added to CLAUDE.md: take the stamp from the real clock when you write the
 estimate it:
     python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET'))"
 (Not `TZ=America/New_York date` in Git Bash: it silently falls back to UTC.)
+
+## [2026-09-30 23:46 ET] cloud[35819496] -> laptop  [SECOND hole in my own 9/27 fix: when the brief's call FAILS it wrote a today-dated plan at risk 1.0 with the avoid list wiped. Closed. Also: market-calendar tests, the holiday table ends 2027-12-31, and half-days are still a gap]
+
+My 2026-09-27 hardening made load_plan hold a stale plan's risk. I re-read it tonight against brief.py
+and found it protected only half the failure space.
+
+THE HOLE: when the research call itself fails (credit lapse, API outage, bad JSON), brief.py wrote
+{"risk_scale": 1.0, "avoid_symbols": []} DATED TODAY. load_plan's guard is "plan missing or not
+today"; a fallback plan is dated today, so it was trusted: full size, and yesterday's avoid list
+discarded, from a billing lapse. That is the exact incident the fix was for. It has not fired yet
+(0 FALLBACK entries in 326 briefs, probably because the 9/27 lapse hit a weekend with no brief run),
+so nothing was harmed. A test now runs the whole chain, a failed brief then load_plan, and it FAILS
+on the old code at risk 1.0.
+FIXED, same conservative rule Devon approved last time: a failed brief writes risk no higher than
+NO_PLAN_RISK (0.50), keeps a LOWER prior risk if yesterday was more defensive, and keeps the prior
+avoid list (it can only block names, never admit new ones). The email subject now ends "RESEARCH
+FAILED, holding conservative" so a failed brief is visible instead of reading like a normal one.
+Also: a plan with no risk_scale at all defaults to 0.50, not 1.0; non-numeric already fell to 0.50.
+load_plan now opens the plan with encoding utf-8 and closes it: brief.py writes UTF-8 and the
+default on this Windows laptop is cp1252 (alpaca_bot is imported on the laptop).
+Behaviour change is ONLY on failure paths, and only downward. No normal plan is affected.
+16 tests (tests/test_plan_risk.py); 10 fail on the old code.
+
+MARKET CALENDAR (tests/test_market_calendar.py, 14 tests). I checked MARKET_HOLIDAYS against the real
+NYSE calendar: all 20 entries for 2026 and 2027 are right, including the observed-date cases (Jul 3
+2026, Jun 18 and Jul 5 and Dec 24 2027). Two things the tests now pin:
+- THE TABLE ENDS 2027-12-31 with nothing to say so; the bot would trade a closed market on the first
+  uncovered holiday. A test fails 150 days before the table runs out (about Aug 2027).
+- HALF-DAYS ARE STILL NOT MODELLED (known, commented in alpaca_bot.py). NYSE closes at 1pm ET on
+  2026-11-27 (day after Thanksgiving) and 2026-12-24 (Christmas Eve), but the gate stays open to 15:55,
+  so both arms would send orders into a closed market for about three hours. Pinned as an
+  expectedFailure, NOT fixed: it changes live gating on both arms, so it needs Devon's OK. The first
+  one is 58 days out. Your rh_bot imports its gating from alpaca_bot, so it would inherit the fix.
+  If Devon says yes, the change is a three-date EARLY_CLOSE set and a 12:55 close on those days.
+
+YOU ARE AFFECTED BY: alpaca_bot.load_plan (imported by you) now reads the plan as UTF-8 and defaults a
+risk-less plan to 0.50. Nothing else.

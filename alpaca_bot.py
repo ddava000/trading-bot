@@ -1218,8 +1218,10 @@ def load_plan(et):
     try:
         if not os.path.exists("daily_plan.json"):
             return no_plan
-        p = json.load(open("daily_plan.json"))
-        rs = max(0.0, min(1.0, float(p.get("risk_scale", 1.0))))
+        with open("daily_plan.json", encoding="utf-8") as _pf:     # brief.py writes UTF-8; the default
+            p = json.load(_pf)                                   # codec on the Windows laptop is cp1252
+        # A plan with no risk_scale at all (hand-edited, truncated) is not a licence for full size.
+        rs = max(0.0, min(1.0, float(p.get("risk_scale", NO_PLAN_RISK))))
         pd = p.get("date")
         stale = pd != et.strftime("%Y-%m-%d")
         if stale:

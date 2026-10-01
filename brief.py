@@ -158,6 +158,42 @@ def get_plan(user_text):
     return json.loads(text), True
 
 
+def _load_prior_plan():
+    try:
+        with open("daily_plan.json", encoding="utf-8") as f:
+            p = json.load(f)
+        return p if isinstance(p, dict) else None
+    except Exception:
+        return None
+
+
+def fallback_plan(err, prior=None):
+    """The plan to write when the research call itself FAILED (credit lapse, API outage, bad JSON).
+
+    It used to write risk_scale 1.0 and an EMPTY avoid list, dated today. That defeated the
+    stale-plan guard in alpaca_bot.load_plan, which only protects against a missing or old plan: a
+    fallback plan IS dated today, so the bot trusted it and traded at full size, and the previous
+    plan's avoid list was thrown away. A billing lapse must not be able to double position sizing,
+    which is the exact incident (2026-09-27, Anthropic credit balance) this guards against.
+
+    So: never above bot.NO_PLAN_RISK, keep a LOWER prior risk if the last plan was more defensive,
+    and keep the prior avoid list (it can only block names, never admit new ones).
+    """
+    risk, avoid = bot.NO_PLAN_RISK, []
+    try:
+        risk = min(max(0.0, float((prior or {}).get("risk_scale"))), bot.NO_PLAN_RISK)
+    except (TypeError, ValueError):
+        pass
+    try:
+        avoid = [str(s) for s in (prior or {}).get("avoid_symbols", [])]
+    except (TypeError, AttributeError):
+        pass
+    return {"regime": "neutral", "risk_scale": risk, "avoid_symbols": avoid, "favor_symbols": [],
+            "notes": (f"LLM brief unavailable ({err}); holding the last plan's avoid list and a "
+                      f"risk no higher than {bot.NO_PLAN_RISK}."),
+            "journal_entry": "Brief failed; conservative hold in effect.", "fallback": True}
+
+
 def main():
     et   = datetime.now(timezone.utc) - timedelta(hours=4)
     mode = "MORNING" if (et.hour, et.minute) < (9, 45) else "INTRADAY"
@@ -166,17 +202,16 @@ def main():
     try:
         plan, ok = get_plan(gather_context(et, mode))
     except Exception as e:
-        print(f"[brief failed: {e}] — writing NEUTRAL plan (bot trades at default risk).")
-        plan = {"regime": "neutral", "risk_scale": 1.0, "avoid_symbols": [],
-                "favor_symbols": [], "notes": f"LLM brief unavailable ({e}); default risk.",
-                "journal_entry": "Brief failed; defaults in effect."}
+        print(f"[brief failed: {e}] - writing a CONSERVATIVE fallback plan "
+              f"(risk capped at {bot.NO_PLAN_RISK}, prior avoid list kept).")
+        plan = fallback_plan(e, _load_prior_plan())
         ok = False
 
     # Clamp risk to [0,1] (can only scale DOWN — never amplify beyond the bot's rails)
     try:
-        plan["risk_scale"] = max(0.0, min(1.0, float(plan.get("risk_scale", 1.0))))
+        plan["risk_scale"] = max(0.0, min(1.0, float(plan.get("risk_scale", bot.NO_PLAN_RISK))))
     except Exception:
-        plan["risk_scale"] = 1.0
+        plan["risk_scale"] = bot.NO_PLAN_RISK
 
     plan["date"] = today
     plan["mode"] = mode
@@ -202,7 +237,10 @@ def main():
             f"Avoid: {plan['avoid_symbols']}\nFavor: {plan['favor_symbols']}\n\n"
             f"Notes: {plan['notes']}\n\nJournal: {plan['journal_entry']}\n")
     print(body)
-    bot.send_email(f"{mode} brief ({bot.MODE}) - {plan['regime']} / risk {plan['risk_scale']}", body)
+    subject = f"{mode} brief ({bot.MODE}) - {plan['regime']} / risk {plan['risk_scale']}"
+    if not ok:
+        subject += " - RESEARCH FAILED, holding conservative"      # a failed brief must be visible
+    bot.send_email(subject, body)
 
 
 if __name__ == "__main__":
