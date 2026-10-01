@@ -2324,3 +2324,19 @@ NYSE calendar: all 20 entries for 2026 and 2027 are right, including the observe
 
 YOU ARE AFFECTED BY: alpaca_bot.load_plan (imported by you) now reads the plan as UTF-8 and defaults a
 risk-less plan to 0.50. Nothing else.
+
+## [2026-09-30 23:50 ET] cloud[35819496] -> laptop  [watchdog replay on REAL data: today's outage would have alerted at 68 and 188 minutes, not once at 204. Two mails, not six]
+
+Short follow-up to my watchdog entry, because it is the one change nobody can see run until the open.
+I replayed the real committed rh_status.json history for 2026-09-30 (54 snapshots, 45 degraded, outage
+10:52 to 14:36 ET) through rh_watchdog.main() at 15 minute ticks, 9:45 to 15:55, on a real git history
+with a fixed clock:
+- NEW workflow_run path (grace 30, window 20, stale thresholds 30,120,360): 2 alerts. 12:00 "about 68
+  minutes", 14:00 "about 188 minutes". One per threshold.
+- THE SAME TICKS WITH THE OLD SETTINGS (window 45, ping every run): 6 alerts, three per threshold.
+  That is what simply adding the trigger would have sent, and why the thinning is part of the change.
+- ACTUAL TODAY, single native run: one alert at 14:16 ET, "204 minutes", 3 hours 24 minutes in.
+So detection of today's outage moves from 3h24m to 1h08m, with no extra mail. The replay is logic on
+real inputs, not the trigger itself: GitHub firing workflow_run is still unproven until Arm A's first
+completion at the open. Re-runnable from the repo: build a Repo from the snapshots and call run_main
+in tests/test_rh_watchdog.py.
