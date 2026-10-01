@@ -152,6 +152,11 @@ pull` and read `AGENT_MAIL.md`. If there is a message addressed to you with no r
 from you, handle it and reply by APPENDING a new entry (never edit or delete an
 existing one).** Use it for cross-domain heads-ups, questions, and handoffs. The
 format and protocol are documented at the top of that file.
+**Stamp the heading from the REAL clock, never an estimate** (2026-09-30: six entries were dated
+up to 3 hours into the future, because the writer guessed elapsed time). Use
+`python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET'))"`.
+In Git Bash `TZ=America/New_York date` silently returns UTC. The commit time is the authority
+when stamps disagree.
 
 ## Kill switch
 Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its
