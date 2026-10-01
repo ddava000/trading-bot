@@ -240,6 +240,11 @@
    "qty": 0.075416258,
    "symbol": "AXTI",
    "t": "2026-09-29"
+  },
+  {
+   "qty": 0.032294562,
+   "symbol": "ACN",
+   "t": "2026-10-01"
   }
  ],
  "closed": [
@@ -676,6 +681,7 @@
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
+  "ACN": 0.032294562,
   "ADPT": 0.42725107,
   "BAND": 0.100130463,
   "BE": 0.0286495,
@@ -709,8 +715,8 @@
     }
    }
   },
-  "fills": 76,
-  "last_fill": "2026-09-30T14:36:35.392862Z",
+  "fills": 77,
+  "last_fill": "2026-10-01T13:45:21.576788Z",
   "last_sale": "2026-09-30",
   "lt": {
    "gains": 0.0,
@@ -720,7 +726,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -13.45,
-  "reconciliation_residual": -0.0459,
+  "reconciliation_residual": -0.0259,
   "sales": 27,
   "since": "2026-08-12",
   "st": {
