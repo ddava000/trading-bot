@@ -1062,6 +1062,9 @@ def publish_degraded(led, reason):
 
 
 MAIL_F = "AGENT_MAIL.md"
+# What Devon calls this session (2026-10-01: he could never tell from an alert WHO
+# needs to check mail). Keep in step with DISPLAY["laptop"] in mail_check.py.
+SESSION_NAME = "LAPTOP BOT DAILY CHECK"
 _MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)\s*->\s*([A-Za-z]+)", re.M)
 
 
@@ -1108,13 +1111,15 @@ def check_mail(led):
             return
         summary = "; ".join(f"{ts} {frm}->{to}" for ts, frm, to in fresh)
         log(f"NEW MAIL for the laptop session: {summary}")
-        notify("RH bot: new mailbox entry for the laptop session", chr(10).join([
+        notify(f"AGENT_MAIL: have {SESSION_NAME} check mail ({len(fresh)} new)", chr(10).join([
+            f"Have {SESSION_NAME} check mail.",
+            "",
             "New AGENT_MAIL.md entries addressed to the laptop session:",
             "",
             *[f"  [{ts}] {frm} -> {to}" for ts, frm, to in fresh],
             "",
             "The daemon cannot act on these; it only reports that they arrived.",
-            "Open a Claude session on the laptop to read and respond.",
+            f"Open the {SESSION_NAME} session on the laptop and say: check mail.",
         ]))
     except Exception as e:
         log(f"mail check skipped ({e})")

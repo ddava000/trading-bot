@@ -132,7 +132,7 @@ class StatelessDigestTests(Runner):
         self.write_mail(entry(NOW - timedelta(hours=3), "cloud[daily]", "laptop", "daily check clean"))
         rc, out = self.main("--for", "laptop", "--since-hours", "24", "--quiet")
         self.assertEqual(rc, 1)
-        self.assertIn("1 for laptop", out)
+        self.assertIn("1 for %s" % M.display("laptop"), out)
         self.assertIn("cloud -> laptop", out)
 
     def test_the_same_mailbox_was_silent_under_the_old_pattern(self):
@@ -157,8 +157,8 @@ class StatelessDigestTests(Runner):
                         + entry(NOW - timedelta(hours=2), "cloud[daily]", "laptop"))
         rc, out = self.main("--for", "cloud,laptop", "--since-hours", "24", "--quiet")
         self.assertEqual(rc, 1)
-        self.assertIn("1 for cloud:", out)
-        self.assertIn("2 for laptop:", out)
+        self.assertIn("1 for %s:" % M.display("cloud"), out)
+        self.assertIn("2 for %s:" % M.display("laptop"), out)
 
     def test_no_entries_parsed_is_an_error_not_a_clean_bill(self):
         self.write_mail("nothing that looks like an entry\n")

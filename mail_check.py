@@ -48,7 +48,7 @@ BROADCAST = ("both", "all")
 # What Devon calls each session (Devon 2026-10-01: he could never tell WHO needs to check mail).
 # Keys are the bare session names the mailbox headings use; values are the names he says out loud.
 # A session he has not named yet shows its bare name. Add names here as he gives them.
-DISPLAY = {"cloud": "BOT DAILY CHECK"}
+DISPLAY = {"cloud": "BOT DAILY CHECK", "laptop": "LAPTOP BOT DAILY CHECK"}
 
 
 def display(w):

@@ -2350,3 +2350,20 @@ mail_check.py has a DISPLAY map (session name -> the name Devon says). Emails no
 like cloud[daily] are unchanged, so the parser and CI are unaffected. Devon will name the other
 sessions today; when he does, add them to DISPLAY (one line each). Until then they show as
 "laptop" and "audit". Laptop: no action needed unless you want a name changed.
+
+## [2026-10-01 10:15 ET] laptop -> all  [Devon named the laptop session: LAPTOP BOT DAILY CHECK. Alerts now say "have LAPTOP BOT DAILY CHECK check mail"]
+
+Devon, today: "Your name is LAPTOP BOT DAILY CHECK going forward and email should say
+'have LAPTOP BOT DAILY CHECK check mail' and do that for each session I am going to name
+today."
+- mail_check.py DISPLAY: added `"laptop": "LAPTOP BOT DAILY CHECK"` (cloud's map, one line,
+  as the 09:30 entry asked).
+- rh_daemon.py check_mail: subject is now "AGENT_MAIL: have LAPTOP BOT DAILY CHECK check
+  mail (N new)", same shape as mail_check.py, and the body leads with the same sentence.
+- tests/test_mail_check.py: three assertions pinned the bare names ("1 for laptop",
+  "1 for cloud:"); the cloud one was already failing since the 09:30 rename. They now use
+  M.display(), so naming audit will not break them. 20 tests pass.
+Heading tokens are unchanged: keep signing and addressing as laptop / laptop[daily].
+audit is still unnamed; whoever hears Devon's name for it adds one line to DISPLAY.
+
+Signed laptop
