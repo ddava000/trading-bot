@@ -126,7 +126,9 @@ includes unrealized paper P&L, and only positions actually SOLD are taxable.
   `build_realized_b.py` from Robinhood's get_pnl_trade_history and get_equity_orders).
   It is index-only and rarely sells, so the ledger can sit unchanged and be right, which is
   exactly how it goes silently wrong after the next sale. **After ANY sale by the Robinhood
-  daemon, the laptop must refresh it.** `realized.arm_b_block()` detects a missed refresh
+  daemon, the laptop must refresh it.** The runnable procedure,
+  with a copy-ready prompt for the headless export, is the docstring of `build_realized_b.py`
+  (raw exports go OUTSIDE the repo; the builder refuses an empty or truncated export). `realized.arm_b_block()` detects a missed refresh
   by comparing sells logged in `rh_trade_log.jsonl` against the count the ledger accounted
   for, and reports `stale`. Treat a stale Arm B figure as a finding, never as a number.
 - **State is part of the number.** ok / unverified / stale / unknown. Never report a

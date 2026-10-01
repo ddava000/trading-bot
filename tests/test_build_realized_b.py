@@ -130,5 +130,115 @@ class LogTripwireInputTests(unittest.TestCase):
         self.assertEqual(led["summary"]["rh_log_sells_counted"], 2)     # rejected is the only exclusion
 
 
+class ExportShapeTests(unittest.TestCase):
+    """The faults the laptop hit running the refresh by hand, turned into behaviour."""
+
+    def test_unwrap_accepts_the_envelope_the_inner_object_and_a_bare_list(self):
+        lst = [{"id": "x"}]
+        self.assertEqual(B.unwrap({"data": {"orders": lst}}, "orders"), lst)
+        self.assertEqual(B.unwrap({"orders": lst}, "orders"), lst)
+        self.assertEqual(B.unwrap(lst, "orders"), lst)
+
+    def test_unwrap_can_say_no(self):
+        """Positive control: the wrong key or a non-list is an error, not an empty result."""
+        with self.assertRaises(ValueError):
+            B.unwrap({"data": {"trades": []}}, "orders")
+        with self.assertRaises(ValueError):
+            B.unwrap({"orders": "nope"}, "orders")
+        with self.assertRaises(ValueError):
+            B.unwrap("nope", "orders")
+
+    def test_export_problem_flags_empty_and_truncated_but_not_a_normal_export(self):
+        self.assertIn("empty", B.export_problem([], []))
+        self.assertIn("truncated", B.export_problem([BUY], [ROW, ROW]))
+        self.assertIsNone(B.export_problem([BUY, SELL], [ROW]))
+
+
+class MainTests(unittest.TestCase):
+    """B.main() end to end on files, as the laptop runs it."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.d = self.tmp.name
+        self.out = os.path.join(self.d, "realized_b.json")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def put(self, name, obj, raw=None):
+        p = os.path.join(self.d, name)
+        with open(p, "w", encoding="utf-8") as fh:
+            fh.write(raw if raw is not None else json.dumps(obj))
+        return p
+
+    def run_main(self, orders_path, pnl_path):
+        import contextlib
+        import io
+        argv = ["build_realized_b.py", "--orders", orders_path, "--pnl", pnl_path,
+                "--status", os.path.join(self.d, "no_status.json"), "--rh-log", NO_LOG, "--out", self.out]
+        buf = io.StringIO()
+        old = sys.argv
+        sys.argv = argv
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = B.main()
+        finally:
+            sys.argv = old
+        return rc, buf.getvalue()
+
+    def read_out(self):
+        with open(self.out, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    def test_all_three_file_shapes_build_the_same_ledger(self):
+        ledgers = []
+        shapes = [("envelope", {"data": {"orders": [BUY, SELL]}}, {"data": {"trades": [ROW]}}),
+                  ("inner", {"orders": [BUY, SELL]}, {"trades": [ROW]}),
+                  ("bare", [BUY, SELL], [ROW])]
+        for name, o, p in shapes:
+            if os.path.exists(self.out):
+                os.remove(self.out)
+            rc, out = self.run_main(self.put(name + "_o.json", o), self.put(name + "_p.json", p))
+            self.assertEqual(rc, 0, out)
+            ledgers.append(self.read_out())
+        self.assertEqual(ledgers[0], ledgers[1])
+        self.assertEqual(ledgers[0], ledgers[2])
+        self.assertIn("export check: 2 orders (2 carry executions), 1 broker sale rows", out)
+
+    def test_an_empty_export_is_refused_and_writes_nothing(self):
+        rc, out = self.run_main(self.put("o.json", {"data": {"orders": []}}),
+                                self.put("p.json", {"data": {"trades": []}}))
+        self.assertEqual(rc, 2)
+        self.assertIn("REFUSING", out)
+        self.assertFalse(os.path.exists(self.out))
+
+    def test_a_refusal_leaves_the_existing_committed_ledger_untouched(self):
+        with open(self.out, "w", encoding="utf-8") as fh:
+            fh.write('{"keep": "me"}')
+        rc, _ = self.run_main(self.put("o.json", []), self.put("p.json", []))
+        self.assertEqual(rc, 2)
+        self.assertEqual(self.read_out(), {"keep": "me"})
+
+    def test_a_truncated_orders_export_is_refused(self):
+        rc, out = self.run_main(self.put("o.json", [BUY]), self.put("p.json", [ROW, ROW]))
+        self.assertEqual(rc, 2)
+        self.assertIn("truncated", out)
+        self.assertFalse(os.path.exists(self.out))
+
+    def test_garbage_and_missing_files_are_refused_not_a_traceback(self):
+        rc, out = self.run_main(self.put("o.json", None, raw="{not json"), self.put("p.json", []))
+        self.assertEqual(rc, 2)
+        self.assertIn("REFUSING", out)
+        rc, out = self.run_main(os.path.join(self.d, "missing.json"), self.put("p2.json", []))
+        self.assertEqual(rc, 2)
+        self.assertIn("REFUSING", out)
+
+    def test_an_unverified_build_exits_1_and_still_writes_the_honest_ledger(self):
+        bad = row("SPY", 1, "-9.00", "2026-09-10T14:00:01Z")
+        rc, _ = self.run_main(self.put("o.json", [BUY, SELL]), self.put("p.json", [bad]))
+        self.assertEqual(rc, 1)
+        self.assertEqual(self.read_out()["summary"]["state"], "unverified")
+
+
 if __name__ == "__main__":
     unittest.main()

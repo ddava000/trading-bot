@@ -7,11 +7,56 @@ unchanged for weeks and still be right, which is exactly how it would go silentl
 after the next sale. This makes the refresh deterministic and cheap: save two broker tool
 outputs to files, run this, commit the result.
 
-INPUTS (the tools' native JSON, saved as returned; nothing needs reshaping):
-  --orders  get_equity_orders   {"data": {"orders": [...]}}   state=filled, ALL history
-                                (created_at_gte 2026-05-01 returned every order in one page)
-  --pnl     get_pnl_trade_history {"data": {"trades": [...]}} span=all
-Both for the Agentic account only. Read-only: this script places nothing.
+REFRESH PROCEDURE (run by the LAPTOP session, which has the broker bridge; the cloud has none).
+Proven end to end 2026-09-30: 139 orders and 50 P&L rows, 50 of 50 sales matched, and the rebuilt
+ledger equalled the committed one. It took four attempts and four faults; each is a rule below.
+ WHEN: after ANY sale by rh_daemon, or whenever realized.arm_b_block() reports the ledger stale.
+ 1. TOOLS, all read-only, Agentic account only (never read another account):
+      get_accounts (find the account that has agentic_allowed; the number never needs to be typed),
+      get_equity_orders (state=filled, everything since 2026-05-01),
+      get_pnl_trade_history (span=all),
+      get_equity_positions (the completeness check: a symbol bought after the P&L history began
+      and still held never appears in that history, so held positions are the only way to confirm
+      nothing is missing).
+    Do NOT assume one page. On 2026-09-29 one page held all 139 orders; on 2026-09-30 it did not,
+    and the agent walked date windows and then each symbol. Page or window until the count stops
+    growing, and say in the final line how many it got.
+ 2. THERE IS NO HUMAN in a headless `claude -p` run. A question goes nowhere and the run still
+    exits 0 with no files, which is indistinguishable from success. The prompt MUST say that nobody
+    can answer, that producing nothing is the worst outcome, and that the agent should write what
+    it has and name the limitation in its last line. A tool outside the allowlist is therefore a
+    limitation to report, not a question to ask: grant the four tools above up front.
+ 3. WRITE INCREMENTALLY. Write orders.json the moment the orders are collected, before starting the
+    P&L call, so a run cut short still leaves something usable.
+ 4. WHERE THE RAW FILES GO: OUTSIDE ANY REPO (the laptop uses C:/Users/devon/rh_export/). They carry
+    the account number and this repo is PUBLIC. Run the bridge with a working directory outside the
+    repo too, so it does not inherit this repo's CLAUDE.md and rightly refuse. Only the sanitised
+    realized_b.json is ever committed. .gitignore also blocks _rh_*.json and rh_export/.
+ 5. FILE SHAPE: save the tool output as returned. This script accepts the full envelope
+    {"data": {"orders": [...]}} / {"data": {"trades": [...]}}, the inner object, or a bare list.
+ 6. POST-CONDITION before trusting a run: both files exist, parse, and the builder prints a
+    plausible "export check" line. It REFUSES, writing nothing and exiting 2, if the orders list is
+    empty or there are more broker sale rows than orders. Exit 0 from the export step proves
+    nothing. NEVER read an exit code through a pipe: `claude ... | tail` reports tail's status,
+    which is always 0, so a killed run looks clean. Capture claude's own status directly.
+ Then:  python build_realized_b.py --orders <orders.json> --pnl <pnl.json>
+        (exit 0 = state ok; exit 1 = built but UNVERIFIED, read the reason; exit 2 = refused)
+        git add realized_b.json, commit, push (explicit path), then read the remote.
+
+ COPY-READY PROMPT for the headless export (the cloud cannot run it; the laptop owns running it):
+   You are exporting read-only data for a tax ledger. NOBODY CAN ANSWER QUESTIONS in this run, so
+   never ask for permission or clarification; if something is unavailable, write what you have and
+   state the limitation in your last line. Producing nothing is the worst outcome.
+   Use only these read-only tools: get_accounts, get_equity_orders, get_pnl_trade_history,
+   get_equity_positions. Use ONLY the account with agentic_allowed. Do not read any other account.
+   1. get_equity_orders, state=filled, created_at_gte 2026-05-01. Do not assume one page: page or
+      use date windows, then confirm per held symbol, until the count stops growing. As soon as you
+      have them, write {"data": {"orders": [...]}} to <OUT>/orders.json, full order objects with
+      their executions, unmodified.
+   2. get_pnl_trade_history, span=all. Write {"data": {"trades": [...]}} to <OUT>/pnl.json.
+   3. get_equity_positions and compare the held symbols against the orders; name any held symbol
+      with no buy in the orders file.
+   Last line: ORDERS=<n> PNL=<n> HELD_WITHOUT_BUY=<list or none> LIMITATIONS=<none or what>.
 
 HOW IT STAYS HONEST: the summary uses the BROKER's realized_gain per sale (authoritative).
 FIFO is run independently on the same executions as a cross-check, sale by sale, and the
@@ -34,6 +79,36 @@ SALE_TOL, TOTAL_TOL, MATCH_SECS = 0.02, 0.10, 120
 
 def _ts(x):
     return datetime.fromisoformat(str(x).replace("Z", "+00:00"))
+
+
+def unwrap(obj, key):
+    """The list under `key`, from whichever shape the export came back in.
+
+    The tool returns {"data": {key: [...]}}, but an agent told to "save the output" tends to
+    write the inner object {key: [...]} or just the bare list. All three are the same data, so
+    accept all three rather than die with KeyError: 'data' on the first run that differs."""
+    if isinstance(obj, dict):
+        if isinstance(obj.get("data"), dict) and key in obj["data"]:
+            obj = obj["data"][key]
+        elif key in obj:
+            obj = obj[key]
+        else:
+            raise ValueError("no %r list in the file (top-level keys: %s)" % (key, sorted(obj)[:6]))
+    if not isinstance(obj, list):
+        raise ValueError("%r is not a list" % key)
+    return obj
+
+
+def export_problem(orders, trades):
+    """Why this export cannot be trusted, or None. Checked BEFORE building, and a refusal writes
+    nothing: an empty export would otherwise produce state ok with zero sales, a false all-clear
+    that is indistinguishable from an account that has never sold."""
+    if not orders:
+        return "the orders export is empty"
+    if len(trades) > len(orders):
+        return ("%d broker sale rows but only %d orders: the orders export is truncated"
+                % (len(trades), len(orders)))
+    return None
 
 
 def build(orders, trades, status=None, rh_log="rh_trade_log.jsonl"):
@@ -138,9 +213,19 @@ def main():
     def _load(path):
         with open(path, encoding="utf-8") as fh:
             return json.load(fh)
-    orders = _load(a.orders)["data"]["orders"]
-    trades = _load(a.pnl)["data"]["trades"]
-    status = _load(a.status) if os.path.exists(a.status) else None
+    try:
+        orders = unwrap(_load(a.orders), "orders")
+        trades = unwrap(_load(a.pnl), "trades")
+        status = _load(a.status) if os.path.exists(a.status) else None
+    except (OSError, ValueError) as e:        # JSONDecodeError is a ValueError
+        print("REFUSING to build, nothing written: %s" % e)
+        return 2
+    print("export check: %d orders (%d carry executions), %d broker sale rows"
+          % (len(orders), sum(1 for o in orders if o.get("executions")), len(trades)))
+    why = export_problem(orders, trades)
+    if why:
+        print("REFUSING to build, nothing written: %s" % why)
+        return 2
     led = build(orders, trades, status, a.rh_log)
     new = json.dumps(led, indent=1, sort_keys=True)
     old = ""
