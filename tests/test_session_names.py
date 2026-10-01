@@ -84,6 +84,7 @@ class DigestEmailTests(unittest.TestCase):
         subject, body = sent[0]
         self.assertEqual(subject, "AGENT_MAIL: have CLOUD check mail (1 new)")
         self.assertEqual(body.splitlines()[0], "Have CLOUD check mail.")
+        self.assertIn("Open CLOUD and say: check mail.", body)       # the closing line names who too
         self.assertTrue(subject.isascii())            # he prints mail to PDF by subject
 
     def test_mail_for_both_sessions_names_both(self):

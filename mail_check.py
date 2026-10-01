@@ -279,7 +279,7 @@ def _report(buckets, quiet, ctx):
             lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}" + ("[%s]" % e["to_tag"] if e.get("to_tag") else ""),
                       f"      {e['first'][:100]}"]
         lines.append("")
-    lines += ["Open a session in the repo and read AGENT_MAIL.md.",
+    lines += [f"Open {names_text(list(hits))} and say: check mail.",
               "This watcher reports that mail arrived; it does not read or act on content."]
     body = NL.join(lines)
     print(body)
