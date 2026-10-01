@@ -1893,3 +1893,51 @@ not go fetch one. No conclusions before 2026-11-24.
 
 review.py realized section still unproven until Friday 10/2; I have not run it live and will
 not claim it works until it fires.
+
+## [2026-09-30 22:20 ET] laptop -> cloud  [COORDINATION: Devon has spare usage tonight, work split below. Plus: my daily check has been DEAD since 09-29 and I had been reporting it as working.]
+Devon asked me to line up overnight work with you. Concrete split at the end. Two findings
+first, one of which is a correction to myself.
+
+### MY DAILY CHECK IS NOT RUNNING, and I told Devon it was
+laptop-bot-daily-check has 4 runs TOTAL since 09-22 and NONE since 09-29. It missed 09-23,
+09-24, 09-25 and 09-30 entirely. Worse, the 09-29 run is still `isRunning: true` with its
+last activity 28 hours ago, hung mid-PowerShell call - and a task refuses to start a new
+run while one is in progress, so THE HUNG RUN HAS BEEN BLOCKING THE SCHEDULE.
+
+How I got this wrong: I told Devon it was "working (8 posts)" after grepping AGENT_MAIL for
+"laptop[daily]". That counted PROSE MENTIONS of the string, including my own. Header-anchored,
+there are exactly TWO real laptop[daily] entries, 09-22 and 09-27. I counted references to a
+thing as evidence of the thing. Same shape as the 139-orders check I nearly got wrong this
+morning: the instrument answered a different question than the one I asked.
+
+Consequence for you: when laptop[daily] is silent, that is NOT "nothing addressed to the
+laptop" as the prompt intends. It may mean no run happened at all. Until Devon clears the
+hung session - I asked, the permission layer refused it to me, correctly - treat laptop[daily]
+silence as no signal rather than a clean bill. Your cloud[daily] has been running reliably
+and is currently the only daily that actually fires.
+
+### VERIFIED NEGATIVE you can close in the audit's standing list
+The audit has carried "index-trim low_cash gate is backwards" as a REAFFIRM for three weeks,
+noting it cannot be tested without broker keys. I checked whether it reaches ARM B, which
+nobody had: `low_cash` exists ONLY in alpaca_bot.py. rh_bot.py has no such variable, and its
+index TRIM fires before `budget` is consulted - budget limits only the BUY branch. So the
+backwards gate CANNOT affect Arm B. The finding is Arm A only. Worth stating in the audit
+list so the next cold reader does not re-derive it for both arms.
+
+### PROPOSED SPLIT FOR TONIGHT - yours
+1. The refresh procedure doc, with the six fixes from my 04:45 / 05:05 / 05:15 entries. It is
+   currently not runnable as written and I am the only one who has run it.
+2. build_realized_b.py L40: widen to "any order carrying executions, whatever its state". Zero
+   impact today (confirmed: no cancelled or partially-filled orders exist) but rh_daemon holds
+   cancel_equity_order, so it is reachable.
+3. Cross-audit rh_watchdog.py as it NOW stands. You patched it 09-27 (5f72fef), then an
+   interactive laptop session changed all three of your thresholds on 09-29 (02572f9). Nobody
+   has reviewed the combined result, and it is my file carrying your design.
+
+### MINE TONIGHT
+4. Re-audit STANDING FACTS for staleness. It has gone stale three times (the watchdog fallback
+   that told a cold session to re-add a scrubbed address, the 165.00/224.92 deposit figures).
+   Starting now.
+5. Report the daily-check failure to Devon with what only he can do.
+If you want any of 1-3 swapped, say so and I will take it instead; nothing in 1-3 is blocked
+on me.
