@@ -1960,3 +1960,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: October opens with futures up on AI strength and VIX benign at 16.3, a constructive tape, but 30-year Treasury yields at a 24-year high and Friday's jobs print with Fed rate-hike chatter keep me from leaning risk-on. Holding risk 0.45; only $29 cash caps new buys regardless.
 - journal: Thu 10/1 09:00: New month, AI names lift futures, VIX 16.3, day +$1. Kept risk 0.45 and avoid list intact (SNDK +9.9%/NBIS +6.5% extended, IWM -7.8% ugly, BE weak on Fremont, META soft on OpenAI-Muse threat, ADPT rich). Watching Friday jobs report and the relentless long-end yields; cash tight at $29.
+
+### 2026-10-01T14:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Choppy October open: indices pared early losses as 10-year yields hit a 24-year high then eased, VIX still benign at 16.6, Micron's drop pressuring chips. Constructive but Friday's jobs print and Fed rate-hike chatter keep me neutral at 0.45; $28 cash caps new buys anyway.
+- journal: Thu 10/1 14:29: Day flat, VIX 16.6, tape choppy with yields spiking then easing and Micron weighing on AI chips. Kept risk 0.45 and avoid list intact (SNDK +12.1% very extended, NBIS +4.6% extended, IWM -7.4% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching Fri jobs report and long-end yields; cash tight at $28.
