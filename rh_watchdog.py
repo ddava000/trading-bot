@@ -26,13 +26,36 @@ os.environ.setdefault("ALPACA_API_KEY", "unused-in-watchdog")
 os.environ.setdefault("ALPACA_SECRET_KEY", "unused-in-watchdog")
 import alpaca_bot as bot
 
+def _env_int(name, default):
+    try:
+        return int((os.environ.get(name) or "").strip() or default)
+    except ValueError:
+        return default
+
+
+def _env_tuple(name, default):
+    try:
+        vals = tuple(int(x) for x in (os.environ.get(name) or "").split(",") if x.strip())
+    except ValueError:
+        vals = ()
+    return vals or default
+
+
 STATUS_F  = "rh_status.json"
 STALE_MIN = 30    # heartbeat is 15 min, so >30 = ~2 missed pushes = likely down
-CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots)
+CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots) ON THE NATIVE SCHEDULE
 # GitHub delays and drops scheduled runs, so the runs do not tile 30-min windows.
 # A threshold counts as crossed if it fell in the last CROSS_WINDOW_MIN: wider than
 # the cadence so a late run cannot skip it. A rare duplicate beats a missed alert.
-CROSS_WINDOW_MIN = 45
+# These three are overridden per TRIGGER by rh-watchdog.yml (empty = the defaults here, which are
+# the original behaviour). GitHub's native */30 cron measured 1 to 3 runs a day on 2026-09-09 to
+# 09-30, one inside market hours, so the workflow ALSO runs after every Arm A run (about every 15
+# min, 26 a day). At that density the defaults would mail on every run while the laptop is down, so
+# that trigger passes a narrower window and thresholds for the stale path as well.
+CROSS_WINDOW_MIN = _env_int("WATCHDOG_CROSS_WINDOW_MIN", 45)
+# Empty = alert on EVERY run while the heartbeat is stale (the original behaviour, right for a
+# sparse schedule). Set, the stale alert fires once per threshold, in minutes THIS SESSION.
+STALE_ALERT_MIN = _env_tuple("WATCHDOG_STALE_ALERT_MIN", ())
 
 # DEGRADED means the daemon is ALIVE and pushing but cannot reach the broker, so it
 # can neither see nor trade the account. It copies the last known equity forward to
@@ -48,11 +71,19 @@ CROSS_WINDOW_MIN = 45
 # First threshold 60, not 45: since dd21a55 the daemon itself alerts at 15 min, so
 # this is the independent BACKSTOP, not a second copy of the same mail.
 DEGRADED_ALERT_MIN = (60, 180, 360)
-GRACE_MIN = 5     # Devon 2026-08-04: minimal delay after the open. The 30-min
+GRACE_MIN = _env_int("WATCHDOG_GRACE_MIN", 5)     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
                   # laptop's own first heartbeat - so a no-show laptop is caught by
                   # then without false-alarming before it has had a chance to push.
+
+
+def crossed(mins, thresholds, window=None):
+    """Thresholds this duration crossed within the last `window` minutes. Stateless: each one
+    fires on the run (or runs) landing in the window after it, so a window wider than the run
+    spacing guarantees at least one, and may give two."""
+    window = CROSS_WINDOW_MIN if window is None else window
+    return [t for t in thresholds if mins >= t > (mins - window)]
 
 
 def _email(frm, pw, to, subject, body):
@@ -150,6 +181,14 @@ def alert(msg, urgent=False):
             print("ntfy failed:", e)
 
     print("sent via:", ", ".join(sent) if sent else "NOTHING (no channels configured)")
+    return bool(sent)
+
+
+def notify(msg, urgent=False):
+    """alert() as an exit code. An alert that reached NO channel must turn the run RED: a green
+    run that says 'sent via: NOTHING' is a dead-man's switch that has quietly stopped switching,
+    and a red run makes GitHub itself email the repo owner."""
+    return 0 if alert(msg, urgent) else 1
 
 
 
@@ -196,9 +235,8 @@ def main():
     # Manual test path: verify every channel reaches the phone without waiting
     # for a real outage. Triggered from the Actions tab with force=true.
     if os.environ.get("FORCE_ALERT", "").lower() == "true":
-        alert("TEST alert from the RH watchdog. All three channels are wired up. "
-              "This is not a real outage.", urgent=True)
-        return 0
+        return notify("TEST alert from the RH watchdog. All three channels are wired up. "
+                      "This is not a real outage.", urgent=True)
 
     et = datetime.now(bot.ET_TZ)
     open_now, _ = bot.check_market()
@@ -217,9 +255,8 @@ def main():
         ts = datetime.strptime(status["ts"], "%Y-%m-%dT%H:%M").replace(tzinfo=bot.ET_TZ)
     except Exception as e:
         # A missing or unreadable status file during open market is itself a red flag.
-        alert(f"RH watchdog could not read {STATUS_F} ({e}). Check the laptop "
-              f"when convenient; Robinhood is index-only so nothing urgent is pending.")
-        return 0
+        return notify(f"RH watchdog could not read {STATUS_F} ({e}). Check the laptop "
+                      f"when convenient; Robinhood is index-only so nothing urgent is pending.")
 
     # DEGRADED comes first: a degraded daemon keeps `ts` fresh, so the staleness
     # check below would call it healthy and return before ever looking.
@@ -236,15 +273,17 @@ def main():
             # Cannot measure duration. Say so and alert anyway rather than infer zero:
             # a check that reports "fine" when it could not look is the failure this
             # whole change exists to remove.
-            alert(f"Arm B is DEGRADED ({why}) and the watchdog could not measure how "
-                  f"long, so this may repeat. The laptop is alive and pushing but "
-                  f"cannot reach the broker, so it can neither see nor trade the "
-                  f"account. Not urgent: index-only has no stops waiting to fire.")
-            return 0
-        crossed = [t for t in DEGRADED_ALERT_MIN
-                   if mins >= t > (mins - CROSS_WINDOW_MIN)]
-        if crossed:
-            alert(chr(10).join([
+            return notify(f"Arm B is DEGRADED ({why}) and the watchdog could not measure how "
+                          f"long, so this may repeat. The laptop is alive and pushing but "
+                          f"cannot reach the broker, so it can neither see nor trade the "
+                          f"account. Not urgent: index-only has no stops waiting to fire.")
+        # Minutes THIS SESSION, never more than the time since the open. An outage that ran past
+        # yesterday's close and is still going has a wall-clock duration of many hours, every
+        # threshold is then long past, and the stateless window below would never match again:
+        # the watchdog would stay silent all day while the account could not trade.
+        mins = min(mins, since_open)
+        if crossed(mins, DEGRADED_ALERT_MIN):
+            return notify(chr(10).join([
                 f"Arm B has been unable to trade for about {int(mins)} minutes "
                 f"({why}), during open market.",
                 "",
@@ -259,16 +298,21 @@ def main():
                 '    claude -p "Reply with exactly: ALIVE"',
                 "and if that fails:  claude auth login",
             ]))
-        else:
-            print(f"Arm B degraded ({why}) for {int(mins)}m - already alerted, "
-                  f"next threshold not yet crossed")
+        print(f"Arm B degraded ({why}) for {int(mins)}m this session - no threshold crossed "
+              f"in the last {CROSS_WINDOW_MIN}m (an earlier one fired on an earlier run)")
         return 0
 
     if stale < STALE_MIN:
         print(f"bot healthy - last heartbeat {int(stale)}m ago ({status['ts']} ET)")
         return 0
 
-    alert(chr(10).join([
+    if STALE_ALERT_MIN:
+        silent = min(stale, since_open)       # a heartbeat missing since yesterday is missing since the open
+        if not crossed(silent, STALE_ALERT_MIN):
+            print(f"laptop silent {int(silent)}m this session - no threshold crossed in the last "
+                  f"{CROSS_WINDOW_MIN}m (an earlier one fired on an earlier run)")
+            return 0
+    return notify(chr(10).join([
         f"The RH laptop bot has stopped reporting. Last heartbeat {status['ts']} ET, "
         f"about {int(stale)} min ago, during open market."
         + (f" It was already DEGRADED ({status.get('degraded')}) when it went quiet."
@@ -286,7 +330,6 @@ def main():
         "Do NOT trust `claude mcp list`; it reports Connected even when the bridge",
         "cannot authenticate at all.",
     ]))
-    return 0
 
 
 if __name__ == "__main__":

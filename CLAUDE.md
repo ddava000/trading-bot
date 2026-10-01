@@ -163,6 +163,12 @@ Both bots publish status files read from the public repo: `status.json` (cloud) 
 only if the current UTC time is well past it. An old timestamp on a weekend or
 overnight is normal, both bots rest when markets are closed.
 
+The cloud watchdog for the laptop (`rh_watchdog.py`, `rh-watchdog.yml`) cannot rely on
+GitHub's native cron: measured 2026-09-09 to 09-30 it ran 1 to 3 times a day, once inside
+market hours. It also runs after every Arm A run (which cron-job.org triggers about every 15
+minutes), and on that path alerts once per threshold rather than on every run. Count its real
+runs (`gh run list --workflow rh-watchdog.yml`) instead of trusting the cron line.
+
 ## Work from your phone (Claude Code on the web)
 Devon can drive this repo from a phone with zero computer running, via Claude Code
 on the web (claude.ai/code, or the Code tab in the Claude app). One-time: connect
