@@ -1,36 +1,36 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-01T13:45Z",
+ "as_of_utc": "2026-10-01T14:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-01T13:45:24+00:00",
+  "checked_at": "2026-10-01T14:00:38+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 21.79,
+ "cash": 16.34,
  "crypto_enabled": true,
- "day_pnl": 0.35,
+ "day_pnl": -0.18,
  "earnings_guard": "live",
- "equity": 235.26,
+ "equity": 234.73,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 3.0,
-  "NBIS": 5.5,
-  "NVDA": 2.0,
-  "PLTR": 0.2,
-  "SNDK": 10.9
+  "MSFT": 2.7,
+  "NBIS": 3.5,
+  "NVDA": 1.6,
+  "PLTR": 2.2,
+  "SNDK": 10.0
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-01T14:05Z",
+ "next_expected_utc": "2026-10-01T14:20Z",
  "orders_this_run": 1,
  "plan": {
   "date": "2026-10-01",
@@ -56,9 +56,9 @@
     }
    }
   },
-  "checked_at": "2026-10-01T13:45:22+00:00",
-  "fills": 77,
-  "last_fill": "2026-10-01T13:45:21.576788Z",
+  "checked_at": "2026-10-01T14:00:36+00:00",
+  "fills": 78,
+  "last_fill": "2026-10-01T14:00:31.236097Z",
   "last_sale": "2026-09-30",
   "lt": {
    "gains": 0.0,
@@ -89,14 +89,14 @@
    }
   }
  },
- "regime": "risk-on",
+ "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 51.69,
-  "index": 122.39,
-  "trade": 32.13
+  "hold": 51.48,
+  "index": 122.15,
+  "trade": 39.31
  },
- "ts": "2026-10-01T09:45 ET",
- "vix": 16.5,
- "vs_baseline_pct": -5.1
+ "ts": "2026-10-01T10:00 ET",
+ "vix": 16.8,
+ "vs_baseline_pct": -5.32
 }
