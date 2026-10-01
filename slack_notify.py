@@ -18,7 +18,7 @@ never be able to take down a trading run.
 Config: SLACK_WEBHOOK_URL (GitHub secret / laptop env). Unset = silent no-op,
 which is the state of the world until Devon creates the webhook.
 """
-import os, sys, re, json, urllib.request, urllib.error, urllib.parse
+import os, sys, re, json, time, urllib.request, urllib.error, urllib.parse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -110,7 +110,9 @@ def _entries():
     """
     try:
         with open(MAILBOX, encoding="utf-8") as f:
-            lines = f.read().splitlines()
+            # "\n" ONLY, like mail_check.HDR. splitlines() also breaks on U+2028 and friends,
+            # so a header-shaped string after one became an entry here and not there.
+            lines = f.read().replace("\r\n", "\n").split("\n")
     except OSError as e:
         print(f"  [slack: cannot read mailbox: {e}]")
         return []
@@ -167,7 +169,19 @@ CHANNEL_ID = (os.environ.get("SLACK_CHANNEL_ID") or "").strip()
 # in, and the whole body lands inside a fenced block labelled as data. Defanging
 # stays ASCII on purpose: a zero-width space would be invisible in the mailbox
 # and blows up on the Windows cp1252 consoles we all run through.
-_HEADING_RE = re.compile(r"^(#{1,6})\s", re.M)
+_HEADING_RE = re.compile(r"^[ \t]*(#{1,6})\s", re.M)
+# splitlines() and some editors treat these as line breaks while a "\n"-only parser does not, so
+# text carrying one could forge an entry header in one reader and not another. Untrusted text is
+# normalised to "\n" on the way in (escapes, so this file stays ASCII).
+_LINE_SEPS = re.compile("[\r\x0b\x0c\x1c\x1d\x1e\x85\u2028\u2029]")
+MAX_INGEST_CHARS = 4000          # per message; a pasted wall of text must not bloat the mailbox
+_ARCHIVE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "AGENT_MAIL_ARCHIVE.md")
+# ONLY the heading line this module writes counts as a cursor. The marker used to be matched
+# anywhere in the file, so a message containing "slack-ts:9999999999.9" (or a paste of one) filed
+# inside the fenced block moved the cursor into the future and silenced ingest for good, with the
+# output still saying "no new channel messages".
+_MARKER_RE = re.compile(r"^## \[[^\n\]]*\] slack -> all  \[relayed from the Slack channel, "
+                        r"slack-ts:([0-9]+\.[0-9]+)\]\s*$", re.M)
 _FENCE = "`" * 3
 
 
@@ -250,11 +264,18 @@ def _last_ingested_ts():
     watcher on 08-23. The repo is the one disk all three of us share, so the marker
     goes in the entry heading and every session agrees on it.
     """
-    try:
-        with open(MAILBOX, encoding="utf-8") as f:
-            found = re.findall(r"slack-ts:([0-9.]+)", f.read())
-    except OSError:
-        return None
+    found = []
+    for i, path in enumerate((MAILBOX, _ARCHIVE)):
+        try:
+            with open(path, encoding="utf-8") as f:
+                found += _MARKER_RE.findall(f.read())
+        except OSError:
+            if i == 0:
+                return None             # no live mailbox: cannot tell, same as before
+    # The weekly audit ARCHIVES settled entries, relay entries included, so the archive must be
+    # read too or a fresh pull re-files every recent message. And no real message is from the future.
+    horizon = time.time() + 86400
+    found = [x for x in found if float(x) <= horizon]
     return max(found, key=float) if found else None
 
 
@@ -289,7 +310,10 @@ def pull(limit=25, ingest=False):
         _FENCE,
     ]
     for m in msgs:
-        safe = _HEADING_RE.sub(r"(\1) ", m["text"]).replace(_FENCE, "'''")
+        text = _LINE_SEPS.sub(chr(10), m["text"].replace(chr(13) + chr(10), chr(10)))
+        if len(text) > MAX_INGEST_CHARS:
+            text = text[:MAX_INGEST_CHARS] + "\n... (truncated on ingest)"
+        safe = _HEADING_RE.sub(r"(\1) ", text).replace(_FENCE, "'''")
         lines.append("<%s %s> %s" % (m["user"], m["ts"], safe))
     lines += [_FENCE, ""]
     try:
