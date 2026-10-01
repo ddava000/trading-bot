@@ -156,11 +156,15 @@ format and protocol are documented at the top of that file.
 up to 3 hours into the future, because the writer guessed elapsed time). Use
 `python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET'))"`.
 In Git Bash `TZ=America/New_York date` silently returns UTC. The commit time is the authority
-when stamps disagree.
+when stamps disagree. If `zoneinfo` raises (the plain `python` on PATH can be C:/Python314, which
+has no tzdata), use C:/Users/devon/AppData/Local/Python/bin/python, or take `date -u` minus 4h
+until Nov 1 2026 and minus 5h after.
 **Session names (Devon 2026-10-01: he could never tell from a mail alert who must check mail).**
 Every mail alert now leads with "Have <name> check mail." Names: CLOUD (the interactive cloud
-session; mail addressed to `cloud`), BOT DAILY CHECK (cloud[daily]), LAPTOP BOT DAILY CHECK
-(laptop). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, laptop, audit)
+session; mail addressed to `cloud`), BOT DAILY CHECK (cloud[daily]), LAPTOP BOT (`laptop`, the
+interactive session that owns the daemon), LAPTOP BOT DAILY CHECK (`laptop[daily]`), and BOT WEEKLY
+AUDIT (`audit`, the Sunday GitHub workflow: it reads mail itself, so alerts never ask Devon to wake
+it). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, laptop, audit)
 never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
 line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test.
 

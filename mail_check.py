@@ -63,8 +63,28 @@ BROADCAST = ("both", "all")
 # tells them apart: `-> laptop` is LAPTOP BOT, `-> laptop[daily]` is LAPTOP BOT DAILY CHECK.
 # A "name[qualifier]" key here wins over the bare name when an entry is addressed that way.
 # Broadcasts (`-> all`, `-> both`) name the bare session.
-DISPLAY = {"cloud": "CLOUD", "laptop": "LAPTOP BOT",
-           "laptop[daily]": "LAPTOP BOT DAILY CHECK"}
+# The weekly audit (token audit) is a GitHub Actions workflow, not a chat: it cannot introduce itself
+# and Devon cannot tell it anything. He asked CLOUD to name it (2026-10-01): BOT WEEKLY AUDIT, after
+# BOT DAILY CHECK. See SELF_READING for why alerts never tell him to wake it.
+# The five named sessions (tests/test_session_roster.py pins this exactly; changing a name needs Devon):
+#   cloud CLOUD | cloud[daily] BOT DAILY CHECK | laptop LAPTOP BOT | laptop[daily] LAPTOP BOT DAILY CHECK
+#   | audit BOT WEEKLY AUDIT. Mail addressed to a bare token names the interactive session.
+DISPLAY = {"cloud": "CLOUD", "cloud[daily]": "BOT DAILY CHECK",
+           "laptop": "LAPTOP BOT", "laptop[daily]": "LAPTOP BOT DAILY CHECK",
+           "audit": "BOT WEEKLY AUDIT"}
+
+# Sessions that are not a chat Devon can open and say "check mail" to. They read the mailbox on their
+# own schedule, so an alert says that instead of asking him to wake them. name -> when it reads.
+SELF_READING = {"audit": "every Sunday"}
+
+
+def _base(key):
+    return key.split("[")[0]
+
+
+def wake_keys(keys):
+    """The DISPLAY keys Devon can actually wake (everything except the self-reading sessions)."""
+    return [k for k in keys if _base(k) not in SELF_READING]
 
 
 def display(w):
@@ -85,7 +105,11 @@ def name_key(to, tag):
 
 def action_line(names):
     """The one sentence an email or Slack post leads with, so the reader knows who to wake."""
-    return "Have " + names_text(names) + " check mail."
+    wake = wake_keys(names)
+    if not wake:
+        when = SELF_READING.get(_base(names[0]), "on its schedule") if names else "on its schedule"
+        return names_text(names) + " reads mail by itself " + when + ". Nothing for you to do."
+    return "Have " + names_text(wake) + " check mail."
 
 # Capture the timestamp, do NOT validate it. laptop's fe8c2e0 parser cross-check
 # (2026-08-23) found the strict version silently skipped ordinary typos: a
@@ -279,12 +303,16 @@ def _report(buckets, quiet, ctx):
             lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}" + ("[%s]" % e["to_tag"] if e.get("to_tag") else ""),
                       f"      {e['first'][:100]}"]
         lines.append("")
-    lines += [f"Open {names_text(list(hits))} and say: check mail.",
-              "This watcher reports that mail arrived; it does not read or act on content."]
+    wake = wake_keys(all_keys)
+    if wake:
+        lines.append(f"Open {names_text(wake)} and say: check mail.")
+    lines.append("This watcher reports that mail arrived; it does not read or act on content.")
     body = NL.join(lines)
     print(body)
     if not quiet:
-        send(f"AGENT_MAIL: have {names_text(all_keys)} check mail ({total} new)", body)
+        subject = (f"AGENT_MAIL: have {names_text(wake)} check mail ({total} new)" if wake else
+                   f"AGENT_MAIL: {total} new for {names_text(all_keys)} (it reads them itself, nothing to do)")
+        send(subject, body)
     return 1
 
 

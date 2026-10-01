@@ -38,14 +38,14 @@ class NameTests(unittest.TestCase):
         self.assertEqual(M.display("laptop"), "LAPTOP BOT")
 
     def test_a_session_not_yet_named_shows_its_bare_name_not_nothing(self):
-        self.assertEqual(M.display("audit"), "audit")
+        self.assertEqual(M.display("someone-new"), "someone-new")
         self.assertEqual(M.display(None), "the sessions")
 
     def test_the_lead_line_reads_naturally_for_one_two_and_three_sessions(self):
         self.assertEqual(M.action_line(["cloud"]), "Have CLOUD check mail.")
         self.assertEqual(M.action_line(["cloud", "laptop"]), "Have CLOUD and LAPTOP BOT check mail.")
-        self.assertEqual(M.action_line(["cloud", "laptop", "audit"]),
-                         "Have CLOUD, LAPTOP BOT and audit check mail.")
+        self.assertEqual(M.action_line(["cloud", "cloud[daily]", "laptop"]),
+                         "Have CLOUD, BOT DAILY CHECK and LAPTOP BOT check mail.")
 
     def test_display_values_are_plain_text_a_subject_line_can_carry(self):
         """Devon prints mail to PDF by subject: no emoji, and nothing that is not ASCII."""
