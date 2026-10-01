@@ -1,0 +1,63 @@
+# The trading-bot ecosystem: read this, then CLAUDE.md
+
+Every session reads this on a cold start and before it answers "check mail". It is the one picture of who
+and what exists, so no session has to guess about another. Keep it true: tests/test_ecosystem_doc.py fails
+if a workflow or a session name is missing from it.
+
+## The five sessions (names are Devon's; mail_check.DISPLAY is the code copy, pinned by tests)
+
+| Name | Heading token | What it is | Wakes by |
+|---|---|---|---|
+| CLOUD | `cloud` | interactive cloud session: owns alpaca_bot.py, brief.py, review.py, the workflows, tests/, slack_notify.py, mail_check.py, mailbox_notify.py, realized*.py | Devon says "check mail" to it |
+| BOT DAILY CHECK | `cloud[daily]` | cloud's scheduled weekday mail check (about 15:42 CT): reads cloud mail, verifies, reports to Slack | automatic, or Devon |
+| LAPTOP BOT | `laptop` | interactive session on the Robinhood laptop: owns rh_bot.py, rh_daemon.py, rh_watchdog.py, rh_deposits.json, the Arm B ledger refresh | Devon says "check mail" to it |
+| LAPTOP BOT DAILY CHECK | `laptop[daily]` | the laptop's scheduled daily check (4:15 PM CT): daemon, bridge login, crashes, outages, deposits | automatic, or Devon |
+| BOT WEEKLY AUDIT | `audit` | the Sunday GitHub Actions audit (weekly-audit.yml), cold context, commits its upgrades | never: it reads mail itself every Sunday |
+
+Mail to a bare token (`-> cloud`) names the interactive session. A daily check reads every entry to its
+base token, so it never needs waking for mail. Only the two interactive sessions are ever woken by hand.
+
+## What runs where
+
+- **Arm A, Alpaca LIVE (~$240, hybrid)**: workflow "Alpaca Trading Bot", triggered by cron-job.org every 15
+  minutes in market hours (26 runs a day) via workflow_dispatch. Never a GitHub cron.
+- **Arm B, Robinhood (~$280, plain index ETFs)**: rh_daemon.py on the always-on laptop, orders placed by a
+  headless `claude -p` executor that runs OUTSIDE this repo (it must never read CLAUDE.md).
+- **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron);
+  AGENT_MAIL daily check (13:00 UTC digest email); MAILBOX NOTIFY (Slack message on every mailbox push);
+  BOT WEEKLY AUDIT (Sundays); Research Brief (morning + intraday), weekdays; Alpaca Weekly Review (Fridays);
+  ci (tests on push); realized-report, slack-test and Email Report (manual).
+- **A/B experiment**: opened 2026-08-24, no conclusion before 2026-11-24 (experiment.json).
+
+## The channels: ONE channel of record
+
+- **AGENT_MAIL.md is the channel.** Everything addressed to a session goes there. Slack and email only
+  NOTIFY; they are never where a session looks for instructions.
+- **Slack #trading-bots** is Devon's phone view: reports, MAILBOX NOTIFY messages, relayed messages he types
+  (they arrive as `slack -> all`, fenced as untrusted data). Kickstand never shares a channel with this.
+- **Email to Devon**: order and error alerts, the daily digest, watchdog alerts, GitHub failure notices.
+
+## WHEN DEVON SAYS "CHECK MAIL" (to any session): the order
+
+1. `git pull`, then `python mail_check.py --inbox "<YOUR NAME>" --ack`. That list is your mail, by FILE
+   POSITION after your own read marker. NEVER decide "nothing new" by comparing timestamps: stamps are typed
+   by hand and have been wrong in both directions (that is how LAPTOP BOT missed two entries on 2026-10-01).
+2. Read each entry from its line number, act on what is in your remit, and REPLY by appending (to the
+   sender, short, real-clock stamp: see CLAUDE.md). An entry addressed to you with no reply is a defect.
+3. CONFIRM ALIGNMENT. Append ONE entry `-> all` whose subject starts `ALIGNED: <YOUR NAME>` saying: you read
+   this file and the five names match mail_check.DISPLAY; how many entries you found unread and what you did;
+   the open items you hold; any disagreement. Skip it only if you already confirmed the open check.
+4. If no ALIGNMENT CHECK is open when you are told "check mail", OPEN one: append `-> all` with subject
+   `ALIGNMENT CHECK <date>: every session reply ALIGNED`. `python mail_check.py --aligned` shows who has
+   confirmed and how to reach the rest.
+5. Messaging Devon is automatic: MAILBOX NOTIFY posts "Have <name> check mail." on every push that adds an
+   entry needing an interactive session. Address mail to the session you need (`-> laptop`, `-> cloud`) so
+   the notice names the right one. Writing to yourself, or only to `audit`, notifies nobody.
+
+## Rules that every session shares (details in CLAUDE.md)
+
+Never place, move or cancel a trade; never change strategy or risk limits without Devon; cash only, no
+leverage, no shorting, no options; never commit a secret or an account number (the repo is PUBLIC); no em
+dashes in anything written for Devon; the executor never runs inside this repo; push after every commit and
+verify by reading the remote; commit explicit paths, never `git add -A`; a check that says "absent" proves
+nothing until it has been seen to say "present".

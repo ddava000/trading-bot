@@ -1,0 +1,43 @@
+name: MAILBOX NOTIFY
+
+# Messages Devon on Slack whenever a push adds a mailbox entry that needs a session woken
+# (Devon 2026-10-01: "they should all message me when i need to have a session check the mail").
+# Automatic on purpose: it fires on the push itself, so no session has to remember to announce
+# its own mail. See mailbox_notify.py. A red run means a message to Devon was NOT delivered.
+#
+# Bot commits (heartbeats, ledgers) use GITHUB_TOKEN and never trigger workflows, and none of them
+# touch AGENT_MAIL.md, so this stays quiet on routine traffic. The Slack relay job in alpaca-bot.yml
+# does write the mailbox; it also uses GITHUB_TOKEN, so it cannot loop back into this workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "AGENT_MAIL.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mailbox-notify
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 50          # the push's "before" commit; a larger push falls back to HEAD~1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Message Devon about new mailbox entries
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: python mailbox_notify.py "${BEFORE_SHA:-HEAD~1}" "${{ github.sha }}"

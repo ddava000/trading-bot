@@ -3,6 +3,9 @@
 This repo runs two automated trading bots. One trades REAL MONEY. Read the hard
 rails before doing anything.
 
+**Then read `ECOSYSTEM.md`**: the five named sessions, every automation, the ONE mail channel, and the
+order to follow when Devon says "check mail".
+
 ## HARD SAFETY RAILS (never violate)
 - **Never place, move, or approve a real-money trade yourself.** Claude engineers
   the automation; the BOT places orders. Do not buy, sell, or transfer on Devon's
@@ -46,7 +49,8 @@ Two Claude sessions may work here at once. Coordinate through the repo (commit +
 pull); the sessions cannot talk directly.
 - **Cloud session owns:** `alpaca_bot.py`, `brief.py`, `review.py`, `backtest.py`,
   `.github/workflows/`, `realized.py`, `realized_report.py`, `build_realized_b.py`,
-  `pnl.py`, `check_ascii.py`, `slack_notify.py`, `mail_check.py`, and `tests/`.
+  `pnl.py`, `check_ascii.py`, `slack_notify.py`, `mail_check.py`,
+  `mailbox_notify.py` and `tests/`.
 - **Laptop session owns:** `rh_bot.py`, `rh_daemon.py`, `rh_watchdog.py`,
   `setup_laptop.ps1`, `rh_deposits.json`, and refreshing `realized_b.json`.
 - **Tests and CI.** Run `python -m unittest discover -s tests` before pushing code.
@@ -167,6 +171,12 @@ AUDIT (`audit`, the Sunday GitHub workflow: it reads mail itself, so alerts neve
 it). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, laptop, audit)
 never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
 line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test.
+**"Check mail" (Devon 2026-10-01) means the same thing to every session**: `git pull`, then
+`python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by FILE POSITION after your own read marker,
+never by comparing timestamps), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
+entry `-> all` after reading ECOSYSTEM.md. If no `ALIGNMENT CHECK` is open, open one. Devon is messaged
+automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. The
+full order is in ECOSYSTEM.md.
 
 ## Kill switch
 Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its

@@ -140,19 +140,187 @@ def parse_ts(ts, tz):
     return None
 
 
+_SENDER = re.compile(r"^## \[[^\]]*\]\s*(\w+)(?:\[([^\]]*)\])?")
+_SUBJECT = re.compile(r"->\s*\w+(?:\[[^\]]*\])?\s*\[(.*)\]\s*$")
+
+
 def entries(text):
     out, ms = [], list(HDR.finditer(text))
     for i, m in enumerate(ms):
         end = ms[i + 1].start() if i + 1 < len(ms) else len(text)
         body = text[m.end():end].strip()
+        eol = text.find("\n", m.start())
+        line_text = text[m.start(): eol if eol != -1 else len(text)].strip()
+        sm, subj = _SENDER.match(line_text), _SUBJECT.search(line_text)
         out.append({"ts": _TZ_SUFFIX.sub("", m.group(1)).strip(), "from": m.group(2).lower(),
-                    "to": m.group(3).lower(), "to_tag": ((m.group(4) if m.re.groups >= 4 else "") or "").lower(), "hdr": m.group(0).strip(),
+                    "to": m.group(3).lower(), "to_tag": ((m.group(4) if m.re.groups >= 4 else "") or "").lower(),
+                    "hdr": m.group(0).strip(),
+                    # Position, not time: the FILE ORDER is the only order every session agrees on. Stamps
+                    # are typed by hand and have been wrong in both directions (2026-09-30 and 10-01).
+                    "line": text.count("\n", 0, m.start()) + 1, "line_text": line_text,
+                    "from_tag": ((sm.group(2) if sm else "") or "").lower(),
+                    "subject": subj.group(1) if subj else "",
                     "first": next((l for l in body.split("\n") if l.strip()), "")})
     return out
 
 
 def addressed_to(e, who):
     return who is None or e["to"] == who or e["to"] in BROADCAST
+
+
+# ---------------------------------------------------------------------------------------------
+# THE ONE WAY EVERY SESSION CHECKS MAIL (Devon 2026-10-01: "check mail" must mean the same thing to all).
+#
+#   python mail_check.py --inbox "LAPTOP BOT" --ack      what is unread for me; then move my marker
+#   python mail_check.py --aligned                        who has confirmed the latest ALIGNMENT CHECK
+#
+# Why it exists: LAPTOP BOT looked for new mail by comparing timestamps with its own last entry, which
+# it had stamped 25 minutes into the future, so two entries addressed to it (including an open decision)
+# looked old and it reported "no new mail". UNREAD HERE IS BY FILE POSITION AFTER A PER-SESSION MARKER,
+# never by timestamp. The marker lives in a gitignored file on the machine that runs the check, keyed by
+# session, so the two laptop sessions (and the two cloud ones) never consume each other's mail.
+CURSORS_FILE = ".mail_inbox_cursors.json"
+INBOX_RECENT = 10
+ALIGN_REQUEST, ALIGN_REPLY = "ALIGNMENT CHECK", "ALIGNED"
+
+
+def resolve_key(name):
+    """'LAPTOP BOT', 'laptop[daily]', 'cloud' -> the DISPLAY key, or None."""
+    low = (name or "").strip().lower()
+    for k, v in DISPLAY.items():
+        if low in (k.lower(), v.lower()):
+            return k
+    return None
+
+
+def _is_daily(key):
+    return key.endswith("[daily]")
+
+
+def addressed_to_key(key, e):
+    """Is this entry mail for the session `key`? A daily check reads every entry to its base token (it is
+    the standing reader of that mailbox); an interactive session skips entries addressed to its daily sibling."""
+    if e["to"] in BROADCAST:
+        return True
+    if e["to"] != _base(key):
+        return False
+    return True if _is_daily(key) else e.get("to_tag") != "daily"
+
+
+def sent_by_key(key, e):
+    """Was it written by this very session (not a sibling that shares the heading token)?"""
+    return e["from"] == _base(key) and (e.get("from_tag") == "daily") == _is_daily(key)
+
+
+def unread_for(all_e, key, marker):
+    """(entries, how). With a marker: everything addressed to `key` after it, by position. Without one, or
+    if the marked heading is gone: the last INBOX_RECENT addressed to it (bias toward reporting)."""
+    mine = lambda e: addressed_to_key(key, e) and not sent_by_key(key, e)
+    if marker:
+        for i in range(len(all_e) - 1, -1, -1):
+            if all_e[i]["line_text"] == marker:
+                return [e for e in all_e[i + 1:] if mine(e)], "since your read marker"
+    return [e for e in all_e if mine(e)][-INBOX_RECENT:], "no read marker found: the last %d addressed to you" % INBOX_RECENT
+
+
+def _ascii(s):
+    return str(s).encode("ascii", "replace").decode()
+
+
+def _load_cursors():
+    try:
+        with open(CURSORS_FILE, encoding="utf-8") as fh:
+            d = json.load(fh)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_cursors(d):
+    with open(CURSORS_FILE, "w", encoding="utf-8") as fh:
+        json.dump(d, fh, indent=1, sort_keys=True)
+
+
+def _read_entries():
+    try:
+        with open(MAILBOX, encoding="utf-8") as fh:
+            text = fh.read()
+    except FileNotFoundError:
+        print(f"{MAILBOX} not found"); return None
+    all_e = entries(text)
+    if not all_e:
+        print("no entries parsed - mailbox format may have changed"); return None
+    return all_e
+
+
+def inbox_cli(argv):
+    i = argv.index("--inbox")
+    name = argv[i + 1] if len(argv) > i + 1 else ""
+    key = resolve_key(name)
+    if not key:
+        print("unknown session %r; expected one of: %s" % (name, ", ".join(DISPLAY.values()))); return 2
+    all_e = _read_entries()
+    if all_e is None:
+        return 2
+    cursors = _load_cursors()
+    unread, how = unread_for(all_e, key, cursors.get(key))
+    print("INBOX for %s: %d unread (%s; by file position, never by timestamp)" % (display(key), len(unread), how))
+    for e in unread:
+        print("  line %-5d %s -> %s%s   [stamp %s ET]" % (
+            e["line"], _ascii(e["line_text"].split("]", 1)[1].split("->")[0].strip()), e["to"],
+            ("[%s]" % e["to_tag"]) if e["to_tag"] else "", _ascii(e["ts"])))
+        print("             " + _ascii(e["subject"] or e["first"])[:110])
+    if unread:
+        print("Read each from its line (sed -n 'LINE,+40p' AGENT_MAIL.md), act, REPLY by appending, then confirm "
+              "with the ALIGNED reply if an ALIGNMENT CHECK is open (python mail_check.py --aligned).")
+    if "--ack" in argv:
+        cursors[key] = all_e[-1]["line_text"]
+        _save_cursors(cursors)
+        print("[read marker moved to the newest entry (line %d) for %s]" % (all_e[-1]["line"], display(key)))
+    return 1 if unread else 0
+
+
+def aligned_status(all_e):
+    """(request_entry or None, [(key, name, state, reply_entry)]). state: asked, aligned or outstanding."""
+    req = None
+    for i in range(len(all_e) - 1, -1, -1):
+        if all_e[i]["subject"].startswith(ALIGN_REQUEST):
+            req = i
+            break
+    if req is None:
+        return None, []
+    rows = []
+    for key in DISPLAY:
+        reply = next((e for e in all_e[req + 1:]
+                      if e["subject"].startswith(ALIGN_REPLY) and sent_by_key(key, e)), None)
+        state = "asked" if sent_by_key(key, all_e[req]) else ("aligned" if reply else "outstanding")
+        rows.append((key, display(key), state, reply))
+    return all_e[req], rows
+
+
+def how_to_reach(key):
+    if key in SELF_READING or _base(key) in SELF_READING:
+        return "automatic: it reads mail itself " + SELF_READING.get(_base(key), "on its schedule")
+    if _is_daily(key):
+        return "automatic at its next scheduled run, or Devon says 'check mail' to " + display(key)
+    return "Devon says 'check mail' to " + display(key)
+
+
+def aligned_cli(argv):
+    all_e = _read_entries()
+    if all_e is None:
+        return 2
+    req, rows = aligned_status(all_e)
+    if req is None:
+        print("no %s entry in the mailbox" % ALIGN_REQUEST); return 0
+    print("%s open since line %d: %s" % (ALIGN_REQUEST, req["line"], _ascii(req["subject"])[:100]))
+    out = 0
+    for key, name, state, reply in rows:
+        extra = ("line %d" % reply["line"]) if reply else (how_to_reach(key) if state == "outstanding" else "asked it")
+        print("  %-24s %-12s %s" % (name, state.upper(), _ascii(extra)))
+        out += state == "outstanding"
+    print("%d of %d still to confirm" % (out, len(rows)))
+    return 1 if out else 0
 
 
 def send(subject, body):
@@ -183,6 +351,10 @@ def send(subject, body):
 
 
 def main():
+    if "--inbox" in sys.argv:
+        return inbox_cli(sys.argv)
+    if "--aligned" in sys.argv:
+        return aligned_cli(sys.argv)
     whos = [None]
     if "--for" in sys.argv:
         raw = sys.argv[sys.argv.index("--for") + 1].lower()
