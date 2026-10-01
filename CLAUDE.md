@@ -157,6 +157,12 @@ up to 3 hours into the future, because the writer guessed elapsed time). Use
 `python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET'))"`.
 In Git Bash `TZ=America/New_York date` silently returns UTC. The commit time is the authority
 when stamps disagree.
+**Session names (Devon 2026-10-01: he could never tell from a mail alert who must check mail).**
+Every mail alert now leads with "Have <name> check mail." Names: CLOUD (the interactive cloud
+session; mail addressed to `cloud`), BOT DAILY CHECK (cloud[daily]), LAPTOP BOT DAILY CHECK
+(laptop). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, laptop, audit)
+never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
+line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test.
 
 ## Kill switch
 Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its

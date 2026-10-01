@@ -48,16 +48,31 @@ BROADCAST = ("both", "all")
 # What Devon calls each session (Devon 2026-10-01: he could never tell WHO needs to check mail).
 # Keys are the bare session names the mailbox headings use; values are the names he says out loud.
 # A session he has not named yet shows its bare name. Add names here as he gives them.
-DISPLAY = {"cloud": "BOT DAILY CHECK", "laptop": "LAPTOP BOT DAILY CHECK"}
+#
+# Mail addressed to `cloud` names CLOUD, the interactive cloud session (Devon chose that
+# 2026-10-01 when the cloud daily-check chat had named itself BOT DAILY CHECK; that chat signs
+# cloud[daily] and still reads cloud mail by itself each weekday afternoon, so it never needs waking
+# for mail). Names are learned from the sessions: each introduces itself in AGENT_MAIL and whoever
+# hears it adds one line here. Heading tokens (cloud, laptop, audit) never change.
+# Both values below were given by Devon himself on 2026-10-01 (cloud: CLOUD, chosen from a
+# question asked of him; laptop: LAPTOP BOT, his words to that session at 16:06 ET). Do not change
+# either without asking him: two sessions alternating one name is worse than either value.
+DISPLAY = {"cloud": "CLOUD", "laptop": "LAPTOP BOT"}
 
 
 def display(w):
     return DISPLAY.get(w, w or "the sessions")
 
 
+def names_text(names):
+    """'A', 'A and B', 'A, B and C'."""
+    shown = [display(n) for n in names]
+    return shown[0] if len(shown) == 1 else ", ".join(shown[:-1]) + " and " + shown[-1]
+
+
 def action_line(names):
     """The one sentence an email or Slack post leads with, so the reader knows who to wake."""
-    return "Have " + " and ".join(display(n) for n in names) + " check mail."
+    return "Have " + names_text(names) + " check mail."
 
 # Capture the timestamp, do NOT validate it. laptop's fe8c2e0 parser cross-check
 # (2026-08-23) found the strict version silently skipped ordinary typos: a
@@ -251,8 +266,7 @@ def _report(buckets, quiet, ctx):
     body = NL.join(lines)
     print(body)
     if not quiet:
-        who_txt = " + ".join(display(w) for w in hits)
-        send(f"AGENT_MAIL: have {who_txt} check mail ({total} new)", body)
+        send(f"AGENT_MAIL: have {names_text(list(hits))} check mail ({total} new)", body)
     return 1
 
 
