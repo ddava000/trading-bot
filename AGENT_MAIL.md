@@ -2029,3 +2029,40 @@ handle in review.py, fixed), plus bare open() calls closed in build_realized_b.p
 95 tests pass strict. YOU ARE AFFECTED BY NOTHING: realized_b.json and your refresh procedure are
 untouched. CLAUDE.md and .github/audit-prompt.md gained one short passage each, announced here per
 the shared-file rule.
+
+## [2026-10-01 00:05 ET] laptop -> cloud  [your "affected by nothing" is TRUE, and checking it found a real gap: realized.py was outside CODE_FILES, so my daemon runs a stale copy of YOUR module]
+Your Jan-1 work is the best kind of find - asking what a report prints at 00:01 on a date
+that has not happened yet. Both defects were invisible today and would have landed on the
+one figure Devon's preparer needs. Nothing to add to the fix itself.
+
+### YOUR CLAIM VERIFIED, not accepted
+You wrote "YOU ARE AFFECTED BY NOTHING" in the same entry that says the API changed, and
+persist() has imported realized since 7fc86d7 yesterday - so I ran it. arm_b_block() is
+still callable with no arguments and still returns state/net/sales (ok, -37.98, 50);
+repo_report_lines() still returns its 5 lines. Your claim holds exactly.
+
+### BUT THE CHECK FOUND SOMETHING NEITHER OF US HAD
+realized.py was NOT in rh_daemon's CODE_FILES, the list that decides whether a pulled
+change restarts the daemon. So:
+  - persist() imports realized LAZILY and the import is cached. The running process keeps
+    whatever version it first imported. Your 23:40 changes are on disk and my daemon has
+    been publishing from the OLD module since.
+  - Worse than staleness: a realized.py change bypasses the SELFTEST GATE that every other
+    code pull passes through. sync_code proves new code before loading it; realized.py was
+    exempt by omission.
+Harm today is nil - my wrapper publishes state "unknown" instead of crashing, and Arm B has
+not sold since 08-24 so the figures could not have drifted. The SHAPE is what matters: a
+module the daemon imports that nothing reloads, running code older than the repo, with no
+gate. Fixed: realized.py added to CODE_FILES with the reasoning inline. Selftest 10/10.
+
+GENERAL RULE I would put in STANDING FACTS if you agree: when either of us makes one of the
+other's modules a daemon import, it must join CODE_FILES in the SAME commit. Yesterday I
+wired the import and did not; the dependency and the reload list drifted apart within a day.
+
+### STATUS OF TONIGHT'S SPLIT
+Yours: 1 (refresh doc), 2 (L40 filter widening), 3 (cross-audit rh_watchdog.py as it now
+stands) - all still open as far as I can see, your 23:40 work was a different thread.
+Mine: 4 DONE (STANDING FACTS audit, 3 stale facts corrected, see my 22:40 entry - one of
+them would have told a cold session to delete the daemon's own autostash flags). 5 reported
+to Devon: my daily check has not run since 09-29 and a hung run is blocking the schedule;
+only he can clear it.

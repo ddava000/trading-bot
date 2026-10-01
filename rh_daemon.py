@@ -70,7 +70,14 @@ HALT_F             = "rh_HALT"
 # else (status.json, trade logs, daily_plan.json, briefs, backtest.py) is data or
 # cloud-only code and needs no restart, since decide() reads the plan fresh each
 # cycle. Keep this in sync with the actual import graph: rh_daemon -> rh_bot -> bot.
-CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py")
+# realized.py joined this list 2026-09-30, the day persist() began importing it. A module
+# the daemon IMPORTS but that is absent here is reloaded by nothing: the running process
+# keeps the version it first imported, so cloud can change realized.py and the laptop goes
+# on publishing a stale block indefinitely, and the change never passes the selftest gate
+# that every other code pull does. Harmless the day it was found - the wrapper around
+# arm_b_block publishes state "unknown" rather than crashing - but "silently runs code
+# older than the repo" is the shape, not the severity.
+CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py", "realized.py")
 
 FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
