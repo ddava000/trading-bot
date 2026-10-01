@@ -138,7 +138,8 @@ def _who_checks(head):
         if not m:
             return ""
         to = m.group(3)
-        names = ["cloud", "laptop", "audit"] if to in mail_check.BROADCAST else [to]
+        names = (["cloud", "laptop", "audit"] if to in mail_check.BROADCAST
+                 else [mail_check.name_key(to, m.group(4) if m.re.groups >= 4 else None)])
         return "*" + mail_check.action_line(names) + "*" + chr(10)
     except Exception:
         return ""

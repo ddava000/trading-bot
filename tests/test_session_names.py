@@ -130,8 +130,16 @@ class LaptopDaemonStaysInStepTests(unittest.TestCase):
 
     def test_the_daemons_alert_leads_with_the_same_sentence(self):
         src = self.source()
-        self.assertIn('f"AGENT_MAIL: have {SESSION_NAME} check mail', src)
-        self.assertIn('f"Have {SESSION_NAME} check mail."', src)
+        # `who` is SESSION_NAME, DAILY_NAME or both, picked per entry from the recipient
+        # qualifier (`-> laptop` vs `-> laptop[daily]`), since Devon named two laptop sessions.
+        self.assertIn('f"AGENT_MAIL: have {who} check mail', src)
+        self.assertIn('f"Have {who} check mail."', src)
+        self.assertIn("else SESSION_NAME", src)
+
+    def test_the_daily_check_name_matches_the_shared_map(self):
+        m = re.search(r'^DAILY_NAME\s*=\s*"([^"]+)"', self.source(), re.M)
+        self.assertIsNotNone(m, "rh_daemon.py no longer defines DAILY_NAME")
+        self.assertEqual(m.group(1), M.DISPLAY["laptop[daily]"])
 
     def test_the_drift_check_can_say_no(self):
         """Positive control: a renamed constant would be caught by the same comparison."""

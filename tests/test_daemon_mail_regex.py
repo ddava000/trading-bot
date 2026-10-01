@@ -66,7 +66,6 @@ class DaemonMailRegexTests(unittest.TestCase):
         self.assertIsNone(old.match(heading))
         self.assertIsNotNone(mail_check.HDR.match(heading))
 
-    @unittest.expectedFailure     # remove this line when rh_daemon._MAIL_HEAD accepts [qualifier]
     def test_the_daemons_notifier_sees_every_live_entry_addressed_to_the_laptop(self):
         rx = daemon_regex()
         if rx is None:

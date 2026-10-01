@@ -1071,7 +1071,15 @@ MAIL_F = "AGENT_MAIL.md"
 # more accurate one. If you are about to change this back, confirm with Devon first -
 # two sessions flipping one string is worse than either value.
 SESSION_NAME = "LAPTOP BOT"
-_MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)\s*->\s*([A-Za-z]+)", re.M)
+# Devon, same day, asked directly: BOTH names stand. LAPTOP BOT is the interactive session
+# that owns this daemon; LAPTOP BOT DAILY CHECK is the scheduled daily check. Mail headed
+# `-> laptop[daily]` is for the daily check, plain `-> laptop` and broadcasts for LAPTOP BOT.
+# Same rule as DISPLAY in mail_check.py.
+DAILY_NAME = "LAPTOP BOT DAILY CHECK"
+# The sender may carry a [qualifier] (cloud[daily], cloud[35819496]). The old pattern could
+# not match those at all, so this notifier never saw mail from a cloud session. Group 4 is
+# the RECIPIENT qualifier.
+_MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*([A-Za-z]+)(?:\[([^\]]*)\])?", re.M)
 
 
 def check_mail(led):
@@ -1096,7 +1104,7 @@ def check_mail(led):
             heads = _MAIL_HEAD.findall(f.read())
         if not heads:
             return
-        keys = ["|".join(h) for h in heads]
+        keys = ["|".join(h[:3]) for h in heads]   # qualifier left out: keeps old ledger keys valid
         seen = led.get("last_mail_seen")
         if seen is None:
             led["last_mail_seen"] = keys[-1]
@@ -1115,17 +1123,20 @@ def check_mail(led):
         led["last_mail_seen"] = keys[-1]
         if not fresh:
             return
-        summary = "; ".join(f"{ts} {frm}->{to}" for ts, frm, to in fresh)
+        who = " and ".join(dict.fromkeys(
+            DAILY_NAME if (h[2].lower() == "laptop" and h[3].lower() == "daily") else SESSION_NAME
+            for h in fresh))
+        summary = "; ".join(f"{ts} {frm}->{to}" for ts, frm, to, _ in fresh)
         log(f"NEW MAIL for the laptop session: {summary}")
-        notify(f"AGENT_MAIL: have {SESSION_NAME} check mail ({len(fresh)} new)", chr(10).join([
-            f"Have {SESSION_NAME} check mail.",
+        notify(f"AGENT_MAIL: have {who} check mail ({len(fresh)} new)", chr(10).join([
+            f"Have {who} check mail.",
             "",
             "New AGENT_MAIL.md entries addressed to the laptop session:",
             "",
-            *[f"  [{ts}] {frm} -> {to}" for ts, frm, to in fresh],
+            *[f"  [{ts}] {frm} -> {to}{'[' + tag + ']' if tag else ''}" for ts, frm, to, tag in fresh],
             "",
             "The daemon cannot act on these; it only reports that they arrived.",
-            f"Open the {SESSION_NAME} session on the laptop and say: check mail.",
+            f"Open the {who} session on the laptop and say: check mail.",
         ]))
     except Exception as e:
         log(f"mail check skipped ({e})")

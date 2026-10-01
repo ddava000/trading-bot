@@ -57,7 +57,14 @@ BROADCAST = ("both", "all")
 # Both values below were given by Devon himself on 2026-10-01 (cloud: CLOUD, chosen from a
 # question asked of him; laptop: LAPTOP BOT, his words to that session at 16:06 ET). Do not change
 # either without asking him: two sessions alternating one name is worse than either value.
-DISPLAY = {"cloud": "CLOUD", "laptop": "LAPTOP BOT"}
+# TWO laptop sessions have names (Devon 2026-10-01, asked directly and he chose two names over
+# one): the interactive session that owns the daemon is LAPTOP BOT, the scheduled daily check is
+# LAPTOP BOT DAILY CHECK. They share the heading token `laptop`, so the RECIPIENT QUALIFIER
+# tells them apart: `-> laptop` is LAPTOP BOT, `-> laptop[daily]` is LAPTOP BOT DAILY CHECK.
+# A "name[qualifier]" key here wins over the bare name when an entry is addressed that way.
+# Broadcasts (`-> all`, `-> both`) name the bare session.
+DISPLAY = {"cloud": "CLOUD", "laptop": "LAPTOP BOT",
+           "laptop[daily]": "LAPTOP BOT DAILY CHECK"}
 
 
 def display(w):
@@ -68,6 +75,12 @@ def names_text(names):
     """'A', 'A and B', 'A, B and C'."""
     shown = [display(n) for n in names]
     return shown[0] if len(shown) == 1 else ", ".join(shown[:-1]) + " and " + shown[-1]
+
+
+def name_key(to, tag):
+    """DISPLAY key for a recipient: "laptop[daily]" if that qualified name exists, else "laptop"."""
+    k = "%s[%s]" % (to, (tag or "").lower())
+    return k if tag and k in DISPLAY else to
 
 
 def action_line(names):
@@ -86,7 +99,8 @@ def action_line(names):
 # invisible to this watcher, so a laptop digest could never report mail from the cloud. The
 # qualifier is accepted and dropped; group 2 and 3 stay the bare session names.
 # (tests/test_mail_check.py also checks every heading in the real mailbox against this.)
-HDR = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*(\w+)", re.M)
+# Group 4 is the RECIPIENT qualifier (None if absent); see DISPLAY for why it is kept.
+HDR = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*(\w+)(?:\[([^\]]*)\])?", re.M)
 _TZ_SUFFIX = re.compile(r"\s*(ET|EST|EDT|UTC|Z)\s*$", re.I)
 
 
@@ -108,7 +122,7 @@ def entries(text):
         end = ms[i + 1].start() if i + 1 < len(ms) else len(text)
         body = text[m.end():end].strip()
         out.append({"ts": _TZ_SUFFIX.sub("", m.group(1)).strip(), "from": m.group(2).lower(),
-                    "to": m.group(3).lower(), "hdr": m.group(0).strip(),
+                    "to": m.group(3).lower(), "to_tag": ((m.group(4) if m.re.groups >= 4 else "") or "").lower(), "hdr": m.group(0).strip(),
                     "first": next((l for l in body.split("\n") if l.strip()), "")})
     return out
 
@@ -253,12 +267,16 @@ def _report(buckets, quiet, ctx):
         return 0
 
     total = sum(len(es) for es in hits.values())
-    lines = [action_line(list(hits)), ""]
+    def keys_for(w, es):               # ordered, unique DISPLAY keys this bucket's entries name
+        ks = [name_key(w, e.get("to_tag")) if e["to"] == w else w for e in es]
+        return list(dict.fromkeys(ks))
+    all_keys = list(dict.fromkeys(k for w, es in hits.items() for k in keys_for(w, es)))
+    lines = [action_line(all_keys), ""]
     for w, es in hits.items():
-        label = display(w)
+        label = " / ".join(display(k) for k in keys_for(w, es))
         lines.append(f"{len(es)} for {label}:")
         for e in es:
-            lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}",
+            lines += [f"  [{e['ts']} ET] {e['from']} -> {e['to']}" + ("[%s]" % e["to_tag"] if e.get("to_tag") else ""),
                       f"      {e['first'][:100]}"]
         lines.append("")
     lines += ["Open a session in the repo and read AGENT_MAIL.md.",
@@ -266,7 +284,7 @@ def _report(buckets, quiet, ctx):
     body = NL.join(lines)
     print(body)
     if not quiet:
-        send(f"AGENT_MAIL: have {names_text(list(hits))} check mail ({total} new)", body)
+        send(f"AGENT_MAIL: have {names_text(all_keys)} check mail ({total} new)", body)
     return 1
 
 
