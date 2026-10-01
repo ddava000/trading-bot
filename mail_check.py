@@ -50,7 +50,14 @@ BROADCAST = ("both", "all")
 # single-digit hour, a missing "ET", or seconds. The format is documented at the top
 # of AGENT_MAIL.md, so the parser does not need to re-enforce it, and being strict
 # about a field nobody reads costs mail.
-HDR = re.compile(r"^## \[([^\]]+)\]\s*(\w+)\s*->\s*(\w+)", re.M)
+#
+# A sender or recipient may carry a bracketed qualifier: cloud[daily], cloud[35819496],
+# laptop[daily]. The first version captured the name with a bare (\w+) and so could not match
+# those at all: 25 of the 46 live entries, EVERY one from a cloud session or a daily check, were
+# invisible to this watcher, so a laptop digest could never report mail from the cloud. The
+# qualifier is accepted and dropped; group 2 and 3 stay the bare session names.
+# (tests/test_mail_check.py also checks every heading in the real mailbox against this.)
+HDR = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*(\w+)", re.M)
 _TZ_SUFFIX = re.compile(r"\s*(ET|EST|EDT|UTC|Z)\s*$", re.I)
 
 
@@ -125,7 +132,8 @@ def main():
             print("--since-hours needs a number"); return 2
 
     try:
-        text = open(MAILBOX, encoding="utf-8").read()
+        with open(MAILBOX, encoding="utf-8") as fh:
+            text = fh.read()
     except FileNotFoundError:
         print(f"{MAILBOX} not found"); return 2
 
@@ -174,13 +182,14 @@ def main():
         return _report(buckets, quiet, f"in the last {since:g}h")
 
     try:
-        seen = json.load(open(STATE)).get("last_hdr", "")
+        with open(STATE, encoding="utf-8") as fh:
+            seen = json.load(fh).get("last_hdr", "")
     except Exception:
         seen = ""
 
     # First run adopts the backlog silently rather than emailing weeks of history.
     if not seen:
-        json.dump({"last_hdr": all_e[-1]["hdr"]}, open(STATE, "w"), indent=1)
+        _save_state(all_e[-1]["hdr"])
         print(f"first run - adopted backlog of {len(all_e)} entries, no email sent")
         return 0
 
@@ -193,9 +202,14 @@ def main():
     # A session's own entries are not mail TO it.
     buckets = {w: [e for e in new
                    if addressed_to(e, w) and not (w and e["from"] == w)] for w in whos}
-    json.dump({"last_hdr": all_e[-1]["hdr"]}, open(STATE, "w"), indent=1)
+    _save_state(all_e[-1]["hdr"])
 
     return _report(buckets, quiet, f"({len(new)} new entr(y/ies))")
+
+
+def _save_state(hdr):
+    with open(STATE, "w", encoding="utf-8") as fh:
+        json.dump({"last_hdr": hdr}, fh, indent=1)
 
 
 def _report(buckets, quiet, ctx):
