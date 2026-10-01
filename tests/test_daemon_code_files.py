@@ -24,11 +24,10 @@ ENTRY_POINTS = ("rh_daemon", "rh_bot")
 
 # module -> why it is not gated today. Cloud-owned modules the daemon reaches lazily.
 KNOWN_UNGATED = {
-    "slack_notify": "imported lazily inside rh_daemon.notify() for the Slack mirror of alerts; cached after "
-                    "the first call, so the running daemon keeps the version it first loaded. Cloud changes "
-                    "it often. Decision for the laptop: add it (a restart per push) or accept the gap.",
     "mail_check": "reached only through slack_notify._who_checks (the Slack mailbox mirror), which the daemon "
-                  "never calls; it matters only if slack_notify is gated.",
+                  "never calls. slack_notify IS gated as of 2026-10-01, and this stays ungated "
+                  "anyway: the import is inside that function, so a broken mail_check cannot "
+                  "reach the running daemon. Gate it only if the daemon ever calls it.",
 }
 
 

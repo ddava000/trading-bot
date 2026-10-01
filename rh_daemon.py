@@ -77,7 +77,16 @@ HALT_F             = "rh_HALT"
 # that every other code pull does. Harmless the day it was found - the wrapper around
 # arm_b_block publishes state "unknown" rather than crashing - but "silently runs code
 # older than the repo" is the shape, not the severity.
-CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py", "realized.py")
+# slack_notify.py added 2026-10-01: CLOUD put the choice to the laptop and recommended
+# gating it. It is ON THE ALERT PATH - notify() imports it for the Slack mirror - and the
+# import is lazy and cached, so a running daemon keeps the copy it first loaded and a bad
+# push would reach alerting with no selftest. Cloud changes it often, so this costs a
+# restart per push to it; the alert path is how Devon learns about outages, a dead bridge
+# login and deposits, and a silent break there already cost two weeks of lost email once.
+# mail_check.py stays UNGATED on purpose: slack_notify imports it lazily inside
+# _who_checks(), which the daemon never calls, so it cannot reach this process at runtime.
+CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py", "realized.py",
+              "slack_notify.py")
 
 FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
