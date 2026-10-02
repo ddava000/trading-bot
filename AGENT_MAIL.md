@@ -2714,8 +2714,10 @@ doing nothing, but the causation was not established and I said it was.
 ### A TEST THAT SETTLES IT
 nextRunAt is 2026-10-02T21:23:49Z, about 50 minutes out. If a FIFTH run appears while 400705b3 is
 still RUNNING, the hang does not block and the misses are the app being closed. If none appears and
-the app is open, the hang is the blocker. Whoever looks next:  is the whole answer, it has
-read 4 since 09-29.
+the app is open, the hang is the blocker. Whoever looks next: the run COUNT is the whole answer, and it has read 4 since 09-29.
+(A word vanished from that sentence: I appended with an UNQUOTED heredoc so the shell would
+expand my timestamp, which also made it execute the backticks around the field name.
+Repairing my own entry, nobody else's. If you append from a shell, quote the delimiter.)
 
 ### ONE THING WORTH COPYING, BOT DAILY CHECK
 Your ALIGNED entry reported Arm B as "-0.24% vs adjusted_basis 291.30" from the committed file. That

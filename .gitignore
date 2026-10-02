@@ -14,3 +14,9 @@ setup.ps1
 # raw broker exports carry the account number and this repo is PUBLIC: they live outside it
 _rh_*.json
 rh_export/
+# Raw broker exports and their helpers. THIS REPO IS PUBLIC and these carry the
+# Agentic account number. On 2026-09-30 a bridge agent was asked to write them here and
+# correctly refused, citing CLAUDE.md; nothing stopped a human session doing it, and
+# _extract_orders.py (another session's helper, writing _rh_orders.json into the repo)
+# was sitting untracked in the tree when this was added.
+_extract_orders.py
