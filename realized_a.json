@@ -250,6 +250,11 @@
    "qty": 0.207760464,
    "symbol": "EFXT",
    "t": "2026-10-01"
+  },
+  {
+   "qty": 0.020321426,
+   "symbol": "GOOGL",
+   "t": "2026-10-02"
   }
  ],
  "closed": [
@@ -707,15 +712,28 @@
    "sale": "12dbecf2-4325-422c-97ee-bfa5a8c05581",
    "symbol": "ADPT",
    "term": "ST"
+  },
+  {
+   "basis": 7.25,
+   "close_date": "2026-10-02",
+   "close_fill": 79,
+   "gain": -0.580785,
+   "open_date": "2026-10-01",
+   "open_fill": 76,
+   "proceeds": 6.669215,
+   "qty": 0.032294562,
+   "sale": "81d8b09a-7027-4d89-bb60-a5e373ec424e",
+   "symbol": "ACN",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "ACN": 0.032294562,
   "BAND": 0.100130463,
   "BE": 0.0286495,
   "EFXT": 0.207760464,
+  "GOOGL": 0.020321426,
   "IWM": 0.137264116,
   "META": 0.007983683,
   "MSFT": 0.014695966,
@@ -736,19 +754,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -13.75,
-    "sales": 28,
+    "net": -14.33,
+    "sales": 29,
     "st": {
      "gains": 0.11,
-     "losses": -13.86,
-     "net": -13.75,
-     "sales": 28
+     "losses": -14.44,
+     "net": -14.33,
+     "sales": 29
     }
    }
   },
-  "fills": 79,
-  "last_fill": "2026-10-01T18:15:18.780995Z",
-  "last_sale": "2026-10-01",
+  "fills": 81,
+  "last_fill": "2026-10-02T13:45:22.471077Z",
+  "last_sale": "2026-10-02",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -756,15 +774,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -13.75,
-  "reconciliation_residual": -0.0477,
-  "sales": 28,
+  "net": -14.33,
+  "reconciliation_residual": -0.0369,
+  "sales": 29,
   "since": "2026-08-12",
   "st": {
    "gains": 0.11,
-   "losses": -13.86,
-   "net": -13.75,
-   "sales": 28
+   "losses": -14.44,
+   "net": -14.33,
+   "sales": 29
   },
   "state": "ok",
   "wash_watch": {
