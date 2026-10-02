@@ -1978,3 +1978,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: After-hours wrap: indices closed slightly higher on easing yields from 24-year highs and a chip rally, VIX benign at 16.4. Friday's jobs report plus Fed rate-hike chatter are the key overnight risks, so I hold neutral at 0.45; $28 cash caps new buys anyway.
 - journal: Thu 10/1 18:02: Day finished flat, VIX 16.4, tape green on easing long-end yields and chip strength. Kept risk 0.45 and avoid list intact (SNDK +12.4% very extended, NBIS +4.4% extended, IWM -7.3% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching Friday's jobs print and long-end yields; cash tight at $28.
+
+### 2026-10-02T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'ACN', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: September jobs report lands this morning — the key event risk — with VIX benign at 15.5 and the tape constructive on easing yields and a chip rally. Holding neutral at 0.40 until the print is digested; $28 cash caps new buys regardless.
+- journal: Fri 10/2 09:00: Overnight futures firm, oil falling, VIX down to 15.5, but jobs report is the morning landmine so I trimmed risk to 0.40. ACN beat on record bookings yet still -5.7%, keeping it off the buy list; SNDK +12.5% very extended, NBIS +6.2% extended, IWM -6.0% ugly. Watching the 08:30 jobs reaction and long-end yields.
