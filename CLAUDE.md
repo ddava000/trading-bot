@@ -65,6 +65,10 @@ pull); the sessions cannot talk directly.
   the mailbox below so the owner has context.
 - **Never `git add -A` or `git commit -a`.** Commit EXPLICIT paths. A broad add
   sweeps up whoever else is mid-edit.
+- **Look before you pull.** Sessions share ONE working tree on this PC. Run
+  `git log origin/main..HEAD` first: if it lists a commit you did not make, another session has
+  work waiting to push. Do not `git pull --rebase` over it (2026-10-02: a pull rebased BOT DAILY
+  CHECK's unpushed reply into a mailbox conflict that blocked its push); let it push, or ask.
 - **Never autostash on a tree that may contain work that is not yours.** On a SHARED
   tree: commit your own work by explicit path, `git status`, then a plain `git pull`,
   and if status shows files you did not touch, STOP and report rather than resolving
