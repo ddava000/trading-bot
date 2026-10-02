@@ -1984,3 +1984,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'ACN', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: September jobs report lands this morning — the key event risk — with VIX benign at 15.5 and the tape constructive on easing yields and a chip rally. Holding neutral at 0.40 until the print is digested; $28 cash caps new buys regardless.
 - journal: Fri 10/2 09:00: Overnight futures firm, oil falling, VIX down to 15.5, but jobs report is the morning landmine so I trimmed risk to 0.40. ACN beat on record bookings yet still -5.7%, keeping it off the buy list; SNDK +12.5% very extended, NBIS +6.2% extended, IWM -6.0% ugly. Watching the 08:30 jobs reaction and long-end yields.
+
+### 2026-10-02T13:56 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Jobs print came in soft (29k, UR 4.2%), cementing a Fed October skip and sending Nasdaq to a record led by Nvidia; VIX benign at 15.8 and the tape is constructive. Nudging risk to 0.50 with the event cleared, though $22 cash caps new buys regardless.
+- journal: Fri 10/2 13:56: Jobs landmine passed cleanly — soft data = Fed skip, Nasdaq record, VIX 15.8. Lifted risk 0.40→0.50. Keeping avoids: SNDK +8.5% & NBIS +8.6% extended, IWM -6.6% ugly, EFXT -5.9% weak. Watching 24-year-high long-end yields for any flip; cash tight at $22.
