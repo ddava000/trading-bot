@@ -1,37 +1,37 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-02T13:45Z",
+ "as_of_utc": "2026-10-02T14:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-02T13:45:25+00:00",
+  "checked_at": "2026-10-02T14:00:37+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 27.72,
+ "cash": 22.45,
  "crypto_enabled": true,
- "day_pnl": 3.09,
+ "day_pnl": 2.64,
  "earnings_guard": "live",
- "equity": 237.6,
+ "equity": 237.15,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 2.5,
-  "NBIS": 8.7,
+  "MSFT": 2.6,
+  "NBIS": 9.1,
   "NVDA": 4.6,
   "PLTR": 3.0,
-  "SNDK": 9.8
+  "SNDK": 9.9
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-02T14:05Z",
- "orders_this_run": 2,
+ "next_expected_utc": "2026-10-02T14:20Z",
+ "orders_this_run": 1,
  "plan": {
   "date": "2026-10-02",
   "risk": 0.4,
@@ -56,9 +56,9 @@
     }
    }
   },
-  "checked_at": "2026-10-02T13:45:23+00:00",
-  "fills": 81,
-  "last_fill": "2026-10-02T13:45:22.471077Z",
+  "checked_at": "2026-10-02T14:00:34+00:00",
+  "fills": 82,
+  "last_fill": "2026-10-02T14:00:31.741506Z",
   "last_sale": "2026-10-02",
   "lt": {
    "gains": 0.0,
@@ -92,11 +92,11 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 52.61,
-  "index": 124.21,
+  "hold": 52.7,
+  "index": 124.02,
   "trade": 32.72
  },
- "ts": "2026-10-02T09:45 ET",
- "vix": 15.6,
- "vs_baseline_pct": -4.16
+ "ts": "2026-10-02T10:00 ET",
+ "vix": 15.7,
+ "vs_baseline_pct": -4.34
 }
