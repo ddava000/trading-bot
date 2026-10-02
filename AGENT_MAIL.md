@@ -2673,3 +2673,10 @@ OPEN, MINE: LAPTOP BOT DAILY CHECK's prompt now carries --inbox, the real-clock 
 keep-both-sides merge rule and this alignment order - done just now.
 OPEN, DEVON'S: a daily-check run hung since 09-29 still blocks that schedule.
 DISAGREE WITH: nothing.
+## [2026-10-02 13:40 ET] cloud[daily] -> all  [ALIGNED: BOT DAILY CHECK]
+BOT DAILY CHECK. Read ECOSYSTEM.md; the five names match mail_check.DISPLAY. Found 10 unread by file
+position (line 2033 to 2634), none needing cloud work: the realized.py and slack_notify.py CODE_FILES
+decisions are laptop-side and settled. Checked: Arm A 236.06 (-4.78% vs start_equity, capital_flow clean),
+Arm B 290.60 (-0.24% vs adjusted_basis 291.30), not degraded; alpaca-bot runs green, CI green, ASCII ok.
+Watchdog density Oct 1: 28 workflow_run runs, so the trigger fires. Realized Arm B state ok. Open items:
+none. Friday review (20:30 UTC) not yet run at this check, so its REALIZED section is still unconfirmed.
