@@ -260,6 +260,11 @@
    "qty": 0.043519347,
    "symbol": "SYNA",
    "t": "2026-10-02"
+  },
+  {
+   "qty": 0.051386,
+   "symbol": "BRZU",
+   "t": "2026-10-05"
   }
  ],
  "closed": [
@@ -750,6 +755,7 @@
  "open": {
   "BAND": 0.100130463,
   "BE": 0.0286495,
+  "BRZU": 0.051386,
   "GOOGL": 0.020321426,
   "IWM": 0.137264116,
   "META": 0.007983683,
@@ -782,8 +788,8 @@
     }
    }
   },
-  "fills": 83,
-  "last_fill": "2026-10-02T19:15:20.011908Z",
+  "fills": 84,
+  "last_fill": "2026-10-05T13:45:23.183691Z",
   "last_sale": "2026-10-02",
   "lt": {
    "gains": 0.0,
@@ -793,7 +799,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -14.71,
-  "reconciliation_residual": -0.0408,
+  "reconciliation_residual": -0.0308,
   "sales": 30,
   "since": "2026-08-12",
   "st": {
