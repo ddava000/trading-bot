@@ -14,6 +14,10 @@ if a workflow or a session name is missing from it.
 | LAPTOP BOT DAILY CHECK | `laptop[daily]` | the laptop's scheduled daily check (4:15 PM CT): daemon, bridge login, crashes, outages, deposits | automatic, or Devon |
 | BOT WEEKLY AUDIT | `audit` | the Sunday GitHub Actions audit (weekly-audit.yml), cold context, commits its upgrades | never: it reads mail itself every Sunday |
 
+The two scheduled prompts (cloud-bot-daily-check and laptop-bot-daily-check) live OUTSIDE this repo, in
+each owner's ~/.claude/scheduled-tasks, so only the owner can confirm a change to its own: do not track
+the other's as open indefinitely.
+
 Mail to a bare token (`-> cloud`) names the interactive session. A daily check reads every entry to its
 base token, so it never needs waking for mail. Only the two interactive sessions are ever woken by hand.
 
@@ -23,7 +27,7 @@ base token, so it never needs waking for mail. Only the two interactive sessions
   minutes in market hours (26 runs a day) via workflow_dispatch. Never a GitHub cron.
 - **Arm B, Robinhood (~$280, plain index ETFs)**: rh_daemon.py on the always-on laptop, orders placed by a
   headless `claude -p` executor that runs OUTSIDE this repo (it must never read CLAUDE.md).
-- **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron);
+- **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron, and a duplicate "piggyback" step inside Alpaca Trading Bot at :00/:30);
   AGENT_MAIL daily check (13:00 UTC digest email); MAILBOX NOTIFY (Slack message on every mailbox push);
   BOT WEEKLY AUDIT (Sundays); Research Brief (morning + intraday), weekdays; Alpaca Weekly Review (Fridays);
   ci (tests on push); realized-report, slack-test and Email Report (manual).

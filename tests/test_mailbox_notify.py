@@ -192,6 +192,12 @@ class WorkflowWiring(unittest.TestCase):
         self.assertIn("mailbox_notify.py", step["run"])
         self.assertGreaterEqual(wf["jobs"]["notify"]["steps"][0]["with"]["fetch-depth"], 2)
 
+    def test_no_concurrency_group_so_a_delayed_run_is_never_dropped_for_a_newer_one(self):
+        with open(os.path.join(ROOT, ".github", "workflows", "mailbox-notify.yml"), encoding="utf-8") as f:
+            wf = yaml.safe_load(f)
+        self.assertNotIn("concurrency", wf)
+        self.assertNotIn("concurrency", wf["jobs"]["notify"])
+
 
 if __name__ == "__main__":
     unittest.main()

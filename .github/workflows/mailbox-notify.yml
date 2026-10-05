@@ -18,9 +18,10 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: mailbox-notify
-  cancel-in-progress: false
+# NO concurrency group, on purpose. GitHub keeps one RUNNING and one PENDING run per group and cancels
+# the older pending one when a newer arrives. During the 2026-10-05 Actions incident (runners not
+# assigned for 15+ minutes) that silently dropped a push's notice, and the diff is per push, so a
+# dropped run is a lost message. Runs are stateless and independent, so let them all run.
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

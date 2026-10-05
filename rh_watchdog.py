@@ -48,10 +48,12 @@ CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots) ON THE NATI
 # A threshold counts as crossed if it fell in the last CROSS_WINDOW_MIN: wider than
 # the cadence so a late run cannot skip it. A rare duplicate beats a missed alert.
 # These three are overridden per TRIGGER by rh-watchdog.yml (empty = the defaults here, which are
-# the original behaviour). GitHub's native */30 cron measured 1 to 3 runs a day on 2026-09-09 to
-# 09-30, one inside market hours, so the workflow ALSO runs after every Arm A run (about every 15
-# min, 26 a day). At that density the defaults would mail on every run while the laptop is down, so
-# that trigger passes a narrower window and thresholds for the stale path as well.
+# the original behaviour). The standalone workflow's own */30 cron measured 1 to 3 runs a day on
+# 2026-09-09 to 09-30, so on 10-01 it gained a trigger after every Arm A run (about every 15 min).
+# CORRECTION 2026-10-05: alpaca-bot.yml ALREADY runs this script at its :00/:30 triggers (since
+# 2026-08-13), on a shallow checkout, so the duration is unmeasurable there and it mails "could not
+# measure" at every slot. At 15-minute density the defaults would mail on every run while the laptop
+# is down, so the workflow_run trigger passes a narrower window and thresholds for the stale path too.
 CROSS_WINDOW_MIN = _env_int("WATCHDOG_CROSS_WINDOW_MIN", 45)
 # Empty = alert on EVERY run while the heartbeat is stale (the original behaviour, right for a
 # sparse schedule). Set, the stale alert fires once per threshold, in minutes THIS SESSION.

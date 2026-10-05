@@ -1,9 +1,10 @@
 """rh_watchdog.py: the cloud dead-man's switch for the Robinhood laptop, which had no tests.
 
 Found by the 2026-09-30 cross-audit and pinned here:
-  * GitHub's native */30 cron ran this only 1 to 3 times a day (one inside market hours), so the
-    workflow now ALSO runs after every Arm A run (~26 a day). At that density the stale alert would
-    mail on every run, so the new path alerts once per threshold (tests below).
+  * The standalone workflow's own */30 cron ran only 1 to 3 times a day, so it gained a trigger after
+    every Arm A run (~26 a day). (CORRECTION 2026-10-05: alpaca-bot.yml already runs this script at
+    :00/:30, shallow, so coverage was never once a day.) At 15-minute density the stale alert would
+    mail on every run, so that path alerts once per threshold (tests below).
   * An outage that runs past yesterday's close made every threshold long past, so the stateless
     window never matched again and the watchdog stayed silent all day. Durations now count the
     current session only.

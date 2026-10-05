@@ -192,11 +192,14 @@ Both bots publish status files read from the public repo: `status.json` (cloud) 
 only if the current UTC time is well past it. An old timestamp on a weekend or
 overnight is normal, both bots rest when markets are closed.
 
-The cloud watchdog for the laptop (`rh_watchdog.py`, `rh-watchdog.yml`) cannot rely on
-GitHub's native cron: measured 2026-09-09 to 09-30 it ran 1 to 3 times a day, once inside
-market hours. It also runs after every Arm A run (which cron-job.org triggers about every 15
-minutes), and on that path alerts once per threshold rather than on every run. Count its real
-runs (`gh run list --workflow rh-watchdog.yml`) instead of trusting the cron line.
+The cloud watchdog for the laptop (`rh_watchdog.py`) runs on THREE paths, and counting only one
+misled this file once: (1) a step inside the Arm A workflow at every :00/:30 trigger (the
+"piggyback", since 2026-08-13; shallow checkout, so it mails "could not measure how long" at every
+slot of an outage: 8 mails on 2026-09-30); (2) `rh-watchdog.yml` after every Arm A run (added
+2026-10-01, deep checkout, once per threshold); (3) that workflow's own */30 cron (GitHub ran it
+only 1 to 3 times a day). Paths 1 and 2 duplicate each other and one should go (Devon's call).
+To judge coverage, count all three: `gh run list --workflow rh-watchdog.yml` AND the watchdog step
+in each Arm A run's log.
 
 ## Work from your phone (Claude Code on the web)
 Devon can drive this repo from a phone with zero computer running, via Claude Code
