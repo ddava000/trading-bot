@@ -2002,3 +2002,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: After-hours on a constructive week: soft jobs cemented a Fed October skip, Nasdaq at a record led by chips, VIX benign at 15.3. Holding risk-on at 0.50 into the weekend with $28 cash capping new buys regardless; extended and weak names stay off the list.
 - journal: Fri 10/2 17:28: Day closed +$2, VIX 15.3, jobs landmine cleared cleanly and tape green all week. Keeping risk 0.50 and avoids intact — SNDK +8.5% & NBIS +8.5% very extended, IWM -6.7% ugly, BE +3.9%/BAND weak. Watching long-end yields over the weekend; cash tight at $28.
+
+### 2026-10-05T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Weekend shifted tone slightly defensive: futures lower on higher long-end yields with Fed minutes due this week, VIX ticking up to 16.2 and breadth still narrow. Trimming to 0.40 and adding GOOGL (Q3 earnings approaching) to avoids; BE weak on ORCL-linked selling, SNDK +9%/NBIS +9% extended, IWM -6.6% ugly.
+- journal: Mon 10/5 09:00: VIX 15.3→16.2, futures soft on rising yields, Fed minutes the week's watch item. Cut risk 0.50→0.40 and added GOOGL to avoids ahead of Q3 earnings. Watching long-end yields and whether narrow breadth broadens; cash tight at $28.
