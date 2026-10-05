@@ -1,38 +1,38 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-05T14:00Z",
+ "as_of_utc": "2026-10-05T14:15Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-05T14:00:39+00:00",
+  "checked_at": "2026-10-05T14:15:29+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 23.65,
+ "cash": 23.64,
  "crypto_enabled": true,
- "day_pnl": -0.25,
- "earnings_guard": "live",
- "equity": 235.97,
+ "day_pnl": 0.2,
+ "earnings_guard": "unknown",
+ "equity": 236.42,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 4.7,
-  "NBIS": 6.3,
-  "NVDA": 4.4,
-  "PLTR": 1.2,
-  "SNDK": 8.4,
-  "VST": 0.0
+  "MSFT": 4.3,
+  "NBIS": 6.1,
+  "NVDA": 4.3,
+  "PLTR": 1.1,
+  "SNDK": 8.7,
+  "VST": 1.0
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-05T14:20Z",
- "orders_this_run": 2,
+ "next_expected_utc": "2026-10-05T14:35Z",
+ "orders_this_run": 0,
  "plan": {
   "date": "2026-10-05",
   "risk": 0.4,
@@ -57,7 +57,7 @@
     }
    }
   },
-  "checked_at": "2026-10-05T14:00:35+00:00",
+  "checked_at": "2026-10-05T14:15:30+00:00",
   "fills": 86,
   "last_fill": "2026-10-05T14:00:32.189952Z",
   "last_sale": "2026-10-05",
@@ -93,11 +93,11 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 52.14,
-  "index": 123.85,
-  "trade": 39.34
+  "hold": 57.31,
+  "index": 124.16,
+  "trade": 31.31
  },
- "ts": "2026-10-05T10:00 ET",
+ "ts": "2026-10-05T10:15 ET",
  "vix": 15.9,
- "vs_baseline_pct": -4.82
+ "vs_baseline_pct": -4.63
 }
