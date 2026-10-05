@@ -8,7 +8,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 299.35,
+ "index": 299.48,
  "orders_today": 2,
  "positions": {
   "IWM": 0.357509,
@@ -76,5 +76,5 @@
  "risk": 0.4,
  "settled": 2.21,
  "trade": 0.0,
- "ts": "2026-10-05T11:23"
+ "ts": "2026-10-05T11:39"
 }
