@@ -524,13 +524,28 @@ def yf_live(sym):
         return next(x for x in reversed(c) if x)
     except Exception: return None
 
+# Whether the last yf_vix() read was a REAL quote (True), the 20.0 fallback (False), or not asked yet
+# (None). The fallback is a calm number by construction, so while this is False the VIX>35 halt AND the
+# 25/20 position-size scaling cannot fire, and a real spike during a Yahoo outage (which blocks datacenter
+# addresses) would be invisible. Found by the 2026-10-04 weekly audit. status.json publishes it as
+# "vix_live", the same idea as earnings_guard's live/degraded. VISIBILITY ONLY: the fallback value and every
+# threshold are unchanged (whether to fail closed instead is Devon's call, not a bug fix).
+VIX_STATE = {"live": None}
+
+
 def yf_vix():
     try:
         d = requests.get("https://query2.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=5d",
                          headers=YF_HEADERS, timeout=10).json()
         c = d["chart"]["result"][0]["indicators"]["quote"][0]["close"]
-        return next(x for x in reversed(c) if x)
-    except Exception: return 20.0
+        v = next(x for x in reversed(c) if x)
+        VIX_STATE["live"] = True
+        return v
+    except Exception as e:
+        VIX_STATE["live"] = False
+        print(f"  [VIX UNAVAILABLE ({type(e).__name__}): using 20.0, so the VIX>35 halt and the size scaling "
+              f"are NOT enforcing this run]")
+        return 20.0
 
 def fetch_wsb():
     try:
@@ -2044,7 +2059,7 @@ def run_bot():
             "regime": "risk-on" if risk_on else "risk-off",
             "plan": {"date": plan.get("plan_date"), "stale": bool(plan.get("stale")),
                      "risk": plan["risk"]},
-            "vix": round(vix, 1), "halted": halted,
+            "vix": round(vix, 1), "vix_live": VIX_STATE["live"], "halted": halted,
             "orders_this_run": len(trades_log),
             # "live" = the Yahoo crumb handshake worked and the earnings guard is
             # really enforcing. "degraded" = it fails open and blocks NOTHING, which
