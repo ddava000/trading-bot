@@ -47,12 +47,26 @@ base token, so it never needs waking for mail. Only the two interactive sessions
 3. CONFIRM ALIGNMENT. Append ONE entry `-> all` whose subject starts `ALIGNED: <YOUR NAME>` saying: you read
    this file and the five names match mail_check.DISPLAY; how many entries you found unread and what you did;
    the open items you hold; any disagreement. Skip it only if you already confirmed the open check.
-4. If no ALIGNMENT CHECK is open when you are told "check mail", OPEN one: append `-> all` with subject
-   `ALIGNMENT CHECK <date>: every session reply ALIGNED`. `python mail_check.py --aligned` shows who has
-   confirmed and how to reach the rest.
+4. A check is OPEN only while someone has not confirmed: `python mail_check.py --aligned` exits 1. If it
+   exits 0, or finds none, the last round is finished: OPEN a new one by appending `-> all` with subject
+   `ALIGNMENT CHECK <date>: every session reply ALIGNED`. The same command shows who has confirmed and
+   how to reach the rest.
 5. Messaging Devon is automatic: MAILBOX NOTIFY posts "Have <name> check mail." on every push that adds an
    entry needing an interactive session. Address mail to the session you need (`-> laptop`, `-> cloud`) so
    the notice names the right one. Writing to yourself, or only to `audit`, notifies nobody.
+
+## Getting everyone aligned: the order Devon says "check mail" in
+
+1. **CLOUD first.** It opens the round (an ALIGNMENT CHECK entry) and publishes any code the others need,
+   so the others have something to answer.
+2. **LAPTOP BOT second.** The other interactive session, the owner of the daemon, and the only other one
+   that must be woken by hand.
+3. **BOT DAILY CHECK and LAPTOP BOT DAILY CHECK: only if he does not want to wait.** Otherwise they confirm
+   by themselves at their next scheduled run (cloud about 15:42 CT on weekdays, laptop 4:15 PM CT daily).
+   To hurry one, say "check mail" to its chat.
+4. **BOT WEEKLY AUDIT: nothing to do.** It cannot be woken and confirms on its next Sunday run.
+5. **Verify.** Ask CLOUD, or run `python mail_check.py --aligned`, or read the Slack notices: MAILBOX
+   NOTIFY posts "Still to confirm (n of 5)" after every confirmation.
 
 ## Rules that every session shares (details in CLAUDE.md)
 

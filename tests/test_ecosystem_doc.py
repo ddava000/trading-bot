@@ -53,6 +53,16 @@ class EcosystemDocTests(unittest.TestCase):
         self.assertIn("AGENT_MAIL.md is the channel", self.doc)
         self.assertIn("Slack and email only NOTIFY", " ".join(self.doc.split()))
 
+    def test_the_checking_order_for_devon_is_there_and_goes_cloud_then_laptop_bot(self):
+        flat = " ".join(self.doc.split())
+        self.assertIn("Getting everyone aligned", flat)
+        section = flat.split("Getting everyone aligned", 1)[1].split("Rules that every session shares", 1)[0]
+        self.assertLess(section.index("CLOUD first"), section.index("LAPTOP BOT second"))
+        self.assertLess(section.index("LAPTOP BOT second"), section.index("BOT WEEKLY AUDIT: nothing to do"))
+
+    def test_a_finished_round_is_not_an_open_one(self):
+        self.assertIn("A check is OPEN only while someone has not confirmed", " ".join(self.doc.split()))
+
     def test_no_em_dashes_and_plain_ascii(self):
         self.assertTrue(self.doc.isascii(), [c for c in self.doc if ord(c) > 127][:5])
 
