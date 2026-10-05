@@ -265,6 +265,11 @@
    "qty": 0.051386,
    "symbol": "BRZU",
    "t": "2026-10-05"
+  },
+  {
+   "qty": 0.035762895,
+   "symbol": "VST",
+   "t": "2026-10-05"
   }
  ],
  "closed": [
@@ -748,13 +753,25 @@
    "sale": "4ca9818f-0e5c-41ae-ac49-5401dbc3fb8b",
    "symbol": "EFXT",
    "term": "ST"
+  },
+  {
+   "basis": 8.22,
+   "close_date": "2026-10-05",
+   "close_fill": 84,
+   "gain": -0.060279,
+   "open_date": "2026-09-29",
+   "open_fill": 72,
+   "proceeds": 8.159721,
+   "qty": 0.0286495,
+   "sale": "5783e247-d569-4143-b23e-95bfe26cbda2",
+   "symbol": "BE",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
   "BAND": 0.100130463,
-  "BE": 0.0286495,
   "BRZU": 0.051386,
   "GOOGL": 0.020321426,
   "IWM": 0.137264116,
@@ -766,7 +783,8 @@
   "QQQ": 0.058331282,
   "SNDK": 0.004539783,
   "SPY": 0.053798739,
-  "SYNA": 0.043519347
+  "SYNA": 0.043519347,
+  "VST": 0.035762895
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
  "summary": {
@@ -778,19 +796,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -14.71,
-    "sales": 30,
+    "net": -14.77,
+    "sales": 31,
     "st": {
      "gains": 0.11,
-     "losses": -14.82,
-     "net": -14.71,
-     "sales": 30
+     "losses": -14.88,
+     "net": -14.77,
+     "sales": 31
     }
    }
   },
-  "fills": 84,
-  "last_fill": "2026-10-05T13:45:23.183691Z",
-  "last_sale": "2026-10-02",
+  "fills": 86,
+  "last_fill": "2026-10-05T14:00:32.189952Z",
+  "last_sale": "2026-10-05",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -798,15 +816,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -14.71,
-  "reconciliation_residual": -0.0308,
-  "sales": 30,
+  "net": -14.77,
+  "reconciliation_residual": -0.0406,
+  "sales": 31,
   "since": "2026-08-12",
   "st": {
    "gains": 0.11,
-   "losses": -14.82,
-   "net": -14.71,
-   "sales": 30
+   "losses": -14.88,
+   "net": -14.77,
+   "sales": 31
   },
   "state": "ok",
   "wash_watch": {
