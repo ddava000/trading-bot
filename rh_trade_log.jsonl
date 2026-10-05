@@ -105,3 +105,5 @@
 {"action": "buy", "symbol": "SPY", "notional": 3.06, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "QQQ", "notional": 3.38, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
 {"action": "buy", "symbol": "IWM", "notional": 3.81, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.81, "reason": "INDEX-CORE toward $100.23", "ts": "2026-10-05T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 4.51, "reason": "INDEX-CORE toward $100.23", "ts": "2026-10-05T09:46", "status": "ok", "venue": "robinhood"}
