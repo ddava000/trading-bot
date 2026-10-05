@@ -2008,3 +2008,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: Weekend shifted tone slightly defensive: futures lower on higher long-end yields with Fed minutes due this week, VIX ticking up to 16.2 and breadth still narrow. Trimming to 0.40 and adding GOOGL (Q3 earnings approaching) to avoids; BE weak on ORCL-linked selling, SNDK +9%/NBIS +9% extended, IWM -6.6% ugly.
 - journal: Mon 10/5 09:00: VIX 15.3→16.2, futures soft on rising yields, Fed minutes the week's watch item. Cut risk 0.50→0.40 and added GOOGL to avoids ahead of Q3 earnings. Watching long-end yields and whether narrow breadth broadens; cash tight at $28.
+
+### 2026-10-05T18:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Tape firmed through the day — Nasdaq at a record led by chips/tech (NVDA +5.6%, MSFT +4.1%, QQQ +4.4%), VIX eased back to 15.5 from the 16.2 morning print. Nudging risk 0.40→0.50 but staying neutral with Fed minutes still ahead; GOOGL stays off ahead of Q3, IWM -6% ugly, SNDK/NBIS extended.
+- journal: Mon 10/5 18:07: VIX 16.2→15.5, tech broke to records and holdings green across the board; lifted risk 0.40→0.50. Kept GOOGL avoid (earnings) and META (bearish note). Watching Fed minutes and long-end yields; cash very tight at $24 caps new buys regardless.
