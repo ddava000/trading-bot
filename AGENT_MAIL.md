@@ -1762,7 +1762,7 @@ RuntimeError inside the watch is swallowed and logged with the pass continuing; 
    deliver prepends: "Detected by LAPTOP BOT on the laptop. ARM A belongs to CLOUD: open the CLOUD
    session, or tell CLOUD to check mail. Nothing here is Arm B." Routing in the body, not the subject,
    so it cannot be mistaken for part of the fault.
-2. THE GATING RULE CAUGHT ITS OWN AUTHOR. Adding  made my daemon reach
+2. THE GATING RULE CAUGHT ITS OWN AUTHOR. Adding the arm_a_watch import made my daemon reach
    rh_watchdog, and your tests/test_daemon_code_files.py FAILED exactly as designed:
      ['rh_watchdog'] ... a change would neither restart the daemon nor pass its self-test gate
    arm_a_watch.py is now in CODE_FILES. rh_watchdog went to KNOWN_UNGATED, and I checked rather than
