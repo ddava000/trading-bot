@@ -256,6 +256,43 @@ def quota_reset_wait(err):
     return wait if 0 < wait <= 6 * 3600 else None
 
 
+def market_minutes_since(ts):
+    """Minutes of TRADING time between `ts` and now - never wall clock.
+
+    2026-10-06 09:45:55 logged "broker reachable again after 1 failed attempt(s), 1
+    degraded pass(es), ~1069 min". 1069 minutes is 17.8 hours: the daemon ran all night,
+    one attempt late on 10-05 set _broker_down_since, no reconcile is attempted outside
+    09:45-15:55, and the first attempt at the 10-06 open subtracted the two timestamps.
+    The broker was NOT unreachable for 17 hours; nothing asked it for 17 hours.
+
+    It is not only a wrong log line. _maybe_alert_broker() measures its 15/60/180 minute
+    thresholds off the same subtraction, so an outage straddling a close would have
+    emailed Devon "down about 1069 minutes" in the first seconds of the next session,
+    for a broker that may be perfectly healthy.
+
+    This is the error class cloud and I spent 09-17 to 09-22 removing from the
+    experiment downtime figure - counting closed-market time as downtime - reappearing
+    in my own alert path a fortnight later. Same market gate both arms obey
+    (bot.check_market: weekdays 09:45-15:55 ET, bot.MARKET_HOLIDAYS excluded).
+    """
+    if not ts:
+        return 0
+    start = datetime.fromtimestamp(ts, bot.ET_TZ)
+    end = datetime.now(bot.ET_TZ)
+    if end <= start:
+        return 0
+    total, day = 0.0, start
+    while day.date() <= end.date():
+        if day.weekday() < 5 and day.strftime("%Y-%m-%d") not in bot.MARKET_HOLIDAYS:
+            o = day.replace(hour=9, minute=45, second=0, microsecond=0)
+            c = day.replace(hour=15, minute=55, second=0, microsecond=0)
+            lo, hi = max(start, o), min(end, c)
+            if hi > lo:
+                total += (hi - lo).total_seconds() / 60
+        day = (day + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    return int(total)
+
+
 def now_et():
     """Always ET, never local time.
 
@@ -1385,7 +1422,7 @@ def _maybe_alert_broker(led):
     global _broker_alert_at
     if not _broker_down_since:
         return
-    _elapsed = time.time() - _broker_down_since
+    _elapsed = market_minutes_since(_broker_down_since) * 60   # TRADING time, not wall clock
     if _reconcile_fails < BROKER_FAIL_ALERT and _elapsed < BROKER_ALERT_AFTER_SEC:
         return
     if (time.time() - _broker_alert_at) < BROKER_REALERT_SEC:
@@ -1541,7 +1578,7 @@ def main():
                 log("reconciling with the broker")
                 if adopt_truth(led, reconcile()):
                     if _reconcile_fails:
-                        _mins = int((time.time() - _broker_down_since) // 60) if _broker_down_since else 0
+                        _mins = market_minutes_since(_broker_down_since)
                         log(f"broker reachable again after {_reconcile_fails} failed attempt(s), "
                             f"{_degraded_passes} degraded pass(es), ~{_mins} min")
                         if _broker_alert_at:
