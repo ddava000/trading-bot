@@ -86,7 +86,7 @@ HALT_F             = "rh_HALT"
 # mail_check.py stays UNGATED on purpose: slack_notify imports it lazily inside
 # _who_checks(), which the daemon never calls, so it cannot reach this process at runtime.
 CODE_FILES = ("rh_bot.py", "rh_daemon.py", "alpaca_bot.py", "realized.py",
-              "slack_notify.py")
+              "slack_notify.py", "arm_a_watch.py")
 
 FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
@@ -1091,6 +1091,48 @@ DAILY_NAME = "LAPTOP BOT DAILY CHECK"
 _MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*([A-Za-z]+)(?:\[([^\]]*)\])?", re.M)
 
 
+_ARM_A_FIRED, _ARM_A_NEXT = {}, 0.0
+
+
+def check_arm_a():
+    """Dead-man's switch for ARM A, run from THIS daemon. Cloud built it; cloud cannot host it.
+
+    Arm A evaluates its stops inside each GitHub Actions run - there are no broker-side stop
+    orders - so a run that never gets a machine means no stop can fire. On 2026-10-05 two runs
+    were never assigned and Arm A went ~28 minutes to the close unprotected, with nothing
+    alerting. Cloud's ARM A WATCH workflow covers it only partly: its workflow_run trigger
+    fires when an Arm A run COMPLETES, which is exactly what a stuck run does not do. This
+    daemon does not depend on Actions, so running the same check here closes that gap and the
+    two arms end up watching each other.
+
+    Wrapped and self-throttled: Arm A monitoring must never cost Arm B a pass. arm_a_watch is
+    silent outside 09:45-15:55 ET and fires once per threshold per episode.
+    """
+    global _ARM_A_NEXT
+    if time.time() < _ARM_A_NEXT:
+        return
+    _ARM_A_NEXT = time.time() + 300
+    try:
+        import arm_a_watch
+
+        def _deliver(subject, body, urgent):
+            # Cloud's subject says WHAT is wrong; Devon asked that alerts say WHO must act, and
+            # for an Arm A fault that is CLOUD, not this session. Their subject is kept verbatim
+            # (he prints mail to PDF by subject and "ARM A WATCH" sorts) and the routing goes in
+            # the first body line, where it cannot be mistaken for part of the problem.
+            return notify(subject, chr(10).join([
+                f"Detected by {SESSION_NAME} on the laptop. ARM A belongs to CLOUD: open the",
+                "CLOUD session, or tell CLOUD to check mail. Nothing here is Arm B.",
+                "", body]))
+
+        rc, line, _ = arm_a_watch.run_once(fetch=True, ref="origin/main",
+                                           fired=_ARM_A_FIRED, deliver=_deliver)
+        if rc:
+            log(line)
+    except Exception as e:
+        log(f"arm a watch skipped ({e})")
+
+
 def check_mail(led):
     """Tell Devon when the mailbox has a new entry addressed to this session.
 
@@ -1539,6 +1581,10 @@ def main():
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
+            # EVERY pass, fast included, not just the full cycle: a stuck Arm A run is exactly the
+            # case where minutes matter, and full cycles are 15 minutes apart. check_arm_a()
+            # self-throttles to 5 minutes and returns immediately outside 09:45-15:55 ET.
+            check_arm_a()
             if full:
                 check_mail(led)   # surface new mailbox entries for this session
                 check_deposit_overdue(led)   # ask, never invent, a missed deposit

@@ -24,6 +24,11 @@ ENTRY_POINTS = ("rh_daemon", "rh_bot")
 
 # module -> why it is not gated today. Cloud-owned modules the daemon reaches lazily.
 KNOWN_UNGATED = {
+    "rh_watchdog": "reached only through arm_a_watch.default_deliver(), which this daemon never calls: "
+                   "check_arm_a() passes its own deliver so the Arm A alert routes through notify(). "
+                   "Verified 2026-10-06: the import sits at indent 4 inside that function (arm_a_watch "
+                   "L252), so a broken rh_watchdog cannot reach the running daemon or silence the Arm A "
+                   "watch. Gate it if the daemon ever calls default_deliver.",
     "mail_check": "reached only through slack_notify._who_checks (the Slack mailbox mirror), which the daemon "
                   "never calls. slack_notify IS gated as of 2026-10-01, and this stays ungated "
                   "anyway: the import is inside that function, so a broken mail_check cannot "
