@@ -97,8 +97,11 @@ def _email(frm, pw, to, subject, body):
         s.sendmail(frm, [to], m.as_string())
 
 
-def alert(msg, urgent=False):
+def alert(msg, urgent=False, subject=None, title=None):
     """Notify. Email always; SMS and push only when urgent.
+
+    subject/title (optional) let arm_a_watch reuse these channels and their secrets rules for a different
+    subject. Left as None, every line below behaves exactly as it always has for the laptop watchdog.
 
     Robinhood went index-only buy-and-hold on 2026-08-22, so a laptop that is
     down no longer means unenforced stops. The real consequence is that
@@ -115,7 +118,7 @@ def alert(msg, urgent=False):
     # exactly the message that must not go missing.
     try:
         import slack_notify
-        if slack_notify.post(("*RH laptop bot needs attention*\n" if urgent
+        if slack_notify.post(("*" + title + "*\n" if title else "*RH laptop bot needs attention*\n" if urgent
                               else "*RH laptop bot is not reporting (not urgent)*\n") + msg):
             sent.append("slack")
     except Exception as e:
@@ -152,8 +155,8 @@ def alert(msg, urgent=False):
     # Email - subject carries no emoji; Devon prints mail to PDF by subject.
     if pw and frm and to:
         try:
-            subject = ("ALERT: RH laptop bot needs attention" if urgent
-                       else "RH laptop bot is not reporting (not urgent)")
+            subject = subject or ("ALERT: RH laptop bot needs attention" if urgent
+                                  else "RH laptop bot is not reporting (not urgent)")
             _email(frm, pw, to, subject, msg)
             sent.append("email")
         except Exception as e:
@@ -175,7 +178,7 @@ def alert(msg, urgent=False):
         try:
             req = urllib.request.Request(
                 "https://ntfy.sh/" + topic, data=msg.encode(),
-                headers={"Title": "RH laptop bot down", "Priority": "high",
+                headers={"Title": title or "RH laptop bot down", "Priority": "high",
                          "Tags": "rotating_light"})
             urllib.request.urlopen(req, timeout=15)
             sent.append("ntfy")

@@ -201,6 +201,13 @@ only 1 to 3 times a day). Paths 1 and 2 duplicate each other and one should go (
 To judge coverage, count all three: `gh run list --workflow rh-watchdog.yml` AND the watchdog step
 in each Arm A run's log.
 
+Arm A's own liveness is watched by `arm_a_watch.py` (workflow ARM A WATCH; Devon 2026-10-06), because
+Arm A's stop-losses run inside each run with no stop orders at the broker. It alerts on a run waiting
+for a machine (6 min), no run triggered (22), and status.json uncommitted (35); the second level of each
+is urgent. The workflow shares fate with GitHub, so the same check should also run on the laptop
+(`run_once()` from rh_daemon's loop, the laptop's call). Never lower a threshold without re-measuring
+the normal gaps (worst commit gap seen: 24.5 min).
+
 ## Work from your phone (Claude Code on the web)
 Devon can drive this repo from a phone with zero computer running, via Claude Code
 on the web (claude.ai/code, or the Code tab in the Claude app). One-time: connect
