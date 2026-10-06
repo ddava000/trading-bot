@@ -2020,3 +2020,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
 - notes: Session closing constructive — Nasdaq at a record led by chips/tech, VIX benign at 15.5, holdings green across the board. Staying neutral at 0.50 given 24-year-high long-end yields and Fed minutes ahead; GOOGL off for Q3, META on bearish note, IWM -6% ugly, SNDK/NBIS extended, and $24 cash caps new buys regardless.
 - journal: Mon 10/5 19:23: Tape held records into the close, VIX steady 15.5, day P&L +$1. Risk unchanged at 0.50, avoids intact. Watching surging long-end yields (highest since 2002) and Fed minutes; cash critically tight at $24.
+
+### 2026-10-06T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Constructive backdrop — Nasdaq at record highs, VIX benign at 15.3, soft jobs report cooling rate-hike bets (Fed likely skips October). Holding neutral at 0.50 given 24-year-high long-end yields and GOOGL under a fresh AI-disclosure/class-action headline; cash critically tight at $24 caps new buys regardless.
+- journal: Tue 10/6 09:00: VIX eased 15.5→15.3, soft jobs report boosts Fed-skip odds, futures mixed. Kept risk 0.50 and avoids intact — GOOGL now also hit by AI-issue class-action news (-4% prior), IWM -5.6% ugly, SNDK/NBIS extended. Watching long-end yields and GOOGL headline fallout; cash $24.
