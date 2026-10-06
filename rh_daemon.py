@@ -989,6 +989,15 @@ def persist(led, res, placed):
     # publish an explicit unknown rather than omitting the key, because an ABSENT block
     # and a ZERO block must not look alike to a reader - the same distinction cloud was
     # careful about with capital_flow, and that this repo has got wrong before.
+    # LIVENESS for the Arm A watch. It is SILENT when Arm A is healthy, which is
+    # indistinguishable from never running - the hazard audit-prompt.md L49 already states:
+    # "any guard that fails OPEN needs a published liveness signal, since a broken one is
+    # indistinguishable from a quiet one." I built that watch on 2026-10-06 with no such
+    # signal and only noticed when I tried to PROVE to myself it was running. null = never
+    # ran in this process; a timestamp = it executed then.
+    snap["arm_a_watch_at"] = (None if not _ARM_A_RAN_AT else
+                              datetime.fromtimestamp(_ARM_A_RAN_AT,
+                                                     bot.ET_TZ).strftime("%Y-%m-%dT%H:%M"))
     try:
         import realized
         snap["realized"] = realized.arm_b_block()
@@ -1092,6 +1101,7 @@ _MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*([A-Za-
 
 
 _ARM_A_FIRED, _ARM_A_NEXT = {}, 0.0
+_ARM_A_RAN_AT = 0.0        # last time the Arm A watch actually executed
 
 
 def check_arm_a():
@@ -1108,7 +1118,7 @@ def check_arm_a():
     Wrapped and self-throttled: Arm A monitoring must never cost Arm B a pass. arm_a_watch is
     silent outside 09:45-15:55 ET and fires once per threshold per episode.
     """
-    global _ARM_A_NEXT
+    global _ARM_A_NEXT, _ARM_A_RAN_AT
     if time.time() < _ARM_A_NEXT:
         return
     _ARM_A_NEXT = time.time() + 300
@@ -1127,6 +1137,7 @@ def check_arm_a():
 
         rc, line, _ = arm_a_watch.run_once(fetch=True, ref="origin/main",
                                            fired=_ARM_A_FIRED, deliver=_deliver)
+        _ARM_A_RAN_AT = time.time()      # positive evidence it executed; see persist()
         if rc:
             log(line)
     except Exception as e:
