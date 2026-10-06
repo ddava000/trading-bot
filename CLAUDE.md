@@ -65,6 +65,11 @@ pull); the sessions cannot talk directly.
   the mailbox below so the owner has context.
 - **Never `git add -A` or `git commit -a`.** Commit EXPLICIT paths. A broad add
   sweeps up whoever else is mid-edit.
+- **Prove an edited live file still imports.** A running process keeps its code in memory, so a syntax or
+  indentation error in `rh_daemon.py` (or a module it imports) is invisible until the next restart (exit 42,
+  a Task Scheduler retry, a crash), when the daemon fails to come back on a market day. After editing one,
+  run `python -c "import rh_daemon"` from the repo root (2026-10-06: caught an IndentationError that had
+  sat on disk for minutes).
 - **Look before you pull.** Sessions share ONE working tree on this PC. Run
   `git log origin/main..HEAD` first: if it lists a commit you did not make, another session has
   work waiting to push. Do not `git pull --rebase` over it (2026-10-02: a pull rebased BOT DAILY

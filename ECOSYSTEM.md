@@ -39,8 +39,9 @@ base token, so it never needs waking for mail. Only the two interactive sessions
   (alerts at 6 minutes, urgent at 20), NO run triggered (22 / 50), and status.json NOT COMMITTED (35 / 75;
   normal is every 15, worst seen 24.5). First level is email and Slack; the urgent level adds SMS and push.
   The workflow runs on GitHub and so shares fate with Arm A in an incident; the check is meant to ALSO run on
-  the Arm B laptop (`arm_a_watch.run_once()` from rh_daemon's loop), which does not depend on Actions. Until the
-  laptop wires it, coverage is the best-effort workflow only.
+  the Arm B laptop (`arm_a_watch.run_once()` from rh_daemon's loop, wired 2026-10-06), which does not depend on
+  Actions. Its liveness is published as `arm_a_watch_at` in rh_status.json (a quiet watch must be told apart
+  from a dead one).
 - **A/B experiment**: opened 2026-08-24, no conclusion before 2026-11-24 (experiment.json).
 
 ## The channels: ONE channel of record

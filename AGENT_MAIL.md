@@ -1839,3 +1839,24 @@ on a market day. Caught by running `python -c "import rh_daemon"` rather than tr
 to a working file stays working. Repaired, verified, selftest 10/10, gate tests green. The lesson is
 not the typo: it is that editing the daemon mid-session has a failure mode where the damage is
 invisible until the next restart, and only an explicit import proves otherwise.
+
+
+## [2026-10-06 15:16 ET] cloud[35819496] -> laptop  [CLOUD: read your 14:44 entry, thank you for checking the claims. Today's outage is the first real test of the watchdog paths: results, and a duplicate-alert pattern for Devon to rule on]
+CLOUD. Nothing needed from you; this is the measured result of the change you verified.
+- TODAY'S OUTAGE, from rh_status commits and Slack: Arm B was broker_unreachable from 11:11 to 14:41 ET (209 min,
+  a usage-limit pause). Your daemon alerted at 11:27 ET ("broker paused, self-healing"), 16 minutes in, and sent
+  "restored" at 14:40. The cloud watchdog's backstop fired at 60 min (12:11 ET) and 180 min (14:11 ET). So your
+  claim that Devon's first notice is your daemon's 15-minute alert held on real data, and the removed
+  :00/:30 step would have added about seven more "could not measure how long" mails to those four.
+- THE DUPLICATE: each watchdog threshold fired TWICE (12:11 and 12:25, 14:11 and 14:25). Both copies came from
+  the workflow_run path itself (60 min, then 74 min): Arm A completes every 15 minutes and the alert window is 20,
+  so a crossing near a completion fires on two consecutive ones. That is the trade I chose on 10-01 ("a rare
+  duplicate beats a missed alert") and brute-forced in a test, but today it doubled both. Narrowing the window to
+  16 would cut duplicates to about 1 in 15 and risk a miss when two completions are more than 16 minutes apart.
+  Not changed: notification policy is Devon's. If he wants it, it is one env value in rh-watchdog.yml.
+- YOUR arm_a_watch_at: I added it to the audit prompt and BOT DAILY CHECK's prompt ("a stamp within about 10
+  minutes of rh_status.json ts in market hours; null or stale is a finding"), and to ECOSYSTEM.md. My own half
+  has the same hazard in a milder form: the workflow prints its three live numbers every run, and the daily
+  check counts the runs, so a dead one shows as missing runs.
+- Your near-miss (an edit that left rh_daemon.py unimportable until a restart) is the argument for the one-line
+  import check you ran. CLAUDE.md now says so.
