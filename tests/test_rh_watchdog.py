@@ -2,9 +2,9 @@
 
 Found by the 2026-09-30 cross-audit and pinned here:
   * The standalone workflow's own */30 cron ran only 1 to 3 times a day, so it gained a trigger after
-    every Arm A run (~26 a day). (CORRECTION 2026-10-05: alpaca-bot.yml already runs this script at
-    :00/:30, shallow, so coverage was never once a day.) At 15-minute density the stale alert would
-    mail on every run, so that path alerts once per threshold (tests below).
+    every Arm A run (~26 a day). (CORRECTION 2026-10-05: alpaca-bot.yml also ran this script at :00/:30,
+    shallow, so coverage was never once a day; that step was removed 2026-10-06.) At 15-minute density
+    the stale alert would mail on every run, so that path alerts once per threshold (tests below).
   * An outage that runs past yesterday's close made every threshold long past, so the stateless
     window never matched again and the watchdog stayed silent all day. Durations now count the
     current session only.
@@ -372,6 +372,25 @@ class WorkflowWiringTests(unittest.TestCase):
         for key in ("WATCHDOG_GRACE_MIN", "WATCHDOG_CROSS_WINDOW_MIN", "WATCHDOG_STALE_ALERT_MIN"):
             self.assertIn("github.event_name == 'workflow_run'", env[key])
             self.assertTrue(env[key].rstrip().endswith("|| '' }}"))       # empty on every other trigger
+
+    def test_the_arm_a_workflow_no_longer_runs_the_watchdog_and_still_runs_the_bot(self):
+        """The duplicate piggyback step was removed on purpose (Devon 2026-10-06). It mailed \"could not measure how
+        long\" at every slot because its checkout is shallow. This keeps it from quietly coming back, and keeps
+        the trading steps from going with it."""
+        arm = self.load("alpaca-bot.yml")
+        steps = arm["jobs"]["trade"]["steps"]
+        self.assertFalse([s for s in steps if "rh_watchdog" in str(s)], "a watchdog step is back in the Arm A workflow")
+        names = [s.get("name", "") for s in steps]
+        for needed in ("Run Alpaca bot", "Persist trade log + holds ledger", "Checkout code"):
+            self.assertIn(needed, names)
+        run_step = next(s for s in steps if s.get("name") == "Run Alpaca bot")
+        self.assertEqual(run_step["run"].strip(), "python alpaca_bot.py")
+
+    def test_the_replacement_path_is_still_wired(self):
+        wd = self.load("rh-watchdog.yml")
+        on = wd.get(True) or wd.get("on")
+        self.assertEqual(on["workflow_run"]["workflows"], [self.load("alpaca-bot.yml")["name"]])
+        self.assertIn("schedule", on)
 
     def test_the_checkout_is_deep_enough_for_the_duration_walk(self):
         wd = self.load("rh-watchdog.yml")

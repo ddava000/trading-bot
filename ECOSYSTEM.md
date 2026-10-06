@@ -27,7 +27,7 @@ base token, so it never needs waking for mail. Only the two interactive sessions
   minutes in market hours (26 runs a day) via workflow_dispatch. Never a GitHub cron.
 - **Arm B, Robinhood (~$280, plain index ETFs)**: rh_daemon.py on the always-on laptop, orders placed by a
   headless `claude -p` executor that runs OUTSIDE this repo (it must never read CLAUDE.md).
-- **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron, and a duplicate "piggyback" step inside Alpaca Trading Bot at :00/:30);
+- **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron backup);
   ARM A WATCH (dead-man's switch for Arm A, see below); AGENT_MAIL daily check (13:00 UTC digest email);
   MAILBOX NOTIFY (Slack message on every mailbox push);
   BOT WEEKLY AUDIT (Sundays); Research Brief (morning + intraday), weekdays; Alpaca Weekly Review (Fridays);

@@ -50,10 +50,10 @@ CHECK_EVERY_MIN = 30   # this watchdog's own cadence (:00/:30 slots) ON THE NATI
 # These three are overridden per TRIGGER by rh-watchdog.yml (empty = the defaults here, which are
 # the original behaviour). The standalone workflow's own */30 cron measured 1 to 3 runs a day on
 # 2026-09-09 to 09-30, so on 10-01 it gained a trigger after every Arm A run (about every 15 min).
-# CORRECTION 2026-10-05: alpaca-bot.yml ALREADY runs this script at its :00/:30 triggers (since
-# 2026-08-13), on a shallow checkout, so the duration is unmeasurable there and it mails "could not
-# measure" at every slot. At 15-minute density the defaults would mail on every run while the laptop
-# is down, so the workflow_run trigger passes a narrower window and thresholds for the stale path too.
+# CORRECTION 2026-10-05: alpaca-bot.yml ALSO ran this script at its :00/:30 triggers (2026-08-13 to
+# 2026-10-06, then removed), on a shallow checkout, so the duration was unmeasurable there and it mailed
+# "could not measure" at every slot. At 15-minute density the defaults would mail on every run while the
+# laptop is down, so the workflow_run trigger passes a narrower window and thresholds for the stale path too.
 CROSS_WINDOW_MIN = _env_int("WATCHDOG_CROSS_WINDOW_MIN", 45)
 # Empty = alert on EVERY run while the heartbeat is stale (the original behaviour, right for a
 # sparse schedule). Set, the stale alert fires once per threshold, in minutes THIS SESSION.

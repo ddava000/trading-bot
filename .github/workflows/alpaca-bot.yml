@@ -96,38 +96,18 @@ jobs:
           CAPITAL_SINCE:      ${{ inputs.capital_since }}
         run: python alpaca_bot.py
 
-      # The watchdog's own workflow uses GitHub-native cron, which skips slots
-      # (documented failure mode — the same reason the bot itself is triggered by
-      # cron-job.org). On 2026-08-13 a 51-minute laptop outage during market hours
-      # fell entirely inside a skipped slot and Devon got NO alert; he noticed
-      # before the monitoring did. So the reliably-triggered bot job now ALSO runs
-      # the check, gated to the :00/:30 triggers to keep the intended ~30-min
-      # cadence (the watchdog has no alert dedup, so every-15-min would double the
-      # texts during an outage). The native-cron workflow stays as a backup.
-      # if: always() — a failing bot step must not skip laptop monitoring.
-      - name: RH laptop watchdog (piggyback on the reliable trigger)
-        if: always()
-        env:
-          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
-          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
-          NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
-          SMS_TO:             ${{ secrets.SMS_TO }}
-          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
-          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
-        run: |
-          m=$(date -u +%M)
-          if [ $((10#$m % 30)) -lt 15 ]; then
-            python rh_watchdog.py || echo "watchdog check errored (non-fatal for trading)"
-          else
-            echo "off-slot trigger (:$m) — watchdog runs on the :00/:30 slots"
-          fi
+      # The laptop watchdog used to run HERE as a step at every :00/:30 trigger (added 2026-08-13, after a
+      # 51-minute laptop outage fell inside a skipped native-cron slot). REMOVED 2026-10-06 at Devon's say-so: it
+      # duplicated rh-watchdog.yml's workflow_run trigger, which fires after every run of THIS workflow (the same
+      # reliable cron-job.org clock) with a deep checkout. This step's checkout is shallow, so it could not measure
+      # how long an outage had lasted and mailed "could not measure how long" at every slot (8 mails on
+      # 2026-09-30). The laptop is still watched by rh-watchdog.yml; Arm A itself by arm-a-watch.yml. A test
+      # (tests/test_rh_watchdog.py) fails if a watchdog step is added back to this workflow.
 
       # Slack READ side (Devon 2026-08-25: "should be able to communicate in slack
       # with the others"). The webhook can only post; this pulls his replies back
       # and files them into AGENT_MAIL.md, which is still the channel of record.
-      # Rides the same reliable 15-min trigger the watchdog piggybacks on. Silent
+      # Rides the same reliable 15-min trigger as the rest of this job. Silent
       # no-op until SLACK_BOT_TOKEN + SLACK_CHANNEL_ID exist. Commits on its own so
       # a relayed message is never mislabelled as a trade.
       - name: Pull Slack messages into the mailbox

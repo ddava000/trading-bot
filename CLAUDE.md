@@ -192,14 +192,15 @@ Both bots publish status files read from the public repo: `status.json` (cloud) 
 only if the current UTC time is well past it. An old timestamp on a weekend or
 overnight is normal, both bots rest when markets are closed.
 
-The cloud watchdog for the laptop (`rh_watchdog.py`) runs on THREE paths, and counting only one
-misled this file once: (1) a step inside the Arm A workflow at every :00/:30 trigger (the
-"piggyback", since 2026-08-13; shallow checkout, so it mails "could not measure how long" at every
-slot of an outage: 8 mails on 2026-09-30); (2) `rh-watchdog.yml` after every Arm A run (added
-2026-10-01, deep checkout, once per threshold); (3) that workflow's own */30 cron (GitHub ran it
-only 1 to 3 times a day). Paths 1 and 2 duplicate each other and one should go (Devon's call).
-To judge coverage, count all three: `gh run list --workflow rh-watchdog.yml` AND the watchdog step
-in each Arm A run's log.
+The cloud watchdog for the laptop (`rh_watchdog.py`, `rh-watchdog.yml`) runs on TWO paths: after every
+Arm A run (`workflow_run`, deep checkout, one alert per threshold; the primary) and its own */30 cron
+(a backup: GitHub ran it only 1 to 3 times a day). A third path, a step inside the Arm A workflow at
+every :00/:30 (the "piggyback", 2026-08-13), was REMOVED 2026-10-06 at Devon's say-so: its shallow
+checkout could not measure outages, so it mailed "could not measure how long" at every slot (8 mails on
+2026-09-30). I once reported the watchdog ran "once a day" because I counted only this workflow's own
+runs and missed that step; count every path before claiming a gap. A test fails if a watchdog step is
+added back to the Arm A workflow. The laptop's own daemon alerts at 15 minutes of broker trouble, so the
+first CLOUD-side alert for a degraded laptop is the 60-minute backstop.
 
 Arm A's own liveness is watched by `arm_a_watch.py` (workflow ARM A WATCH; Devon 2026-10-06), because
 Arm A's stop-losses run inside each run with no stop orders at the broker. It alerts on a run waiting

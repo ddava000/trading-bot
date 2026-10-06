@@ -12,14 +12,15 @@ on:
     # off-hours runs just exit 0.
     # MEASURED 2026-09-30: this STANDALONE workflow ran only 1 to 3 times a day (9/09 to 9/30), once
     # inside market hours, not the 17 the cron implies.
-    # CORRECTION 2026-10-05: that was NOT the whole picture. alpaca-bot.yml has run rh_watchdog.py in a
-    # step at every :00/:30 trigger since 2026-08-13 (the "piggyback"), so laptop coverage was every 30
-    # minutes all along; I counted only this workflow's own runs. That step has a SHALLOW checkout, so it
-    # cannot measure how long an outage has lasted and mails "could not measure how long" at every slot
-    # (8 mails during the 9/30 outage). This path passes no overrides (the legacy behaviour).
+    # CORRECTION 2026-10-05: that was NOT the whole picture. alpaca-bot.yml ran rh_watchdog.py in a step at
+    # every :00/:30 trigger from 2026-08-13 (the "piggyback"), so laptop coverage was every 30 minutes all
+    # along; I counted only this workflow's own runs. That step had a SHALLOW checkout, so it could not
+    # measure how long an outage had lasted and mailed "could not measure how long" at every slot (8 mails
+    # during the 9/30 outage). REMOVED 2026-10-06 at Devon's say-so; the workflow_run trigger below replaces
+    # it. This cron path passes no overrides (the legacy behaviour) and is only a backup.
     - cron: "*/30 13-21 * * 1-5"
-  # Added 2026-10-01 as the "primary" path; it DUPLICATES the piggyback step in alpaca-bot.yml (see the
-  # correction above), so one of the two should go. Runs after every Arm A run. Arm A is triggered by cron-job.org through
+  # PRIMARY path (added 2026-10-01). Runs after every Arm A run, with a deep checkout so it can measure outage
+  # duration, and thins its alerts to one per threshold. Arm A is triggered by cron-job.org through
   # workflow_dispatch and ran 26 times in each market day (9/28, 9/29, 9/30), so its completions are
   # a ~15 minute clock that GitHub's own scheduler does not give us. The watchdog stays
   # independent of the LAPTOP, which is the point; it fires whatever Arm A's conclusion was.
