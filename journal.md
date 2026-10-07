@@ -2050,3 +2050,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BRZU', 'GOOGL', 'CEG', 'VST', 'SYNA'] | favor: ['QQQ', 'MSFT', 'SPY', 'NVDA']
 - notes: Futures slipping as oil and Treasury yields push higher (yields near multi-decade highs) after records — a pullback risk off an extended rally; VIX firmer at 15.8. Downshifting to neutral/0.40: cash is critically tight at $24 and several holdings (NBIS +8.6%, VST +8.4%) look extended, so I'm defensive on new buys.
 - journal: Wed 10/7 09:00: Regime cut risk-on→neutral, 0.50→0.40. Futures down on rising oil/yields despite yesterday's records; VIX 15.0→15.8. GOOGL stays off into Q3 earnings; IWM -7.5% is the worsening small-cap laggard. Watching whether yield pressure drags tech from its highs.
+
+### 2026-10-07T14:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BAND', 'BRZU', 'CEG', 'SYNA', 'GOOGL'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: Split tape: Dow down ~400-500 as 10-year yields hit a 24-year high, yet tech holds records (NVDA/AMD lead) and VIX is benign at 15.1. Holding neutral/0.40 — rising yields are a real headwind and several holdings are extended (VST +15.8%, SNDK +8.5%, NBIS/NVDA +4-5%), plus cash is critically tight at $25, so new buys stay limited.
+- journal: Wed 10/7 14:59: Held neutral 0.40. VIX eased 15.8→15.1 but 10-yr yields at 24-year high pressuring the Dow even as tech makes records — divergent tape. Added VST (+15.8%) to avoid as overextended; IWM -7.7% still the worst laggard. Watching whether yield spike finally drags tech off highs into the close.
