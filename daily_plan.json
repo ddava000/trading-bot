@@ -7,10 +7,10 @@
     "SNDK",
     "NBIS",
     "NVDA",
-    "BAND",
     "BRZU",
     "CEG",
     "SYNA",
+    "PLTR",
     "GOOGL"
   ],
   "favor_symbols": [
@@ -18,9 +18,9 @@
     "MSFT",
     "SPY"
   ],
-  "notes": "Split tape: Dow down ~400-500 as 10-year yields hit a 24-year high, yet tech holds records (NVDA/AMD lead) and VIX is benign at 15.1. Holding neutral/0.40 \u2014 rising yields are a real headwind and several holdings are extended (VST +15.8%, SNDK +8.5%, NBIS/NVDA +4-5%), plus cash is critically tight at $25, so new buys stay limited.",
-  "journal_entry": "Wed 10/7 14:59: Held neutral 0.40. VIX eased 15.8\u219215.1 but 10-yr yields at 24-year high pressuring the Dow even as tech makes records \u2014 divergent tape. Added VST (+15.8%) to avoid as overextended; IWM -7.7% still the worst laggard. Watching whether yield spike finally drags tech off highs into the close.",
+  "notes": "End-of-day split tape: Dow down ~300 on 24-year-high yields and Fed-minutes digestion, but tech/S&P near records (NVDA/AMD leading) and VIX benign at 15.1. Holding neutral/0.40 \u2014 rising yields are a persistent headwind, cash is critically tight at $30, and multiple holdings are extended (VST +15.8%, SNDK +7%, NBIS +6.4%).",
+  "journal_entry": "Wed 10/7 16:42: Held neutral 0.40 into the close. VIX steady 15.1; yields at multi-decade high pressuring Dow while tech holds records \u2014 divergence persists. Added PLTR (+3.8%) to avoid as extended; IWM -7.9% still worst laggard. Watching whether yield pressure finally drags tech off highs tomorrow.",
   "date": "2026-10-07",
   "mode": "INTRADAY",
-  "updated_at": "2026-10-07T14:59 ET"
+  "updated_at": "2026-10-07T16:42 ET"
 }
