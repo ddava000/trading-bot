@@ -122,7 +122,7 @@ jobs:
             git config user.email "alpaca-bot@users.noreply.github.com"
             git add -- AGENT_MAIL.md
             git commit -m "AGENT_MAIL: relay Slack messages from Devon $(date -u +%FT%TZ)"
-            git push || (git pull --rebase --autostash origin main && git push) || true
+            bash .github/scripts/push_retry.sh "slack relay" warn
           fi
 
       - name: Persist trade log + holds ledger
@@ -147,7 +147,12 @@ jobs:
             git config user.email "alpaca-bot@users.noreply.github.com"
             if [ -n "$trades" ]; then msg="trade log $(date -u +%FT%TZ)"; else msg="status heartbeat $(date -u +%FT%TZ)"; fi
             git commit -m "$msg"
-            git push || (git pull --rebase --autostash origin main && git push) || true
+            # push_retry.sh retries, and is LOUD when it never lands (2026-10-07: GitHub rejected every write
+            # for 9 minutes and this line used to end in "|| true", so a run finished green with its state
+            # unsaved and status.json frozen). Trade data (trade_log/holds, i.e. the stop levels) failing to
+            # save FAILS the step; a heartbeat alone leaves a warning annotation.
+            if [ -n "$trades" ]; then mode=fatal; else mode=warn; fi
+            bash .github/scripts/push_retry.sh "$msg" "$mode"
           else
             echo "nothing to persist"
           fi

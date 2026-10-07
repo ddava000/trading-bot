@@ -213,6 +213,10 @@ for a machine (6 min), no run triggered (22), and status.json uncommitted (35); 
 is urgent. The workflow shares fate with GitHub, so the same check should also run on the laptop
 (`run_once()` from rh_daemon's loop, the laptop's call). Never lower a threshold without re-measuring
 the normal gaps (worst commit gap seen: 24.5 min).
+A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
+run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
+`::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so
+look for "Arm A heartbeat not saved" / "Arm A state not saved" in the run before calling a quiet bot dead.
 
 ## Work from your phone (Claude Code on the web)
 Devon can drive this repo from a phone with zero computer running, via Claude Code
