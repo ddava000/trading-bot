@@ -1141,7 +1141,7 @@ _ARM_A_FIRED, _ARM_A_NEXT = {}, 0.0
 _ARM_A_RAN_AT = 0.0        # last time the Arm A watch actually executed
 
 
-def check_arm_a():
+def check_arm_a(led):
     """Dead-man's switch for ARM A, run from THIS daemon. Cloud built it; cloud cannot host it.
 
     Arm A evaluates its stops inside each GitHub Actions run - there are no broker-side stop
@@ -1175,6 +1175,15 @@ def check_arm_a():
         rc, line, _ = arm_a_watch.run_once(fetch=True, ref="origin/main",
                                            fired=_ARM_A_FIRED, deliver=_deliver)
         _ARM_A_RAN_AT = time.time()      # positive evidence it executed; see persist()
+        # Persist the once-per-episode dedupe. 2026-10-07: this alerted at 11:23:39, a code
+        # change restarted the daemon at 11:25:02, and the SAME threshold alerted again at
+        # 11:25:23 - because _ARM_A_FIRED is a module global and a restart re-arms it. Fourth
+        # time this shape has bitten (broker re-alert, selftest, deposit overdue, now this), so
+        # it goes on the ledger like the others. Sets are not JSON, so only {signal: [minutes]}
+        # is kept; the "_failed" retry state is deliberately NOT persisted - losing it costs at
+        # most one retried delivery, and it is keyed by tuples.
+        _remember_alerts(led, arm_a_fired={k: sorted(v) for k, v in _ARM_A_FIRED.items()
+                                           if isinstance(v, set)})
         if rc:
             log(line)
     except Exception as e:
@@ -1525,6 +1534,8 @@ def main():
     _broker_alert_at   = float(_a.get("broker_alert_at") or 0.0)
     _selftest_alert_at = float(_a.get("selftest_alert_at") or 0.0)
     _deposit_alert_on  = _a.get("deposit_alert_on") or None
+    _ARM_A_FIRED.clear()
+    _ARM_A_FIRED.update({k: set(v) for k, v in (_a.get("arm_a_fired") or {}).items()})
     if _broker_alert_at:
         _reconcile_fails = int(_a.get("reconcile_fails") or 0)
     if _selftest_alert_at:
@@ -1632,7 +1643,7 @@ def main():
             # EVERY pass, fast included, not just the full cycle: a stuck Arm A run is exactly the
             # case where minutes matter, and full cycles are 15 minutes apart. check_arm_a()
             # self-throttles to 5 minutes and returns immediately outside 09:45-15:55 ET.
-            check_arm_a()
+            check_arm_a(led)
             if full:
                 check_mail(led)   # surface new mailbox entries for this session
                 check_deposit_overdue(led)   # ask, never invent, a missed deposit
