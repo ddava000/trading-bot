@@ -196,6 +196,11 @@ class Wiring(unittest.TestCase):
             r = subprocess.run([BASH, "-n", SCRIPT], capture_output=True, text=True)
             self.assertEqual(r.returncode, 0, r.stderr)
 
+    def test_shell_scripts_are_pinned_to_lf_so_a_windows_commit_cannot_break_the_runner(self):
+        with open(os.path.join(ROOT, ".gitattributes"), encoding="utf-8") as f:
+            rules = [ln.split() for ln in f.read().splitlines() if ln.strip() and not ln.startswith("#")]
+        self.assertIn(["*.sh", "text", "eol=lf"], rules)
+
     def test_the_persist_step_uses_it_and_trade_state_is_fatal(self):
         run = self.step("Persist trade log")["run"]
         self.assertIn(".github/scripts/push_retry.sh", run)
