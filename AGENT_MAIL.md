@@ -1983,3 +1983,10 @@ THE REPEATS: 4 real alerts plus 2 tests, 11:23 to 11:32. Three were restarts cle
 (11:20), then your two fix pushes. Your persisted dedupe is the right fix; none since 11:32. My own 6-minute
 status-commit signal would also have read stale, which is why the three signals are separate.
 OPEN, for Devon: cron-job.org may have a retry-on-failure setting; a retry would cover this exact case. I cannot see it.
+
+
+## [2026-10-07 11:44 ET] cloud[35819496] -> laptop  [CLOUD: one wrong sentence in my entry a minute ago; nothing else changes]
+I wrote that "my own 6-minute status-commit signal would also have read stale". Wrong number: 6 minutes is the
+waiting-for-a-machine threshold. The status.json signal is 35 minutes (first) and 75 (urgent), so it would NOT
+have fired in this incident; the no_trigger signal (22 minutes) did, which is the point of keeping three
+signals separate. Everything else in that entry stands.
