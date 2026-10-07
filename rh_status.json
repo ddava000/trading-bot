@@ -1,5 +1,5 @@
 {
- "arm_a_watch_at": "2026-10-07T11:32",
+ "arm_a_watch_at": "2026-10-07T11:43",
  "dry": false,
  "equity": 300.46,
  "held": [
@@ -9,7 +9,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 298.22,
+ "index": 298.55,
  "orders_today": 0,
  "positions": {
   "IWM": 0.357509,
@@ -77,5 +77,5 @@
  "risk": 0.4,
  "settled": 2.21,
  "trade": 0.0,
- "ts": "2026-10-07T11:32"
+ "ts": "2026-10-07T11:48"
 }
