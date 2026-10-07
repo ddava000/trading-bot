@@ -293,6 +293,46 @@ def _hours_since(iso):
         return None       # unparseable = treat as unknown, and alert rather than skip
 
 
+def market_minutes_between(start_utc, end_utc):
+    """Minutes of the bot's OWN trading window (weekdays 09:45 to 15:55 ET, MARKET_HOLIDAYS excluded) that fall
+    between two moments. Wall-clock time over a close, a weekend or a holiday is not downtime: nothing runs
+    then, so a failure on the last run before the close followed by a good run at the next open is a few
+    minutes of trading time, not 18 hours. (Found 2026-10-07 when LAPTOP BOT caught the same mistake in its
+    own alert path: 1069 minutes reported for one failed attempt.)"""
+    if end_utc <= start_utc:
+        return 0.0
+    s, e = start_utc.astimezone(ET_TZ), end_utc.astimezone(ET_TZ)
+    total, day = 0.0, s.date()
+    while day <= e.date():
+        if day.weekday() < 5 and day.strftime("%Y-%m-%d") not in MARKET_HOLIDAYS:
+            o = datetime(day.year, day.month, day.day, 9, 45, tzinfo=ET_TZ)
+            c = datetime(day.year, day.month, day.day, 15, 55, tzinfo=ET_TZ)
+            lo, hi = max(o, s), min(c, e)
+            if hi > lo:
+                total += (hi - lo).total_seconds() / 60.0
+        day += timedelta(days=1)
+    return total
+
+
+def _market_hours_since(iso):
+    """Trading hours (see market_minutes_between) since an ISO stamp, or None if unparseable."""
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return market_minutes_between(t, datetime.now(timezone.utc)) / 60.0
+    except Exception:
+        return None       # unparseable = unknown, never zero
+
+
+def _fmt_trading_time(hours):
+    if hours is None:
+        return None
+    if hours < 1 / 60:
+        return "under a minute of trading time"
+    if hours < 1:
+        return "%d minutes of trading time" % round(hours * 60)
+    return "%.1fh of trading time" % hours
+
+
 def outage_note_blind():
     """One blind window recorded. Emails on the first, then backs off. Never silent."""
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -304,7 +344,7 @@ def outage_note_blind():
     # gap is None when there has been no alert yet OR the stamp is corrupt. Both
     # mean "we cannot prove Devon was told", so both alert. Fail loud, not quiet.
     due = (gap is None) or (gap >= OUTAGE_REALERT_H)
-    dur = _hours_since(since)
+    dur = _market_hours_since(since)      # TRADING time, not wall clock: see market_minutes_between
     if due:
         send_email(
             f"Alpaca bot ({MODE}) - Alpaca unreachable all window",
@@ -312,7 +352,7 @@ def outage_note_blind():
             "protective pass). No orders were placed; positions are unwatched until a "
             "run gets through. Nothing is wrong with the bot - check "
             "https://status.alpaca.markets" + (
-                f"{chr(10)}{chr(10)}Unreachable for about {dur:.1f}h so far."
+                f"{chr(10)}{chr(10)}Unreachable for about {_fmt_trading_time(dur)} so far."
                 if dur is not None and dur >= OUTAGE_REALERT_H else "") + (
                 f"{chr(10)}Repeats are suppressed for {OUTAGE_REALERT_H:.0f}h at a time; "
                 "you will get one more if it is still down then, and one when it clears."))
@@ -329,10 +369,10 @@ def outage_note_contact():
     st = _outage_load()
     if not st.get("unreachable_since"):
         return
-    dur = _hours_since(st["unreachable_since"])
+    dur = _market_hours_since(st["unreachable_since"])
     send_email(f"Alpaca bot ({MODE}) - Alpaca reachable again",
                "Contact with Alpaca is restored and protective passes are running."
-               + (f" It was unreachable for about {dur:.1f}h." if dur is not None else ""))
+               + (f" It was unreachable for about {_fmt_trading_time(dur)}." if dur is not None else ""))
     _outage_save({})
 
 
