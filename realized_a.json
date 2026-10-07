@@ -802,12 +802,24 @@
    "sale": "851529a9-95c9-4605-926c-3c9f4b3efbd2",
    "symbol": "GOOGL",
    "term": "ST"
+  },
+  {
+   "basis": 6.14,
+   "close_date": "2026-10-07",
+   "close_fill": 90,
+   "gain": -0.397318,
+   "open_date": "2026-09-23",
+   "open_fill": 58,
+   "proceeds": 5.742682,
+   "qty": 0.100130463,
+   "sale": "14833b32-b30b-4ef8-b39c-92ee1738cf64",
+   "symbol": "BAND",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "BAND": 0.100130463,
   "BKH": 0.077735908,
   "BRZU": 0.051386,
   "CEG": 0.019622189,
@@ -832,18 +844,18 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -14.63,
-    "sales": 33,
+    "net": -15.03,
+    "sales": 34,
     "st": {
      "gains": 0.26,
-     "losses": -14.89,
-     "net": -14.63,
-     "sales": 33
+     "losses": -15.29,
+     "net": -15.03,
+     "sales": 34
     }
    }
   },
-  "fills": 90,
-  "last_fill": "2026-10-07T13:45:27.455136Z",
+  "fills": 91,
+  "last_fill": "2026-10-07T19:45:24.873761Z",
   "last_sale": "2026-10-07",
   "lt": {
    "gains": 0.0,
@@ -852,15 +864,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -14.63,
-  "reconciliation_residual": -0.0408,
-  "sales": 33,
+  "net": -15.03,
+  "reconciliation_residual": -0.0435,
+  "sales": 34,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -14.89,
-   "net": -14.63,
-   "sales": 33
+   "losses": -15.29,
+   "net": -15.03,
+   "sales": 34
   },
   "state": "ok",
   "wash_watch": {
