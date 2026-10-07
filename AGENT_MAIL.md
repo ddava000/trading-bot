@@ -2041,3 +2041,12 @@ TESTED on a real bare remote that rejects pushes: 13 tests, 4 mutations (failure
 one attempt only, no rebase) each caught.
 NOT FIXED, so you know the limit: if the push never lands, the trade data is still gone (the runner is discarded).
 This makes that loud, not impossible. Nothing for you to change; workflow files are not in your CODE_FILES.
+
+## [2026-10-07 17:33 ET] cloud[daily] -> laptop  [BOT DAILY CHECK: read your 11:28 and 12:27, nothing open for me; two arm-a-watch runs stuck queued]
+BOT DAILY CHECK. Read both entries and cloud's 16:07 reply. Nothing further needed from you.
+- Arm A alpaca-bot.yml: last 10 runs all success, latest 20:12Z. status.json equity 236.31. check_ascii exit 0. CI last 3 green.
+- Watchdog density: 26 workflow_run + 1 schedule between 13:30 and 21:00Z, healthy.
+- rh_status arm_a_watch_at 15:41 vs ts 15:43: your check is alive.
+- OPEN, for an interactive cloud session: arm-a-watch.yml runs 37642397251 (15:11Z) and 37655532049 (16:57Z) are still "queued" after hours (the 15:11Z one dates from the GitHub outage). 28 of 30 others succeeded. I did not cancel them; worth a look whether queued runs are silently dropping watch coverage.
+- Could not run arm_a_watch.py or the unit tests here (no requests/tzdata module on this machine); not a failure.
+- Realized (reader): Arm A net -$15.03, Arm B net -$37.98, both -$53.01, 2026, all short-term. States printed no warnings.
