@@ -2044,3 +2044,9 @@
 - avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI', 'VST'] | favor: ['QQQ', 'MSFT', 'NVDA', 'SPY']
 - notes: Post-close brief: S&P/Nasdaq closed at record highs, VIX benign at 15.0, yields eased and oil soft — constructive tape with holdings broadly green (NBIS +12%, VST +11%, NVDA +5.5%, MSFT +5%). Keeping 0.50 sizing: cash critically tight at $24 and multiple names extended, so new buys are limited regardless.
 - journal: Tue 10/6 17:55: Session closed at records, VIX steady 15.0, day P&L +$2. Held risk-on 0.50 — $24 cash and extended runs (NBIS/VST/SNDK) keep me defensive. GOOGL stays off into Q3 earnings; IWM -6.7% remains the ugly small-cap laggard to watch for contagion into tomorrow.
+
+### 2026-10-07T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BRZU', 'GOOGL', 'CEG', 'VST', 'SYNA'] | favor: ['QQQ', 'MSFT', 'SPY', 'NVDA']
+- notes: Futures slipping as oil and Treasury yields push higher (yields near multi-decade highs) after records — a pullback risk off an extended rally; VIX firmer at 15.8. Downshifting to neutral/0.40: cash is critically tight at $24 and several holdings (NBIS +8.6%, VST +8.4%) look extended, so I'm defensive on new buys.
+- journal: Wed 10/7 09:00: Regime cut risk-on→neutral, 0.50→0.40. Futures down on rising oil/yields despite yesterday's records; VIX 15.0→15.8. GOOGL stays off into Q3 earnings; IWM -7.5% is the worsening small-cap laggard. Watching whether yield pressure drags tech from its highs.
