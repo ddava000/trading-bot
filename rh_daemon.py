@@ -392,6 +392,20 @@ if CFG.get("gmail_user"):
 if CFG.get("alert_email"):
     bot.ALERT_TO = CFG["alert_email"]
 
+# ALSO into os.environ, not only onto the module. Found 2026-10-07 while Devon asked me to
+# fire the Arm A watch: the documented test `python arm_a_watch.py --force` reported
+# "sent via: slack" with NO email, because it delivers through rh_watchdog.alert(), which
+# reads os.environ - and the laptop only ever set bot.GMAIL_* module attributes. Production
+# was fine (rh_daemon.notify -> bot.send_email uses the attributes) so the TEST was broken,
+# not the alerting: it would have reported a dead email channel that works, or passed while
+# proving nothing about the path that carries real alerts. Slack keys were already exported
+# this way; the mail identity was not. Same lesson as STANDING FACTS: verify in the
+# environment the code actually runs in.
+for _k, _e in (("gmail_user", "GMAIL_USER"), ("gmail_app_password", "GMAIL_APP_PASSWORD"),
+               ("alert_email", "ALERT_EMAIL")):
+    if CFG.get(_k):
+        os.environ.setdefault(_e, CFG[_k])
+
 # Slack webhook, same pattern and same reason. SLACK_WEBHOOK_URL is a GitHub
 # secret, which covers the workflows, but this daemon runs on the LAPTOP where no
 # such environment exists, so the mirror would have silently no-opped forever
