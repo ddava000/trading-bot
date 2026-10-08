@@ -1515,6 +1515,7 @@ def _maybe_alert_broker(led):
 
 DOWNTIME_MIN_SEC = 300      # a gap under this is a code-pull restart, not an outage
 DOWNTIME_MIN_MARKET_MIN = 2 # market minutes below this are heartbeat resolution, not blindness
+DOWNTIME_RETRY_MAX = 24     # passes to keep retrying a parked downtime report before giving up
 
 
 def _implied_boot_epoch():
@@ -1532,6 +1533,47 @@ def _implied_boot_epoch():
         return time.time() - ctypes.windll.kernel32.GetTickCount64() / 1000.0
     except Exception:
         return None
+
+
+def retry_pending_downtime(led):
+    """Send a parked downtime report, and keep trying until it is away. Never raises.
+
+    report_downtime runs about 40 seconds after boot (measured 2026-10-08: boot
+    11:32:12 ET, daemon start 11:32:52), which is exactly when this laptop may not
+    have a network yet. So the one alert whose job is to survive an outage is the
+    one most likely to be sent while the machine is still coming up.
+
+    Called from the main loop on EVERY pass, before the market gate, so a report
+    parked out of session still goes as soon as the network returns rather than
+    waiting for an open. Bounded: a send that has failed DOWNTIME_RETRY_MAX times
+    has email AND Slack both broken, which is its own alarm and not something to
+    retry forever. Giving up latches the dampener so the loop goes quiet, and says
+    so in the log, because a report that exists only here still beats one that
+    quietly vanished.
+    """
+    try:
+        p = (led.get("alerts") or {}).get("pending_downtime")
+        if not p:
+            return
+        tries = int(p.get("tries") or 0) + 1
+        a = led.setdefault("alerts", {})
+        if notify(p.get("subject") or "", p.get("body") or ""):
+            a.pop("pending_downtime", None)
+            a["downtime_reported"] = p.get("stamp")
+            save_ledger(led)
+            log(f"downtime report for {p.get('stamp')} ET delivered"
+                + (f" on try {tries}" if tries > 1 else ""))
+        elif tries >= DOWNTIME_RETRY_MAX:
+            a.pop("pending_downtime", None)
+            a["downtime_reported"] = p.get("stamp")
+            save_ledger(led)
+            log(f"!! downtime report for {p.get('stamp')} ET GIVEN UP after {tries} tries - "
+                "email and Slack both failed, so that gap is in this log and nowhere else")
+        else:
+            p["tries"] = tries
+            save_ledger(led)
+    except Exception as e:
+        log(f"retry_pending_downtime failed ({e}) — not fatal, continuing")
 
 
 def report_downtime(led):
@@ -1619,27 +1661,28 @@ def report_downtime(led):
             subject = f"{SESSION_NAME}: Arm B was blind {mins} market minute(s) - daemon gap"
         else:
             subject = f"{SESSION_NAME}: laptop rebooted while the market was shut ({wall} gap)"
-        delivered = notify(subject,
-               f"Arm B published no heartbeat between {stamp} ET and "
-               f"{now_et().strftime('%Y-%m-%dT%H:%M')} ET.\n"
-               f"Gap: {wall} of wall clock, {mins} minute(s) of it inside 09:45-15:55 ET on a "
-               f"trading day.\n\n{cause}\n\n"
-               "In the gap Arm B placed nothing and cancelled nothing, and its stops could not have "
-               "fired either - positions were held unmanaged. The daemon is running again and will "
-               "reconcile with the broker on this cycle.")
-        # Record the dampener only once the mail is actually AWAY. This runs seconds
-        # after boot (40 s on 2026-10-08), which is exactly when the network may not
-        # be up yet; writing the key first would file a send that never happened as
-        # reported and never retry it. Leaving it unwritten costs one more attempt on
-        # the next restart, and a send that keeps failing is loud in the log rather
-        # than silently lost. Cloud's 2026-10-08 audit, item 2.
-        if delivered:
-            _remember_alerts(led, downtime_reported=stamp)
-            log(f"downtime reported: gap {wall} since {stamp} ET, {mins} market minute(s), "
-                f"rebooted={rebooted}")
-        else:
-            log(f"downtime NOT reported (send failed): gap {wall} since {stamp} ET, "
-                f"{mins} market minute(s), rebooted={rebooted} — will retry on the next restart")
+        body = (f"Arm B published no heartbeat between {stamp} ET and "
+                f"{now_et().strftime('%Y-%m-%dT%H:%M')} ET.\n"
+                f"Gap: {wall} of wall clock, {mins} minute(s) of it inside 09:45-15:55 ET on a "
+                f"trading day.\n\n{cause}\n\n"
+                "In the gap Arm B placed nothing and cancelled nothing, and its stops could not have "
+                "fired either - positions were held unmanaged. The daemon is running again and will "
+                "reconcile with the broker on this cycle.")
+        # PARK IT ON THE LEDGER BEFORE SENDING, then let the retry path do the send and
+        # all the bookkeeping. The first version recorded the dampener only on a True,
+        # which stopped a failed send being filed as delivered but left the report with
+        # nowhere to live: the evidence a retry needs is the stale ts in rh_status.json,
+        # and the FIRST PASS after boot overwrites it, so the gap then reads as a minute
+        # and returns early. Cloud reproduced that on 2026-10-08 and I confirmed it with
+        # the real function against a pinned clock - the 11:20 outage was never reported
+        # at all. "Will retry on the next restart" was a promise the code could not keep.
+        # A report has to outlive the file it was derived from.
+        a = led.setdefault("alerts", {})
+        a["pending_downtime"] = {"stamp": stamp, "subject": subject, "body": body, "tries": 0}
+        save_ledger(led)
+        log(f"downtime detected: gap {wall} since {stamp} ET, {mins} market minute(s), "
+            f"rebooted={rebooted}")
+        retry_pending_downtime(led)
     except Exception as e:
         log(f"report_downtime failed ({e}) — not fatal, startup continues")
 
@@ -1691,6 +1734,13 @@ def main():
     report_downtime(led)   # a gap nothing could alert from while it was happening
     last_full = 0.0
     while True:
+        # Before the HALT check and before the market gate, deliberately. A downtime
+        # report parked by a failed send must go as soon as the network is back, and
+        # neither a paused bot nor a shut market makes the outage less true - the 11:27
+        # gap was out of session and still cost Devon the knowledge that his laptop
+        # had gone down. Cheap and quota-free: it returns immediately with nothing
+        # parked, which is every pass but the handful after a failure.
+        retry_pending_downtime(led)
         if os.path.exists(HALT_F):
             log("rh_HALT present — trading paused")
             if "--once" in sys.argv:      # otherwise --once spins here forever

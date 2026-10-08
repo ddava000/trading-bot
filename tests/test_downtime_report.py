@@ -31,17 +31,31 @@ import rh_daemon as D
 class DowntimeReportTests(unittest.TestCase):
     def setUp(self):
         self.sent, self.logged, self.ledger = [], [], {}
-        # notify/log/_remember_alerts are the only things report_downtime reaches
-        # outward through; patching them keeps this off the real files and out of mail.
+        # EVERY outward call report_downtime and retry_pending_downtime make has to be
+        # stubbed here, and save_ledger is in that list for a reason: on 2026-10-08 I
+        # added a save_ledger call to the parking path, ran this file, and it wrote the
+        # TEST's dict straight over the live rh_ledger.json - the real positions, cash
+        # and alert dampeners, on a file that is gitignored and has no backup. The suite
+        # had been safe only because the code happened to go through _remember_alerts.
+        # A test must not be able to reach live state by accident, so _save is stubbed
+        # too: it is the single floor under every writer in this module, and anything
+        # that tries to write a real file from here fails loudly instead of silently
+        # succeeding.
         for name, fn in (
             ("notify", lambda s, b, untrusted=False: (self.sent.append((s, b)), True)[1]),
             ("log", self.logged.append),
             ("_remember_alerts",
              lambda led, **kw: led.setdefault("alerts", {}).update(kw)),
+            ("save_ledger", lambda led: None),
+            ("_save", self._refuse_write),
         ):
             p = mock.patch.object(D, name, fn)
             p.start()
             self.addCleanup(p.stop)
+
+    @staticmethod
+    def _refuse_write(path, obj):
+        raise AssertionError("a test tried to write the real file %r - stub the writer" % path)
 
     def call(self, stamp, mins, boot, led=None):
         """One report_downtime call with everything outside it pinned."""
@@ -136,19 +150,63 @@ class DowntimeReportTests(unittest.TestCase):
         self.assertEqual(len(self.sent), 1, "the dedupe key must live on the LEDGER, "
                                             "not in a module global a restart clears")
 
-    def test_a_failed_send_is_not_recorded_as_reported(self):
-        """Cloud's 2026-10-08 audit, item 2.
+    def test_a_failed_send_parks_the_report_and_does_not_latch(self):
+        """Cloud's 2026-10-08 audit, item 2, and its follow-up.
 
-        This runs seconds after boot - 40 s on 2026-10-08 - which is exactly when the
-        network may not be up. Writing the dampener before the send meant a mail that
-        never left was filed as delivered and never retried: the outage alert lost to
-        the outage. Record only on a True from notify.
+        This runs about 40 seconds after boot, exactly when the network may not be up.
+        The first fix stopped a failed send being filed as delivered, but left the
+        report with nowhere to live: the evidence is the stale ts in rh_status.json and
+        the first pass overwrites it, so the promised retry could never happen. The
+        report is now parked on the ledger, which outlives that file.
         """
         with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
             self.call(self.stamp_ago(31), 31, time.time() - 300)
-        self.assertNotIn("downtime_reported", self.ledger.get("alerts", {}),
-                         "a failed send must stay unreported so the next restart retries")
-        self.assertTrue(any("NOT reported (send failed)" in m for m in self.logged), self.logged)
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("downtime_reported", alerts, "a failed send must not latch")
+        parked = alerts.get("pending_downtime")
+        self.assertIsNotNone(parked, "the report must survive the failed send")
+        self.assertIn("blind 31 market minute(s)", parked["subject"])
+        self.assertEqual(parked["stamp"], self.stamp_ago(31))
+        self.assertEqual(parked["tries"], 1)
+
+    def test_the_parked_report_goes_once_the_network_is_back(self):
+        """The exact sequence cloud reproduced: the heartbeat file is gone by then."""
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.sent.clear()
+        D.retry_pending_downtime(self.ledger)          # what the main loop calls each pass
+        self.assertEqual(len(self.sent), 1, "the parked report must send")
+        self.assertIn("blind 31 market minute(s)", self.sent[0][0])
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("pending_downtime", alerts, "delivered, so unpark it")
+        self.assertEqual(alerts.get("downtime_reported"), self.stamp_ago(31))
+        D.retry_pending_downtime(self.ledger)
+        self.assertEqual(len(self.sent), 1, "and every later pass must send nothing")
+
+    def test_the_retry_gives_up_loudly_rather_than_forever(self):
+        """Both channels dead is its own alarm, not something to retry until reboot."""
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+            for _ in range(D.DOWNTIME_RETRY_MAX):
+                D.retry_pending_downtime(self.ledger)
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("pending_downtime", alerts, "must stop, or it logs every pass forever")
+        self.assertEqual(alerts.get("downtime_reported"), self.stamp_ago(31))
+        self.assertTrue(any("GIVEN UP" in m for m in self.logged), self.logged)
+
+    def test_the_retry_is_free_when_nothing_is_parked(self):
+        """It runs on EVERY pass, before the market gate, so it must cost nothing."""
+        D.retry_pending_downtime({})
+        D.retry_pending_downtime({"alerts": {}})
+        self.assertEqual(self.sent, [])
+        self.assertEqual(self.logged, [])
+
+    def test_the_retry_never_raises_on_a_damaged_record(self):
+        """It is called from the top of the main loop; it must never stop the daemon."""
+        for bad in ({"alerts": {"pending_downtime": {}}},
+                    {"alerts": {"pending_downtime": {"tries": "x"}}}):
+            D.retry_pending_downtime(bad)
+        self.assertTrue(True, "no exception escaped")
 
     def test_a_delivered_send_is_recorded(self):
         """Control for the test above: with delivery working, the dampener must latch."""
@@ -173,6 +231,42 @@ class DowntimeReportTests(unittest.TestCase):
         sent, logged = self.call("not-a-timestamp", 31, time.time())
         self.assertEqual(sent, [])
         self.assertTrue(any("report_downtime failed" in m for m in logged), logged)
+
+    # ---- the wiring, read from SOURCE ------------------------------------------------
+
+    def test_the_retry_is_wired_into_the_main_loop_before_the_market_gate(self):
+        """Without this nothing notices if the call site is dropped.
+
+        A mutation run on 2026-10-08 removed `retry_pending_downtime(led)` from main()'s
+        loop and every behavioural test here still passed: the retry would then only run
+        at startup, which is precisely the hole it was written to close, because the
+        first pass overwrites the heartbeat the startup path reads. Position matters too
+        - it sits above the HALT check and the market gate, since neither a paused bot
+        nor a shut market makes the outage it is reporting less true.
+        """
+        import ast
+
+        src = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                "rh_daemon.py"), encoding="utf-8").read()
+        main = next(n for n in ast.walk(ast.parse(src))
+                    if isinstance(n, ast.FunctionDef) and n.name == "main")
+        loop = next(n for n in ast.walk(main) if isinstance(n, ast.While))
+
+        def calls(node):
+            return [c.func.id for c in ast.walk(node)
+                    if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+
+        top = [name for stmt in loop.body for name in calls(stmt)]
+        self.assertIn("retry_pending_downtime", top,
+                      "the retry must run every pass, not only at startup")
+        gate = [i for i, stmt in enumerate(loop.body)
+                if any(isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute)
+                       and c.func.attr == "check_market" for c in ast.walk(stmt))]
+        retry_at = next(i for i, stmt in enumerate(loop.body)
+                        if "retry_pending_downtime" in calls(stmt))
+        if gate:
+            self.assertLess(retry_at, gate[0],
+                            "a report parked out of session must not wait for an open")
 
     # ---- the boot clock itself --------------------------------------------------------
 

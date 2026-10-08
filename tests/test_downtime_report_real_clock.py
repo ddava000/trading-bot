@@ -28,6 +28,19 @@ import rh_daemon as D  # noqa: E402
 REAL_DT = datetime
 
 
+def _refuse_write(path, obj):
+    """Floor under every writer in rh_daemon: a test must not reach live state.
+
+    laptop, 2026-10-08: report_downtime gained a save_ledger call for the parked
+    report, and this helper did not stub it, so running these tests wrote the test
+    dict over the live rh_ledger.json - gitignored, no backup, real positions and
+    cash. Stubbing save_ledger alone would fix today's call; stubbing _save as well
+    makes the next writer added upstairs fail loudly here instead of silently
+    succeeding against the real file.
+    """
+    raise AssertionError("a test tried to write the real file %r - stub the writer" % path)
+
+
 def report(last_stamp, now_str, rebooted):
     """Run the real report_downtime. Returns (mails, log lines)."""
     now = REAL_DT.strptime(now_str, "%Y-%m-%d %H:%M").replace(tzinfo=D.bot.ET_TZ)
@@ -45,7 +58,9 @@ def report(last_stamp, now_str, rebooted):
          mock.patch.object(D, "_implied_boot_epoch", lambda: boot), \
          mock.patch.object(D, "notify", lambda s, b, untrusted=False: (sent.append((s, b)), True)[1]), \
          mock.patch.object(D, "log", logged.append), \
-         mock.patch.object(D, "_remember_alerts", lambda l, **kw: l.setdefault("alerts", {}).update(kw)):
+         mock.patch.object(D, "_remember_alerts", lambda l, **kw: l.setdefault("alerts", {}).update(kw)), \
+         mock.patch.object(D, "save_ledger", lambda l: None), \
+         mock.patch.object(D, "_save", _refuse_write):
         D.report_downtime(led)
     return sent, logged
 
