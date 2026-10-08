@@ -280,6 +280,11 @@
    "qty": 0.077735908,
    "symbol": "BKH",
    "t": "2026-10-07"
+  },
+  {
+   "qty": 0.161235573,
+   "symbol": "U",
+   "t": "2026-10-08"
   }
  ],
  "closed": [
@@ -832,6 +837,7 @@
   "SNDK": 0.004539783,
   "SPY": 0.053798739,
   "SYNA": 0.043519347,
+  "U": 0.161235573,
   "VST": 0.035762895
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
@@ -854,8 +860,8 @@
     }
    }
   },
-  "fills": 91,
-  "last_fill": "2026-10-07T19:45:24.873761Z",
+  "fills": 92,
+  "last_fill": "2026-10-08T13:45:25.635697Z",
   "last_sale": "2026-10-07",
   "lt": {
    "gains": 0.0,
@@ -865,7 +871,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -15.03,
-  "reconciliation_residual": -0.0435,
+  "reconciliation_residual": -0.0335,
   "sales": 34,
   "since": "2026-08-12",
   "st": {
