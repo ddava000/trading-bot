@@ -1513,6 +1513,104 @@ def _maybe_alert_broker(led):
                      reconcile_fails=_reconcile_fails)
 
 
+DOWNTIME_MIN_SEC = 300      # a gap under this is a code-pull restart, not an outage
+
+
+def _implied_boot_epoch():
+    """Epoch seconds this machine booted, from the uptime counter. None if unreadable.
+
+    ctypes/GetTickCount64 rather than psutil (not installed here) or a PowerShell
+    subprocess (a second of startup, and one more thing that can be broken on the
+    one path that reports the laptop dying). Checked against EventLog 6013 on
+    2026-10-08: implied 10:32:11 local against a real boot of 10:32:12. Should the
+    counter ever exclude time spent asleep it implies a LATER boot, which can only
+    make a sleep look like the outage it was - the error runs the safe way.
+    """
+    try:
+        import ctypes
+        return time.time() - ctypes.windll.kernel32.GetTickCount64() / 1000.0
+    except Exception:
+        return None
+
+
+def report_downtime(led):
+    """Email Devon when the daemon returns from a gap nothing announced. Never raises.
+
+    2026-10-08, the laptop's two crashes: the 04:54 ET bugcheck reached Devon only
+    because LAPTOP BOT DAILY CHECK happened to run at 10:24, and the 11:27 ET one -
+    wholly inside the trading session - reached him not at all. The daemon came back
+    at 11:32:52, logged "rh_daemon starting", and said nothing. Every other kind of
+    blindness here emails: broker unreachable, selftest failing, login expired, Arm A
+    gone quiet. The one that takes this entire process down was the one with no alert,
+    because a dead daemon cannot report itself and nothing looked back on the way up.
+
+    The measure is the gap between the heartbeat rh_status.json still carries and now,
+    and it is deliberately cause-agnostic: a bugcheck, a power loss, Windows Update, a
+    stopped task and a closed lid all read the same here, and the figure Devon needs -
+    how long Arm B could not act - is the same for every one of them.
+
+    Two gates keep it from crying wolf. market_minutes_since means an overnight gap is
+    never billed as blind trading time, and a gap that cost no market minutes is only
+    mailed when the machine actually rebooted inside it; without that second gate the
+    first code-pull restart each Monday would mail Devon about the weekend. Dedupe is
+    on the ledger, keyed by the heartbeat the gap ended: module globals have now lost
+    restart-critical state four times, and this function exists only because of a
+    restart.
+    """
+    try:
+        stamp = (_load(STATUS_F, {}) or {}).get("ts")
+        if not stamp:
+            return                      # first ever run, or a wiped status file
+        last = datetime.strptime(stamp, "%Y-%m-%dT%H:%M").replace(tzinfo=bot.ET_TZ)
+        gap = (now_et() - last).total_seconds()
+        if gap < DOWNTIME_MIN_SEC:
+            return                      # a restart for code takes well under a minute
+        if (led.get("alerts") or {}).get("downtime_reported") == stamp:
+            return                      # reported already; a 2nd restart must not re-alert
+
+        mins = market_minutes_since(last.timestamp())
+        boot = _implied_boot_epoch()
+        rebooted = boot is not None and boot > last.timestamp()
+        hrs, rem = divmod(int(gap), 3600)
+        wall = f"{hrs}h{rem // 60:02d}m" if hrs else f"{rem // 60} min"
+        if not mins and not rebooted:
+            # Nothing tradeable was missed and the machine never went away: an
+            # ordinary restart across a closed market. Leave a line, send nothing.
+            log(f"daemon gap {wall} since {stamp} ET, no market time and no reboot — not alerting")
+            _remember_alerts(led, downtime_reported=stamp)
+            return
+        _remember_alerts(led, downtime_reported=stamp)
+
+        if boot is None:
+            cause = ("Could not read this machine's boot time, so whether the LAPTOP went away or "
+                     "only this daemon did is unknown.")
+        elif rebooted:
+            cause = ("The LAPTOP went down and came back: it booted "
+                     f"{datetime.fromtimestamp(boot, bot.ET_TZ).strftime('%H:%M ET')}, inside the gap. "
+                     "Event Viewer / Windows Logs / System has the cause: Kernel-Power 41 carries the "
+                     "bugcheck code, EventLog 6008 the time it went down, User32 1074 says a human or "
+                     "an update asked for it instead.")
+        else:
+            cause = ("The laptop STAYED UP and only this daemon was missing, so the scheduled task was "
+                     "stopped, killed, or did not restart. Windows power events will show nothing.")
+        if mins:
+            subject = f"{SESSION_NAME}: Arm B was blind {mins} market minute(s) - daemon gap"
+        else:
+            subject = f"{SESSION_NAME}: laptop rebooted while the market was shut ({wall} gap)"
+        notify(subject,
+               f"Arm B published no heartbeat between {stamp} ET and "
+               f"{now_et().strftime('%Y-%m-%dT%H:%M')} ET.\n"
+               f"Gap: {wall} of wall clock, {mins} minute(s) of it inside 09:45-15:55 ET on a "
+               f"trading day.\n\n{cause}\n\n"
+               "In the gap Arm B placed nothing and cancelled nothing, and its stops could not have "
+               "fired either - positions were held unmanaged. The daemon is running again and will "
+               "reconcile with the broker on this cycle.")
+        log(f"downtime reported: gap {wall} since {stamp} ET, {mins} market minute(s), "
+            f"rebooted={rebooted}")
+    except Exception as e:
+        log(f"report_downtime failed ({e}) — not fatal, startup continues")
+
+
 def main():
     if not acquire_singleton():
         log("another rh_daemon is already running — this instance is exiting")
@@ -1557,6 +1655,7 @@ def main():
     if _broker_alert_at or _selftest_alert_at or _deposit_alert_on:
         log(f"restored alert state from the ledger: broker_fails={_reconcile_fails} "
             f"selftest_fails={_selftest_fails} deposit_alert_on={_deposit_alert_on}")
+    report_downtime(led)   # a gap nothing could alert from while it was happening
     last_full = 0.0
     while True:
         if os.path.exists(HALT_F):
