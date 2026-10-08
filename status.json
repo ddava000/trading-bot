@@ -1,37 +1,37 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-08T13:45Z",
+ "as_of_utc": "2026-10-08T14:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-08T13:45:29+00:00",
+  "checked_at": "2026-10-08T14:00:34+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 22.84,
+ "cash": 17.13,
  "crypto_enabled": true,
- "day_pnl": -1.26,
+ "day_pnl": -1.49,
  "earnings_guard": "live",
- "equity": 235.17,
+ "equity": 234.94,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 5.3,
-  "NBIS": 2.3,
+  "MSFT": 5.5,
+  "NBIS": 1.4,
   "NVDA": 3.2,
-  "PLTR": 6.6,
-  "SNDK": 3.9,
-  "VST": 15.5
+  "PLTR": 7.7,
+  "SNDK": 3.2,
+  "VST": 14.5
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-08T14:05Z",
+ "next_expected_utc": "2026-10-08T14:20Z",
  "orders_this_run": 1,
  "plan": {
   "date": "2026-10-08",
@@ -57,9 +57,9 @@
     }
    }
   },
-  "checked_at": "2026-10-08T13:45:27+00:00",
-  "fills": 92,
-  "last_fill": "2026-10-08T13:45:25.635697Z",
+  "checked_at": "2026-10-08T14:00:31+00:00",
+  "fills": 93,
+  "last_fill": "2026-10-08T14:00:30.046771Z",
   "last_sale": "2026-10-07",
   "lt": {
    "gains": 0.0,
@@ -93,12 +93,12 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 57.51,
-  "index": 123.56,
-  "trade": 23.65
+  "hold": 57.38,
+  "index": 123.55,
+  "trade": 31.17
  },
- "ts": "2026-10-08T09:45 ET",
+ "ts": "2026-10-08T10:00 ET",
  "vix": 15.5,
  "vix_live": true,
- "vs_baseline_pct": -5.14
+ "vs_baseline_pct": -5.23
 }
