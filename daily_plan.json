@@ -19,9 +19,9 @@
     "MSFT",
     "SPY"
   ],
-  "notes": "AI trade stumbling late on an OpenAI revenue setback (Nasdaq -1%, chips selling off) while Dow holds up as yields retreat; VIX still benign at 15.4. Holding neutral/0.40: cash critically tight at $22, IWM -7.9% deep laggard, and chip/AI names (NVDA, NBIS, SNDK) now under fresh pressure worth avoiding.",
-  "journal_entry": "Thu 10/8 16:45: Tape rotated \u2014 AI/chip stocks cracked into the close on OpenAI revenue report (Nasdaq -1%), reversing earlier tech leadership; added NVDA/SNDK back to avoid. Yields eased, Dow positive. Cash near-zero at $22 caps any new buys regardless. Watching whether AI-trade weakness carries into Friday.",
+  "notes": "VIX benign at 15.4 but tape remains split: oil-driven inflation worries, multi-decade-high yields, and lingering AI/chip wobble from the OpenAI revenue setback. Holding neutral/0.40 with cash critically tight at $22, IWM -7.8% deep laggard, and several extended/wobbly names (VST +8.4%, PLTR +6.3%, chips) worth avoiding.",
+  "journal_entry": "Thu 10/8 18:32: After-hours \u2014 CEG surging +4% overnight and NBIS getting a Rosenblatt Buy init, but AI-trade still shaky and yields the key headwind. Cash near-zero at $22 caps new buys regardless; day P&L just -$3. Watching whether AI weakness and oil/yields carry into Friday.",
   "date": "2026-10-08",
   "mode": "INTRADAY",
-  "updated_at": "2026-10-08T16:45 ET"
+  "updated_at": "2026-10-08T18:32 ET"
 }
