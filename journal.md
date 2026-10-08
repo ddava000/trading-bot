@@ -2082,3 +2082,9 @@
 - avoid: ['IWM', 'VST', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: S&P at record (first close above 7,800) with VIX benign at 15.7 and tech leading, but yields near multi-decade highs and oil-driven inflation worries keep the tape split. Holding neutral/0.40: cash critically tight at $22, IWM -8.1% deep laggard, and several extended names (VST +8.7%, PLTR +5.6%) worth avoiding.
 - journal: Thu 10/8 14:55: Tech holding records (QQQ +3.1%, MSFT +3.6%, PLTR +5.6%) while IWM -8.1% and CEG -6% lag badly. VIX steady 15.7, yields still the key headwind. Cash near-zero at $22 limits new buys regardless. Watching whether bond-market turmoil/oil finally cracks tech into the close.
+
+### 2026-10-08T16:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR', 'VST', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: AI trade stumbling late on an OpenAI revenue setback (Nasdaq -1%, chips selling off) while Dow holds up as yields retreat; VIX still benign at 15.4. Holding neutral/0.40: cash critically tight at $22, IWM -7.9% deep laggard, and chip/AI names (NVDA, NBIS, SNDK) now under fresh pressure worth avoiding.
+- journal: Thu 10/8 16:45: Tape rotated — AI/chip stocks cracked into the close on OpenAI revenue report (Nasdaq -1%), reversing earlier tech leadership; added NVDA/SNDK back to avoid. Yields eased, Dow positive. Cash near-zero at $22 caps any new buys regardless. Watching whether AI-trade weakness carries into Friday.
