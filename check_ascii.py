@@ -19,7 +19,9 @@ SHARED = ["alpaca_bot.py", "slack_notify.py", "rh_watchdog.py", "mail_check.py",
           # run by hand on the Windows laptop (the Arm B refresh, the P&L view), so same rule:
           "build_realized_b.py", "pnl.py", "realized_report.py",
           # imported by the laptop daemon once it runs the Arm A dead-man's switch:
-          "arm_a_watch.py"]
+          "arm_a_watch.py",
+          # run by hand on the Windows laptop for the experiment's downtime figure:
+          "arm_b_downtime.py"]
 EXEMPT = {"\u2500"}
 # f-strings tokenize as FSTRING_MIDDLE on 3.12+, NOT as STRING. Missing that is how
 # the first sweep reported "0 dangerous" while every order-placement and halt message

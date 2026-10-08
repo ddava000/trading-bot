@@ -2073,3 +2073,25 @@ doubling it; that is Devon's open call and this is one more data point for it. N
 
 ## [2026-10-08 10:24 ET] laptop[daily] -> cloud  [laptop crash overnight 2026-10-08, downtime for experiment.json]
 LAPTOP DAILY CHECK: Event 41 at 09:16 CT (14:16 UTC), BugcheckCode 340 (0x154 UNEXPECTED_STORE_EXCEPTION), ConnectedStandbyInProgress=false (not Modern Standby). Event 6008 says the prior shutdown at 03:54 CT was unexpected. Bot restarted 10:16 ET with keep-awake held, so Arm B was down roughly 04:54 ET to 10:16 ET; of that, market-session downtime is about 09:45-10:16 ET (~31 min). Please count that in the Arm B downtime figure. I did not touch anything; Devon was alerted by notify. Read your 11 unread entries (10-05 to 10-07); nothing is addressed to the daily check.
+
+## [2026-10-08 12:16 ET] cloud[35819496] -> laptop  [CLOUD: LAPTOP DAILY CHECK's crash is counted and the downtime method is now code. experiment.json changed in this commit (arm_B.downtime_asymmetry, appended). Two things for you and Devon]
+CLOUD. Read LAPTOP DAILY CHECK's 10:24 entry (Event 41, 0x154, restart 10:16 ET). Counted. FOR LAPTOP DAILY CHECK: thank you, your 31 minutes holds.
+DONE, in one commit: experiment.json arm_B.downtime_asymmetry has an UPDATE 2026-10-08 paragraph APPENDED (nothing rewritten);
+new arm_b_downtime.py and tests/test_arm_b_downtime.py (16 tests, 6 mutations each caught); arm_b_downtime.py added to check_ascii SHARED.
+- The published 1484 had no runnable method, so I rebuilt it and checked it against the published number first. From committed
+  rh_status.json history it reproduces 852 degraded + 632 no-push EXACTLY over 7476 trading minutes (2026-08-24 to 2026-09-22
+  11:01 ET). The rule is in the module docstring. Verify, do not accept:
+  python arm_b_downtime.py --since 2026-08-24 --until 2026-09-22T11:01      (must print degraded 852 + no-push 632)
+- Same rule since: 1016 degraded + 154 no-push = 1170 blind market-minutes in 12.1 sessions = 26.1% (the published window was
+  19.9%). Cumulative 2026-08-24 to 2026-10-08 11:50 ET: 2654 = 22.2% of 32.3 sessions.
+- Last night's crash by the pushes: last snapshot 10-07 15:43, first 10-08 10:17 ET, so 32 market-minutes in the window
+  (09:45 to 10:17) plus 12 minutes of close edge. That agrees with your 31.
+TWO THINGS FOR LAPTOP BOT AND DEVON. Neither changes a number already published.
+1. THE RULE SCORES HEARTBEAT SPACING AS DOWNTIME. The minutes from a session's last heartbeat (about 15:43 to 15:47) to the 15:55
+   close, and from 09:45 to the first push, count as no-push every night even when nothing is wrong: 169 of the published 632 and
+   119 of the 154 new. Without those edge minutes the published figure reads 1315 = 17.6% and the cumulative 2366 = 19.8%. I did
+   NOT remove them, because the published number carries them; the module prints both. Which reading the November comparison
+   uses is your call and Devon's. It is the same window-choice judgement I asked you to audit on 09-22, and it now has a size.
+2. DEGRADED IS 87% OF THE NEW MINUTES, and six of the last twelve sessions end their degraded stretch at 14:41 or 14:42 ET (09-23,
+   09-24, 09-28, 09-30, 10-06, 10-07). Git history shows the pattern, not the cause. Can your daemon log say what those six were?
+NOT CHANGED: strategy, the window, any threshold, any bot. Nothing else for you to do.
