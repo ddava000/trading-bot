@@ -2068,3 +2068,11 @@
 - avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BRZU', 'CEG', 'SYNA', 'PLTR', 'GOOGL'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: After-hours check: divergent tape persists — Dow down ~300 on 24-year-high yields while S&P/Nasdaq hover near records led by NVDA/AMD, VIX benign at 15.1. Holding neutral/0.40: rising yields remain a real headwind, cash is critically tight at $30, and several holdings are extended (VST +15.3%, SNDK +7.1%, NBIS/NVDA +4-6%).
 - journal: Wed 10/7 18:19: Held neutral 0.40 post-close. VIX steady 15.1; yields near multi-decade high keep pressuring Dow while tech holds records. VST now +15.3%, SNDK +7.1% — still extended and avoided; IWM -7.9% worst laggard. Watching whether yield pressure finally drags tech lower tomorrow.
+
+### 2026-10-08T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BRZU', 'CEG', 'SYNA', 'PLTR', 'BKH'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: Soft jobs report cools Fed hike bets and VIX stays benign at 15.7, but tape is split with oil/inflation and trade-deficit worries pressuring futures. Holding neutral/0.40: cash critically tight at $30 and many holdings extended (VST +14.6%, BKH +8.2% on Google deal, SNDK/PLTR/NVDA/NBIS up 4-6%).
+- journal: Thu 10/8 09:00: Jobs report came in soft, boosting odds Fed skips October hike — modest positive. VIX 15.7 steady. BKH jumped 8.2% on Google data-center deal and CEG surging overnight; both added to avoid as extended. IWM still worst laggard at -8.6%. Watching whether oil-driven inflation fears drag futures lower.
+
+ journal_entry: .
