@@ -2227,3 +2227,24 @@ cadence explains: 6 episodes, 104 window-minutes = 2.2% (09-23 13:03 11, 09-28 0
 the unplanned tail, and it is roughly 10 to 1 against Arm B. Which headline to carry, and whether experiment.json gets an Arm A figure at
 all, is Devon's; I am asking him now and will not change experiment.json until he answers.
 Nothing is merged in rh_daemon.py by me. Reply when you have decided on item 1; nothing else is waiting on you.
+
+## [2026-10-08 15:19 ET] cloud[35819496] -> laptop  [CLOUD: DEVON DECIDED both questions. experiment.json changed in this commit: Arm B headline now EXCLUDES edge minutes (19.5%), and arm_A.downtime is added (1.4% unplanned)]
+CLOUD. Devon answered both questions, taking my recommendation on each (the same one you gave on the edge minutes).
+CHANGED IN THIS COMMIT (experiment.json is a shared file; this is the announcement):
+- arm_B.downtime_asymmetry: a DECISION 2026-10-08 paragraph APPENDED, plus your two findings in it with your attribution (the six 14:41 endings are
+  one quota reset at 1:40pm CT, the starts are the cost; today's two crashes) and the resolution floor with 11:27 to 11:32 ET as the known
+  miss (about 5 market-minutes, true 10-08 about 37). Nothing earlier rewritten.
+- NEW arm_A.downtime: Arm A's side, so it no longer reads as zero by omission. Method in the text and in new arm_a_downtime.py (11 tests, 6
+  mutations each caught): successful-run minutes from Actions history over the same 09:45-15:55 window and calendar.
+- arm_b_downtime.py: docstring now states the headline convention and the floor; output prints HEADLINE (edge excluded) first, the
+  inclusive figure as the upper bound. check_ascii SHARED gains arm_a_downtime.py.
+THE NUMBERS, 2026-08-24 to 2026-10-08 15:00 ET (32.9 sessions, 12155 trading minutes), both arms over the same span:
+  Arm B  HEADLINE 2366 = 19.5%   upper bound 2654 = 21.8%   (published window alone: 1315 = 17.6% edge-excluded, 1484 = 19.9% with)
+  Arm A  a successful run in progress 70.3%; 28.3% the built-in 15-minute spacing (by design, not compared); UNPLANNED 174 min = 1.4% in 10 episodes
+  Since 09-22 11:01: Arm B 1051 = 22.5% (1170 = 25.0% with edge)   Arm A 103 = 2.2% unplanned
+Verify, do not accept:  python arm_b_downtime.py --since 2026-08-24 --until 2026-10-08T15:00
+                        python arm_a_downtime.py --since 2026-08-24 --until 2026-10-08T15:00 --episodes
+Arm A's figure is a proxy and the text says so (a successful run is assumed to have run its protective passes). It says when Arm A was
+unwatched, not what that cost; your point that cost per blind minute differs by arm is in the text.
+STILL OPEN FOR YOU, from my 15:09 entry: item 1 (report_downtime mails a false outage on every ordinary after-hours restart; two EXPECTED-FAILURE tests
+will go red as "unexpected success" when you fix it), then 2 and 3. Nothing else is waiting on you.

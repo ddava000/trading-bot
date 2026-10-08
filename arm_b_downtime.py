@@ -12,10 +12,14 @@ THE RULE (all times Eastern; snapshots are the committed rh_status.json history,
   * a shorter gap that follows a DEGRADED snapshot is DEGRADED (alive and pushing, but unable to see or trade the
     account: usage limit, expired login); the window minutes inside it count
   * a degraded snapshot followed by a LONG gap still counts its first DEGRADED_COVER (5) minutes as degraded
-EDGE MINUTES (a diagnostic, NOT subtracted): the rule scores the minutes between the last heartbeat of a session (about
-15:43-15:47) and the 15:55 close, and between the 09:45 open and the first push (about 09:46-09:50), as no-push, because
-heartbeats are only about every 15 minutes. That is up to ~17 min per overnight even when nothing is wrong. They are
-reported separately as `edge` so the published number can be read with or without them.
+EDGE MINUTES: the rule scores the minutes between the last heartbeat of a session (about 15:43-15:47) and the 15:55 close,
+and between the 09:45 open and the first push (about 09:46-09:50), as no-push, because heartbeats are only about every 15
+minutes. That is up to ~17 min per overnight even when nothing is wrong. Devon decided 2026-10-08 that the HEADLINE figure
+EXCLUDES them and the figure with them is the stated upper bound; the published 1484 (19.9%) carried them, 1315 (17.6%) does not.
+
+RESOLUTION FLOOR: the rule works from pushes, so it cannot see an outage that leaves a push gap of GAP_MIN (30) minutes or less.
+Heartbeats are about 15 minutes apart, so a shorter threshold would invent outages. Known miss: 2026-10-08 11:27 to 11:32 ET (pushes
+11:13 then 11:33), about 5 market-minutes. A push-based measure under-reports; compare it with the daemon log when one is available.
 
 Not a trading input. Read-only: it runs `git log` and prints.
 
@@ -171,10 +175,10 @@ def main(argv=None):
         for e in r["episodes"]:
             print("  %-8s %s -> %s %6.0f min%s" % (e["kind"], e["start"].strftime("%m-%d %H:%M"), e["end"].strftime("%m-%d %H:%M"),
                                                    e["minutes"], ("  (edge %.0f)" % e["edge"]) if e["edge"] else ""))
-    print("degraded %.0f + no-push %.0f = %.0f blind market-minutes = %.1f%% of trading time" % (
-        r["degraded"], r["no_push"], blind, 100.0 * blind / r["trading"] if r["trading"] else 0.0))
-    print("  of the no-push, %.0f are close/open EDGE minutes (heartbeat spacing, not an outage); without them: %.0f = %.1f%%" % (
-        r["edge"], blind - r["edge"], 100.0 * (blind - r["edge"]) / r["trading"] if r["trading"] else 0.0))
+    t = r["trading"] or 1.0
+    print("HEADLINE (edge minutes excluded): %.0f blind market-minutes = %.1f%% of trading time" % (blind - r["edge"], 100.0 * (blind - r["edge"]) / t))
+    print("upper bound (edge minutes in):    degraded %.0f + no-push %.0f = %.0f = %.1f%%  (%.0f of the no-push are close/open edge minutes)" % (
+        r["degraded"], r["no_push"], blind, 100.0 * blind / t, r["edge"]))
     return 0
 
 
