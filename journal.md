@@ -2076,3 +2076,9 @@
 - journal: Thu 10/8 09:00: Jobs report came in soft, boosting odds Fed skips October hike — modest positive. VIX 15.7 steady. BKH jumped 8.2% on Google data-center deal and CEG surging overnight; both added to avoid as extended. IWM still worst laggard at -8.6%. Watching whether oil-driven inflation fears drag futures lower.
 
  journal_entry: .
+
+### 2026-10-08T14:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: S&P at record (first close above 7,800) with VIX benign at 15.7 and tech leading, but yields near multi-decade highs and oil-driven inflation worries keep the tape split. Holding neutral/0.40: cash critically tight at $22, IWM -8.1% deep laggard, and several extended names (VST +8.7%, PLTR +5.6%) worth avoiding.
+- journal: Thu 10/8 14:55: Tech holding records (QQQ +3.1%, MSFT +3.6%, PLTR +5.6%) while IWM -8.1% and CEG -6% lag badly. VIX steady 15.7, yields still the key headwind. Cash near-zero at $22 limits new buys regardless. Watching whether bond-market turmoil/oil finally cracks tech into the close.

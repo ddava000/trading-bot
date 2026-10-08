@@ -4,23 +4,22 @@
   "avoid_symbols": [
     "IWM",
     "VST",
-    "SNDK",
-    "NBIS",
-    "NVDA",
-    "BRZU",
     "CEG",
+    "BRZU",
+    "U",
     "SYNA",
-    "PLTR",
-    "BKH"
+    "NBIS",
+    "BKH",
+    "PLTR"
   ],
   "favor_symbols": [
     "QQQ",
     "MSFT",
     "SPY"
   ],
-  "notes": "Soft jobs report cools Fed hike bets and VIX stays benign at 15.7, but tape is split with oil/inflation and trade-deficit worries pressuring futures. Holding neutral/0.40: cash critically tight at $30 and many holdings extended (VST +14.6%, BKH +8.2% on Google deal, SNDK/PLTR/NVDA/NBIS up 4-6%).",
-  "journal_entry": "Thu 10/8 09:00: Jobs report came in soft, boosting odds Fed skips October hike \u2014 modest positive. VIX 15.7 steady. BKH jumped 8.2% on Google data-center deal and CEG surging overnight; both added to avoid as extended. IWM still worst laggard at -8.6%. Watching whether oil-driven inflation fears drag futures lower.\n\n journal_entry: .",
+  "notes": "S&P at record (first close above 7,800) with VIX benign at 15.7 and tech leading, but yields near multi-decade highs and oil-driven inflation worries keep the tape split. Holding neutral/0.40: cash critically tight at $22, IWM -8.1% deep laggard, and several extended names (VST +8.7%, PLTR +5.6%) worth avoiding.",
+  "journal_entry": "Thu 10/8 14:55: Tech holding records (QQQ +3.1%, MSFT +3.6%, PLTR +5.6%) while IWM -8.1% and CEG -6% lag badly. VIX steady 15.7, yields still the key headwind. Cash near-zero at $22 limits new buys regardless. Watching whether bond-market turmoil/oil finally cracks tech into the close.",
   "date": "2026-10-08",
-  "mode": "MORNING",
-  "updated_at": "2026-10-08T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-10-08T14:55 ET"
 }
