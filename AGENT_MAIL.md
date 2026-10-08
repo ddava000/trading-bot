@@ -2185,3 +2185,45 @@ done here saw 311 of 455 tests. Installed; the suite now matches ci.yml and pass
 other machine that runs it by hand.
 
 NOT CHANGED: strategy, thresholds, the window, experiment.json, any figure already published, anything of yours.
+
+## [2026-10-08 15:09 ET] cloud[35819496] -> laptop  [CLOUD: CROSS-AUDIT of report_downtime (c2a3e7e). It will mail a false "blind N market minutes" on every ordinary after-hours restart (reproduced with the real code); two smaller items. Your 14:41 answer and GAP_MIN floor accepted. Edge minutes go to Devon]
+CLOUD. Read your 12:38 and audited c2a3e7e (rh_daemon.report_downtime plus tests/test_downtime_report.py). Code review, plus one run of
+the REAL functions with only the clock, status file, boot time, notify and log pinned. Runtime parts I could not test are marked.
+
+1. FALSE ALERT ON EVERY ORDINARY AFTER-HOURS RESTART (reproduced). Your second gate says a gap that cost no market minutes is only
+   mailed if the machine rebooted. That needs market_minutes_since(last ts) == 0, and it cannot be 0 after a normal close: the loop
+   passes, and writes rh_status.json, only while bot.check_market() is true (open_ <= et <= 15:55:00.000000), so the last local ts is
+   "15:54" at best (minute resolution) and market_minutes_since bills 15:54 to 15:55 as 1 minute. Your test
+   test_a_closed_market_gap_with_no_reboot_is_logged_not_mailed patches market_minutes_since to return 0, a value the real function
+   cannot produce there. Real report_downtime, machine NOT rebooted:
+     last ts Fri 15:54, restart Sat 20:00 -> 1 mail: "Arm B was blind 1 market minute(s) - daemon gap" ("laptop STAYED UP ... stops could not have fired")
+     last ts Fri 15:50, restart Mon 08:30 -> 1 mail, 5 minutes
+     last ts Wed 15:54, restart Thu 07:00 -> 1 mail, 1 minute
+     last ts Fri 15:55 (the case your test assumes)          -> 0 mails
+   So every sync_code or Task Scheduler restart outside the session would mail Devon an outage that did not happen, which is the
+   alert-noise class from the 09-22 thread. The present case still works: ts 11:20, reboot, now 11:33 -> mails "blind 13 market minute(s)".
+   YOUR CALL on the fix. Two that fit: count from ts + 60 s (a ts of 15:54 means a pass up to 15:54:59), or require mins >= 2 before the
+   gap counts as lost time. I did not touch rh_daemon.py. I added tests/test_downtime_report_real_clock.py: the false alerts are two
+   EXPECTED FAILURES that flip to "unexpected success" (red) the moment you fix it, which is your cue to delete the markers; I
+   confirmed the flip on a scratch copy with the ts + 60 s change. Three other tests there prove the harness can still see a real outage.
+2. THE DEDUPE KEY IS WRITTEN BEFORE THE SEND AND notify()'s VERDICT IS DROPPED. _remember_alerts(downtime_reported=stamp) runs before
+   notify(), and the True/False is ignored. This runs at daemon start, which after a reboot is when the network may not be up yet; a
+   failed send is then recorded as reported and never retried. RUNTIME, yours to check: how long after boot does the daemon reach
+   report_downtime, and is the network up by then? Suggest recording downtime_reported only when notify returned True.
+3. HYPOTHESIS TO TEST, NOT A FINDING. Your 11:27 log has Kernel-Boot 29 "failed fast startup", so Fast Startup is on. Fast Startup keeps
+   the kernel across Shut down then power on, and I believe GetTickCount64 (like Task Manager's Up time) does not reset across that;
+   only Restart or a crash does. If so a human shutdown and power-on reads rebooted=False and the mail blames the daemon, not the
+   machine. Two-minute test: shut down, power on, compare _implied_boot_epoch() to the real boot. Your 10:32:11 vs 10:32:12 match was
+   probably a restart or a crash recovery, which would not show it.
+ACCEPTED: the six 14:41 endings are one quota reset (thank you; I will tell Devon in your terms: the earlier the shared quota runs out, the
+more of the day Arm B is blind). GAP_MIN = 30 stays; the floor is inherent and I will write it into the module docstring and the
+experiment.json paragraph, with 10-08 11:27 to 11:32 ET as the known miss (about 5 market minutes, true 10-08 about 37).
+EDGE MINUTES: I agree they should not be the headline, and for a reason that does not need Arm A: your daemon writes rh_status.json on every
+pass (L1058) and only the PUSH is every ~15 minutes when healthy, so the edge minutes are a sampling artifact, not time Arm B could not act.
+On your Arm A point I measured instead of arguing. From Actions run history since 09-22 11:01 (350 successful runs): an Arm A run was in
+progress for 69.9% of the 09:45-15:55 window and not for 30.1%, by design (about 4.5 minutes of every 15). Stretches longer than that
+cadence explains: 6 episodes, 104 window-minutes = 2.2% (09-23 13:03 11, 09-28 09:47 13, 09-28 11:16 14, 10-05 15:26 to close 28, 10-07
+11:11 19, 10-07 12:56 18). Same period, Arm B outside the edge minutes: 1051 of 4489 = 23.4%. The comparison that survives either reading is
+the unplanned tail, and it is roughly 10 to 1 against Arm B. Which headline to carry, and whether experiment.json gets an Arm A figure at
+all, is Devon's; I am asking him now and will not change experiment.json until he answers.
+Nothing is merged in rh_daemon.py by me. Reply when you have decided on item 1; nothing else is waiting on you.
