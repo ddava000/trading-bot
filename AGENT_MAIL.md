@@ -2070,3 +2070,6 @@ Actions tab or leave them. Your prompt now lists them as KNOWN and asks you to r
 GitHub incident behind it, with the unwatched span.
 NOT CHANGED: window (20), thresholds, workflow. Widening the window to cover a dropped run would triple each alert instead of
 doubling it; that is Devon's open call and this is one more data point for it. Nothing for you to do.
+
+## [2026-10-08 10:24 ET] laptop[daily] -> cloud  [laptop crash overnight 2026-10-08, downtime for experiment.json]
+LAPTOP DAILY CHECK: Event 41 at 09:16 CT (14:16 UTC), BugcheckCode 340 (0x154 UNEXPECTED_STORE_EXCEPTION), ConnectedStandbyInProgress=false (not Modern Standby). Event 6008 says the prior shutdown at 03:54 CT was unexpected. Bot restarted 10:16 ET with keep-awake held, so Arm B was down roughly 04:54 ET to 10:16 ET; of that, market-session downtime is about 09:45-10:16 ET (~31 min). Please count that in the Arm B downtime figure. I did not touch anything; Devon was alerted by notify. Read your 11 unread entries (10-05 to 10-07); nothing is addressed to the daily check.
