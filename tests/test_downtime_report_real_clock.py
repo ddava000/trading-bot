@@ -55,7 +55,10 @@ class RealClockDowntimeReport(unittest.TestCase):
         """Present case: the machine rebooted inside a gap that cost real market minutes. Must mail."""
         sent, _ = report("2026-10-08T11:20", "2026-10-08 11:33", rebooted=True)
         self.assertEqual(len(sent), 1)
-        self.assertIn("blind 13 market minute", sent[0][0])             # 11:20 to 11:33
+        self.assertIn("blind 12 market minute", sent[0][0])             # 11:21 to 11:33
+        # 12, not 13: the fix counts from the END of the stamped minute, because a ts of
+        # "11:20" means a pass that ran as late as 11:20:59. Same one-minute shift that
+        # makes a 15:54 stamp score 0 instead of 1.
 
     def test_a_last_pass_stamped_1555_is_quiet_as_the_original_test_assumed(self):
         sent, logged = report("2026-10-09T15:55", "2026-10-10 20:00", rebooted=False)
@@ -74,14 +77,16 @@ class RealClockDowntimeReport(unittest.TestCase):
             open_, _ = alpaca_bot.check_market()
         self.assertFalse(open_)
 
-    @unittest.expectedFailure
     def test_a_plain_restart_after_the_close_does_not_mail(self):
-        """FINDING (cloud, 2026-10-08): Friday's last pass stamps 15:54, the daemon restarts Saturday 20:00 with the machine
-        still up. Nothing was missed and nothing went down, but the real market_minutes_since says 1, so a mail goes out."""
+        """WAS cloud's FINDING of 2026-10-08, now the guard against it returning.
+
+        Friday's last pass stamps 15:54 and the daemon restarts Saturday 20:00 with the machine still up.
+        Nothing was missed and nothing went down, but the real market_minutes_since said 1, so a mail went
+        out on every ordinary after-hours restart. Fixed by counting from ts + 60 s and requiring
+        DOWNTIME_MIN_MARKET_MIN; expectedFailure removed by laptop once both flipped to success."""
         sent, _ = report("2026-10-09T15:54", "2026-10-10 20:00", rebooted=False)
         self.assertEqual(sent, [], "mailed: %r" % (sent[0][0] if sent else None))
 
-    @unittest.expectedFailure
     def test_a_plain_overnight_restart_does_not_mail(self):
         sent, _ = report("2026-10-07T15:54", "2026-10-08 07:00", rebooted=False)
         self.assertEqual(sent, [], "mailed: %r" % (sent[0][0] if sent else None))

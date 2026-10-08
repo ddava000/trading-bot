@@ -1514,6 +1514,7 @@ def _maybe_alert_broker(led):
 
 
 DOWNTIME_MIN_SEC = 300      # a gap under this is a code-pull restart, not an outage
+DOWNTIME_MIN_MARKET_MIN = 2 # market minutes below this are heartbeat resolution, not blindness
 
 
 def _implied_boot_epoch():
@@ -1568,18 +1569,30 @@ def report_downtime(led):
         if (led.get("alerts") or {}).get("downtime_reported") == stamp:
             return                      # reported already; a 2nd restart must not re-alert
 
-        mins = market_minutes_since(last.timestamp())
+        # Count from the END of the stamped minute, not its start. ts has minute
+        # resolution, so "15:54" means a pass that ran as late as 15:54:59, and the
+        # market gate closes at 15:55:00 - measuring from 15:54 bills that one
+        # truncated minute as blindness on EVERY after-hours restart. The floor then
+        # covers the other half: passes are FAST_PASS_SEC apart, so the last stamp of
+        # a session is 15:54 normally and 15:53 when a pass runs long, and neither is
+        # an outage. Cloud caught this on 2026-10-08 by running the real functions
+        # against a pinned clock; my own test had asserted the right behaviour from a
+        # stamp of 15:55, which this loop can never write because check_market() is
+        # already false at 15:55:00. Mocking a value production cannot produce is how
+        # a test agrees with code that is wrong.
+        mins = market_minutes_since(last.timestamp() + 60)
+        lost = mins >= DOWNTIME_MIN_MARKET_MIN
         boot = _implied_boot_epoch()
         rebooted = boot is not None and boot > last.timestamp()
         hrs, rem = divmod(int(gap), 3600)
         wall = f"{hrs}h{rem // 60:02d}m" if hrs else f"{rem // 60} min"
-        if not mins and not rebooted:
+        if not lost and not rebooted:
             # Nothing tradeable was missed and the machine never went away: an
             # ordinary restart across a closed market. Leave a line, send nothing.
-            log(f"daemon gap {wall} since {stamp} ET, no market time and no reboot — not alerting")
+            log(f"daemon gap {wall} since {stamp} ET, {mins} market minute(s) and no reboot "
+                f"— under the {DOWNTIME_MIN_MARKET_MIN}-minute floor, not alerting")
             _remember_alerts(led, downtime_reported=stamp)
             return
-        _remember_alerts(led, downtime_reported=stamp)
 
         if boot is None:
             cause = ("Could not read this machine's boot time, so whether the LAPTOP went away or "
@@ -1589,15 +1602,24 @@ def report_downtime(led):
                      f"{datetime.fromtimestamp(boot, bot.ET_TZ).strftime('%H:%M ET')}, inside the gap. "
                      "Event Viewer / Windows Logs / System has the cause: Kernel-Power 41 carries the "
                      "bugcheck code, EventLog 6008 the time it went down, User32 1074 says a human or "
-                     "an update asked for it instead.")
+                     "an update asked for it instead - a memory test or an update reboot lands here too, "
+                     "so check 1074 before assuming a crash.")
         else:
-            cause = ("The laptop STAYED UP and only this daemon was missing, so the scheduled task was "
-                     "stopped, killed, or did not restart. Windows power events will show nothing.")
-        if mins:
+            # Deliberately weaker than it used to read. The uptime counter is the only
+            # thing consulted, and cloud's 2026-10-08 audit raised that Fast Startup
+            # (on, and it failed here that morning) carries the kernel across a Shut
+            # down, so a shutdown-and-power-on may not reset it and would land here
+            # looking like the machine never left. Say what was measured, not what it
+            # implies.
+            cause = ("The uptime counter shows no reboot inside the gap, so this looks like the daemon "
+                     "alone: the scheduled task was stopped, killed, or did not restart. Treat that as "
+                     "the counter's reading, not proof - with Fast Startup on, a Shut down and power on "
+                     "may not reset it. Windows power events settle it.")
+        if lost:
             subject = f"{SESSION_NAME}: Arm B was blind {mins} market minute(s) - daemon gap"
         else:
             subject = f"{SESSION_NAME}: laptop rebooted while the market was shut ({wall} gap)"
-        notify(subject,
+        delivered = notify(subject,
                f"Arm B published no heartbeat between {stamp} ET and "
                f"{now_et().strftime('%Y-%m-%dT%H:%M')} ET.\n"
                f"Gap: {wall} of wall clock, {mins} minute(s) of it inside 09:45-15:55 ET on a "
@@ -1605,8 +1627,19 @@ def report_downtime(led):
                "In the gap Arm B placed nothing and cancelled nothing, and its stops could not have "
                "fired either - positions were held unmanaged. The daemon is running again and will "
                "reconcile with the broker on this cycle.")
-        log(f"downtime reported: gap {wall} since {stamp} ET, {mins} market minute(s), "
-            f"rebooted={rebooted}")
+        # Record the dampener only once the mail is actually AWAY. This runs seconds
+        # after boot (40 s on 2026-10-08), which is exactly when the network may not
+        # be up yet; writing the key first would file a send that never happened as
+        # reported and never retry it. Leaving it unwritten costs one more attempt on
+        # the next restart, and a send that keeps failing is loud in the log rather
+        # than silently lost. Cloud's 2026-10-08 audit, item 2.
+        if delivered:
+            _remember_alerts(led, downtime_reported=stamp)
+            log(f"downtime reported: gap {wall} since {stamp} ET, {mins} market minute(s), "
+                f"rebooted={rebooted}")
+        else:
+            log(f"downtime NOT reported (send failed): gap {wall} since {stamp} ET, "
+                f"{mins} market minute(s), rebooted={rebooted} — will retry on the next restart")
     except Exception as e:
         log(f"report_downtime failed ({e}) — not fatal, startup continues")
 

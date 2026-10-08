@@ -64,12 +64,29 @@ class DowntimeReportTests(unittest.TestCase):
         self.assertEqual(self.ledger, {}, "a non-event must not write the dedupe key either")
 
     def test_a_closed_market_gap_with_no_reboot_is_logged_not_mailed(self):
-        """Without this gate the first code pull each Monday mails about the weekend."""
-        sent, logged = self.call(self.stamp_ago(4000), 0, time.time() - 999999)
+        """Without this gate the first code pull each Monday mails about the weekend.
+
+        The mocked value here is 1, not 0. It used to be 0, and cloud's 2026-10-08
+        audit showed 0 is a value the real market_minutes_since CANNOT return for an
+        after-hours restart: the last stamp of a session is 15:54, and counting from
+        the start of that minute bills 15:54-15:55 as one blind minute. The test
+        passed while production mailed a false alert on every such restart, because
+        the mock was kinder than reality. 1 is what really happens; assert against
+        that. tests/test_downtime_report_real_clock.py pins the real function.
+        """
+        sent, logged = self.call(self.stamp_ago(4000), 1, time.time() - 999999)
         self.assertEqual(sent, [])
         self.assertTrue(any("not alerting" in m for m in logged), logged)
         self.assertIn("downtime_reported", self.ledger.get("alerts", {}),
                       "still dedupe it, or every restart re-logs the same gap")
+
+    def test_the_floor_is_two_minutes_not_one(self):
+        """One market minute is heartbeat resolution; two is time Arm B could not act."""
+        self.call(self.stamp_ago(4000), D.DOWNTIME_MIN_MARKET_MIN - 1, time.time() - 999999)
+        self.assertEqual(self.sent, [], "below the floor must stay quiet")
+        self.call(self.stamp_ago(4001), D.DOWNTIME_MIN_MARKET_MIN, time.time() - 999999, led={})
+        self.assertEqual(len(self.sent), 1, "at the floor it must mail")
+        self.assertIn("blind 2 market minute(s)", self.sent[0][0])
 
     # ---- what it must actually report ------------------------------------------------
 
@@ -91,10 +108,18 @@ class DowntimeReportTests(unittest.TestCase):
         self.assertEqual(len(sent), 1)
         self.assertIn("market was shut", sent[0][0])
 
-    def test_a_gap_with_the_machine_still_up_blames_the_task_not_windows(self):
+    def test_a_gap_with_the_machine_still_up_points_at_the_task_without_asserting_it(self):
+        """It must report what the uptime counter SAID, not what that implies.
+
+        Cloud's 2026-10-08 audit, item 3: Fast Startup keeps the kernel across a Shut
+        down, so the counter may not reset and a human shutdown could read as "the
+        machine never left". The wording has to leave that open or the mail blames the
+        task for something Windows did.
+        """
         sent, _ = self.call(self.stamp_ago(31), 31, time.time() - 999999)
-        self.assertIn("STAYED UP", sent[0][1])
         self.assertIn("scheduled task", sent[0][1])
+        self.assertIn("Fast Startup", sent[0][1], "name the counter's blind spot")
+        self.assertNotIn("STAYED UP", sent[0][1], "too strong for a single uptime read")
 
     def test_an_unreadable_boot_time_still_mails_and_says_so(self):
         sent, _ = self.call(self.stamp_ago(31), 31, None)
@@ -110,6 +135,25 @@ class DowntimeReportTests(unittest.TestCase):
         self.call(self.stamp_ago(31), 31, time.time() - 300, led)
         self.assertEqual(len(self.sent), 1, "the dedupe key must live on the LEDGER, "
                                             "not in a module global a restart clears")
+
+    def test_a_failed_send_is_not_recorded_as_reported(self):
+        """Cloud's 2026-10-08 audit, item 2.
+
+        This runs seconds after boot - 40 s on 2026-10-08 - which is exactly when the
+        network may not be up. Writing the dampener before the send meant a mail that
+        never left was filed as delivered and never retried: the outage alert lost to
+        the outage. Record only on a True from notify.
+        """
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.assertNotIn("downtime_reported", self.ledger.get("alerts", {}),
+                         "a failed send must stay unreported so the next restart retries")
+        self.assertTrue(any("NOT reported (send failed)" in m for m in self.logged), self.logged)
+
+    def test_a_delivered_send_is_recorded(self):
+        """Control for the test above: with delivery working, the dampener must latch."""
+        self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.assertIn("downtime_reported", self.ledger.get("alerts", {}))
 
     def test_the_dedupe_is_per_outage_not_forever(self):
         """A new gap has a new ending heartbeat, so it must mail again."""
