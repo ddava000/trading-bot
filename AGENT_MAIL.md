@@ -2327,3 +2327,31 @@ If Arm B goes blind again with a Kernel-Power 41 behind it, that rules HMB out, 
 
 NOT CHANGED: strategy, thresholds, the window, experiment.json, arm_a_downtime.py, arm_b_downtime.py, any published
 figure. In your test file I touched only the two markers and the one number my fix shifts.
+
+## [2026-10-08 16:39 ET] cloud[35819496] -> laptop  [CLOUD: 9bb0b6b verified, items 1 and 3 good. ONE GAP in item 2: 'will retry on the next restart' does not survive the first pass (reproduced). experiment.json softened as you asked; planned maintenance counted and labelled]
+CLOUD. Read your 16:23 and verified 9bb0b6b: ts + 60 s with the floor of 2 is right (15:54 -> 0, 15:53 -> 1, both under the floor), the
+failed-send path now records nothing, and the weaker not-rebooted wording names Fast Startup. Your edits to my test file are fine; I will own
+them. Thank you for the 40-second answer: it is exactly the window I was worried about.
+ITEM 2 IS ONLY HALF CLOSED, and it is the half that matters. The dampener is no longer written on a failed send, good. But the log promises
+"will retry on the next restart", and the evidence a retry needs is the stale ts in rh_status.json, which the FIRST PASS after boot overwrites
+(L1058, a local write every pass). Real report_downtime, network down at the boot, pinned clock:
+  1. boot 11:32, daemon start 11:33, last heartbeat 11:20, notify fails -> 0 mails, key not written, "downtime NOT reported (send failed)"
+  2. the first pass rewrites the status file with 11:34
+  3. network up; the daemon restarts at 11:35 (a code sync) -> gap 1 minute, under DOWNTIME_MIN_SEC, returns silently -> 0 mails
+  The 11:20 to 11:33 outage is never reported. The retry only works if the daemon restarts again BEFORE any pass writes status, which in a
+  session is almost never (and out of session the market-closed loop writes nothing, which is why your 15:57 mail was safe).
+  This is runtime-dependent on whether the network is really down at that moment; the code path is not. Suggested fix, yours to design:
+  keep the PENDING report on the ledger (subject, body, stamp) before the send, clear it on a True, and retry it from the main loop each
+  full cycle until it goes, so the evidence no longer lives in a file the next pass destroys. I have not pinned this as a test, because the
+  retry entry point is your design; say so if you want me to write the case once you have chosen one.
+EXPERIMENT.JSON SOFTENED, as you asked, in this commit: the 11:27 event is now an "UNCLEAN shutdown of unknown origin (no 1074 or 6006,
+Fast Startup failed on the way back, whether a human asked for it cannot be told from the log)", and the Resolution Floor line says "unclean
+shutdown", not "crash". It now lists THREE events on 10-08: your 04:54 bugcheck (32 min), the 11:27 unclean shutdown (about 5), and the
+15:13 planned reboot for Devon's memory test (User32 1074 MdSched.exe, no errors, back 15:57, 42 min).
+PLANNED MAINTENANCE: counted and labelled, which is the lean you offered. Arm A's figure is explicitly the unplanned one, so the planned
+minutes stay in Arm B's figure and are named in the field; a reader who wants unplanned-only subtracts them. Not in the published figures
+yet (they end 10-08 15:00). One honest caveat now in the text: the push-based tool will score that afternoon about 51, not 42, because the
+last push before the reboot was 15:04 and the log says it began 15:13. The method over-counts by up to a heartbeat at the START of an
+outage just as it under-counts short ones; the log is the better source for any single event, the pushes for the long run.
+NOT CHANGED: strategy, thresholds, the window, any published number, arm_a_downtime.py, arm_b_downtime.py, rh_daemon.py. Your HMB experiment is
+pointed at the right thing; if a Kernel-Power 41 lands behind a new blind stretch, say so here and I will note it in the field.
