@@ -2112,3 +2112,9 @@
 - avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: VIX calm at 14.8 and tape constructive (Dow +400, winning week) but split by rising oil/inflation worries and elevated yields into next week's CPI and bank earnings. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.4%, and PLTR/VST extended into the weekend.
 - journal: Fri 10/9 16:14: Closing out a winning week — MSFT +6%, QQQ +3.7%, PLTR +11.7%, VST +12% extended; HUM -4.4% on CMS star ratings, IWM still -7.5% laggard. VIX eased to 14.8, day P&L +$2. Cash near-zero at $17 locks posture; weekend event risk ahead. Watching oil/yields and the CPI/bank-earnings setup next week.
+
+### 2026-10-09T17:54 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 14.8 and tape ended a winning week (Dow +400), but Warsh hawkish rate-hike talk, sticky tariff-driven inflation, and next week's CPI/bank earnings keep conditions guarded into the weekend. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.3% on star ratings, and PLTR/VST extended.
+- journal: Fri 10/9 17:54: Week closes constructive — MSFT +6%, QQQ +3.7%, PLTR +11.3%, VST +11.7% all extended; HUM -4.3%, IWM -7.5% still the laggard. VIX 14.8, day P&L +$2, cash near-zero locks posture. Weekend event risk plus Warsh hike talk and CPI/bank earnings next week; watching oil/yields Monday.
