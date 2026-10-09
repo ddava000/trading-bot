@@ -2094,3 +2094,9 @@
 - avoid: ['IWM', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR', 'VST', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: VIX benign at 15.4 but tape remains split: oil-driven inflation worries, multi-decade-high yields, and lingering AI/chip wobble from the OpenAI revenue setback. Holding neutral/0.40 with cash critically tight at $22, IWM -7.8% deep laggard, and several extended/wobbly names (VST +8.4%, PLTR +6.3%, chips) worth avoiding.
 - journal: Thu 10/8 18:32: After-hours — CEG surging +4% overnight and NBIS getting a Rosenblatt Buy init, but AI-trade still shaky and yields the key headwind. Cash near-zero at $22 caps new buys regardless; day P&L just -$3. Watching whether AI weakness and oil/yields carry into Friday.
+
+### 2026-10-09T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 15.2 and tech futures rebounding after the OpenAI-driven selloff, but oil-driven inflation worries and multi-decade-high yields keep the tape split ahead of next week's CPI/bank earnings. Holding neutral/0.40 with cash critically tight at $22, IWM -7.7% deep laggard, and extended names (VST +10.2%, PLTR +7.4%) worth avoiding into the weekend.
+- journal: Fri 10/9 09:00: Tech bouncing back (MSFT +4.7%, QQQ +4.0%, NVDA/PLTR green) after yesterday's AI wobble; VIX eased to 15.2 and jobs report cooled Oct hike bets. Cash near-zero at $22 caps new buys regardless. Watching oil/yields and positioning into next week's CPI and bank earnings.
