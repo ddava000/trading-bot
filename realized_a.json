@@ -290,6 +290,11 @@
    "qty": 0.042097488,
    "symbol": "MANE",
    "t": "2026-10-08"
+  },
+  {
+   "qty": 0.012400189,
+   "symbol": "HUM",
+   "t": "2026-10-09"
   }
  ],
  "closed": [
@@ -846,6 +851,7 @@
   "BKH": 0.077735908,
   "BRZU": 0.051386,
   "CEG": 0.019622189,
+  "HUM": 0.012400189,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
   "NBIS": 0.066354061,
@@ -878,8 +884,8 @@
     }
    }
   },
-  "fills": 94,
-  "last_fill": "2026-10-08T14:30:23.111854Z",
+  "fills": 95,
+  "last_fill": "2026-10-09T13:45:21.908329Z",
   "last_sale": "2026-10-08",
   "lt": {
    "gains": 0.0,
@@ -889,7 +895,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -15.46,
-  "reconciliation_residual": -0.0458,
+  "reconciliation_residual": -0.0358,
   "sales": 35,
   "since": "2026-08-12",
   "st": {
