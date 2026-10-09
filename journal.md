@@ -2106,3 +2106,9 @@
 - avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: VIX calm at 14.9 and tech rebounding (MSFT +6%, QQQ +3.7%, PLTR +10%, VST +12%), but oil-driven inflation worries and elevated yields keep the tape guarded ahead of next week's CPI and bank earnings. Holding neutral/0.40: cash critically tight at $17, IWM -7.4% deep laggard, and extended AI/power names overbought into the weekend.
 - journal: Fri 10/9 14:26: Tech recovered through the session — MSFT/QQQ leading, PLTR +10% and VST +12% now extended; VIX eased to 14.9. Cash near-zero at $17 caps any new buys regardless; day P&L +$2. Avoiding chasing extended names into the weekend; watching oil/yields and CPI/bank-earnings setup next week.
+
+### 2026-10-09T16:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 14.8 and tape constructive (Dow +400, winning week) but split by rising oil/inflation worries and elevated yields into next week's CPI and bank earnings. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.4%, and PLTR/VST extended into the weekend.
+- journal: Fri 10/9 16:14: Closing out a winning week — MSFT +6%, QQQ +3.7%, PLTR +11.7%, VST +12% extended; HUM -4.4% on CMS star ratings, IWM still -7.5% laggard. VIX eased to 14.8, day P&L +$2. Cash near-zero at $17 locks posture; weekend event risk ahead. Watching oil/yields and the CPI/bank-earnings setup next week.
