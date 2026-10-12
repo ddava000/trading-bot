@@ -264,5 +264,63 @@ class AlignmentTracker(Box):
         self.assertIn("no ALIGNMENT CHECK", out)
 
 
+class AMergeCanHideMailBehindYourMarker(Box):
+    """FINDING (laptop, 2026-10-12), taken from the live incident, not invented.
+
+    The marker is the entry's HEADING TEXT and the position is re-derived by searching for
+    it, which is why the weekly archive - which moved every line in the file - did not
+    desync anyone. The hole is the other direction. STANDING FACTS says a merge keeps BOTH
+    sides with the OTHER side FIRST and never orders by timestamp, so a simultaneous append
+    lands the other session's entry ABOVE ours. If --ack has already moved our marker to
+    our own entry, that merged entry is now behind the marker and "everything after the
+    marker" can never return it.
+
+    What actually happened: LAPTOP BOT appended at 13:35 and acked, cloud[daily] appended
+    at 13:36 addressed to `all`, the rebase conflicted, and the merge rule put cloud's
+    entry above ours. `--inbox` then reported 0 unread with cloud's entry unread. Nothing
+    was lost that time only because the entry was read by hand while resolving the
+    conflict - the mechanism had stopped reporting it.
+
+    This is the 2026-10-01 failure class again (mail addressed to a session, silently not
+    reported) reached by a different route, so it is marked rather than left as prose. The
+    fix is the file owner's call; a seen-SET of headings instead of a single position would
+    close it and would also keep the bias-toward-reporting the docstring promises. Delete
+    the expectedFailure when it flips to unexpected success.
+    """
+
+    def build(self):
+        """The file exactly as the merge rule leaves it: theirs first, though stamped later."""
+        self.write(e("2026-10-11 15:29", "audit", "both", "weekly audit")
+                   + e("2026-10-12 13:36", "cloud[daily]", "all", "daily check ack")
+                   + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        return self.entries()
+
+    def test_control_our_own_entry_is_last_so_that_is_what_ack_marks(self):
+        es = self.build()
+        self.assertEqual(es[-1]["from"], "laptop")
+
+    def test_control_that_entry_really_is_addressed_to_us(self):
+        """Or the failure below would be passing for the wrong reason."""
+        es = self.build()
+        unread, _ = M.unread_for(es, "laptop", None)
+        self.assertIn("daily check ack", [x["subject"] for x in unread])
+
+    def test_control_the_same_entry_merged_AFTER_ours_is_reported(self):
+        """Proves this is about ORDER, not addressing: flip the two and it shows up."""
+        self.write(e("2026-10-11 15:29", "audit", "both", "weekly audit")
+                   + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        marker = self.entries()[-1]["line_text"]
+        self.append(e("2026-10-12 13:36", "cloud[daily]", "all", "daily check ack"))
+        unread, _ = M.unread_for(self.entries(), "laptop", marker)
+        self.assertEqual([x["subject"] for x in unread], ["daily check ack"])
+
+    @unittest.expectedFailure
+    def test_an_entry_merged_in_above_our_marker_is_still_unread(self):
+        es = self.build()
+        marker = es[-1]["line_text"]          # what --ack stored: our own newest entry
+        unread, _ = M.unread_for(es, "laptop", marker)
+        self.assertEqual([x["subject"] for x in unread], ["daily check ack"])
+
+
 if __name__ == "__main__":
     unittest.main()
