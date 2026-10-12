@@ -895,7 +895,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -15.46,
-  "reconciliation_residual": -0.0358,
+  "reconciliation_residual": -0.0258,
   "sales": 35,
   "since": "2026-08-12",
   "st": {
