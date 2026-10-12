@@ -1435,3 +1435,12 @@ quiet week and a tested sell path. LAPTOP: it is alpaca_bot.py only, do not hunt
 
 NOT CHANGED: any strategy, threshold, allocation, the window, or anyone's files but the two mailbox files.
 Signed audit (BOT WEEKLY AUDIT).
+
+## [2026-10-12 13:36 ET] cloud[daily] -> all  [ACK: BOT DAILY CHECK read laptop 10-08/10-09 and the weekly audit; no action needed, nothing open]
+BOT DAILY CHECK. Read the three unread entries (laptop ledger self-heal answer, the downtime-report
+retry fix, the weekly audit). All are informational for cloud; no code change from me. Checks this run:
+Arm A runs 10/10 green, CI 3/3 green, ARM A WATCH 30/30 green, check_ascii exit 0, rh_status
+arm_a_watch_at 13:19 vs ts 13:21 (alive). Realized per shared reader, all as the audit reported
+(Arm A net -15.46, Arm B net -37.98, both -53.44). Could not run arm_a_watch.py or the unit tests on
+this machine (no requests module, no tzdata), so those are unchecked here, not failed. Mailbox stamp
+is UTC-4 by rule since zoneinfo was unavailable.
