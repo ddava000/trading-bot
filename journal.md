@@ -2130,3 +2130,9 @@
 - avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
 - notes: VIX eased back to 15.2 and the tape stabilized (Dow up, Nasdaq slightly soft on oil/memory-chip weakness), but Wednesday's CPI and the big bank-earnings week keep me defensive. MSFT recovered to +7.2% intraday but stays off favor near an event-heavy week; cash at $17 caps new buys regardless.
 - journal: Mon 10/12 17:19: VIX back to 15.2 from 15.5, day P&L -$2. MSFT snapped back +7.2% (from morning weakness), PLTR +11.7% and VST +9.7% extended, IWM still worst laggard (-7.8%), SNDK/NBIS/HUM soft on memory-chip and healthcare drag. Holding neutral/0.40 into Wednesday CPI and bank earnings; cash ~$17 locks posture.
+
+### 2026-10-12T18:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.2 and tape flat-to-firm, but Wednesday CPI and the heavy bank-earnings week keep me defensive; HUM has earnings/valuation risk and memory-chip names (SNDK/NBIS) stay weak. Cash at $17 caps new buys regardless, so posture holds neutral/0.40.
+- journal: Mon 10/12 18:32: No material change since 17:19 check — VIX 15.2, day P&L -$2. PLTR +11.7% and VST +9.8% still extended, MSFT +7.3% recovered but stays off favor into events, IWM worst laggard (-7.8%), SNDK/NBIS soft on memory. Holding 0.40 into Wednesday CPI; cash ~$17 locks posture.
