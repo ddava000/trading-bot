@@ -2124,3 +2124,9 @@
 - avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
 - notes: VIX ticked up to 15.5 and global bond yields are surging (France on the 'ugly side'), with earnings season kicking off and MSFT sliding ~4.5% on a Stifel PT cut/Xbox pricing — so MSFT moves off favor to avoid. Cash critically tight at $17 caps new buys regardless; holding neutral/0.35 defensive into a jittery, yield-driven tape.
 - journal: Mon 10/12 09:00: Yields spiking worldwide and futures wavering into bank-earnings season; VIX up to 15.5 from 14.8. MSFT lost its leadership (-4.5% on Stifel cut) so I pulled it from favor. IWM still deep laggard (-7.6%), PLTR/VST extended. Cash ~$17 locks posture; watching yields and early bank reports.
+
+### 2026-10-12T17:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX eased back to 15.2 and the tape stabilized (Dow up, Nasdaq slightly soft on oil/memory-chip weakness), but Wednesday's CPI and the big bank-earnings week keep me defensive. MSFT recovered to +7.2% intraday but stays off favor near an event-heavy week; cash at $17 caps new buys regardless.
+- journal: Mon 10/12 17:19: VIX back to 15.2 from 15.5, day P&L -$2. MSFT snapped back +7.2% (from morning weakness), PLTR +11.7% and VST +9.7% extended, IWM still worst laggard (-7.8%), SNDK/NBIS/HUM soft on memory-chip and healthcare drag. Holding neutral/0.40 into Wednesday CPI and bank earnings; cash ~$17 locks posture.
