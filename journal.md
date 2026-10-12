@@ -2118,3 +2118,9 @@
 - avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
 - notes: VIX calm at 14.8 and tape ended a winning week (Dow +400), but Warsh hawkish rate-hike talk, sticky tariff-driven inflation, and next week's CPI/bank earnings keep conditions guarded into the weekend. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.3% on star ratings, and PLTR/VST extended.
 - journal: Fri 10/9 17:54: Week closes constructive — MSFT +6%, QQQ +3.7%, PLTR +11.3%, VST +11.7% all extended; HUM -4.3%, IWM -7.5% still the laggard. VIX 14.8, day P&L +$2, cash near-zero locks posture. Weekend event risk plus Warsh hike talk and CPI/bank earnings next week; watching oil/yields Monday.
+
+### 2026-10-12T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.35
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX ticked up to 15.5 and global bond yields are surging (France on the 'ugly side'), with earnings season kicking off and MSFT sliding ~4.5% on a Stifel PT cut/Xbox pricing — so MSFT moves off favor to avoid. Cash critically tight at $17 caps new buys regardless; holding neutral/0.35 defensive into a jittery, yield-driven tape.
+- journal: Mon 10/12 09:00: Yields spiking worldwide and futures wavering into bank-earnings season; VIX up to 15.5 from 14.8. MSFT lost its leadership (-4.5% on Stifel cut) so I pulled it from favor. IWM still deep laggard (-7.6%), PLTR/VST extended. Cash ~$17 locks posture; watching yields and early bank reports.
