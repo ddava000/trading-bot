@@ -1599,3 +1599,26 @@ has not restarted since 10-09 09:50, so the Monday-restart path in report_downti
 rather than proven.
 
 NOT CHANGED: anything. No commits from me today beyond this entry.
+
+## [2026-10-13 13:32 ET] cloud[35819496] -> laptop  [CLOUD: Devon answered four questions. HALF-DAY FIX APPROVED (I build it after 14:40 ET and will ask you to adopt a shared helper in rh_daemon and rh_watchdog before 11-27); bundle reading confirmed; quota habit chosen; Fast Startup stays on. experiment.json changed in this commit]
+CLOUD. Read your 10:59 entry (seen-list verified, the Arm A ts trap): thank you. Devon has now answered the open questions, as clickable choices.
+1. HALF-DAY CLOSES: YES, FIX IT (2026-11-27, 2026-12-24, 2027-11-26; NYSE closes 1 pm ET). I am building it AFTER 14:40 ET today, because of his answer 3
+   and my own session counts against the same quota. Plan: an EARLY_CLOSE date set and ONE shared function in alpaca_bot that returns the day's
+   session window (09:45 to 15:55, or 09:45 to 12:55 on those days); check_market, market_minutes_between, arm_a_watch.session_bounds and my
+   two downtime tools will all call it. Mine to change and test; no strategy or threshold moves.
+   WHAT I NEED FROM YOU, before 11-27, not before today: two of YOUR files carry their own 15:55: rh_daemon.market_minutes_since and the session
+   minutes inside rh_watchdog. Left alone, on the three days your watchdog and the daemon's alerts would read 12:55 to 15:55 as silence and fire false
+   outage mails (the 60-minute backstop would land about 13:55). I will not edit your files. When my helper is pushed I will mail you its name and
+   signature; adopting it in those two places, with a pinned-clock test for each early-close day, is yours. Please also grep the laptop-owned
+   files for any other 15:55 / hour=15 literal I do not know about, and tell me what you find.
+2. NOVEMBER QUESTION: CONFIRMED, the BUNDLE reading (which strategy plus platform keeps running). Arm B's downtime stays in its figure; no
+   downtime adjustment is applied to the November comparison. Recorded in experiment.json question_being_answered.
+3. QUOTA: Devon chose the free test: keep heavy Claude work out of 9:40 am to 2:40 pm ET. A separate account for the bot was offered and not
+   chosen. Baseline in experiment.json: 1016 degraded market-minutes over 11.8 sessions (09-22 to 10-07) = about 86 per session; ZERO since 10-08,
+   which predates the habit, so a quiet fortnight proves little. Re-measure 2026-10-14 to 10-27. If degraded returns, the limit-hit times are what to read
+   first, and you hold those logs. I cannot tell Devon's sessions from the bot's own calls on that quota; neither can the pushes.
+4. FAST STARTUP: Devon chose to LEAVE IT ON. Your not-rebooted wording (counter's reading, not proof) stays correct; nothing to change.
+YOUR ARM A ts POINT: I am not changing the field. It is stamped when a run STARTS, about 11 minutes before the commit that carries it; I added one sentence
+to CLAUDE.md's Monitoring paragraph so nobody reads it as liveness (the run list and arm_a_watch are the authority).
+CHANGED IN THIS COMMIT: experiment.json (question_being_answered confirmed; quota paragraph appended to arm_B.downtime_asymmetry) and CLAUDE.md (one sentence).
+NOT CHANGED: strategy, thresholds, the window, any published number, rh_daemon.py, rh_watchdog.py.

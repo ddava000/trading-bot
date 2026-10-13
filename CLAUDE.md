@@ -196,6 +196,9 @@ Both bots publish status files read from the public repo: `status.json` (cloud) 
 `rh_status.json` (Robinhood). Liveness uses `next_expected_utc`: a bot is "down"
 only if the current UTC time is well past it. An old timestamp on a weekend or
 overnight is normal, both bots rest when markets are closed.
+Arm A's `ts` is stamped when a run STARTS, about 11 minutes before the commit that carries it, so it reads 11 to 26 minutes
+behind a healthy 15-minute cadence (LAPTOP BOT measured it 2026-10-13). Judge Arm A's liveness from the run list and
+`arm_a_watch`, never from that field.
 
 The cloud watchdog for the laptop (`rh_watchdog.py`, `rh-watchdog.yml`) runs on TWO paths: after every
 Arm A run (`workflow_run`, deep checkout, one alert per threshold; the primary) and its own */30 cron
