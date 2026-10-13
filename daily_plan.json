@@ -19,9 +19,9 @@
     "SPY",
     "QQQ"
   ],
-  "notes": "VIX calm at 15.3 near the close but the tape stays split \u2014 Nasdaq soft on memory/chip weakness (SNDK -6.6%, NBIS -6.9%), and September CPI lands tomorrow with heavy bank earnings in progress. PLTR +11.5%/VST +12.7%/MSFT +7.7% extended, IWM worst laggard (-8.2%); cash at $22 caps new buys, so posture holds neutral/0.40 into the event.",
-  "journal_entry": "Tue 10/13 16:46: Day flat, VIX 15.3 into the close. Chip drag persists but stabilizing vs morning rout; winners (PLTR/VST/MSFT) stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI \u2014 cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.",
+  "notes": "VIX calm at 15.3 after the close but September CPI lands tomorrow and bank earnings keep rolling in, so event risk dominates; Nasdaq soft on chip/memory weakness (SNDK -6.3%, NBIS -6.2%) while PLTR +11.5%/VST +13.1%/MSFT +7.8% are extended and IWM is the worst laggard (-8.1%). Cash at $22 caps new buys regardless, so posture holds neutral/0.40 into the print.",
+  "journal_entry": "Tue 10/13 17:59: Day flat, VIX 15.3 post-close. Chip drag persists but stabilizing; winners stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI \u2014 cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.",
   "date": "2026-10-13",
   "mode": "INTRADAY",
-  "updated_at": "2026-10-13T16:46 ET"
+  "updated_at": "2026-10-13T17:59 ET"
 }
