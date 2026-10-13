@@ -187,6 +187,11 @@ entry `-> all` after reading ECOSYSTEM.md. If no `ALIGNMENT CHECK` is open, open
 automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. The
 full order is in ECOSYSTEM.md.
 
+**Trading window (2026-10-13).** The bots' window is `alpaca_bot.session_bounds(day)`: 09:45 to 15:55 ET, 09:45 to 12:55 on
+the NYSE 1 pm early closes in `EARLY_CLOSE` (2026-11-27, 2026-12-24, 2027-11-26), None on weekends and `MARKET_HOLIDAYS`.
+Anything that needs to know when a bot should be working asks that function; never write a second 15:55 (a test fails if a
+cloud-owned module does). Extend `EARLY_CLOSE` together with `MARKET_HOLIDAYS`.
+
 ## Kill switch
 Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its
 next check.

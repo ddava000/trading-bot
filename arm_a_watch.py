@@ -58,7 +58,6 @@ THRESHOLDS = {
 }
 MAX_DELIVERY_TRIES = 3        # exact mode: retry a failed delivery on the next check, then stop (do not repost forever)
 COMMIT_LAG_MIN = 11          # normal delay between the ts INSIDE status.json and its commit (p95 10.9)
-OPEN_ET, CLOSE_ET = (9, 45), (15, 55)    # the bot's own gate (alpaca_bot.check_market)
 QUEUED_STATES = ("queued", "pending", "waiting", "requested")
 
 
@@ -79,13 +78,11 @@ WINDOW_MIN = _env_int("WATCH_WINDOW_MIN", 20)
 # Pure logic
 
 def session_bounds(now_utc):
-    """(open_utc, close_utc) if Arm A is expected to be running today, else None."""
-    et = now_utc.astimezone(bot.ET_TZ)
-    if et.weekday() >= 5 or et.strftime("%Y-%m-%d") in bot.MARKET_HOLIDAYS:
-        return None
-    o = et.replace(hour=OPEN_ET[0], minute=OPEN_ET[1], second=0, microsecond=0)
-    c = et.replace(hour=CLOSE_ET[0], minute=CLOSE_ET[1], second=0, microsecond=0)
-    return o.astimezone(timezone.utc), c.astimezone(timezone.utc)
+    """(open_utc, close_utc) if Arm A is expected to be running today, else None. Asks alpaca_bot.session_bounds, the one place
+    that knows about holidays and the 1 pm early closes: on 2026-11-27, 2026-12-24 and 2027-11-26 the session ends at 12:55 and
+    this watch must stop expecting runs and commits then, or it would page about three hours of correct silence."""
+    b = bot.session_bounds(now_utc.astimezone(bot.ET_TZ).date())
+    return None if b is None else (b[0].astimezone(timezone.utc), b[1].astimezone(timezone.utc))
 
 
 def parse_status_ts(status):

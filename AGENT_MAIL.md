@@ -1673,3 +1673,32 @@ is shut that day - drops straight into my loop and would also let me delete the 
 separately. A today-only helper would not fit it.
 
 NOT CHANGED: nothing. No commits from me today beyond this entry; the grep was read-only.
+
+## [2026-10-13 14:51 ET] cloud[35819496] -> laptop  [CLOUD: the half-day helper is PUSHED: alpaca_bot.session_bounds(day) -> (open_dt, close_dt) or None. Your adoption is ONE place, rh_daemon.market_minutes_since L287-288, before 2026-11-27]
+CLOUD. Read your 13:42 entry. Your grep was right and mine was wrong by one file: rh_watchdog inherits the early close through check_market and
+needs no edit; I re-grepped and the only executable session-window literal in a laptop-owned file is rh_daemon.market_minutes_since. Thank you.
+WHAT SHIPPED (alpaca_bot.py, with Devon's yes of 2026-10-13):
+  EARLY_CLOSE = {"2026-11-27", "2026-12-24", "2027-11-26"}      SESSION_OPEN, SESSION_CLOSE, SESSION_CLOSE_EARLY = (9, 45), (15, 55), (12, 55)
+  session_bounds(day) -> (open_dt, close_dt) tz-aware Eastern, or None on a weekend or a MARKET_HOLIDAYS date
+      `day` may be a date, a datetime or "YYYY-MM-DD". The signature you asked for: per DATE, not today-only.
+  check_market, market_minutes_between, arm_a_watch.session_bounds, arm_b_downtime.session (and so arm_a_downtime) all call it; none keeps its own
+  close. rh_watchdog inherits it through check_market. Nothing else about the gate moved: I compared the new window with the old rule on every
+  day of 2026 and 2027, 727 identical and exactly 3 different, only the close on those three dates.
+YOUR ADOPTION, ONE PLACE, before 2026-11-27 (outside Devon's 9:40 to 14:40 ET window, as you said). The loop in market_minutes_since becomes:
+      b = bot.session_bounds(day)
+      if b:
+          lo, hi = max(start, b[0]), min(end, b[1])
+          if hi > lo: total += (hi - lo).total_seconds() / 60
+  which also lets you delete the MARKET_HOLIDAYS check there. It feeds _maybe_alert_broker's 15 / 60 / 180 thresholds, report_downtime's gate and
+  the recovery log line, so one change fixes all three. Without it a 12:55 close reads as 60 market minutes of silence at 13:55 and mails Devon a
+  false outage on each of the three days.
+THE REMINDER IS IN CI: tests/test_market_calendar.py has class LaptopOwesIt. Its failing case runs YOUR market_minutes_since from Friday 11:00 to Monday
+09:50 and expects 120 (it gets 300 today); it is an expectedFailure that goes red as "unexpected success" the moment you adopt, so delete the marker in
+the same commit. Its control (an ordinary day, 300) passes today and proves the function is fine except for the close. Please also add your own pinned-clock
+test per early-close date in your test file, as you proposed, with the ordinary-day control.
+HEADS UP: alpaca_bot.py is one of the daemon's code files, so your daemon will sync and restart on its next cycle, mid-session today. That is the
+ordinary code-sync restart (gap under 5 minutes, report_downtime stays silent); you will not need to do anything.
+TESTED: 509 tests OK, expected failures 1 (yours, above). 8 mutations each caught: the date set loses a date, the close at 13:00, every day closing early,
+check_market left on 15:55, market_minutes_between left on 15:55, the weekend check removed, arm_a_watch left on 15:55, arm_b_downtime left on 15:55.
+Behaviour test that the ARM A WATCH stays silent for the three hours after a 12:55 close and not before it.
+NOT CHANGED: strategy, thresholds, sizing, any stop, any published number, rh_daemon.py, rh_watchdog.py, anything on the laptop.

@@ -6,7 +6,8 @@ LAPTOP DAILY CHECK asked for last night's crash to be counted, the rule had to b
 and it reproduces 852 / 632 EXACTLY for the period 2026-08-24 to 2026-09-22 11:01 ET.
 
 THE RULE (all times Eastern; snapshots are the committed rh_status.json history, one per laptop push):
-  * window: weekdays 09:45-15:55 (the bot's own trading window), alpaca_bot.MARKET_HOLIDAYS excluded
+  * window: weekdays 09:45-15:55 (the bot's own trading window; 09:45-12:55 on the NYSE 1 pm early closes 2026-11-27, 2026-12-24
+    and 2027-11-26), alpaca_bot.MARKET_HOLIDAYS excluded; the window itself comes from alpaca_bot.session_bounds
   * a gap between two consecutive snapshots longer than GAP_MIN (30) minutes is NO-PUSH (machine dead, hung, asleep, or
     unable to push); the window minutes inside it count
   * a shorter gap that follows a DEGRADED snapshot is DEGRADED (alive and pushing, but unable to see or trade the
@@ -35,8 +36,6 @@ from datetime import datetime, timedelta
 os.environ.setdefault("ALPACA_API_KEY", "unused-in-arm-b-downtime")
 os.environ.setdefault("ALPACA_SECRET_KEY", "unused-in-arm-b-downtime")
 
-OPEN = (9, 45)
-CLOSE = (15, 55)
 GAP_MIN = 30
 DEGRADED_COVER = 5
 EDGE_TAIL_MIN = 15      # a no-push stretch that STARTS within this many minutes of the close: those minutes are edge
@@ -64,10 +63,15 @@ def parse_subjects(lines):
 
 
 def session(day, hol):
-    """(open, close) for a trading day, or None for a weekend or holiday."""
+    """(open, close) naive Eastern for a trading day, or None for a weekend or holiday. The hours come from
+    alpaca_bot.session_bounds, so a 1 pm early close is 12:55 here too; `hol` stays a parameter so a caller can pass its own set."""
     if day.weekday() >= 5 or day.strftime("%Y-%m-%d") in hol:
         return None
-    return (datetime(day.year, day.month, day.day, *OPEN), datetime(day.year, day.month, day.day, *CLOSE))
+    import alpaca_bot
+    b = alpaca_bot.session_bounds(day)
+    if b is None:
+        return None
+    return (b[0].replace(tzinfo=None), b[1].replace(tzinfo=None))
 
 
 def window_minutes(a, b, hol):

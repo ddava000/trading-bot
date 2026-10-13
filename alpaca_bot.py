@@ -294,7 +294,8 @@ def _hours_since(iso):
 
 
 def market_minutes_between(start_utc, end_utc):
-    """Minutes of the bot's OWN trading window (weekdays 09:45 to 15:55 ET, MARKET_HOLIDAYS excluded) that fall
+    """Minutes of the bot's OWN trading window (weekdays 09:45 to 15:55 ET, 12:55 on EARLY_CLOSE days, MARKET_HOLIDAYS
+    excluded; see session_bounds) that fall
     between two moments. Wall-clock time over a close, a weekend or a holiday is not downtime: nothing runs
     then, so a failure on the last run before the close followed by a good run at the next open is a few
     minutes of trading time, not 18 hours. (Found 2026-10-07 when LAPTOP BOT caught the same mistake in its
@@ -304,10 +305,9 @@ def market_minutes_between(start_utc, end_utc):
     s, e = start_utc.astimezone(ET_TZ), end_utc.astimezone(ET_TZ)
     total, day = 0.0, s.date()
     while day <= e.date():
-        if day.weekday() < 5 and day.strftime("%Y-%m-%d") not in MARKET_HOLIDAYS:
-            o = datetime(day.year, day.month, day.day, 9, 45, tzinfo=ET_TZ)
-            c = datetime(day.year, day.month, day.day, 15, 55, tzinfo=ET_TZ)
-            lo, hi = max(o, s), min(c, e)
+        b = session_bounds(day)
+        if b:
+            lo, hi = max(b[0], s), min(b[1], e)
             if hi > lo:
                 total += (hi - lo).total_seconds() / 60.0
         day += timedelta(days=1)
@@ -379,8 +379,7 @@ def outage_note_contact():
 # ── Step 1: Market hours ──────────────────────────────────────────────────────
 # NYSE/NASDAQ full-closure holidays (observed dates). Hardcoded for verifiable
 # correctness; refresh every couple of years (the weekly audit can top it up).
-# Does NOT yet cover half-days (1pm early closes, e.g. day after Thanksgiving) -
-# low-frequency, minor; a follow-up if it ever bites.
+# Half-days (1 pm early closes) are EARLY_CLOSE, just below.
 MARKET_HOLIDAYS = {
     "2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25",
     "2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25",
@@ -388,15 +387,36 @@ MARKET_HOLIDAYS = {
     "2027-06-18","2027-07-05","2027-09-06","2027-11-25","2027-12-24",
 }
 
+# NYSE 1 pm ET early closes: the day after Thanksgiving and Christmas Eve. Devon approved gating them 2026-10-13; until then the
+# bot kept sending orders into a closed market for about three hours on each. The bot's window ends five minutes before the
+# exchange does, exactly as on a normal day (15:55 for the 16:00 close), so on these days it ends at 12:55. Hand-kept like
+# MARKET_HOLIDAYS: add the next year's dates from the NYSE calendar when that set is extended (a test fails 150 days before either
+# table runs out).
+EARLY_CLOSE = {"2026-11-27", "2026-12-24", "2027-11-26"}
+SESSION_OPEN, SESSION_CLOSE, SESSION_CLOSE_EARLY = (9, 45), (15, 55), (12, 55)
+
+
+def session_bounds(day):
+    """THE bot's trading window for one calendar date: (open, close) as tz-aware ET datetimes, or None on a weekend or a
+    MARKET_HOLIDAYS date. `day` may be a date, a datetime or "YYYY-MM-DD". Everything that needs to know when the bot is
+    supposed to be working asks THIS (check_market, market_minutes_between, ARM A WATCH, the laptop's alerts and the downtime
+    tools), so an early close cannot be modelled in one place and missed in another."""
+    if isinstance(day, str):
+        day = datetime.strptime(day, "%Y-%m-%d")
+    y, m, d = day.year, day.month, day.day
+    key = "%04d-%02d-%02d" % (y, m, d)
+    if datetime(y, m, d).weekday() >= 5 or key in MARKET_HOLIDAYS:
+        return None
+    ch, cm = SESSION_CLOSE_EARLY if key in EARLY_CLOSE else SESSION_CLOSE
+    return (datetime(y, m, d, SESSION_OPEN[0], SESSION_OPEN[1], tzinfo=ET_TZ), datetime(y, m, d, ch, cm, tzinfo=ET_TZ))
+
+
 def check_market():
     et = datetime.now(ET_TZ)
-    if et.weekday() >= 5:                            # weekend
+    b = session_bounds(et)
+    if b is None:                                    # weekend or market holiday
         return False, et
-    if et.strftime("%Y-%m-%d") in MARKET_HOLIDAYS:   # market holiday - skip like a weekend
-        return False, et
-    open_  = et.replace(hour=9,  minute=45, second=0, microsecond=0)
-    close_ = et.replace(hour=15, minute=55, second=0, microsecond=0)
-    return open_ <= et <= close_, et
+    return b[0] <= et <= b[1], et
 
 def next_market_run(et):
     """UTC time by which the bot should next run. During market hours that is one
