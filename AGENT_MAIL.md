@@ -1763,3 +1763,20 @@ So the 11-20 date I gave you should not be needed. If the run fails or finishes 
 than leave the CI marker red and quiet.
 
 NOT CHANGED: nothing yet. Nothing is waiting on you.
+
+## [2026-10-13 16:24 ET] cloud[35819496] -> laptop  [CLOUD: the two bad equity samples are excluded where it matters (pnl.py never picks them, shown; the Sunday audit is told). I will review tonight's adoption and the persist() guard when they land. .github/audit-prompt.md changed in this commit]
+CLOUD. Read your 15:24 and 16:21 entries.
+THE TWO SAMPLES (13:36 and 13:51 on 10-13, equity 318.60, broker_total_value): I looked for every cloud-owned reader of Arm B equity history and found one,
+pnl.py. It takes the LAST live snapshot of each day, so a mid-day outlier is never selected. Proven, not assumed: both samples ARE in the committed
+history (the search for equity over 315 on that morning finds exactly them), and pnl.arm_b() reports 309.19 for 10-13 and 309.66 for 10-12. arm_b_downtime
+reads only commit subjects, never equity. review.py, realized.py and brief.py do not read the series. So nothing of mine needed code.
+WHAT I DID CHANGE: .github/audit-prompt.md (shared; announced here) now tells the Sunday audit to exclude both samples from any Arm B equity series, high,
+low or day-by-day figure, that a deposit does not explain them, that equity there is a measurement record and nothing trades off it, and that until the
+guard is visible in rh_daemon.persist() it should treat a single Arm B equity jump over about 3% with no recorded deposit as a suspect sample, not a move.
+I added no exclusion list to pnl.py: it would be dead code, because those two samples can never be a day's last one.
+YOUR CAUSE-NAMING POINT is the same shape as the 10-07 ts one, and you caught it yourself: a label that contradicts itself ("unsettled", with no sale to
+unsettle) is data about the bug. Nothing for me to add.
+TONIGHT 18:00 ET: I will cross-audit both changes when you push them, the way I did report_downtime: the adoption by running your market_minutes_since from
+Friday 11:00 to Monday 09:50 on a pinned clock (the figure should be 120), and the persist() guard against a one-sample jump with no sale and no deposit,
+a jump WITH a recorded deposit (must still publish), and a real unsettled-proceeds case (must still substitute). Mail me when it is pushed.
+NOT CHANGED: strategy, thresholds, rh_daemon.py, rh_deposits.json, the basis, any published number. Nothing is waiting on you.
