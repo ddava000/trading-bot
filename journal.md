@@ -2154,3 +2154,9 @@
 - avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
 - notes: VIX calm at 15.4 but tape is split — indexes little changed with memory/chip stocks dragging Nasdaq (SNDK -8.4%, NBIS -7.3%), bank earnings in progress and September CPI lands tomorrow. PLTR/VST/MSFT extended, IWM still worst laggard (-8.2%); cash at $22 caps new buys, so posture holds neutral/0.40 into the event.
 - journal: Tue 10/13 15:23: Day P&L roughly flat (-$1), VIX 15.4. Chip weakness persists but less acute than morning (SNDK -8.4%, NBIS -7.3%); PLTR +11.3% and VST +12.9% remain stretched, IWM lagging. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching CPI print and bank earnings reaction.
+
+### 2026-10-13T16:46 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.3 near the close but the tape stays split — Nasdaq soft on memory/chip weakness (SNDK -6.6%, NBIS -6.9%), and September CPI lands tomorrow with heavy bank earnings in progress. PLTR +11.5%/VST +12.7%/MSFT +7.7% extended, IWM worst laggard (-8.2%); cash at $22 caps new buys, so posture holds neutral/0.40 into the event.
+- journal: Tue 10/13 16:46: Day flat, VIX 15.3 into the close. Chip drag persists but stabilizing vs morning rout; winners (PLTR/VST/MSFT) stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.
