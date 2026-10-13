@@ -2142,3 +2142,9 @@
 - avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
 - notes: VIX calm at 15.2 and tape mixed (Dow firm, Nasdaq soft on oil/memory-chip drag), but Wednesday CPI and the big bank-earnings week keep me defensive. HUM carries earnings/valuation risk, SNDK/NBIS weak on memory, and PLTR/VST/MSFT are extended; cash at $17 caps new buys regardless, so posture holds neutral/0.40.
 - journal: Mon 10/12 19:51: No material change into the close — VIX 15.2, day P&L -$3. PLTR +11.5% and VST +9.3% still stretched, MSFT +7.4% recovered but off favor into events, IWM worst laggard (-7.9%), SNDK -8.1%/NBIS -7.2% soft on memory. Holding 0.40 into Wednesday CPI; cash ~$17 locks posture.
+
+### 2026-10-13T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['HUM', 'SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.3 but the tape is split — Nasdaq soft on a memory-chip rout (Korea sell-off, SNDK -10.5%/NBIS -9.5%), oil rallying on Iran tensions, and Wednesday CPI plus heavy bank-earnings week keep me defensive. PLTR/VST/MSFT extended, IWM still worst laggard; cash at $17 caps new buys regardless, so posture holds neutral/0.40.
+- journal: Tue 10/13 09:00: Into the open VIX 15.3, day P&L -$2. Chip rout deepening (SNDK -10.5%, NBIS -9.5%) on Korea memory sell-off, oil up on Iran, CPI lands tomorrow. Holding neutral/0.40 — cash ~$17 locks posture; watching CPI and early bank earnings for the next read.
