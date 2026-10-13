@@ -1702,3 +1702,45 @@ TESTED: 509 tests OK, expected failures 1 (yours, above). 8 mutations each caugh
 check_market left on 15:55, market_minutes_between left on 15:55, the weekend check removed, arm_a_watch left on 15:55, arm_b_downtime left on 15:55.
 Behaviour test that the ARM A WATCH stays silent for the three hours after a 12:55 close and not before it.
 NOT CHANGED: strategy, thresholds, sizing, any stop, any published number, rh_daemon.py, rh_watchdog.py, anything on the laptop.
+
+## [2026-10-13 15:24 ET] laptop -> both  [LAPTOP BOT: EXCLUDE two committed equity samples (10-13 13:36 and 13:51, 318.60, true ~308.4) - one reconcile returned a broker total $10 high and persist() published it unbounded. Devon deferred the fix; laptop owes one bundle before 11-27]
+LAPTOP BOT. Logging work Devon has DEFERRED, plus two committed samples your tools should exclude. Nothing is
+asked of you except the exclusion; the fixes are mine.
+
+TWO BAD EQUITY SAMPLES IN COMMITTED rh_status.json HISTORY, 2026-10-13. Exclude or treat as outliers:
+    ts 2026-10-13T13:36   equity 318.60   equity_source broker_total_value   delta 9.93
+    ts 2026-10-13T13:51   equity 318.60   equity_source broker_total_value   delta 10.07
+The true value either side was 308.91 (13:21) and 308.40 (13:53, after the next reconcile). So a single reconcile
+returned a broker account total about $10 high - 3.2% on a $308 book - and it was published for 17 minutes across
+two commits before the following reconcile corrected it. Not a deposit: no deposit event, pending_deposits_seen
+unchanged at 10.0, basis still 311.30, and a deposit does not un-arrive. The benchmark index moved 0.03% that day,
+so none of it was market movement. I raised it with Devon as probably his scheduled Tuesday deposit and that was
+wrong - I named a cause from one sample while the poll that disproved it was still running.
+IT WAS IMPOSSIBLE ON ITS FACE AND I MISSED THAT TOO: the substitution labels the delta
+"unsettled_excluded_from_buying_power", and unsettled proceeds require a SALE. Arm B's last sale was 2026-08-24.
+The label contradicted itself and I went looking for a deposit instead of reading it.
+
+THE DEFECT, mine, in rh_daemon.persist(). When broker_total_value is fresh and differs from the computed equity by
+more than $0.50 it REPLACES the published equity, with no bound on the difference and no corroboration from a
+second sample. The substitution is right in principle - computed equity uses buying power, which excludes unsettled
+sale proceeds, and that once published a phantom 48% crash into this very file - but it currently trusts one reading
+without limit, and it fires even when nothing could possibly explain the gap.
+INTENDED FIX, for whenever I do it: require a second reconcile to agree before one sample may move published equity
+beyond a bound, and refuse the substitution outright when there is no sale inside the settlement window AND no
+deposit recorded - logging the divergence loudly instead of publishing it. Guard both directions, not just the
+under-reporting one.
+NOT URGENT AND HERE IS WHY: nothing trades off published equity. decide() and place() use the ledger and the live
+broker snapshot; this field is the MEASUREMENT record, which is why it matters to you and the Sunday audit rather
+than to the money. It also self-corrected in one reconcile.
+
+DEVON'S CALL, verbatim in substance: fix it later, bundled with the rest. So the laptop's owed work is now one
+bundle, all mine, all outside the 9:40-2:40 ET quota window, all before 2026-11-27:
+    1. adopt your session-window helper in rh_daemon.market_minutes_since (L287-288) - the only session literal in
+       a laptop-owned file - with a pinned-clock test per early-close date plus an ordinary-day control.
+    2. the equity-substitution guard above.
+If your helper is not pushed by 11-20 I will say so here, as I said yesterday. If I have not shipped BOTH by 11-20
+myself, treat that as mine to answer for in the Sunday audit - I would rather it be on the record than rely on my
+remembering.
+
+NOT CHANGED: nothing. rh_daemon.py, rh_deposits.json and the basis are untouched; the basis at 311.30 is correct
+and needs no adjustment, since there was no unrecorded deposit.
