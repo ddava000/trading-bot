@@ -176,9 +176,18 @@ def addressed_to(e, who):
 #
 # Why it exists: LAPTOP BOT looked for new mail by comparing timestamps with its own last entry, which
 # it had stamped 25 minutes into the future, so two entries addressed to it (including an open decision)
-# looked old and it reported "no new mail". UNREAD HERE IS BY FILE POSITION AFTER A PER-SESSION MARKER,
-# never by timestamp. The marker lives in a gitignored file on the machine that runs the check, keyed by
-# session, so the two laptop sessions (and the two cloud ones) never consume each other's mail.
+# looked old and it reported "no new mail". UNREAD HERE IS BY HEADING AGAINST A PER-SESSION SEEN-LIST,
+# never by timestamp and never by position. The list lives in a gitignored file on the machine that runs the
+# check, keyed by session, so the two laptop sessions (and the two cloud ones) never consume each other's mail.
+#
+# Why a LIST of headings and not one marker (2026-10-12, found by LAPTOP BOT from a live incident): the first
+# version stored ONE heading and called everything after it unread. A merge keeps both sides with the OTHER
+# side first and never orders by timestamp, so when two sessions append in the same minute the other one's entry
+# lands ABOVE ours; --ack had already moved the marker onto our own newest entry, so that entry sat behind it and
+# could never come back. `--inbox` said 0 unread with mail waiting, which is indistinguishable from a quiet
+# mailbox: the 2026-10-01 failure class by a second route. A heading is either in your seen-list or it is not, so
+# where a merge puts it does not matter. A lost list reads as nothing seen (the safe direction), and headings
+# the weekly archive moves out of the file simply stop mattering.
 CURSORS_FILE = ".mail_inbox_cursors.json"
 INBOX_RECENT = 10
 ALIGN_REQUEST, ALIGN_REPLY = "ALIGNMENT CHECK", "ALIGNED"
@@ -212,15 +221,53 @@ def sent_by_key(key, e):
     return e["from"] == _base(key) and (e.get("from_tag") == "daily") == _is_daily(key)
 
 
+def identities(all_e):
+    """One stable identity per entry, in file order: its heading text, plus "#n" for the n-th identical heading
+    (n >= 1), so two entries stamped the same minute with the same subject are still two."""
+    count, out = {}, []
+    for e in all_e:
+        t = e["line_text"]
+        n = count.get(t, 0)
+        count[t] = n + 1
+        out.append(t if n == 0 else "%s#%d" % (t, n))
+    return out
+
+
+_STAMP = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
+
+
+def _later(a, b):
+    """True only when both stamps are well formed and a is strictly later than b. Never guesses on a typo."""
+    a, b = (_TZ_SUFFIX.sub("", str(a)).strip(), _TZ_SUFFIX.sub("", str(b)).strip())
+    return bool(_STAMP.match(a) and _STAMP.match(b) and a > b)
+
+
 def unread_for(all_e, key, marker):
-    """(entries, how). With a marker: everything addressed to `key` after it, by position. Without one, or
-    if the marked heading is gone: the last INBOX_RECENT addressed to it (bias toward reporting)."""
+    """(entries, how). `marker` is what --ack stored for this session:
+      * {"seen": [identities]}: everything addressed to `key` whose identity is NOT in the list, wherever a merge
+        put it. If none of the listed identities are in the file at all (an archive swept them, or the list came
+        from another history), fall back to the last INBOX_RECENT, because a flood of everything is not mail.
+      * a heading string (the first version): everything addressed to `key` after that entry by position, PLUS any
+        entry above it that is stamped later than it, which is the signature of a merge that put the other side
+        first; this only ever errs toward reporting, and the next --ack migrates the session to the list.
+      * nothing, or a heading no longer in the file: the last INBOX_RECENT addressed to `key`."""
     mine = lambda e: addressed_to_key(key, e) and not sent_by_key(key, e)
-    if marker:
+    fallback = ([e for e in all_e if mine(e)][-INBOX_RECENT:],
+                "no read marker found: the last %d addressed to you" % INBOX_RECENT)
+    if isinstance(marker, dict):
+        seen = marker.get("seen")
+        ids = identities(all_e)
+        if isinstance(seen, list) and seen and set(seen) & set(ids):
+            have = set(seen)
+            return [e for e, i in zip(all_e, ids) if i not in have and mine(e)], "since your last --ack"
+        return fallback
+    if isinstance(marker, str) and marker:
         for i in range(len(all_e) - 1, -1, -1):
             if all_e[i]["line_text"] == marker:
-                return [e for e in all_e[i + 1:] if mine(e)], "since your read marker"
-    return [e for e in all_e if mine(e)][-INBOX_RECENT:], "no read marker found: the last %d addressed to you" % INBOX_RECENT
+                after = [e for e in all_e[i + 1:] if mine(e)]
+                above = [e for e in all_e[:i] if mine(e) and _later(e["ts"], all_e[i]["ts"])]
+                return above + after, "since your read marker"
+    return fallback
 
 
 def _ascii(s):
@@ -264,7 +311,7 @@ def inbox_cli(argv):
         return 2
     cursors = _load_cursors()
     unread, how = unread_for(all_e, key, cursors.get(key))
-    print("INBOX for %s: %d unread (%s; by file position, never by timestamp)" % (display(key), len(unread), how))
+    print("INBOX for %s: %d unread (%s; by heading, never by timestamp or position)" % (display(key), len(unread), how))
     for e in unread:
         print("  line %-5d %s -> %s%s   [stamp %s ET]" % (
             e["line"], _ascii(e["line_text"].split("]", 1)[1].split("->")[0].strip()), e["to"],
@@ -274,9 +321,9 @@ def inbox_cli(argv):
         print("Read each from its line (sed -n 'LINE,+40p' AGENT_MAIL.md), act, REPLY by appending, then confirm "
               "with the ALIGNED reply if an ALIGNMENT CHECK is open (python mail_check.py --aligned).")
     if "--ack" in argv:
-        cursors[key] = all_e[-1]["line_text"]
+        cursors[key] = {"seen": identities(all_e)}
         _save_cursors(cursors)
-        print("[read marker moved to the newest entry (line %d) for %s]" % (all_e[-1]["line"], display(key)))
+        print("[%d entries marked read for %s; newest is line %d]" % (len(all_e), display(key), all_e[-1]["line"]))
     return 1 if unread else 0
 
 

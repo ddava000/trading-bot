@@ -181,8 +181,8 @@ it). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, la
 never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
 line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test.
 **"Check mail" (Devon 2026-10-01) means the same thing to every session**: `git pull`, then
-`python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by FILE POSITION after your own read marker,
-never by comparing timestamps), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
+`python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by HEADING against the list you have already seen,
+never by comparing timestamps and not by position: a merge can put another session's entry above your own), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
 entry `-> all` after reading ECOSYSTEM.md. If no `ALIGNMENT CHECK` is open, open one. Devon is messaged
 automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. The
 full order is in ECOSYSTEM.md.

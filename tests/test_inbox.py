@@ -1,4 +1,4 @@
-"""One way for every session to check mail: unread by FILE POSITION after a per-session marker.
+"""One way for every session to check mail: unread by HEADING against a per-session seen-list.
 
 The failure this exists for (2026-10-01): LAPTOP BOT judged "new" by comparing timestamps with its own last
 entry, which it had stamped 25 minutes ahead of the real clock. Two entries addressed to it, one carrying an
@@ -284,8 +284,12 @@ class AMergeCanHideMailBehindYourMarker(Box):
     This is the 2026-10-01 failure class again (mail addressed to a session, silently not
     reported) reached by a different route, so it is marked rather than left as prose. The
     fix is the file owner's call; a seen-SET of headings instead of a single position would
-    close it and would also keep the bias-toward-reporting the docstring promises. Delete
-    the expectedFailure when it flips to unexpected success.
+    close it and would also keep the bias-toward-reporting the docstring promises.
+
+    FIXED 2026-10-13 (cloud): --ack now stores the list of headings seen (TheSeenListClosesTheMerge below), and a
+    session still holding a first-version marker gets this case rescued once (a later-stamped entry above its
+    marker is reported) until its next --ack migrates it. This test is the original, kept as the regression:
+    its expectedFailure flipped to unexpected success, as the finding said it would.
     """
 
     def build(self):
@@ -314,12 +318,135 @@ class AMergeCanHideMailBehindYourMarker(Box):
         unread, _ = M.unread_for(self.entries(), "laptop", marker)
         self.assertEqual([x["subject"] for x in unread], ["daily check ack"])
 
-    @unittest.expectedFailure
     def test_an_entry_merged_in_above_our_marker_is_still_unread(self):
         es = self.build()
         marker = es[-1]["line_text"]          # what --ack stored: our own newest entry
         unread, _ = M.unread_for(es, "laptop", marker)
         self.assertEqual([x["subject"] for x in unread], ["daily check ack"])
+
+
+class TheSeenListClosesTheMerge(Box):
+    """The fix for the class above (cloud, 2026-10-13): --ack stores the headings it has seen, not one position.
+
+    Each test reaches the live route (the CLI, a real cursors file, a merged file), not a stub, because the
+    failure was a mechanism that said 0 unread while mail waited, and a mock would have agreed with it."""
+
+    def merged(self):
+        """Our entry last, the other session's entry ABOVE it though stamped later: the merge rule's output."""
+        return (e("2026-10-11 15:29", "audit", "both", "weekly audit")
+                + e("2026-10-12 13:36", "cloud[daily]", "all", "daily check ack")
+                + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+
+    def test_the_live_incident_end_to_end_ack_then_a_merge_above_our_own_entry(self):
+        self.write(e("2026-10-11 15:29", "audit", "both", "weekly audit") + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        self.cli("--inbox", "LAPTOP BOT", "--ack")                  # the marker now sits on our own newest entry
+        self.write(self.merged())                                    # the rebase puts cloud[daily]'s entry above it
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertEqual(rc, 1, out)
+        self.assertIn("daily check ack", out)
+
+    def test_once_acked_the_merged_entry_is_read_and_stays_read(self):
+        self.write(e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        self.write(self.merged())
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        self.assertEqual(self.cli("--inbox", "LAPTOP BOT")[0], 0)
+
+    def test_ack_stores_every_heading_so_a_later_arrival_anywhere_is_new(self):
+        self.write(SCENARIO)
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        with open(M.CURSORS_FILE, encoding="utf-8") as f:
+            stored = json.load(f)["laptop"]
+        self.assertEqual(len(stored["seen"]), 4)
+        self.assertEqual(stored["seen"], M.identities(self.entries()))
+
+    def test_a_new_entry_inserted_in_the_MIDDLE_is_reported_too(self):
+        self.write(SCENARIO)
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        es = SCENARIO.split("## [")
+        middle = "## [".join([es[0], es[1], es[2], e("2026-10-01 16:30", "cloud[35819496]", "laptop", "slipped in mid-file")[4:], es[3], es[4]])
+        self.write(middle)
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertEqual(rc, 1)
+        self.assertIn("slipped in mid-file", out)
+
+    def test_the_weekly_archive_removing_old_entries_neither_floods_nor_hides(self):
+        self.write(SCENARIO)
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        self.write(e("2026-10-01 16:24", "cloud[35819496]", "all", "roster of five")           # the archive moved the rest away
+                   + e("2026-10-12 09:00", "cloud[35819496]", "laptop", "after the archive"))
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertEqual(rc, 1)
+        self.assertIn("after the archive", out)
+        self.assertNotIn("roster of five", out)
+
+    def test_an_identical_heading_arriving_later_is_still_new(self):
+        """Two entries stamped the same minute with the same subject are two entries."""
+        self.write(e("2026-10-12 09:00", "cloud[35819496]", "laptop", "same"))
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        self.append(e("2026-10-12 09:00", "cloud[35819496]", "laptop", "same"))
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertEqual(rc, 1, out)
+
+    def test_a_list_with_nothing_in_common_with_the_file_falls_back_to_the_last_ten_not_a_flood(self):
+        self.write("".join(e("2026-10-01 10:%02d" % i, "cloud[35819496]", "laptop", "n%d" % i) for i in range(15)))
+        with open(M.CURSORS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"laptop": {"seen": ["## [from another history] x -> y  [z]"]}}, f)
+        rc, out = self.cli("--inbox", "laptop")
+        self.assertIn("10 unread", out)
+
+    def test_a_damaged_list_reads_as_nothing_seen(self):
+        self.write(e("2026-10-12 09:00", "cloud[35819496]", "laptop", "one"))
+        for bad in ({"seen": []}, {"seen": "oops"}, {"nope": 1}, 17, None):
+            with open(M.CURSORS_FILE, "w", encoding="utf-8") as f:
+                json.dump({"laptop": bad}, f)
+            self.assertEqual(self.cli("--inbox", "laptop")[0], 1, bad)
+
+    def test_sessions_still_do_not_consume_each_others_mail(self):
+        self.write(e("2026-10-12 09:00", "cloud[35819496]", "laptop", "for both laptop sessions"))
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        self.assertEqual(self.cli("--inbox", "LAPTOP BOT DAILY CHECK")[0], 1)
+
+
+class LegacyMarkersMigrate(Box):
+    """Cursors written by the first version are one heading string. They must keep working, and the first --ack
+    must move them to the seen-list, so nobody is flooded and nobody loses the mail they had not read."""
+
+    def test_a_legacy_marker_still_means_everything_after_it(self):
+        self.write(SCENARIO)
+        with open(M.CURSORS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"laptop": M.entries(SCENARIO)[1]["line_text"]}, f)
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertIn("2 unread", out)
+
+    def test_a_legacy_marker_also_reports_a_later_stamped_entry_a_merge_put_above_it(self):
+        """The one-time rescue: the exact signature of the incident, for a session that has not acked since the upgrade."""
+        self.write(e("2026-10-11 15:29", "audit", "both", "weekly audit")
+                   + e("2026-10-12 13:36", "cloud[daily]", "all", "daily check ack")
+                   + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        with open(M.CURSORS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"laptop": M.entries(open("AGENT_MAIL.md", encoding="utf-8").read())[-1]["line_text"]}, f)
+        rc, out = self.cli("--inbox", "LAPTOP BOT")
+        self.assertEqual(rc, 1)
+        self.assertIn("daily check ack", out)
+
+    def test_the_rescue_does_not_fire_on_an_earlier_or_malformed_stamp(self):
+        body = (e("2026-10-12 09:00", "cloud[35819496]", "laptop", "older, above the marker")
+                + "## [soon-ish ET] cloud[35819496] -> laptop  [typo stamp above the marker]\nbody\n\n"
+                + e("2026-10-12 13:35", "laptop", "both", "my reply"))
+        self.write(body)
+        marker = self.entries()[-1]["line_text"]
+        unread, _ = M.unread_for(self.entries(), "laptop", marker)
+        self.assertEqual(unread, [])
+
+    def test_the_first_ack_migrates_a_legacy_marker_to_the_list(self):
+        self.write(SCENARIO)
+        with open(M.CURSORS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"laptop": M.entries(SCENARIO)[1]["line_text"]}, f)
+        self.cli("--inbox", "LAPTOP BOT", "--ack")
+        with open(M.CURSORS_FILE, encoding="utf-8") as f:
+            self.assertIsInstance(json.load(f)["laptop"], dict)
+        self.assertEqual(self.cli("--inbox", "LAPTOP BOT")[0], 0)
 
 
 if __name__ == "__main__":

@@ -54,8 +54,8 @@ base token, so it never needs waking for mail. Only the two interactive sessions
 
 ## WHEN DEVON SAYS "CHECK MAIL" (to any session): the order
 
-1. `git pull`, then `python mail_check.py --inbox "<YOUR NAME>" --ack`. That list is your mail, by FILE
-   POSITION after your own read marker. NEVER decide "nothing new" by comparing timestamps: stamps are typed
+1. `git pull`, then `python mail_check.py --inbox "<YOUR NAME>" --ack`. That list is your mail: every entry addressed to you whose heading is not in your own seen-list (a merge can put
+   another session's entry ABOVE yours, so position cannot be trusted, which is how 2026-10-12 nearly hid one). NEVER decide "nothing new" by comparing timestamps: stamps are typed
    by hand and have been wrong in both directions (that is how LAPTOP BOT missed two entries on 2026-10-01).
 2. Read each entry from its line number, act on what is in your remit, and REPLY by appending (to the
    sender, short, real-clock stamp: see CLAUDE.md). An entry addressed to you with no reply is a defect.
