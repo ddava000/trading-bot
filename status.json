@@ -1,37 +1,37 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-14T17:45Z",
+ "as_of_utc": "2026-10-14T18:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-14T17:45:31+00:00",
+  "checked_at": "2026-10-14T18:00:38+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 23.55,
+ "cash": 29.03,
  "crypto_enabled": true,
- "day_pnl": -6.2,
+ "day_pnl": -6.58,
  "earnings_guard": "unknown",
- "equity": 225.73,
+ "equity": 225.35,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.2,
-  "NBIS": -17.1,
-  "NVDA": -2.5,
-  "PLTR": 8.0,
-  "SNDK": -11.0,
-  "VST": 4.9
+  "MSFT": 6.1,
+  "NBIS": -17.9,
+  "NVDA": -2.8,
+  "PLTR": 7.9,
+  "SNDK": -10.9,
+  "VST": 4.6
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-14T18:05Z",
+ "next_expected_utc": "2026-10-14T18:20Z",
  "orders_this_run": 0,
  "plan": {
   "date": "2026-10-14",
@@ -47,19 +47,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -16.41,
-    "sales": 37,
+    "net": -16.83,
+    "sales": 38,
     "st": {
      "gains": 0.26,
-     "losses": -16.67,
-     "net": -16.41,
-     "sales": 37
+     "losses": -17.09,
+     "net": -16.83,
+     "sales": 38
     }
    }
   },
-  "checked_at": "2026-10-14T17:45:32+00:00",
-  "fills": 98,
-  "last_fill": "2026-10-14T13:52:38.022606Z",
+  "checked_at": "2026-10-14T18:00:39+00:00",
+  "fills": 99,
+  "last_fill": "2026-10-14T17:46:33.587663Z",
   "last_sale": "2026-10-14",
   "lt": {
    "gains": 0.0,
@@ -68,15 +68,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -16.41,
-  "reconciliation_residual": -0.0466,
-  "sales": 37,
+  "net": -16.83,
+  "reconciliation_residual": -0.048,
+  "sales": 38,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -16.67,
-   "net": -16.41,
-   "sales": 37
+   "losses": -17.09,
+   "net": -16.83,
+   "sales": 38
   },
   "state": "ok",
   "wash_watch": {
@@ -93,12 +93,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 52.49,
-  "index": 121.03,
-  "trade": 28.67
+  "hold": 52.33,
+  "index": 120.85,
+  "trade": 23.14
  },
- "ts": "2026-10-14T13:45 ET",
+ "ts": "2026-10-14T14:00 ET",
  "vix": 16.9,
  "vix_live": true,
- "vs_baseline_pct": -8.95
+ "vs_baseline_pct": -9.1
 }
