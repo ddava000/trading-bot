@@ -272,8 +272,16 @@ def market_minutes_since(ts):
 
     This is the error class cloud and I spent 09-17 to 09-22 removing from the
     experiment downtime figure - counting closed-market time as downtime - reappearing
-    in my own alert path a fortnight later. Same market gate both arms obey
-    (bot.check_market: weekdays 09:45-15:55 ET, bot.MARKET_HOLIDAYS excluded).
+    in my own alert path a fortnight later. Same market gate both arms obey, asked for
+    per DATE rather than rebuilt here: bot.session_bounds (weekdays 09:45-15:55 ET,
+    09:45-12:55 on bot.EARLY_CLOSE half-days, bot.MARKET_HOLIDAYS excluded).
+
+    2026-10-14: the window used to be two literals in the loop below. On the three
+    1 pm closes (2026-11-27, 2026-12-24, 2027-11-26) that read 12:55-15:55 as three
+    hours of silence, so the 60-minute backstop in _maybe_alert_broker would have
+    emailed Devon a false outage at about 13:55 on each of them, and report_downtime
+    would have billed the same minutes as blindness. One duplicated constant, three
+    wrong consumers - which is the argument for asking the shared helper instead.
     """
     if not ts:
         return 0
@@ -283,10 +291,14 @@ def market_minutes_since(ts):
         return 0
     total, day = 0.0, start
     while day.date() <= end.date():
-        if day.weekday() < 5 and day.strftime("%Y-%m-%d") not in bot.MARKET_HOLIDAYS:
-            o = day.replace(hour=9, minute=45, second=0, microsecond=0)
-            c = day.replace(hour=15, minute=55, second=0, microsecond=0)
-            lo, hi = max(start, o), min(end, c)
+        # bot.session_bounds is the ONE place the window lives, weekday, holiday and
+        # early close together, so this cannot model a half-day correctly while
+        # check_market or the ARM A WATCH models it differently. It returns None on a
+        # weekend or a MARKET_HOLIDAYS date, which is why the explicit weekday and
+        # holiday test that used to be here is gone rather than merely redundant.
+        b = bot.session_bounds(day)
+        if b:
+            lo, hi = max(start, b[0]), min(end, b[1])
             if hi > lo:
                 total += (hi - lo).total_seconds() / 60
         day = (day + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -1005,6 +1017,52 @@ def email_trades(res, placed, led):
         log(f"reported {ok}/{len(orders)} fills")
 
 
+EQUITY_JUMP_MAX = 3.00      # dollars of broker/computed gap to substitute unchecked
+EQUITY_AGREE_TOL = 0.50     # two consecutive broker readings this close corroborate
+
+
+def _pick_equity(computed, broker, prev_broker, last_published):
+    """Which number to publish when the broker's total and the computed equity disagree.
+
+    Returns (value, held_back) - held_back is the rejected candidate, or None.
+
+    A SMALL gap substitutes as it always did: buying power legitimately excludes
+    unsettled sale proceeds and a pending deposit, so broker total is the better figure.
+
+    A LARGE gap needs more than one reading. My first attempt asked whether anything
+    could EXPLAIN the gap - a sale inside the settlement window, a recent deposit - and
+    that discriminator is wrong, which the real incident proves: on 2026-10-13 a deposit
+    had been recorded the day before, so the bad $10 reading was perfectly "explicable",
+    and it was still wrong. What actually separates a real settlement gap from a bad
+    sample is PERSISTENCE. A real one is still there at the next reconcile; that $10 was
+    gone in fifteen minutes.
+
+    So: two consecutive broker readings that agree are believed, whatever the gap, which
+    is what lets a genuine step change (a large deposit, a wind-down) be adopted on the
+    pass after it appears. Failing that, prefer CONTINUITY - whichever candidate is
+    closer to the equity already published - because an account's value does not move 3%
+    in fifteen minutes without a cause, while a glitched field can.
+    That tie-break is what makes this safe in BOTH directions, and the direction that
+    already cost real credibility is the low one: after the 2026-08-24 wind-down, broker
+    total was ~232 and computed ~124, and publishing computed was a phantom 48% crash.
+    Under this rule that case substitutes immediately - the reading before it also said
+    ~232, so it corroborates - rather than waiting a cycle. Checked in the tests.
+    """
+    if computed is None:
+        return broker, None
+    if abs(float(broker) - float(computed)) <= EQUITY_JUMP_MAX:
+        return broker, None
+    if prev_broker is not None and abs(float(broker) - float(prev_broker)) <= EQUITY_AGREE_TOL:
+        return broker, None                      # persistent, so real
+    if last_published is None:
+        return computed, float(broker)           # nothing to anchor to: trust the arithmetic
+    near_broker = abs(float(broker) - float(last_published))
+    near_computed = abs(float(computed) - float(last_published))
+    if near_broker <= near_computed:
+        return broker, None
+    return computed, float(broker)
+
+
 def persist(led, res, placed):
     """Write the ledger locally; commit the shareable log/status for monitoring."""
     global _last_push_at, _last_push_material
@@ -1016,13 +1074,44 @@ def persist(led, res, placed):
     # while the account actually held ~$232: a phantom 48% crash, in the very file
     # cloud and audit measure Arm B from. Publish the broker's total instead, and
     # say so when they differ, so a settlement artifact is never read as a loss.
+    # 2026-10-14: the substitution above is right and it trusted ONE reading without
+    # limit. On 2026-10-13 a single reconcile returned a broker total about $10 high and
+    # this file published equity 318.60 at 13:36 and 13:51 against a true ~308.4 - 3.2%
+    # on a $308 book, committed twice, corrected by the next reconcile. The benchmark
+    # index moved 0.03% that day, so none of it was a move. It was also impossible on its
+    # face: the field is labelled "unsettled", unsettled proceeds require a SALE, and the
+    # last sale was 2026-08-24. A label that contradicts itself is data about the bug.
+    #
+    # So the substitution now has to be EXPLICABLE or CORROBORATED, and both tests are
+    # cheap. A big gap is accepted when something could have caused it (an unsettled sale
+    # inside the settlement window, or a deposit recorded recently), or when a second
+    # reconcile agrees with the first. One sample, no cause, no corroboration: keep the
+    # computed figure and say so loudly in the log. Guarding BOTH directions matters -
+    # the 08-24 case was this field reading LOW, and nothing here may regress that.
     bt, bt_at = led.get("broker_total_value"), led.get("broker_total_at") or 0
     if bt and (time.time() - bt_at) < RECONCILE_MAX_AGE_SEC * 2:
         computed = snap.get("equity")
-        snap["equity"] = bt
-        if computed is not None and abs(float(computed) - float(bt)) > 0.50:
+        # The previous reading and the previously PUBLISHED equity are the two anchors
+        # _pick_equity needs. The reading lives on the LEDGER, because a module global
+        # would lose it on exactly the restart that tends to follow a bad day - this file
+        # has lost restart-critical state in a global five times. Remember the raw reading
+        # whether or not it was used, or a persistent gap could never corroborate itself.
+        prev_broker = led.get("broker_total_prev")
+        last_published = (_load(STATUS_F, {}) or {}).get("equity")
+        value, held_back = _pick_equity(computed, bt, prev_broker, last_published)
+        led["broker_total_prev"] = float(bt)
+        snap["equity"] = value
+        if held_back is not None:
+            log(f"!! broker_total_value {held_back} against computed {computed}, previous "
+                f"reading {prev_broker}, last published {last_published}: one unconfirmed "
+                f"sample moving equity more than ${EQUITY_JUMP_MAX:.2f}, so publishing "
+                f"{value} and holding it back until a reading agrees with it")
+            snap["equity_source"] = "computed (broker_total_value held back)"
+            snap["broker_total_value_held_back"] = held_back
+            snap["broker_total_value_delta"] = round(float(held_back) - float(computed), 2)
+        elif computed is not None and abs(float(value) - float(computed)) > 0.50:
             snap["equity_source"] = "broker_total_value"
-            snap["unsettled_excluded_from_buying_power"] = round(float(bt) - float(computed), 2)
+            snap["unsettled_excluded_from_buying_power"] = round(float(value) - float(computed), 2)
     snap.update({"ts": now_et().strftime("%Y-%m-%dT%H:%M"),
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
                  "holds": sorted(led.get("holds") or {}),

@@ -232,6 +232,62 @@ class DowntimeReportTests(unittest.TestCase):
         self.assertEqual(sent, [])
         self.assertTrue(any("report_downtime failed" in m for m in logged), logged)
 
+    # ---- the early closes, on a pinned clock -----------------------------------------
+
+    def _minutes(self, since, now):
+        """Real market_minutes_since with only the clock pinned. (ET naive "YYYY-MM-DD HH:MM".)"""
+        real = D.datetime
+        start = real.strptime(since, "%Y-%m-%d %H:%M").replace(tzinfo=D.bot.ET_TZ)
+        fixed = real.strptime(now, "%Y-%m-%d %H:%M").replace(tzinfo=D.bot.ET_TZ)
+
+        class At(real):
+            @classmethod
+            def now(cls, tz=None):
+                return fixed.astimezone(tz) if tz else fixed
+        with mock.patch.object(D, "datetime", At):
+            return D.market_minutes_since(start.timestamp())
+
+    def test_each_early_close_day_stops_counting_at_1255(self):
+        """The three 1 pm closes. Measured from 11:00, so the answer is 115 on a half-day.
+
+        Without this the 60-minute backstop in _maybe_alert_broker emails Devon a false
+        outage at about 13:55 on each date, and report_downtime bills the same minutes.
+        """
+        for day in sorted(D.bot.EARLY_CLOSE):
+            with self.subTest(day=day):
+                self.assertEqual(self._minutes(day + " 11:00", day + " 15:30"), 115,
+                                 "%s is a 1 pm close: 11:00-12:55 is 115 minutes" % day)
+
+    def test_an_ordinary_day_still_counts_to_1555(self):
+        """The control. A helper that returned 12:55 EVERY day would pass the test above."""
+        self.assertEqual(self._minutes("2026-11-30 11:00", "2026-11-30 17:00"), 295)
+
+    def test_the_two_differ_which_is_the_whole_point(self):
+        """Both clocks run PAST both closes, or the comparison measures the wrong thing.
+
+        My first draft pinned `now` at 15:30 for each, so the ordinary day was clipped by
+        the clock at 15:30 and the half-day by its 12:55 close: it compared a 270-minute
+        span with a 115-minute one and asserted the difference was 180. The test caught
+        it, which is the argument for the control existing at all.
+        """
+        early = self._minutes("2026-11-27 11:00", "2026-11-27 17:00")
+        ordinary = self._minutes("2026-11-30 11:00", "2026-11-30 17:00")
+        self.assertEqual((early, ordinary), (115, 295))
+        self.assertEqual(ordinary - early, 180, "a half-day is exactly three hours shorter")
+
+    def test_a_gap_straddling_an_early_close_counts_both_days_correctly(self):
+        """Why the helper had to be per-DATE: one span can cross days with different closes.
+
+        2026-11-27 is a 1 pm close, 2026-11-30 the next trading day. 11:00 to 12:55 is
+        115, plus 09:45 to 09:50 on Monday is 5.
+        """
+        self.assertEqual(self._minutes("2026-11-27 11:00", "2026-11-30 09:50"), 120)
+
+    def test_a_holiday_inside_the_span_still_counts_nothing(self):
+        """session_bounds returns None on holidays, so deleting the local check kept this."""
+        self.assertEqual(self._minutes("2026-12-24 13:30", "2026-12-26 09:45"), 0,
+                         "12-24 after its 12:55 close, 12-25 a holiday, 12-26 up to the open")
+
     # ---- the wiring, read from SOURCE ------------------------------------------------
 
     def test_the_retry_is_wired_into_the_main_loop_before_the_market_gate(self):

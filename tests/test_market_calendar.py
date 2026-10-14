@@ -231,14 +231,13 @@ class EveryConsumerAgrees(unittest.TestCase):
 
 
 class LaptopOwesIt(unittest.TestCase):
-    """rh_daemon.market_minutes_since is LAPTOP-owned and still carries its own 09:45 / 15:55 (L287-288). It feeds the daemon's
+    """rh_daemon.market_minutes_since is LAPTOP-owned and used to carry its own 09:45 / 15:55. It feeds the daemon's
     15 / 60 / 180 minute broker alerts, the downtime report's market-minute gate and the recovery log line. Left alone, a 12:55 close
     reads as 60 market minutes of silence at 13:55 and the daemon mails Devon a false outage on each early-close day.
 
-    EXPECTED FAILURE until LAPTOP BOT adopts bot.session_bounds there (asked in AGENT_MAIL 2026-10-13, before 2026-11-27). It flips
-    to "unexpected success" the moment it does: delete the marker then, in the same commit as the adoption."""
+    ADOPTED 2026-10-14 (laptop): the loop now asks bot.session_bounds per date, so this is the regression rather than the debt. The
+    marker CLOUD left here flipped to "unexpected success" on the adoption, exactly as its note said it would, and is deleted."""
 
-    @unittest.expectedFailure
     def test_rh_daemon_market_minutes_since_stops_at_the_early_close(self):
         import rh_daemon as RD
         now = at(2026, 11, 30, 9, 50)
