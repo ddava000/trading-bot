@@ -2184,3 +2184,9 @@
 - avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
 - notes: Hot CPI selloff persists into the close with VIX ticking up to 17.0; AI/memory names still bleeding (NBIS -17.5%, SNDK -10.2%) and IWM -10.1% remains worst laggard. Inflation-driven downside dominates and cash at $29 caps new buys regardless, so holding risk-off/0.30.
 - journal: Wed 10/14 15:35: Late-day, VIX 17.0, tape still red on hot CPI. NBIS deepened to -17.5%, SNDK -10.2%, IWM -10.1% weakest; day P&L only -$6, portfolio resilient. Staying risk-off/0.30 into the close; watching for overnight stabilization and tomorrow's bank-earnings/yield reaction.
+
+### 2026-10-14T17:01 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Post-close read: hot CPI drove S&P -1%, AI/memory names led declines (NBIS -16.7%, SNDK -12.5%), IWM -10.1% in correction territory. VIX 16.9 elevated but not panicked; cash at $29 caps new buys regardless, so holding risk-off/0.30.
+- journal: Wed 10/14 17:01: Session closed red on hot CPI; VIX 16.9, day P&L only -$6 so portfolio held up well. NBIS -16.7%, SNDK -12.5%, IWM -10.1% remain weakest. Staying risk-off/0.30 overnight; watching tomorrow for yield/rate-hike reaction and bank-earnings follow-through.
