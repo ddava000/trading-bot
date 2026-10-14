@@ -861,6 +861,19 @@
    "sale": "fdb502e4-97d7-4158-9756-c122eb56448f",
    "symbol": "HUM",
    "term": "ST"
+  },
+  {
+   "basis": 7.6,
+   "close_date": "2026-10-14",
+   "close_fill": 97,
+   "gain": -0.535302,
+   "open_date": "2026-10-08",
+   "open_fill": 91,
+   "proceeds": 7.064698,
+   "qty": 0.161235573,
+   "sale": "4026fc36-2118-402e-a654-c2d5cf92afe9",
+   "symbol": "U",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -879,7 +892,6 @@
   "SNDK": 0.004539783,
   "SPY": 0.053798739,
   "SYNA": 0.043519347,
-  "U": 0.161235573,
   "VST": 0.035762895
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
@@ -892,19 +904,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -15.87,
-    "sales": 36,
+    "net": -16.41,
+    "sales": 37,
     "st": {
      "gains": 0.26,
-     "losses": -16.13,
-     "net": -15.87,
-     "sales": 36
+     "losses": -16.67,
+     "net": -16.41,
+     "sales": 37
     }
    }
   },
-  "fills": 97,
-  "last_fill": "2026-10-14T13:45:24.195201Z",
-  "last_sale": "2026-10-13",
+  "fills": 98,
+  "last_fill": "2026-10-14T13:52:38.022606Z",
+  "last_sale": "2026-10-14",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -912,15 +924,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -15.87,
-  "reconciliation_residual": -0.0319,
-  "sales": 36,
+  "net": -16.41,
+  "reconciliation_residual": -0.0466,
+  "sales": 37,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -16.13,
-   "net": -15.87,
-   "sales": 36
+   "losses": -16.67,
+   "net": -16.41,
+   "sales": 37
   },
   "state": "ok",
   "wash_watch": {
