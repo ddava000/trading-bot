@@ -70,17 +70,20 @@ class OneReadingPersistedTwice(unittest.TestCase):
         self.assertEqual(second["equity"], 358.55)
         self.assertNotIn("broker_total_value_held_back", second)
 
-    @unittest.expectedFailure
     def test_the_same_cached_reading_on_the_next_cycle_is_not_corroboration(self):
-        """FINDING (cloud, 2026-10-14): no new reconcile, the SAME broker_total_value and the SAME broker_total_at, one persist cycle later.
-        The remembered 'previous reading' is now that very reading, so it corroborates itself and 318.60 is published, as on 10-13."""
+        """WAS cloud's FINDING of 2026-10-14, now the regression against it.
+
+        No new reconcile, the SAME broker_total_value and the SAME broker_total_at, one persist cycle
+        later. The remembered 'previous reading' used to be that very reading, so it corroborated
+        itself and 318.60 was published, exactly as on 10-13. FIXED by laptop the same day: persist()
+        rotates prev only when broker_total_at changes, so corroboration needs two DISTINCT
+        reconciles. expectedFailure removed once both of these flipped to unexpected success."""
         led = ledger(318.60, prev=308.91)
         first = persist_once(led, computed=308.67, published_before=308.91)
         self.assertEqual(first["equity"], 308.67)
         second = persist_once(led, computed=308.53, published_before=first["equity"])
         self.assertEqual(second["equity"], 308.53, "the one bad reading corroborated itself and was published: %r" % (second.get("equity"),))
 
-    @unittest.expectedFailure
     def test_it_stays_held_back_across_several_cycles_until_a_reconcile_says_otherwise(self):
         led = ledger(318.60, prev=308.91)
         published = 308.91

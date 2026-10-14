@@ -1037,11 +1037,15 @@ def _pick_equity(computed, broker, prev_broker, last_published):
     sample is PERSISTENCE. A real one is still there at the next reconcile; that $10 was
     gone in fifteen minutes.
 
-    So: two consecutive broker readings that agree are believed, whatever the gap, which
-    is what lets a genuine step change (a large deposit, a wind-down) be adopted on the
-    pass after it appears. Failing that, prefer CONTINUITY - whichever candidate is
-    closer to the equity already published - because an account's value does not move 3%
-    in fifteen minutes without a cause, while a glitched field can.
+    So: two broker readings from DISTINCT reconciles that agree are believed, whatever
+    the gap, which is what lets a genuine step change (a large deposit, a wind-down) be
+    adopted. Distinct matters: persist() runs every cycle while a reconcile refreshes the
+    reading at most every RECONCILE_MAX_AGE_SEC, so a cached value would otherwise
+    corroborate itself one cycle later - see the rotation in persist(). The cost is that
+    a genuine step is published on the next RECONCILE, up to half an hour, not the next
+    pass. Failing that, prefer CONTINUITY - whichever candidate is closer to the equity
+    already published - because an account's value does not move 3% in fifteen minutes
+    without a cause, while a glitched field can.
     That tie-break is what makes this safe in BOTH directions, and the direction that
     already cost real credibility is the low one: after the 2026-08-24 wind-down, broker
     total was ~232 and computed ~124, and publishing computed was a phantom 48% crash.
@@ -1096,10 +1100,24 @@ def persist(led, res, placed):
         # would lose it on exactly the restart that tends to follow a bad day - this file
         # has lost restart-critical state in a global five times. Remember the raw reading
         # whether or not it was used, or a persistent gap could never corroborate itself.
+        # ROTATE ONLY ON A NEW RECONCILE. persist() runs every cycle but a reconcile
+        # refreshes broker_total_value at most every RECONCILE_MAX_AGE_SEC, so the same
+        # reading is persisted several cycles running. The first version of this stored
+        # prev on EVERY call, which made a cached reading corroborate ITSELF on the next
+        # cycle - the guard held 2026-10-13's glitch back once and then published it.
+        # Cloud reproduced that with the real persist() and proved the cadence from the
+        # incident's own samples: 318.60 at both 13:36 and 13:51, same broker total,
+        # deltas 9.93 then 10.07, because the computed figure moved and the reading did
+        # not. Keying the rotation on broker_total_at makes corroboration mean what it
+        # says: two DISTINCT reconciles.
+        seen_at = led.get("broker_total_seen_at")
+        if seen_at != bt_at:
+            led["broker_total_prev"] = led.get("broker_total_last")
+            led["broker_total_last"] = float(bt)
+            led["broker_total_seen_at"] = bt_at
         prev_broker = led.get("broker_total_prev")
         last_published = (_load(STATUS_F, {}) or {}).get("equity")
         value, held_back = _pick_equity(computed, bt, prev_broker, last_published)
-        led["broker_total_prev"] = float(bt)
         snap["equity"] = value
         if held_back is not None:
             log(f"!! broker_total_value {held_back} against computed {computed}, previous "

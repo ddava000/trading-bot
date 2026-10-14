@@ -117,11 +117,20 @@ class PersistUsesIt(unittest.TestCase):
         raise AssertionError("a test tried to write the real file %r" % path)
 
     def ledger(self, broker_total, prev=None):
+        """A ledger in STEADY STATE: `prev` is the reading from the PREVIOUS reconcile.
+
+        It is seeded as broker_total_last with an older broker_total_seen_at, because
+        that is what the live ledger holds - persist() promotes last -> prev when it sees
+        a new broker_total_at. Seeding broker_total_prev directly (as my first draft did)
+        models a state the daemon never reaches, and the rotation then discards it.
+        """
         import time
+        now = time.time()
         led = {"positions": [], "holds": {}, "orders_today": 0, "cash": 1.0,
-               "broker_total_value": broker_total, "broker_total_at": time.time()}
+               "broker_total_value": broker_total, "broker_total_at": now}
         if prev is not None:
-            led["broker_total_prev"] = prev
+            led["broker_total_last"] = prev
+            led["broker_total_seen_at"] = now - 1800      # an earlier, DISTINCT reconcile
         return led
 
     def run_persist(self, led, computed, last_published):
@@ -139,11 +148,30 @@ class PersistUsesIt(unittest.TestCase):
         self.assertEqual(snap.get("broker_total_value_held_back"), 318.60)
         self.assertIn("held back", snap.get("equity_source", ""))
 
-    def test_persist_remembers_the_reading_even_when_it_rejected_it(self):
-        """Or a persistent gap could never corroborate itself on the next pass."""
+    def test_persist_remembers_a_rejected_reading_but_only_as_the_LATEST_not_the_PREVIOUS(self):
+        """This test used to pin the bug it was meant to prevent.
+
+        It asserted broker_total_prev == 318.60 immediately after the persist that
+        REJECTED 318.60 - which is exactly what let the cached reading corroborate itself
+        on the next cycle and publish the glitch (cloud's cross-audit, 2026-10-14, with
+        the real persist()). The reading must still be remembered, or a genuine gap could
+        never corroborate itself; it just belongs in `last`, with `prev` holding the
+        reading from the PREVIOUS reconcile. Rotation is keyed on broker_total_at.
+        """
         led = self.ledger(318.60, prev=308.91)
         self.run_persist(led, computed=308.77, last_published=308.91)
-        self.assertEqual(led.get("broker_total_prev"), 318.60)
+        self.assertEqual(led.get("broker_total_last"), 318.60, "kept, as the latest reading")
+        self.assertEqual(led.get("broker_total_prev"), 308.91,
+                         "but NOT promoted to 'previous' - that is self-corroboration")
+
+    def test_a_re_persisted_reading_does_not_rotate_anything(self):
+        """The cadence that caused it: persist() per cycle, reconcile at most per 30 min."""
+        led = self.ledger(318.60, prev=308.91)
+        self.run_persist(led, computed=308.77, last_published=308.91)
+        snapshot = (led.get("broker_total_prev"), led.get("broker_total_last"))
+        second = self.run_persist(led, computed=308.53, last_published=308.77)
+        self.assertEqual((led.get("broker_total_prev"), led.get("broker_total_last")), snapshot)
+        self.assertEqual(second.get("equity"), 308.53, "still held back on the second cycle")
 
     def test_persist_substitutes_and_labels_a_normal_settlement_gap(self):
         led = self.ledger(232.00, prev=232.00)
