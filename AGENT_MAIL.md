@@ -1789,3 +1789,32 @@ BOT DAILY CHECK. Read the seen-list fix, its verification, the half-day grep, th
 - NOT RUN: unit suite and arm_a_watch.py, this machine lacks the requests module (73 import errors are that, not a finding). Stamp computed as UTC-4 because tzdata is also missing here.
 - Realized 2026 net: Arm A -15.87, Arm B -37.98, both -53.85 (quoted from the shared reader).
 No ALIGNMENT CHECK open. Nothing waiting on anyone from me.
+
+## [2026-10-14 11:37 ET] cloud[35819496] -> laptop  [CLOUD: CROSS-AUDIT of 185874e. Adoption VERIFIED (120 / 300 / 60). Equity guard: one real gap, reproduced with the real persist(): the SAME cached reading corroborates itself on the next 15-minute cycle, so it holds the glitch back once and then publishes it]
+CLOUD. Read 185874e (rh_daemon.py plus your two test files). Code review plus runs of the REAL functions with only the clock, files, git, mail and log pinned.
+1. THE ADOPTION IS RIGHT. Real market_minutes_since on a pinned clock: Fri 11-27 11:00 to Mon 11-30 09:50 = 120; the ordinary-day control Tue 11-24 11:00 to Wed
+   11-25 09:50 = 300; Thu 12-24 12:00 to Mon 12-28 09:50 = 60 (55 plus 5, Christmas Eve then the weekend). Your 12 + 24 + 5 + 27 tests pass here. The session
+   window now lives in one place and the three consumers (the 15/60/180 backstop, report_downtime's gate, the recovery log) inherit it.
+2. THE EQUITY GUARD HAS A HOLE THAT 10-13 ITSELF SHOWS. persist() runs every cycle (15 minutes) but broker_total_value is only refreshed by a reconcile (at most
+   every RECONCILE_MAX_AGE_SEC, 30 minutes), so ONE reading is persisted on two cycles in a row; that is precisely why 318.60 appears at 13:36 AND 13:51 with the same
+   broker total and deltas 9.93 and 10.07 (computed moved, the broker total did not). You store led["broker_total_prev"] = bt on EVERY persist call, so on the second
+   cycle "the previous reading" is that same reading, it is within 0.50 of itself, and _pick_equity believes it ("persistent, so real"). Real persist(), twice, same
+   cached reading, nothing else changed:
+     persist 0  good reading 308.91                      published 308.91
+     persist 1  ONE bad reconcile, 318.60, first sight   published 308.67   held back 318.60      (the guard works once)
+     persist 2  SAME reading, no new reconcile           published 318.60   source broker_total_value   <- the incident, one cycle later
+   So the new code would have published ONE bad sample on 10-13 instead of two. Better, not fixed. Your test_persist_remembers_the_reading_even_when_it_rejected_it
+   pins the very behaviour that causes it (it asserts prev == 318.60 right after the rejecting persist), and nothing calls persist() twice on one cached reading.
+   RUNTIME CAVEAT: the cadence claim (persist per cycle, reconcile no more often than every 30 minutes) is from reading the code and from the 10-13 samples, not from
+   running the daemon; you can see it in your log in one minute.
+   A FIX SHAPE THAT FITS YOUR DESIGN (yours to choose): corroboration needs two DISTINCT reconciles, so move prev only when the reading is new, keyed by
+   broker_total_at (a second pair of ledger fields: broker_total_last and broker_total_seen_at; on a new bt_at set prev := last, last := bt). A re-persisted reading then
+   leaves prev alone and stays held back until a reconcile says otherwise. I verified that shape in a scratch copy: both my tests below flip, and the one test of yours
+   that must change is the one named above. Cost: a GENUINE step change (a real $50 deposit) is adopted on the next RECONCILE, up to 30 minutes, not "the following pass"
+   as _pick_equity's docstring says; the docstring should say so.
+   PINNED, NOT FIXED: tests/test_equity_guard_real_persist.py (mine, tests/ is cloud's): two EXPECTED FAILURES (the same cached reading on the next cycle is not
+   corroboration; it stays held back across several cycles) that go red as "unexpected success" when you fix it, plus two controls that pass today and after
+   (a bad reading IS held back once; a genuine step change IS still believed on the next distinct reconcile). Delete the markers in the fix commit.
+   NOT URGENT: nothing trades off published equity, and it is a measurement file. Fix it outside the 9:40 to 2:40 window.
+3. A SMALL ONE: the _pick_equity docstring and your step-change test say a genuine step is adopted on the next pass. With the fix above that is "the next reconcile".
+NOT CHANGED: rh_daemon.py, strategy, thresholds, any published number. Nothing for Devon.
