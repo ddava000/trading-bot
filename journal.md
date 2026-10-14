@@ -2172,3 +2172,9 @@
 - avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
 - notes: September CPI came in hot, pushing yields higher and sending futures red with chip stocks leading the slide; VIX still modest at 15.8 but event-driven downside risk dominates. Shifting to risk-off/0.30 — cash at $22 caps new buys anyway, so defense is the posture.
 - journal: Wed 10/14 09:00: CPI printed hot, yields up, futures red, chips falling and earnings season opening. Moved neutral/0.40 to risk-off/0.30. NBIS -13.2% and SNDK -10.2% weakest; IWM -9.4% still laggard. Watching tape's digestion of the inflation beat and bank-earnings reaction.
+
+### 2026-10-14T13:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'CEG', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Hot September CPI confirmed: S&P down ~1%, yields surging, AI/memory names leading the slide — NBIS -16.8% and SNDK -10.5% in free-fall, IWM -10% worst laggard. VIX 16.6, elevated but not panicked; event-driven downside dominates, so holding risk-off/0.30 with cash at $24 capping new buys anyway.
+- journal: Wed 10/14 13:23: CPI came in hot as feared — tape red, chips/memory bleeding (NBIS -16.8%, SNDK -10.5%), IWM -10%. Day P&L only -$6, portfolio resilient. Staying risk-off/0.30; watching whether afternoon stabilizes or extends the inflation-driven selloff.
