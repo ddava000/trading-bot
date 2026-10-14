@@ -2166,3 +2166,9 @@
 - avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
 - notes: VIX calm at 15.3 after the close but September CPI lands tomorrow and bank earnings keep rolling in, so event risk dominates; Nasdaq soft on chip/memory weakness (SNDK -6.3%, NBIS -6.2%) while PLTR +11.5%/VST +13.1%/MSFT +7.8% are extended and IWM is the worst laggard (-8.1%). Cash at $22 caps new buys regardless, so posture holds neutral/0.40 into the print.
 - journal: Tue 10/13 17:59: Day flat, VIX 15.3 post-close. Chip drag persists but stabilizing; winners stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.
+
+### 2026-10-14T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: September CPI came in hot, pushing yields higher and sending futures red with chip stocks leading the slide; VIX still modest at 15.8 but event-driven downside risk dominates. Shifting to risk-off/0.30 — cash at $22 caps new buys anyway, so defense is the posture.
+- journal: Wed 10/14 09:00: CPI printed hot, yields up, futures red, chips falling and earnings season opening. Moved neutral/0.40 to risk-off/0.30. NBIS -13.2% and SNDK -10.2% weakest; IWM -9.4% still laggard. Watching tape's digestion of the inflation beat and bank-earnings reaction.
