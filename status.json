@@ -1,13 +1,13 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-14T15:00Z",
+ "as_of_utc": "2026-10-14T15:15Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-14T15:00:31+00:00",
+  "checked_at": "2026-10-14T15:15:26+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
@@ -16,22 +16,22 @@
  },
  "cash": 23.55,
  "crypto_enabled": true,
- "day_pnl": -4.36,
+ "day_pnl": -4.92,
  "earnings_guard": "unknown",
- "equity": 227.57,
+ "equity": 227.01,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.9,
-  "NBIS": -14.9,
-  "NVDA": -1.1,
-  "PLTR": 11.0,
-  "SNDK": -9.3,
-  "VST": 6.3
+  "MSFT": 6.8,
+  "NBIS": -15.5,
+  "NVDA": -1.5,
+  "PLTR": 9.8,
+  "SNDK": -10.1,
+  "VST": 6.2
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-14T15:20Z",
+ "next_expected_utc": "2026-10-14T15:35Z",
  "orders_this_run": 0,
  "plan": {
   "date": "2026-10-14",
@@ -57,7 +57,7 @@
     }
    }
   },
-  "checked_at": "2026-10-14T15:00:32+00:00",
+  "checked_at": "2026-10-14T15:15:28+00:00",
   "fills": 98,
   "last_fill": "2026-10-14T13:52:38.022606Z",
   "last_sale": "2026-10-14",
@@ -93,12 +93,12 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 53.47,
-  "index": 121.97,
-  "trade": 28.58
+  "hold": 53.15,
+  "index": 121.76,
+  "trade": 28.55
  },
- "ts": "2026-10-14T11:00 ET",
+ "ts": "2026-10-14T11:15 ET",
  "vix": 15.8,
  "vix_live": true,
- "vs_baseline_pct": -8.2
+ "vs_baseline_pct": -8.43
 }
