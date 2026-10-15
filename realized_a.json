@@ -300,6 +300,11 @@
    "qty": 0.253369023,
    "symbol": "FTRE",
    "t": "2026-10-14"
+  },
+  {
+   "qty": 0.101851287,
+   "symbol": "CTSH",
+   "t": "2026-10-15"
   }
  ],
  "closed": [
@@ -894,6 +899,7 @@
  "open": {
   "BKH": 0.077735908,
   "BRZU": 0.051386,
+  "CTSH": 0.101851287,
   "FTRE": 0.253369023,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
@@ -926,8 +932,8 @@
     }
    }
   },
-  "fills": 99,
-  "last_fill": "2026-10-14T17:46:33.587663Z",
+  "fills": 100,
+  "last_fill": "2026-10-15T13:45:20.195083Z",
   "last_sale": "2026-10-14",
   "lt": {
    "gains": 0.0,
@@ -937,7 +943,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -16.83,
-  "reconciliation_residual": -0.048,
+  "reconciliation_residual": -0.038,
   "sales": 38,
   "since": "2026-08-12",
   "st": {

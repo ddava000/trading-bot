@@ -1,40 +1,40 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-14T19:45Z",
+ "as_of_utc": "2026-10-15T13:45Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-14T19:45:25+00:00",
+  "checked_at": "2026-10-15T13:45:23+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 29.03,
+ "cash": 22.33,
  "crypto_enabled": true,
- "day_pnl": -6.55,
- "earnings_guard": "unknown",
- "equity": 225.38,
+ "day_pnl": -2.56,
+ "earnings_guard": "live",
+ "equity": 223.24,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 5.9,
-  "NBIS": -17.4,
-  "NVDA": -2.7,
-  "PLTR": 7.1,
-  "SNDK": -10.7,
-  "VST": 5.2
+  "MSFT": 6.3,
+  "NBIS": -24.3,
+  "NVDA": -4.9,
+  "PLTR": 6.3,
+  "SNDK": -17.2,
+  "VST": 3.8
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-14T20:05Z",
- "orders_this_run": 0,
+ "next_expected_utc": "2026-10-15T14:05Z",
+ "orders_this_run": 1,
  "plan": {
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "risk": 0.3,
   "stale": false
  },
@@ -57,9 +57,9 @@
     }
    }
   },
-  "checked_at": "2026-10-14T19:45:26+00:00",
-  "fills": 99,
-  "last_fill": "2026-10-14T17:46:33.587663Z",
+  "checked_at": "2026-10-15T13:45:21+00:00",
+  "fills": 100,
+  "last_fill": "2026-10-15T13:45:20.195083Z",
   "last_sale": "2026-10-14",
   "lt": {
    "gains": 0.0,
@@ -69,7 +69,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -16.83,
-  "reconciliation_residual": -0.048,
+  "reconciliation_residual": -0.038,
   "sales": 38,
   "since": "2026-08-12",
   "st": {
@@ -90,15 +90,15 @@
    }
   }
  },
- "regime": "risk-on",
+ "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 52.38,
-  "index": 121.02,
-  "trade": 22.95
+  "hold": 50.51,
+  "index": 120.6,
+  "trade": 23.1
  },
- "ts": "2026-10-14T15:45 ET",
- "vix": 16.9,
+ "ts": "2026-10-15T09:45 ET",
+ "vix": 17.5,
  "vix_live": true,
- "vs_baseline_pct": -9.09
+ "vs_baseline_pct": -9.95
 }
