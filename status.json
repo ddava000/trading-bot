@@ -1,37 +1,37 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-15T14:00Z",
+ "as_of_utc": "2026-10-15T14:15Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-15T14:00:52+00:00",
+  "checked_at": "2026-10-15T14:15:29+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 27.84,
+ "cash": 27.85,
  "crypto_enabled": true,
- "day_pnl": -3.37,
- "earnings_guard": "live",
- "equity": 222.43,
+ "day_pnl": -2.67,
+ "earnings_guard": "unknown",
+ "equity": 223.13,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.0,
-  "NVDA": -5.6,
-  "PLTR": 4.5,
-  "SNDK": -18.0,
-  "VST": 1.9
+  "MSFT": 6.1,
+  "NVDA": -5.0,
+  "PLTR": 4.8,
+  "SNDK": -17.4,
+  "VST": 1.8
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-15T14:20Z",
- "orders_this_run": 1,
+ "next_expected_utc": "2026-10-15T14:35Z",
+ "orders_this_run": 0,
  "plan": {
   "date": "2026-10-15",
   "risk": 0.3,
@@ -56,7 +56,7 @@
     }
    }
   },
-  "checked_at": "2026-10-15T14:00:36+00:00",
+  "checked_at": "2026-10-15T14:15:30+00:00",
   "fills": 102,
   "last_fill": "2026-10-15T14:00:34.229275Z",
   "last_sale": "2026-10-15",
@@ -92,12 +92,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 38.87,
-  "index": 120.34,
-  "trade": 29.8
+  "hold": 39.01,
+  "index": 120.78,
+  "trade": 35.49
  },
- "ts": "2026-10-15T10:00 ET",
- "vix": 17.4,
+ "ts": "2026-10-15T10:15 ET",
+ "vix": 17.8,
  "vix_live": true,
- "vs_baseline_pct": -10.28
+ "vs_baseline_pct": -10.0
 }
