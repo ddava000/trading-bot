@@ -2190,3 +2190,9 @@
 - avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
 - notes: Post-close read: hot CPI drove S&P -1%, AI/memory names led declines (NBIS -16.7%, SNDK -12.5%), IWM -10.1% in correction territory. VIX 16.9 elevated but not panicked; cash at $29 caps new buys regardless, so holding risk-off/0.30.
 - journal: Wed 10/14 17:01: Session closed red on hot CPI; VIX 16.9, day P&L only -$6 so portfolio held up well. NBIS -16.7%, SNDK -12.5%, IWM -10.1% remain weakest. Staying risk-off/0.30 overnight; watching tomorrow for yield/rate-hike reaction and bank-earnings follow-through.
+
+### 2026-10-15T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Second straight down day — hot wholesale inflation (PPI) adds to Wed's CPI, semiconductor sell-off continuing and S&P futures sliding; VIX ticked up to 17.5. AI/memory names still the epicenter (NBIS -20.4%, SNDK -16.5%), IWM -9.8% in correction. Inflation/tech-downside dominates and cash at $29 caps new buys anyway, so holding risk-off/0.30.
+- journal: Thu 10/15 09:00: Selloff extended to a second day on hot PPI; semis leading declines again, VIX 17.5 (up from 16.9). NBIS deepened to -20.4%, SNDK -16.5%, IWM -9.8% still laggards; day P&L only -$2 overnight. Staying risk-off/0.30; watching whether the tech/chip bleed stabilizes or accelerates into the weekend.
