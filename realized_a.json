@@ -305,6 +305,11 @@
    "qty": 0.101851287,
    "symbol": "CTSH",
    "t": "2026-10-15"
+  },
+  {
+   "qty": 0.198701484,
+   "symbol": "ARQT",
+   "t": "2026-10-15"
   }
  ],
  "closed": [
@@ -892,18 +897,31 @@
    "sale": "81eabf39-d377-4c2c-aa43-5a0c6ea9510c",
    "symbol": "CEG",
    "term": "ST"
+  },
+  {
+   "basis": 14.83,
+   "close_date": "2026-10-15",
+   "close_fill": 100,
+   "gain": -3.726975,
+   "open_date": "2026-08-27",
+   "open_fill": 21,
+   "proceeds": 11.103025,
+   "qty": 0.066354061,
+   "sale": "4ed0aa2c-4abb-4881-8189-5f6b838df07c",
+   "symbol": "NBIS",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
+  "ARQT": 0.198701484,
   "BKH": 0.077735908,
   "BRZU": 0.051386,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
-  "NBIS": 0.066354061,
   "NVDA": 0.054469495,
   "PLTR": 0.042013208,
   "QQQ": 0.058331282,
@@ -922,19 +940,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -16.83,
-    "sales": 38,
+    "net": -20.56,
+    "sales": 39,
     "st": {
      "gains": 0.26,
-     "losses": -17.09,
-     "net": -16.83,
-     "sales": 38
+     "losses": -20.82,
+     "net": -20.56,
+     "sales": 39
     }
    }
   },
-  "fills": 100,
-  "last_fill": "2026-10-15T13:45:20.195083Z",
-  "last_sale": "2026-10-14",
+  "fills": 102,
+  "last_fill": "2026-10-15T14:00:34.229275Z",
+  "last_sale": "2026-10-15",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -942,15 +960,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -16.83,
-  "reconciliation_residual": -0.038,
-  "sales": 38,
+  "net": -20.56,
+  "reconciliation_residual": -0.051,
+  "sales": 39,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -17.09,
-   "net": -16.83,
-   "sales": 38
+   "losses": -20.82,
+   "net": -20.56,
+   "sales": 39
   },
   "state": "ok",
   "wash_watch": {
