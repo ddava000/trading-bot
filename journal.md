@@ -2196,3 +2196,9 @@
 - avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
 - notes: Second straight down day — hot wholesale inflation (PPI) adds to Wed's CPI, semiconductor sell-off continuing and S&P futures sliding; VIX ticked up to 17.5. AI/memory names still the epicenter (NBIS -20.4%, SNDK -16.5%), IWM -9.8% in correction. Inflation/tech-downside dominates and cash at $29 caps new buys anyway, so holding risk-off/0.30.
 - journal: Thu 10/15 09:00: Selloff extended to a second day on hot PPI; semis leading declines again, VIX 17.5 (up from 16.9). NBIS deepened to -20.4%, SNDK -16.5%, IWM -9.8% still laggards; day P&L only -$2 overnight. Staying risk-off/0.30; watching whether the tech/chip bleed stabilizes or accelerates into the weekend.
+
+### 2026-10-15T13:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'BRZU', 'IWM', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'CTSH']
+- notes: Rotation out of tech on hot CPI/energy-driven inflation: Dow +400 while Nasdaq slides and AI/semis keep bleeding (SNDK -15.1%, NVDA -4.3%, BRZU -4.9%). VIX eased to 16.9 but tape is bifurcated and cash at $28 caps new buys, so holding risk-off/0.30.
+- journal: Thu 10/15 13:12: Tape split — Dow up on yield drop/rotation, Nasdaq down as tech/AI sells off. VIX back to 16.9 (from 17.5 AM). SNDK -15.1% worst, IWM -9.4% still in correction; day P&L only -$2, portfolio resilient. Staying risk-off/0.30; watching whether rotation into value/Dow persists or tech bleed drags the broad index lower.
