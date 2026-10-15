@@ -910,6 +910,19 @@
    "sale": "4ed0aa2c-4abb-4881-8189-5f6b838df07c",
    "symbol": "NBIS",
    "term": "ST"
+  },
+  {
+   "basis": 6.87,
+   "close_date": "2026-10-15",
+   "close_fill": 102,
+   "gain": -0.525884,
+   "open_date": "2026-10-05",
+   "open_fill": 83,
+   "proceeds": 6.344116,
+   "qty": 0.051386,
+   "sale": "12e9d9fd-d4c6-4bff-82e6-4b0d705a636f",
+   "symbol": "BRZU",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -917,7 +930,6 @@
  "open": {
   "ARQT": 0.198701484,
   "BKH": 0.077735908,
-  "BRZU": 0.051386,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
   "IWM": 0.137264116,
@@ -940,18 +952,18 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -20.56,
-    "sales": 39,
+    "net": -21.09,
+    "sales": 40,
     "st": {
      "gains": 0.26,
-     "losses": -20.82,
-     "net": -20.56,
-     "sales": 39
+     "losses": -21.35,
+     "net": -21.09,
+     "sales": 40
     }
    }
   },
-  "fills": 102,
-  "last_fill": "2026-10-15T14:00:34.229275Z",
+  "fills": 103,
+  "last_fill": "2026-10-15T19:33:42.943441Z",
   "last_sale": "2026-10-15",
   "lt": {
    "gains": 0.0,
@@ -960,15 +972,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -20.56,
-  "reconciliation_residual": -0.051,
-  "sales": 39,
+  "net": -21.09,
+  "reconciliation_residual": -0.0551,
+  "sales": 40,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -20.82,
-   "net": -20.56,
-   "sales": 39
+   "losses": -21.35,
+   "net": -21.09,
+   "sales": 40
   },
   "state": "ok",
   "wash_watch": {
