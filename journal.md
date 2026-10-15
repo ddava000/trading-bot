@@ -2202,3 +2202,9 @@
 - avoid: ['SNDK', 'NVDA', 'BRZU', 'IWM', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'CTSH']
 - notes: Rotation out of tech on hot CPI/energy-driven inflation: Dow +400 while Nasdaq slides and AI/semis keep bleeding (SNDK -15.1%, NVDA -4.3%, BRZU -4.9%). VIX eased to 16.9 but tape is bifurcated and cash at $28 caps new buys, so holding risk-off/0.30.
 - journal: Thu 10/15 13:12: Tape split — Dow up on yield drop/rotation, Nasdaq down as tech/AI sells off. VIX back to 16.9 (from 17.5 AM). SNDK -15.1% worst, IWM -9.4% still in correction; day P&L only -$2, portfolio resilient. Staying risk-off/0.30; watching whether rotation into value/Dow persists or tech bleed drags the broad index lower.
+
+### 2026-10-15T15:18 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'BRZU', 'IWM', 'NVDA', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: VIX eased to 16.5 and Dow +500 as the market shakes off hot CPI via rotation into value, but AI/semis still bleeding (SNDK -13.5%, BRZU -6.0%, IWM -8.9%). With only $28 cash and <45 min to close, holding risk-off/0.30 and avoiding the weak-tech laggards.
+- journal: Thu 10/15 15:18: Tape firming into the close — Dow +500, VIX down to 16.5 from 16.9, QQQ/SPY roughly flat as rotation holds. SNDK worst at -13.5%, IWM -8.9% still in correction; day P&L only -$1, portfolio resilient. Staying risk-off/0.30; watching for overnight stabilization and bank-earnings/yield reaction into tomorrow.","journal_entry":"Thu 10/15 15:18: Dow +500 into close, VIX 16.5, rotation out of tech persisting; SNDK -13.5% and IWM -8.9% laggards. Portfolio resilient (P&L -$1). Holding risk-off/0.30 into close.
