@@ -310,6 +310,11 @@
    "qty": 0.198701484,
    "symbol": "ARQT",
    "t": "2026-10-15"
+  },
+  {
+   "qty": 0.03993923,
+   "symbol": "HONA",
+   "t": "2026-10-16"
   }
  ],
  "closed": [
@@ -932,6 +937,7 @@
   "BKH": 0.077735908,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
+  "HONA": 0.03993923,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
   "NVDA": 0.054469495,
@@ -962,8 +968,8 @@
     }
    }
   },
-  "fills": 103,
-  "last_fill": "2026-10-15T19:33:42.943441Z",
+  "fills": 104,
+  "last_fill": "2026-10-16T13:45:23.085219Z",
   "last_sale": "2026-10-15",
   "lt": {
    "gains": 0.0,
@@ -973,7 +979,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -21.09,
-  "reconciliation_residual": -0.0551,
+  "reconciliation_residual": -0.0451,
   "sales": 40,
   "since": "2026-08-12",
   "st": {
