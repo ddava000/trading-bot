@@ -2226,3 +2226,9 @@
 - avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST'] | favor: ['SPY', 'QQQ', 'CTSH']
 - notes: Midday Friday the tape stays volatile and bifurcated after hot September CPI revived Fed rate-hike odds; AI/semis keep bleeding (SNDK -16.1%, NVDA -4.6%, IWM -10.1% deepening correction). VIX ticked up to 17.3 and with only $21 cash I'm holding risk-off/0.30.
 - journal: Fri 10/16 12:48: VIX up to 17.3 from 16.0; IWM worsened to -10.1% and SNDK -16.1% — small-cap/memory still leading declines while MSFT +4.8% holds. Day P&L -$3, portfolio stable. Staying risk-off/0.30; watching whether indices crack below midday lows into the weekend.
+
+### 2026-10-16T14:54 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST', 'QQQ'] | favor: ['SPY', 'CTSH']
+- notes: Late Friday the tape is deteriorating — Nasdaq down ~2% for its worst week since June, VIX up to 20.7, oil rising and hot CPI keeping Fed rate-hike odds alive; SNDK -17% and IWM -10.4% remain in freefall. With only $21 cash, an ugly into-the-weekend tape, and headlines of hidden market risk building, I'm firmly risk-off/0.30.
+- journal: Fri 10/16 14:54: VIX jumped to 20.7 (from 17.3) as Nasdaq -2% heads for worst week since June; SNDK -17%, IWM -10.4% deepening, NVDA -5.7%. Day P&L -$4, portfolio holding up. Staying risk-off/0.30 into the weekend close; watching for a late-day flush or stabilization and gap risk Monday.
