@@ -1,13 +1,15 @@
 {
- "arm_a_watch_at": "2026-10-15T15:52",
+ "arm_a_watch_at": "2026-10-16T09:45",
  "dry": false,
- "equity": 305.52,
+ "equity": 305.2,
  "held": [
   "IWM",
   "QQQ",
   "SPY"
  ],
+ "hold": 0,
  "holds": [],
+ "index": 302.88,
  "orders_today": 0,
  "positions": {
   "IWM": 0.3712,
@@ -71,5 +73,9 @@
    }
   }
  },
- "ts": "2026-10-15T15:53"
+ "regime": "risk-off",
+ "risk": 0.3,
+ "settled": 2.28,
+ "trade": 0.0,
+ "ts": "2026-10-16T09:45"
 }
