@@ -1,37 +1,37 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-16T14:00Z",
+ "as_of_utc": "2026-10-16T14:15Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-16T14:00:41+00:00",
+  "checked_at": "2026-10-16T14:15:23+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 20.73,
+ "cash": 20.74,
  "crypto_enabled": true,
- "day_pnl": -1.15,
- "earnings_guard": "live",
- "equity": 224.07,
+ "day_pnl": -1.23,
+ "earnings_guard": "unknown",
+ "equity": 223.99,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.5,
-  "NVDA": -4.7,
-  "PLTR": 3.7,
-  "SNDK": -16.1,
-  "VST": 7.2
+  "MSFT": 6.4,
+  "NVDA": -4.6,
+  "PLTR": 5.0,
+  "SNDK": -15.6,
+  "VST": 6.8
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-16T14:20Z",
- "orders_this_run": 1,
+ "next_expected_utc": "2026-10-16T14:35Z",
+ "orders_this_run": 0,
  "plan": {
   "date": "2026-10-16",
   "risk": 0.3,
@@ -56,7 +56,7 @@
     }
    }
   },
-  "checked_at": "2026-10-16T14:00:39+00:00",
+  "checked_at": "2026-10-16T14:15:24+00:00",
   "fills": 105,
   "last_fill": "2026-10-16T14:00:37.256425Z",
   "last_sale": "2026-10-15",
@@ -92,12 +92,12 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 39.36,
-  "index": 121.28,
-  "trade": 35.98
+  "hold": 39.49,
+  "index": 121.29,
+  "trade": 42.47
  },
- "ts": "2026-10-16T10:00 ET",
+ "ts": "2026-10-16T10:15 ET",
  "vix": 15.9,
  "vix_live": true,
- "vs_baseline_pct": -9.62
+ "vs_baseline_pct": -9.65
 }
