@@ -315,6 +315,11 @@
    "qty": 0.03993923,
    "symbol": "HONA",
    "t": "2026-10-16"
+  },
+  {
+   "qty": 0.119971392,
+   "symbol": "ARXS",
+   "t": "2026-10-16"
   }
  ],
  "closed": [
@@ -934,6 +939,7 @@
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
   "ARQT": 0.198701484,
+  "ARXS": 0.119971392,
   "BKH": 0.077735908,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
@@ -968,8 +974,8 @@
     }
    }
   },
-  "fills": 104,
-  "last_fill": "2026-10-16T13:45:23.085219Z",
+  "fills": 105,
+  "last_fill": "2026-10-16T14:00:37.256425Z",
   "last_sale": "2026-10-15",
   "lt": {
    "gains": 0.0,

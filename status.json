@@ -1,36 +1,36 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-16T13:45Z",
+ "as_of_utc": "2026-10-16T14:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-16T13:45:26+00:00",
+  "checked_at": "2026-10-16T14:00:41+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 27.45,
+ "cash": 20.73,
  "crypto_enabled": true,
- "day_pnl": -0.52,
+ "day_pnl": -1.15,
  "earnings_guard": "live",
- "equity": 224.7,
+ "equity": 224.07,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.4,
+  "MSFT": 6.5,
   "NVDA": -4.7,
-  "PLTR": 5.5,
-  "SNDK": -14.6,
-  "VST": 6.6
+  "PLTR": 3.7,
+  "SNDK": -16.1,
+  "VST": 7.2
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-16T14:05Z",
+ "next_expected_utc": "2026-10-16T14:20Z",
  "orders_this_run": 1,
  "plan": {
   "date": "2026-10-16",
@@ -56,9 +56,9 @@
     }
    }
   },
-  "checked_at": "2026-10-16T13:45:24+00:00",
-  "fills": 104,
-  "last_fill": "2026-10-16T13:45:23.085219Z",
+  "checked_at": "2026-10-16T14:00:39+00:00",
+  "fills": 105,
+  "last_fill": "2026-10-16T14:00:37.256425Z",
   "last_sale": "2026-10-15",
   "lt": {
    "gains": 0.0,
@@ -92,12 +92,12 @@
  "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 39.58,
-  "index": 121.57,
-  "trade": 29.36
+  "hold": 39.36,
+  "index": 121.28,
+  "trade": 35.98
  },
- "ts": "2026-10-16T09:45 ET",
+ "ts": "2026-10-16T10:00 ET",
  "vix": 15.9,
  "vix_live": true,
- "vs_baseline_pct": -9.36
+ "vs_baseline_pct": -9.62
 }
