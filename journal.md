@@ -2214,3 +2214,9 @@
 - avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'QQQ', 'CTSH']
 - notes: At the close, Dow finished +550 on rotation out of AI/tech after hot CPI/PPI, but semis/memory still bleeding (SNDK -12.1%, NVDA -4%) and IWM -8.7% in correction. VIX calm at 16.5 and day P&L only -$1, but bifurcated tape and $34 cash keep me risk-off/0.30.
 - journal: Thu 10/15 16:35: Session closed — Dow +550 on value rotation, Nasdaq/AI weak; VIX 16.5. SNDK -12.1% worst, IWM still in correction; portfolio resilient at -$1. Holding risk-off/0.30; watching overnight stabilization, bank earnings and yield/inflation follow-through into Friday.
+
+### 2026-10-16T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'VST', 'ARQT', 'FTRE', 'BKH', 'MSFT'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: Hot September CPI has a Fed rate hike back on the table and the tape is still bifurcated — Dow up on rotation into healthcare/value while AI/semis bleed (SNDK -14.6%, NVDA -4.4%, IWM -8.6% in correction). VIX calm at 16.0 but event/rate risk plus only $34 cash keep me risk-off/0.30; MSFT avoided ahead of earnings.
+- journal: Fri 10/16 09:00: Rotation-out-of-AI theme persists into Friday; hot CPI revives rate-hike odds. SNDK -14.6% worst, IWM still in correction, NVDA weak. MSFT earnings approaching — avoiding. Holding risk-off/0.30, watching yields and whether value rotation holds or broad index cracks.
