@@ -87,12 +87,19 @@ class WhoGetsNamed(Repo):
         self.assertEqual(posts[0].splitlines()[0], "*Have CLOUD check mail.*")
 
     def test_each_wakeable_session_is_named_by_its_own_name(self):
-        for to, name in (("cloud[daily]", "BOT DAILY CHECK"), ("laptop[daily]", "LAPTOP BOT DAILY CHECK"),
-                         ("laptop", "LAPTOP BOT")):
+        for to, name in (("cloud", "CLOUD"), ("laptop", "LAPTOP BOT")):
             with self.subTest(to=to):
                 self.setUp()
                 _, posts = self.notify_for(e("2026-10-01 11:00", "audit", to, "x"))
                 self.assertEqual(posts[0].splitlines()[0], "*Have %s check mail.*" % name)
+
+    def test_mail_to_a_retired_daily_check_never_asks_devon_to_wake_it(self):
+        """Retired 2026-10-17. The old behaviour paged him with 'Have BOT DAILY CHECK check mail' for a session that no longer runs."""
+        for to, name in (("cloud[daily]", "BOT DAILY CHECK"), ("laptop[daily]", "LAPTOP BOT DAILY CHECK")):
+            with self.subTest(to=to):
+                self.setUp()
+                _, posts = self.notify_for(e("2026-10-01 11:00", "audit", to, "x"))
+                self.assertEqual(posts, [])
 
     def test_mail_to_the_audit_alone_wakes_nobody_and_posts_nothing(self):
         rc, posts = self.notify_for(e("2026-10-01 11:00", "laptop", "audit", "for sunday"))
@@ -124,7 +131,7 @@ class AlignmentChecks(Repo):
         _, posts = self.notify_for(e("2026-10-01 17:00", "cloud[35819496]", "all", "ALIGNMENT CHECK 2026-10-01: reply"))
         text = posts[0]
         self.assertEqual(text.splitlines()[0], "*Have LAPTOP BOT check mail.*")
-        self.assertIn("Still to confirm (4 of 5):", text)
+        self.assertIn("Still to confirm (2 of 3):", text)
         self.assertIn("- LAPTOP BOT: Devon says 'check mail' to LAPTOP BOT", text)
         self.assertIn("- BOT WEEKLY AUDIT: automatic: it reads mail itself every Sunday", text)
 
@@ -134,7 +141,7 @@ class AlignmentChecks(Repo):
         self.run_notify(base, tip)
         self.assertEqual(len(self.posts), 1)
         self.assertFalse(self.posts[0].startswith("*Have"), self.posts[0])      # a confirmation wakes nobody
-        self.assertIn("Still to confirm (3 of 5):", self.posts[0])
+        self.assertIn("Still to confirm (1 of 3):", self.posts[0])
         self.assertNotIn("- LAPTOP BOT:", self.posts[0])
 
     def test_a_reply_addressed_to_all_does_not_ping_the_other_interactive_session_either(self):
@@ -143,14 +150,12 @@ class AlignmentChecks(Repo):
         self.run_notify(base, tip)
         self.assertNotIn("Have CLOUD check mail", self.posts[0])
 
-    def test_all_five_confirmed_says_so(self):
+    def test_all_active_sessions_confirmed_says_so_and_the_retired_daily_checks_are_not_waited_on(self):
         base = self.commit(e("2026-10-01 17:00", "cloud[35819496]", "all", "ALIGNMENT CHECK 2026-10-01")
-                           + e("2026-10-01 17:01", "cloud[daily]", "all", "ALIGNED: BOT DAILY CHECK")
-                           + e("2026-10-01 17:02", "laptop[daily]", "all", "ALIGNED: LAPTOP BOT DAILY CHECK")
                            + e("2026-10-01 17:03", "audit", "all", "ALIGNED: BOT WEEKLY AUDIT"), first=True)
         tip = self.commit(e("2026-10-01 17:05", "laptop", "all", "ALIGNED: LAPTOP BOT"))
         self.run_notify(base, tip)
-        self.assertIn("All five sessions have confirmed ALIGNED.", self.posts[0])
+        self.assertIn("All 3 active sessions have confirmed ALIGNED.", self.posts[0])
 
 
 class FailureIsLoud(Repo):

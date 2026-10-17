@@ -103,13 +103,36 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(M.display(M.name_key("audit", None)), "BOT WEEKLY AUDIT")
 
     def test_mail_addressed_to_each_wakeable_session_names_that_session(self):
-        for to, name in (("cloud", "CLOUD"), ("cloud[daily]", "BOT DAILY CHECK"),
-                         ("laptop", "LAPTOP BOT"), ("laptop[daily]", "LAPTOP BOT DAILY CHECK")):
+        for to, name in (("cloud", "CLOUD"), ("laptop", "LAPTOP BOT")):
             with self.subTest(to=to):
                 base = to.split("[")[0]
                 sent = digest(entry("audit", to), "--for", base, "--since-hours", "24")
                 self.assertEqual(sent[0][0], "AGENT_MAIL: have %s check mail (1 new)" % name)
                 self.assertEqual(sent[0][1].splitlines()[0], "Have %s check mail." % name)
+
+
+class RetiredDailyChecksTests(unittest.TestCase):
+    """The two scheduled daily checks were retired by Devon 2026-10-17 (one froze, one was killed by the shared session limit, both silently;
+    daily_digest.py replaced their report). They stay in DISPLAY so old headings parse and the five names stay pinned, but nothing wakes them."""
+
+    def test_exactly_the_two_daily_checks_are_retired_and_both_are_still_named(self):
+        self.assertEqual(sorted(M.RETIRED), ["cloud[daily]", "laptop[daily]"])
+        for k in M.RETIRED:
+            self.assertIn(k, M.DISPLAY)
+
+    def test_they_are_never_in_the_list_of_sessions_devon_can_wake(self):
+        self.assertEqual(M.wake_keys(["cloud", "cloud[daily]", "laptop", "laptop[daily]", "audit"]), ["cloud", "laptop"])
+
+    def test_the_lead_line_for_mail_to_a_retired_session_says_so_instead_of_asking_him_to_wake_it(self):
+        self.assertEqual(M.action_line(["cloud[daily]"]), "BOT DAILY CHECK is retired. Nothing for you to do.")
+        self.assertEqual(M.action_line(["cloud[daily]", "laptop[daily]"]),
+                         "BOT DAILY CHECK and LAPTOP BOT DAILY CHECK are retired. Nothing for you to do.")
+        self.assertEqual(M.action_line(["cloud", "cloud[daily]"]), "Have CLOUD check mail.")            # control: the live one is still named
+
+    def test_an_alignment_check_does_not_wait_on_them_and_says_how_they_stand(self):
+        self.assertIn("retired", M.how_to_reach("laptop[daily]"))
+        self.assertNotIn("scheduled run", M.how_to_reach("cloud[daily]"))
+        self.assertIn("Sunday", M.how_to_reach("audit"))                                                  # control: the audit keeps its own wording
 
 
 class DaemonStaysInStepTests(unittest.TestCase):
@@ -136,7 +159,7 @@ class AuditIsSelfReadingTests(unittest.TestCase):
     def test_the_audit_is_left_out_when_others_must_be_woken(self):
         self.assertEqual(M.action_line(["cloud", "audit"]), "Have CLOUD check mail.")
         self.assertEqual(M.action_line(["cloud", "laptop", "audit"]), "Have CLOUD and LAPTOP BOT check mail.")
-        self.assertEqual(M.wake_keys(["cloud", "audit", "laptop[daily]"]), ["cloud", "laptop[daily]"])
+        self.assertEqual(M.wake_keys(["cloud", "audit", "laptop[daily]"]), ["cloud"])          # laptop[daily] was retired 2026-10-17
 
     def test_a_digest_for_the_audit_alone_never_says_have_it_check_mail(self):
         sent = digest(entry("laptop", "audit"), "--for", "audit", "--since-hours", "24")

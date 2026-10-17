@@ -50,9 +50,10 @@ def alignment_lines(mailbox_text):
     if req is None:
         return []
     todo = [(name, key) for key, name, state, _ in rows if state == "outstanding"]
+    active = [r for r in rows if r[2] != "retired"]
     if not todo:
-        return ["All five sessions have confirmed ALIGNED."]
-    return ["Still to confirm (%d of %d):" % (len(todo), len(rows))] + [
+        return ["All %d active sessions have confirmed ALIGNED." % len(active)]
+    return ["Still to confirm (%d of %d):" % (len(todo), len(active))] + [
         "- %s: %s" % (name, M.how_to_reach(key)) for name, key in todo]
 
 

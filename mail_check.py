@@ -77,14 +77,20 @@ DISPLAY = {"cloud": "CLOUD", "cloud[daily]": "BOT DAILY CHECK",
 # own schedule, so an alert says that instead of asking him to wake them. name -> when it reads.
 SELF_READING = {"audit": "every Sunday"}
 
+# RETIRED by Devon 2026-10-17: the two scheduled daily-check sessions. One froze on 2026-10-14 and skipped two days unnoticed, the other was
+# killed by the shared session limit, and the report they posted is now sent by GitHub (daily_digest.py, no Claude session at all). They stay in
+# DISPLAY so every old heading still parses and tests/test_session_roster.py keeps pinning the history, but nothing wakes them, an ALIGNMENT CHECK
+# does not wait on them, and a mail addressed to one says so instead of asking Devon to wake something that no longer runs.
+RETIRED = {"cloud[daily]": "2026-10-17", "laptop[daily]": "2026-10-17"}
+
 
 def _base(key):
     return key.split("[")[0]
 
 
 def wake_keys(keys):
-    """The DISPLAY keys Devon can actually wake (everything except the self-reading sessions)."""
-    return [k for k in keys if _base(k) not in SELF_READING]
+    """The DISPLAY keys Devon can actually wake (everything except the self-reading and the retired sessions)."""
+    return [k for k in keys if _base(k) not in SELF_READING and k not in RETIRED]
 
 
 def display(w):
@@ -107,6 +113,8 @@ def action_line(names):
     """The one sentence an email or Slack post leads with, so the reader knows who to wake."""
     wake = wake_keys(names)
     if not wake:
+        if names and all(n in RETIRED for n in names):
+            return names_text(names) + (" is" if len(names) == 1 else " are") + " retired. Nothing for you to do."
         when = SELF_READING.get(_base(names[0]), "on its schedule") if names else "on its schedule"
         return names_text(names) + " reads mail by itself " + when + ". Nothing for you to do."
     return "Have " + names_text(wake) + " check mail."
@@ -340,12 +348,15 @@ def aligned_status(all_e):
     for key in DISPLAY:
         reply = next((e for e in all_e[req + 1:]
                       if e["subject"].startswith(ALIGN_REPLY) and sent_by_key(key, e)), None)
-        state = "asked" if sent_by_key(key, all_e[req]) else ("aligned" if reply else "outstanding")
+        state = ("retired" if key in RETIRED else
+                 "asked" if sent_by_key(key, all_e[req]) else ("aligned" if reply else "outstanding"))
         rows.append((key, display(key), state, reply))
     return all_e[req], rows
 
 
 def how_to_reach(key):
+    if key in RETIRED:
+        return "retired %s: nothing to do" % RETIRED[key]
     if key in SELF_READING or _base(key) in SELF_READING:
         return "automatic: it reads mail itself " + SELF_READING.get(_base(key), "on its schedule")
     if _is_daily(key):
@@ -363,10 +374,10 @@ def aligned_cli(argv):
     print("%s open since line %d: %s" % (ALIGN_REQUEST, req["line"], _ascii(req["subject"])[:100]))
     out = 0
     for key, name, state, reply in rows:
-        extra = ("line %d" % reply["line"]) if reply else (how_to_reach(key) if state == "outstanding" else "asked it")
+        extra = ("line %d" % reply["line"]) if reply and state != "retired" else (how_to_reach(key) if state in ("outstanding", "retired") else "asked it")
         print("  %-24s %-12s %s" % (name, state.upper(), _ascii(extra)))
         out += state == "outstanding"
-    print("%d of %d still to confirm" % (out, len(rows)))
+    print("%d of %d still to confirm" % (out, len([r for r in rows if r[2] != "retired"])))
     return 1 if out else 0
 
 

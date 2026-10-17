@@ -44,8 +44,8 @@ class NameTests(unittest.TestCase):
     def test_the_lead_line_reads_naturally_for_one_two_and_three_sessions(self):
         self.assertEqual(M.action_line(["cloud"]), "Have CLOUD check mail.")
         self.assertEqual(M.action_line(["cloud", "laptop"]), "Have CLOUD and LAPTOP BOT check mail.")
-        self.assertEqual(M.action_line(["cloud", "cloud[daily]", "laptop"]),
-                         "Have CLOUD, BOT DAILY CHECK and LAPTOP BOT check mail.")
+        # the daily checks were retired 2026-10-17: they are never named as someone to wake
+        self.assertEqual(M.action_line(["cloud", "cloud[daily]", "laptop"]), "Have CLOUD and LAPTOP BOT check mail.")
 
     def test_display_values_are_plain_text_a_subject_line_can_carry(self):
         """Devon prints mail to PDF by subject: no emoji, and nothing that is not ASCII."""

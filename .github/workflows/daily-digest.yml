@@ -1,0 +1,57 @@
+name: DAILY DIGEST
+
+# A once-a-day summary of both bots, sent by GitHub. Devon 2026-10-17 retired the two scheduled Claude
+# sessions that used to post one (BOT DAILY CHECK froze on 2026-10-14 and skipped two days unnoticed, LAPTOP
+# BOT DAILY CHECK was killed by the shared Claude session limit the same afternoon) and asked for this
+# instead: a script on a runner that has no session to freeze and no quota to run out. See daily_digest.py.
+#
+# The primary trigger is workflow_run on the Arm A workflow, which completes every 15 minutes and is far more
+# reliable than a cron; the script sends only for the FIRST Arm A run to finish after the bot's close, so
+# the other ~25 invocations a day exit in seconds. The schedule is a best-effort backup (GitHub throttles
+# crons) that sends only if the workflow_run path had nothing to fire on.
+#
+# No concurrency group, on purpose (GitHub cancels the older PENDING run when a newer one arrives, which
+# silently dropped a MAILBOX NOTIFY run during the 2026-10-05 incident). Runs are stateless and independent.
+on:
+  workflow_run:
+    workflows: ["Alpaca Trading Bot"]
+    types: [completed]
+  schedule:
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "no = only if a digest is due. yes = send one now (a test)."
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
+
+permissions:
+  contents: read
+  actions: read          # list today's runs of every workflow
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 400     # the laptop's rh_status.json history for the last few days
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --quiet requests
+      - name: Send the daily digest if one is due
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+          GH_TOKEN:           ${{ github.token }}
+          TRIGGER_RUN_ID:     ${{ github.event.workflow_run.id }}
+          FORCE_DIGEST:       ${{ inputs.force }}
+        run: python daily_digest.py

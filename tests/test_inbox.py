@@ -215,16 +215,16 @@ class AlignmentTracker(Box):
         _, rows = M.aligned_status(self.entries())
         return {name: state for _, name, state, _ in rows}
 
-    def test_the_asker_is_marked_and_everyone_else_is_outstanding(self):
-        self.assertEqual(self.states(), {"CLOUD": "asked", "BOT DAILY CHECK": "outstanding",
-                                         "LAPTOP BOT": "outstanding", "LAPTOP BOT DAILY CHECK": "outstanding",
+    def test_the_asker_is_marked_and_everyone_active_else_is_outstanding_and_the_retired_daily_checks_wait_on_nobody(self):
+        self.assertEqual(self.states(), {"CLOUD": "asked", "BOT DAILY CHECK": "retired",
+                                         "LAPTOP BOT": "outstanding", "LAPTOP BOT DAILY CHECK": "retired",
                                          "BOT WEEKLY AUDIT": "outstanding"})
 
     def test_a_reply_aligns_only_the_session_that_wrote_it(self):
         self.append(e("2026-10-01 17:05", "laptop", "all", "ALIGNED: LAPTOP BOT read ECOSYSTEM.md"))
         s = self.states()
         self.assertEqual(s["LAPTOP BOT"], "aligned")
-        self.assertEqual(s["LAPTOP BOT DAILY CHECK"], "outstanding")          # same token, different session
+        self.assertEqual(s["LAPTOP BOT DAILY CHECK"], "retired")              # same token, different session, retired 2026-10-17
 
     def test_a_reply_from_before_the_request_does_not_count(self):
         self.write(e("2026-10-01 16:00", "laptop", "all", "ALIGNED: stale")
@@ -236,26 +236,26 @@ class AlignmentTracker(Box):
 
     def test_the_newest_request_wins(self):
         self.append(e("2026-10-01 17:05", "laptop", "all", "ALIGNED: LAPTOP BOT"))
-        self.append(e("2026-10-02 09:00", "laptop[daily]", "all", "ALIGNMENT CHECK 2026-10-02: again"))
+        self.append(e("2026-10-02 09:00", "cloud[35819496]", "all", "ALIGNMENT CHECK 2026-10-02: again"))
         s = self.states()
-        self.assertEqual(s["LAPTOP BOT DAILY CHECK"], "asked")
+        self.assertEqual(s["CLOUD"], "asked")
         self.assertEqual(s["LAPTOP BOT"], "outstanding")
 
     def test_cli_exit_code_and_how_to_reach_each_outstanding_session(self):
         rc, out = self.cli("--aligned")
         self.assertEqual(rc, 1)
-        self.assertIn("4 of 5 still to confirm", out)
+        self.assertIn("2 of 3 still to confirm", out)                          # CLOUD asked; the two daily checks are retired
         self.assertIn("Devon says 'check mail' to LAPTOP BOT", out)
-        self.assertIn("automatic at its next scheduled run", out)             # the daily checks
+        self.assertIn("retired 2026-10-17: nothing to do", out)               # the daily checks
+        self.assertNotIn("automatic at its next scheduled run", out)
         self.assertIn("automatic: it reads mail itself every Sunday", out)      # the audit
 
     def test_everyone_aligned_is_exit_zero(self):
-        for frm, who in (("cloud[daily]", "BOT DAILY CHECK"), ("laptop", "LAPTOP BOT"),
-                         ("laptop[daily]", "LAPTOP BOT DAILY CHECK"), ("audit", "BOT WEEKLY AUDIT")):
+        for frm, who in (("laptop", "LAPTOP BOT"), ("audit", "BOT WEEKLY AUDIT")):
             self.append(e("2026-10-01 17:10", frm, "all", "ALIGNED: " + who))
         rc, out = self.cli("--aligned")
         self.assertEqual(rc, 0)
-        self.assertIn("0 of 5 still to confirm", out)
+        self.assertIn("0 of 3 still to confirm", out)
 
     def test_no_request_in_the_mailbox_is_reported_plainly(self):
         self.write(SCENARIO)

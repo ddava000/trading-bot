@@ -9,17 +9,19 @@ if a workflow or a session name is missing from it.
 | Name | Heading token | What it is | Wakes by |
 |---|---|---|---|
 | CLOUD | `cloud` | interactive cloud session: owns alpaca_bot.py, brief.py, review.py, the workflows, tests/, slack_notify.py, mail_check.py, mailbox_notify.py, realized*.py | Devon says "check mail" to it |
-| BOT DAILY CHECK | `cloud[daily]` | cloud's scheduled weekday mail check (about 15:42 CT): reads cloud mail, verifies, reports to Slack | automatic, or Devon |
+| BOT DAILY CHECK | `cloud[daily]` | RETIRED 2026-10-17 (Devon). It was cloud's scheduled weekday check; replaced by DAILY DIGEST | never: it no longer runs |
 | LAPTOP BOT | `laptop` | interactive session on the Robinhood laptop: owns rh_bot.py, rh_daemon.py, rh_watchdog.py, rh_deposits.json, the Arm B ledger refresh | Devon says "check mail" to it |
-| LAPTOP BOT DAILY CHECK | `laptop[daily]` | the laptop's scheduled daily check (4:15 PM CT): daemon, bridge login, crashes, outages, deposits | automatic, or Devon |
+| LAPTOP BOT DAILY CHECK | `laptop[daily]` | RETIRED 2026-10-17 (Devon). It was the laptop's scheduled daily check; replaced by DAILY DIGEST and the daemon's own downtime alert | never: it no longer runs |
 | BOT WEEKLY AUDIT | `audit` | the Sunday GitHub Actions audit (weekly-audit.yml), cold context, commits its upgrades | never: it reads mail itself every Sunday |
 
-The two scheduled prompts (cloud-bot-daily-check and laptop-bot-daily-check) live OUTSIDE this repo, in
-each owner's ~/.claude/scheduled-tasks, so only the owner can confirm a change to its own: do not track
-the other's as open indefinitely.
+WHY THE TWO DAILY CHECKS ARE RETIRED (Devon 2026-10-17): BOT DAILY CHECK froze on 2026-10-14 (a command six seconds in) and
+skipped two days unnoticed; LAPTOP BOT DAILY CHECK was killed by the shared Claude session limit the same afternoon. Both only restated
+what GitHub already checks without a Claude session (CI, ARM A WATCH, the laptop watchdog, the daemon's own alerts, the Sunday audit).
+Their report is now the DAILY DIGEST workflow (daily_digest.py). Their scheduled tasks live outside this repo, each owner's
+~/.claude/scheduled-tasks: cloud-bot-daily-check is disabled; laptop-bot-daily-check is the laptop's to disable. They stay in
+mail_check.DISPLAY (RETIRED) so old headings still parse; mail addressed to one wakes nobody.
 
-Mail to a bare token (`-> cloud`) names the interactive session. A daily check reads every entry to its
-base token, so it never needs waking for mail. Only the two interactive sessions are ever woken by hand.
+Mail to a bare token (`-> cloud`) names the interactive session. Only the two interactive sessions are ever woken by hand.
 
 ## What runs where
 
@@ -29,6 +31,8 @@ base token, so it never needs waking for mail. Only the two interactive sessions
   headless `claude -p` executor that runs OUTSIDE this repo (it must never read CLAUDE.md).
 - **GitHub workflows**: Alpaca Trading Bot; RH laptop watchdog (after every Arm A run, plus a */30 cron backup);
   ARM A WATCH (dead-man's switch for Arm A, see below); AGENT_MAIL daily check (13:00 UTC digest email);
+  DAILY DIGEST (once per trading day after the close: a summary of both bots by email and Slack, sent by GitHub with no
+  Claude session; the first Arm A run to finish after the close triggers it, a schedule is the backup);
   MAILBOX NOTIFY (Slack message on every mailbox push);
   BOT WEEKLY AUDIT (Sundays); Research Brief (morning + intraday), weekdays; Alpaca Weekly Review (Fridays);
   ci (tests on push); realized-report, slack-test and Email Report (manual).
@@ -76,12 +80,10 @@ base token, so it never needs waking for mail. Only the two interactive sessions
    so the others have something to answer.
 2. **LAPTOP BOT second.** The other interactive session, the owner of the daemon, and the only other one
    that must be woken by hand.
-3. **BOT DAILY CHECK and LAPTOP BOT DAILY CHECK: only if he does not want to wait.** Otherwise they confirm
-   by themselves at their next scheduled run (cloud about 15:42 CT on weekdays, laptop 4:15 PM CT daily).
-   To hurry one, say "check mail" to its chat.
+3. **BOT DAILY CHECK and LAPTOP BOT DAILY CHECK: retired 2026-10-17.** Nothing to do and nobody to wait for.
 4. **BOT WEEKLY AUDIT: nothing to do.** It cannot be woken and confirms on its next Sunday run.
 5. **Verify.** Ask CLOUD, or run `python mail_check.py --aligned`, or read the Slack notices: MAILBOX
-   NOTIFY posts "Still to confirm (n of 5)" after every confirmation.
+   NOTIFY posts "Still to confirm (n of 3)" after every confirmation.
 
 ## Rules that every session shares (details in CLAUDE.md)
 
