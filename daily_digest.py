@@ -120,15 +120,20 @@ def build_report(f):
             flags.append("ARM A IS HALTED")
         if a.get("vix_live") is False:
             flags.append("Arm A VIX feed is not live (fallback value in use)")
+    td = f.get("trading_day", True)
     done, expect = f.get("arm_a_finished"), f.get("arm_a_expected")
-    if done is None or expect is None:
+    if not td:
+        L.append("  not a trading day: no run cadence expected")
+    elif done is None or expect is None:
         flags.append("COULD NOT COUNT today's Arm A runs")
     else:
         L.append("  runs finished today: %d (about %d expected for this session)" % (done, expect))
         if done < ARM_A_RUN_FLOOR * expect:
             flags.append("ARM A RAN %d times, under %d%% of the %d expected" % (done, int(ARM_A_RUN_FLOOR * 100), expect))
     ua = f.get("arm_a_unplanned")
-    if ua is None:
+    if not td:
+        pass
+    elif ua is None:
         flags.append("COULD NOT MEASURE Arm A's unplanned gaps")
     else:
         L.append("  unplanned unwatched minutes today: %.0f" % ua)
@@ -146,7 +151,9 @@ def build_report(f):
         if b.get("broker_total_value_held_back") is not None:
             flags.append("Arm B equity guard held back a reading (%s); the published figure is unconfirmed" % b["broker_total_value_held_back"])
     m = f.get("arm_b")
-    if m is None:
+    if not td:
+        L.append("  not a trading day: no blind minutes to measure")
+    elif m is None:
         flags.append("COULD NOT MEASURE Arm B's blind minutes")
     else:
         blind = m["degraded"] + m["no_push"] - m["edge"]
@@ -248,7 +255,7 @@ def arm_a_finished(raw, day):
 
 def gather(now, raw, repo_root="."):
     day = now.astimezone(ET).date()
-    f = {"date": day.isoformat(), "weekday": day.strftime("%a")}
+    f = {"date": day.isoformat(), "weekday": day.strftime("%a"), "trading_day": bot.session_bounds(day) is not None}
     if raw is None:
         f["runs"] = f["ci"] = f["arm_a_finished"] = f["arm_a_expected"] = f["arm_a_unplanned"] = None
     else:
@@ -329,7 +336,7 @@ def run_once(now=None, event=None, trigger_run_id=None, force=False, raw=False, 
     sent = deliver(subject, body)
     if not sent:
         return 1, "DAILY DIGEST: built (%s) but NOT delivered to any channel" % verdict
-    return 0, "DAILY DIGEST: sent (%s) via %s" % (verdict, ",".join(sent) if isinstance(sent, (list, tuple)) else sent)
+    return 0, "DAILY DIGEST: sent (%s)%s" % (verdict, " via " + ",".join(sent) if isinstance(sent, (list, tuple)) else "")
 
 
 def main():

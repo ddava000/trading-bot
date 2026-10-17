@@ -150,6 +150,25 @@ class TheReport(unittest.TestCase):
         self.assertIn("ATTENTION", body)
 
 
+class ANonTradingDay(unittest.TestCase):
+    """A forced test digest on a weekend must not cry 'could not measure' about things that do not exist that day."""
+
+    def test_no_cadence_or_blindness_flags_when_there_was_no_session(self):
+        _, flags, _, body = D.build_report(facts(trading_day=False, arm_a_finished=None, arm_a_expected=None, arm_a_unplanned=None, arm_b=None))
+        self.assertEqual(flags, [])
+        self.assertIn("not a trading day", body)
+
+    def test_the_same_unknowns_on_a_trading_day_are_still_flags_control(self):
+        _, flags, _, _ = D.build_report(facts(trading_day=True, arm_a_finished=None, arm_a_expected=None, arm_a_unplanned=None, arm_b=None))
+        self.assertEqual(len([x for x in flags if x.startswith("COULD NOT")]), 3)
+
+    def test_gather_marks_a_saturday_and_a_weekday_correctly(self):
+        os.chdir(ROOT)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertFalse(D.gather(et(2026, 10, 17, 17, 0), [], ROOT)["trading_day"])
+            self.assertTrue(D.gather(et(2026, 10, 16, 17, 0), [], ROOT)["trading_day"])
+
+
 class TheRunsList(unittest.TestCase):
     def row(self, name, created, updated=None, status="completed", conclusion="success", rid=1):
         return {"name": name, "created_at": created, "updated_at": updated or created, "status": status, "conclusion": conclusion, "id": rid}
