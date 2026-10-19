@@ -2250,3 +2250,9 @@
 - avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
 - notes: Midday tape is constructive — AI trade rebounding, VIX eased to 18.4, and day P&L is green; but SNDK (-13%) and IWM (-10%) remain broken and a heavy bank-earnings/CPI week keeps risk two-sided. Holding neutral/0.45 with only $16 cash limiting new buys anyway.
 - journal: Mon 10/19 14:45: Rebound holding — VIX 18.4, Nasdaq buying the dip, MSFT +6% and PLTR +4% leading, Day P&L +$2. Nudged risk_scale to 0.45 from morning's 0.40 as the dip-buy sticks. BKH upgraded to strong-buy by Jefferies; added to favor. Still avoiding SNDK/IWM wreckage and watching earnings landmines this week.
+
+### 2026-10-19T16:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
+- notes: End-of-day tape held constructive — AI trade rebounded, VIX eased to 18.4, Day P&L finished green; but SNDK (-13%) and IWM (-10%) remain broken and a heavy bank-earnings/CPI week keeps risk two-sided. Holding neutral/0.45 into the close with only $16 cash capping any new buys anyway.
+- journal: Mon 10/19 16:40: Close — rebound stuck, VIX 18.4, MSFT +6% and PLTR +4% led, ARQT +14% after Guggenheim PT raise, Day P&L +$2. Maintaining neutral/0.45. Still avoiding SNDK/IWM wreckage; watching bank earnings and macro landmines this week for gap risk.
