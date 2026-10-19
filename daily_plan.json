@@ -1,24 +1,24 @@
 {
   "regime": "neutral",
-  "risk_scale": 0.4,
+  "risk_scale": 0.45,
   "avoid_symbols": [
     "SNDK",
-    "NVDA",
     "IWM",
+    "NVDA",
     "SYNA",
     "ARXS",
     "FTRE",
-    "PLTR",
-    "CTSH"
+    "HONA"
   ],
   "favor_symbols": [
     "MSFT",
-    "VST",
+    "PLTR",
+    "BKH",
     "SPY"
   ],
-  "notes": "VIX eased to 18.6 from 20 and futures are stabilizing as the AI trade rebounds and a soft jobs report lifts odds the Fed skips October; but hot September CPI and a heavy bank-earnings/CPI week keep risk two-sided, and SNDK (-14%) and IWM (-10%) are still broken. Nudging to neutral/0.40 with only $21 cash.",
-  "journal_entry": "Mon 10/19 09:00: Weekend gap is constructive \u2014 VIX 18.6 (down from 20), Nasdaq futures buying the dip. Upgraded to neutral/0.40 from Friday's risk-off/0.30. Still avoiding the AI/memory/small-cap wreckage (SNDK, NVDA, IWM); MSFT +4.8% and VST +7.3% leading. Watching earnings-season landmines this week and whether the rebound holds.",
+  "notes": "Midday tape is constructive \u2014 AI trade rebounding, VIX eased to 18.4, and day P&L is green; but SNDK (-13%) and IWM (-10%) remain broken and a heavy bank-earnings/CPI week keeps risk two-sided. Holding neutral/0.45 with only $16 cash limiting new buys anyway.",
+  "journal_entry": "Mon 10/19 14:45: Rebound holding \u2014 VIX 18.4, Nasdaq buying the dip, MSFT +6% and PLTR +4% leading, Day P&L +$2. Nudged risk_scale to 0.45 from morning's 0.40 as the dip-buy sticks. BKH upgraded to strong-buy by Jefferies; added to favor. Still avoiding SNDK/IWM wreckage and watching earnings landmines this week.",
   "date": "2026-10-19",
-  "mode": "MORNING",
-  "updated_at": "2026-10-19T09:00 ET"
+  "mode": "INTRADAY",
+  "updated_at": "2026-10-19T14:45 ET"
 }
