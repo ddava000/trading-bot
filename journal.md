@@ -2238,3 +2238,9 @@
 - avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST', 'QQQ'] | favor: ['SPY', 'CTSH']
 - notes: Into the Friday close the tape is ugly — Nasdaq down 2% for its worst week since June on an AI sell-off, oil topping $100 on Iran/Hormuz escalation, and hot September CPI keeping a Fed hike on the table; VIX at 20 with SNDK -18% and IWM -10% still in freefall. With only $21 cash and weekend gap risk, I'm staying firmly risk-off/0.30.
 - journal: Fri 10/16 16:08: Final-hour close — Nasdaq -2%, VIX ~20, oil over $100 on Hormuz attacks adding fresh geopolitical risk. SNDK worsened to -18%, IWM -10.3%, NVDA -5.7%; Day P&L -$4. Carrying risk-off/0.30 into the weekend; watching Monday gap and whether value rotation holds or indices crack further.
+
+### 2026-10-19T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'ARXS', 'FTRE', 'PLTR', 'CTSH'] | favor: ['MSFT', 'VST', 'SPY']
+- notes: VIX eased to 18.6 from 20 and futures are stabilizing as the AI trade rebounds and a soft jobs report lifts odds the Fed skips October; but hot September CPI and a heavy bank-earnings/CPI week keep risk two-sided, and SNDK (-14%) and IWM (-10%) are still broken. Nudging to neutral/0.40 with only $21 cash.
+- journal: Mon 10/19 09:00: Weekend gap is constructive — VIX 18.6 (down from 20), Nasdaq futures buying the dip. Upgraded to neutral/0.40 from Friday's risk-off/0.30. Still avoiding the AI/memory/small-cap wreckage (SNDK, NVDA, IWM); MSFT +4.8% and VST +7.3% leading. Watching earnings-season landmines this week and whether the rebound holds.
