@@ -2274,3 +2274,9 @@
 - avoid: ['SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
 - notes: Constructive midday tape — Dow up 400-500 on solid earnings and falling oil, VIX eased to 17.7, Fed held steady removing a major event overhang. Nudging risk to 0.50 but only $3 cash caps new buys regardless; still avoiding broken SNDK/IWM and chip weakness in NVDA.
 - journal: Tue 10/20 13:22: Tape improved — Dow +400-500 on earnings/oil relief, VIX down to 17.7 from 18.7, Fed held rates. Bumped risk_scale to 0.50 from 0.40. ARQT +16%, MSFT/PLTR/BKH green and leading. Cash nearly exhausted ($3). Watching SNDK (-13%) and IWM (-9%) wreckage plus any AI-stock wobble into earnings.
+
+### 2026-10-20T15:29 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
+- notes: Late-day tape constructive — Dow up 400+ on solid earnings and falling oil, VIX eased to 17.5, Fed held steady removing event overhang. Holding risk at 0.50 but only $21 cash caps new buys; still avoiding broken SNDK/IWM and chip weakness in NVDA.
+- journal: Tue 10/20 15:29: Into the close tape holding green, VIX down to 17.5, Day P&L +$1. ARQT +17%, MSFT/PLTR/BKH leading. Maintaining risk-on/0.50. Cash tight at $21. Watching SNDK (-13.6%) and IWM (-8.5%) wreckage plus any overnight AI/chip wobble.
