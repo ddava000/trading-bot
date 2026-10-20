@@ -6,16 +6,22 @@ CI / ARM A WATCH / watchdog results GitHub already produces, and posted "all gre
 retired both and asked for this instead: a plain script on a GitHub runner that cannot hang on a prompt and has no session limit. The alerts
 that actually page him (CI, ARM A WATCH, the laptop watchdog, the daemon's own alerts, the Sunday audit) are unchanged.
 
-WHEN IT SENDS. Once per trading day, after the bot's own close plus 10 minutes (session_bounds, so a 1 pm early close sends at 13:05).
-  * workflow_run on "Alpaca Trading Bot" (fires every 15 minutes, reliably): sends iff the triggering run is the FIRST Arm A run to finish
-    after that threshold. No stored state: later runs see an earlier one and stay quiet.
-  * schedule (best effort; GitHub throttles crons) and manual dispatch: send iff NO Arm A run has finished after the threshold, i.e. the
-    workflow_run path had nothing to fire on. dispatch with force=yes always sends (a test).
+WHEN IT SENDS. Once per trading day, from the bot's own close (session_bounds, so 15:55 ET, or 12:55 on a 1 pm early close). ANY trigger
+may fire it; the rule is the same for all of them: due, and not already sent today. "Sent" is read from GitHub itself, not stored anywhere: a
+run of this workflow whose step "Send the daily digest" ended in success. A failed send therefore retries on the next trigger.
+  * workflow_run on "Alpaca Trading Bot": its last run of the day starts at 15:45 and finishes about 15:55:45, just after the close, so it is
+    normally the trigger. (A first version waited until 16:05 and so could never fire: the last Arm A run was already over. It went out only
+    through the best-effort schedule, three hours late, on its first real day, 2026-10-19.)
+  * workflow_run on "Research Brief (morning + intraday)": its evening run is a second chance after the close.
+  * schedule (best effort; GitHub throttles crons, so there are two) and manual dispatch. dispatch with force=yes always sends (a test).
+The workflow serialises runs (one concurrency group, no cancel-in-progress), so two triggers in the same minute cannot both send.
 It never says calm about what it could not measure: an unreadable source is a flag, not a pass.
 
 Read-only. Delivery is rh_watchdog.alert (email + Slack), which owns the secrets rules.
 
-Run:  python daily_digest.py            (GITHUB_EVENT_NAME / TRIGGER_RUN_ID / FORCE_DIGEST come from the workflow)
+Run:  python daily_digest.py --decide     writes due=true|false to $GITHUB_OUTPUT (the workflow's first step)
+      python daily_digest.py --send       builds and delivers (the second step, only when due)
+      python daily_digest.py              both, for a local look (FORCE_DIGEST=yes to ignore the clock)
 """
 import json
 import os
@@ -34,12 +40,16 @@ import arm_b_downtime as B  # noqa: E402
 REPO = "ddava000/trading-bot"
 ET = ZoneInfo("America/New_York")
 UTC = timezone.utc
-DIGEST_DELAY_MIN = 10          # after the bot's own close
-BACKUP_WAIT_MIN = 60           # the schedule path waits this long past the threshold before deciding the workflow_run path missed
+DIGEST_DELAY_MIN = 0           # due at the bot's own close: the last Arm A run finishes about 45 seconds after it
+SEND_STEP = "Send the daily digest"      # the workflow step whose success means "today's digest went out"
+WORKFLOW_FILE = "daily-digest.yml"
+OWN_NAME = "DAILY DIGEST"
 ARM_A_RUN_FLOOR = 0.75         # fewer finished Arm A runs than this share of the session's cadence is a flag
 ARM_A_UNPLANNED_FLAG_MIN = 15  # window minutes of unplanned Arm A gap in one day
 ARM_B_BLIND_FLAG_MIN = 15      # headline blind market-minutes in one day
-BAD = ("failure", "cancelled", "timed_out", "startup_failure", "action_required")
+BAD = ("failure", "timed_out", "startup_failure", "action_required")
+# A cancelled run is reported but is not a flag by itself: GitHub cancels runs during its own Actions incidents (a laptop watchdog run
+# was cancelled that way on 2026-10-19), and a dropped Arm A run shows up in the cadence and unplanned-gap checks anyway.
 
 
 # ---------------------------------------------------------------------------------------------------
@@ -51,34 +61,18 @@ def threshold(day):
     return None if b is None else b[1] + timedelta(minutes=DIGEST_DELAY_MIN)
 
 
-def should_send(event, now, runs, trigger_run_id=None, force=False):
-    """(bool, why). `now` is tz-aware; `runs` is today's finished Arm A runs as [{id, updated_at (aware)}]."""
-    th = threshold(now.astimezone(ET).date())
+def should_send(now, sent_today, force=False):
+    """(bool, why). `now` is tz-aware. The same rule for every trigger: due, and not already sent today."""
     if force:
         return True, "forced"
+    th = threshold(now.astimezone(ET).date())
     if th is None:
         return False, "not a trading day"
     if now < th:
         return False, "the session is not over"
-    after = [r for r in runs if r["updated_at"] >= th]
-    if event == "workflow_run":
-        if trigger_run_id is None:
-            return False, "workflow_run without a trigger id"
-        ids = {str(r["id"]) for r in after}
-        if str(trigger_run_id) not in ids:
-            known = [r for r in runs if str(r["id"]) == str(trigger_run_id)]
-            if known:                                                       # it finished BEFORE the threshold
-                return False, "this run finished before the close"
-            after = after + [{"id": trigger_run_id, "updated_at": now}]     # the API can lag the event that announced the run
-        first = sorted(after, key=lambda r: r["updated_at"])[0]
-        if str(first["id"]) == str(trigger_run_id):
-            return True, "first Arm A run to finish after the close"
-        return False, "an earlier run after the close already sent it"
-    if now < th + timedelta(minutes=BACKUP_WAIT_MIN):
-        return False, "too early for the backup path"
-    if after:
-        return False, "the workflow_run path already fired"
-    return True, "backup: no Arm A run finished after the close"
+    if sent_today:
+        return False, "today's digest was already sent"
+    return True, "due and not yet sent today"
 
 
 def _pct(x):
@@ -166,9 +160,22 @@ def build_report(f):
     if runs is not None:
         L.append("GITHUB")
         for name in sorted(runs["by_name"]):
-            L.append("  %-36s %3d run(s)%s" % (name, runs["by_name"][name]["total"],
-                                                "" if not runs["by_name"][name]["bad"] else ", %d not green" % len(runs["by_name"][name]["bad"])))
-        L.append("  CI latest: %s" % ci)
+            e = runs["by_name"][name]
+            if name == OWN_NAME and not e["bad"]:
+                continue                                    # its own invocations are noise (about 28 a day, one of which sends)
+            extra = ""
+            if e["bad"]:
+                extra += ", %d not green" % len(e["bad"])
+            if e.get("cancelled"):
+                extra += ", %d cancelled" % e["cancelled"]
+            L.append("  %-36s %3d run(s)%s" % (name, e["total"], extra))
+        L.append("  CI latest: %s%s" % (ci, " (%s ET)" % f["ci_when"] if f.get("ci_when") else ""))
+    inc = f.get("incidents")
+    if inc:
+        for start, end, impact, name in inc:
+            L.append("  GitHub status: %s incident %s to %s ET: %s (cancelled or late runs today may be this, not the bots)" % (impact, start, end, name))
+    elif inc is not None:
+        L.append("  GitHub status: no major incident today")
 
     # ---- realized and mail
     L.append("REALIZED (shared reader, not tax advice)")
@@ -207,6 +214,10 @@ def _api(path, token=None):
         return json.loads(r.read().decode("utf-8"))
 
 
+def _utc(s):
+    return datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+
+
 def fetch_runs_since(day_iso):
     """Every workflow run created on or after `day_iso` (YYYY-MM-DD, UTC), across the repo, or None on failure."""
     out = []
@@ -223,22 +234,79 @@ def fetch_runs_since(day_iso):
         return None
 
 
-def _utc(s):
-    return datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=UTC)
+def fetch_ci(fetch=None):
+    """{conclusion, when} for the latest COMPLETED ci run, whatever day it was (CI runs only on pushes), or None if unreadable."""
+    try:
+        rs = (fetch or _api)("actions/workflows/ci.yml/runs?per_page=5&status=completed").get("workflow_runs", [])
+        if not rs:
+            return None
+        return {"conclusion": rs[0].get("conclusion"), "when": _utc(rs[0]["created_at"]).astimezone(ET).strftime("%m-%d %H:%M")}
+    except Exception as e:
+        print("  [daily digest: could not read the CI result: %s]" % e)
+        return None
+
+
+def fetch_incidents(day, fetch=None):
+    """GitHub's own status incidents that started on `day` (ET) as [(start, end, impact, name)], [] for none, None if unreadable."""
+    try:
+        if fetch is None:
+            with urllib.request.urlopen("https://www.githubstatus.com/api/v2/incidents.json", timeout=20) as r:
+                data = json.loads(r.read().decode("utf-8"))
+        else:
+            data = fetch()
+        out = []
+        for i in data.get("incidents", []):
+            start = datetime.fromisoformat(i["created_at"].replace("Z", "+00:00")).astimezone(ET)
+            if start.date() != day or i.get("impact") not in ("major", "critical"):
+                continue
+            end = i.get("resolved_at")
+            end = datetime.fromisoformat(end.replace("Z", "+00:00")).astimezone(ET).strftime("%H:%M") if end else "ongoing"
+            out.append((start.strftime("%H:%M"), end, i["impact"], i.get("name", "")))
+        return sorted(out)
+    except Exception as e:
+        print("  [daily digest: could not read GitHub's status page: %s]" % e)
+        return None
+
+
+def digest_already_sent(day, fetch=None):
+    """True iff a run of THIS workflow created on `day` at or after the due time has a successful SEND_STEP. Read from GitHub, not stored.
+    False when unsure: a duplicate digest beats a missing one."""
+    th = threshold(day)
+    if th is None:
+        return False
+    fetch = fetch or _api
+    try:
+        since = (th.astimezone(UTC) - timedelta(days=1)).strftime("%Y-%m-%d")
+        runs = fetch("actions/workflows/%s/runs?per_page=100&created=%%3E%%3D%s" % (WORKFLOW_FILE, since)).get("workflow_runs", [])
+        for r in runs:                                      # newest first
+            if _utc(r["created_at"]) < th.astimezone(UTC):
+                break
+            if r.get("status") != "completed":
+                continue                                    # includes the run that is asking
+            for j in fetch("actions/runs/%s/jobs" % r["id"]).get("jobs", []):
+                for s in j.get("steps", []):
+                    if s.get("name") == SEND_STEP and s.get("conclusion") == "success":
+                        return True
+        return False
+    except Exception as e:
+        print("  [daily digest: could not tell whether today's digest was sent (%s); treating it as not sent]" % e)
+        return False
 
 
 def summarize_runs(raw, day):
-    """Today's runs (by ET date of creation) grouped by workflow name, with the not-green ones listed."""
+    """Today's runs (by ET date of creation) grouped by workflow name; failures listed, cancellations only counted."""
     by, bad = {}, []
     for r in raw:
         created = _utc(r["created_at"]).astimezone(ET)
         if created.date() != day or r.get("status") != "completed":
             continue
-        e = by.setdefault(r["name"], {"total": 0, "bad": []})
+        e = by.setdefault(r["name"], {"total": 0, "bad": [], "cancelled": 0})
         e["total"] += 1
         if r.get("conclusion") in BAD:
             e["bad"].append(r["conclusion"])
             bad.append((r["name"], r["conclusion"], created.strftime("%H:%M")))
+        elif r.get("conclusion") == "cancelled":
+            e["cancelled"] += 1
     return {"by_name": by, "bad": bad}
 
 
@@ -253,16 +321,15 @@ def arm_a_finished(raw, day):
     return out
 
 
-def gather(now, raw, repo_root="."):
+def gather(now, raw, repo_root=".", ci_info=None, incidents=None):
     day = now.astimezone(ET).date()
-    f = {"date": day.isoformat(), "weekday": day.strftime("%a"), "trading_day": bot.session_bounds(day) is not None}
+    bounds = bot.session_bounds(day)
+    f = {"date": day.isoformat(), "weekday": day.strftime("%a"), "trading_day": bounds is not None,
+         "ci": (ci_info or {}).get("conclusion"), "ci_when": (ci_info or {}).get("when"), "incidents": incidents}
     if raw is None:
-        f["runs"] = f["ci"] = f["arm_a_finished"] = f["arm_a_expected"] = f["arm_a_unplanned"] = None
+        f["runs"] = f["arm_a_finished"] = f["arm_a_expected"] = f["arm_a_unplanned"] = None
     else:
         f["runs"] = summarize_runs(raw, day)
-        ci = [r for r in raw if r.get("name") == "ci" and r.get("status") == "completed"]
-        f["ci"] = sorted(ci, key=lambda r: r["created_at"])[-1].get("conclusion") if ci else None
-        bounds = bot.session_bounds(day)
         fin = arm_a_finished(raw, day)
         # only runs that finished inside the session count towards the cadence (the pre-open ones exit in seconds)
         inside = [r for r in fin if bounds and bounds[0] <= r["updated_at"].astimezone(ET) <= bounds[1] + timedelta(minutes=15)]
@@ -291,7 +358,6 @@ def gather(now, raw, repo_root="."):
     try:
         since = (day - timedelta(days=3)).isoformat()
         snaps = B.parse_subjects(B.git_subjects(since=since))
-        bounds = bot.session_bounds(day)
         f["arm_b"] = B.measure(snaps, bounds[0].replace(tzinfo=None), bounds[1].replace(tzinfo=None), B.holidays()) if snaps and bounds else None
     except Exception as e:
         print("  [daily digest: arm b measure failed: %s]" % e)
@@ -319,18 +385,25 @@ def default_deliver(subject, body):
     return rh_watchdog.alert(body, urgent=False, subject=subject, title=subject)
 
 
-def run_once(now=None, event=None, trigger_run_id=None, force=False, raw=False, deliver=default_deliver, repo_root="."):
-    """(exit_code, one_line_summary). raw=False means fetch from the API; tests pass a list (or None to simulate a failed read)."""
+def decide(now=None, force=False, sent_today=None):
+    """(bool, why): is a digest due right now? sent_today=None reads GitHub; tests pass a bool."""
     now = now or datetime.now(UTC)
-    event = event if event is not None else os.environ.get("GITHUB_EVENT_NAME", "")
-    trigger_run_id = trigger_run_id if trigger_run_id is not None else (os.environ.get("TRIGGER_RUN_ID") or None)
+    if sent_today is None:
+        sent_today = False if force else digest_already_sent(now.astimezone(ET).date())
+    return should_send(now, sent_today, force)
+
+
+def send(now=None, raw=False, deliver=default_deliver, repo_root=".", ci_info=False, incidents=False):
+    """Build and deliver. (exit_code, one_line_summary). raw/ci_info/incidents default to fetching; tests inject (None = a failed read)."""
+    now = now or datetime.now(UTC)
     day = now.astimezone(ET).date()
     if raw is False:
         raw = fetch_runs_since((now - timedelta(days=1)).strftime("%Y-%m-%d"))
-    send, why = should_send(event, now, arm_a_finished(raw, day) if raw else [], trigger_run_id, force)
-    if not send:
-        return 0, "DAILY DIGEST: not sending (%s)" % why
-    facts = gather(now, raw, repo_root)
+    if ci_info is False:
+        ci_info = fetch_ci()
+    if incidents is False:
+        incidents = fetch_incidents(day)
+    facts = gather(now, raw, repo_root, ci_info, incidents)
     verdict, flags, subject, body = build_report(facts)
     print(body)
     sent = deliver(subject, body)
@@ -339,9 +412,29 @@ def run_once(now=None, event=None, trigger_run_id=None, force=False, raw=False, 
     return 0, "DAILY DIGEST: sent (%s)%s" % (verdict, " via " + ",".join(sent) if isinstance(sent, (list, tuple)) else "")
 
 
-def main():
+def run_once(now=None, force=False, sent_today=None, **kw):
+    """decide, then send if due. (exit_code, one_line_summary)."""
+    ok, why = decide(now, force, sent_today)
+    if not ok:
+        return 0, "DAILY DIGEST: not sending (%s)" % why
+    return send(now, **kw)
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
     force = (os.environ.get("FORCE_DIGEST") or "").strip().lower() in ("yes", "true", "1")
-    rc, line = run_once(force=force)
+    if "--decide" in argv:
+        ok, why = decide(force=force)
+        print("DAILY DIGEST: %s (%s)" % ("DUE" if ok else "not due", why))
+        out = os.environ.get("GITHUB_OUTPUT")
+        if out:
+            with open(out, "a", encoding="utf-8") as fh:
+                fh.write("due=%s\n" % ("true" if ok else "false"))
+        return 0
+    if "--send" in argv:
+        rc, line = send()
+    else:
+        rc, line = run_once(force=force)
     print(line)
     return rc
 

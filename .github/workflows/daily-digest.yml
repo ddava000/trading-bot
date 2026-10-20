@@ -5,19 +5,24 @@ name: DAILY DIGEST
 # BOT DAILY CHECK was killed by the shared Claude session limit the same afternoon) and asked for this
 # instead: a script on a runner that has no session to freeze and no quota to run out. See daily_digest.py.
 #
-# The primary trigger is workflow_run on the Arm A workflow, which completes every 15 minutes and is far more
-# reliable than a cron; the script sends only for the FIRST Arm A run to finish after the bot's close, so
-# the other ~25 invocations a day exit in seconds. The schedule is a best-effort backup (GitHub throttles
-# crons) that sends only if the workflow_run path had nothing to fire on.
+# ANY trigger below may send it; the rule is the same for all of them: the bot's session is over, and no run
+# of THIS workflow has already completed the "Send the daily digest" step today. GitHub is the record of what
+# was sent; nothing is stored in the repo. A failed send leaves that step red, so the next trigger retries.
+# The usual trigger is the last Arm A run of the day, which starts at 15:45 ET and finishes about 15:55:45,
+# just after the bot's close. (The first version waited 10 minutes past the close, which that run can never
+# reach, so on 2026-10-19 the digest went out only through the schedule, three hours late.)
 #
-# No concurrency group, on purpose (GitHub cancels the older PENDING run when a newer one arrives, which
-# silently dropped a MAILBOX NOTIFY run during the 2026-10-05 incident). Runs are stateless and independent.
+# One concurrency group, no cancel-in-progress: runs are serialised so two triggers in the same minute
+# cannot both send. GitHub keeps only one PENDING run per group, which is harmless here because every run is
+# equivalent (a newer one makes the same decision). Do not copy this to the watchers: a dropped pending run
+# once silently lost a MAILBOX NOTIFY, and ARM A WATCH deliberately has no group.
 on:
   workflow_run:
-    workflows: ["Alpaca Trading Bot"]
+    workflows: ["Alpaca Trading Bot", "Research Brief (morning + intraday)"]
     types: [completed]
   schedule:
-    - cron: "30 21 * * 1-5"
+    - cron: "10 20 * * 1-5"      # 16:10 ET in summer time
+    - cron: "40 21 * * 1-5"      # a second chance; GitHub throttles crons
   workflow_dispatch:
     inputs:
       force:
@@ -26,9 +31,13 @@ on:
         options: ["no", "yes"]
         default: "no"
 
+concurrency:
+  group: daily-digest
+  cancel-in-progress: false
+
 permissions:
   contents: read
-  actions: read          # list today's runs of every workflow
+  actions: read          # list today's runs of every workflow and this workflow's own send steps
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -45,13 +54,18 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install --quiet requests
-      - name: Send the daily digest if one is due
+      - name: Decide whether a digest is due
+        id: decide
+        env:
+          GH_TOKEN:           ${{ github.token }}
+          FORCE_DIGEST:       ${{ inputs.force }}
+        run: python daily_digest.py --decide
+      - name: Send the daily digest
+        if: steps.decide.outputs.due == 'true'
         env:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
           SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
           GH_TOKEN:           ${{ github.token }}
-          TRIGGER_RUN_ID:     ${{ github.event.workflow_run.id }}
-          FORCE_DIGEST:       ${{ inputs.force }}
-        run: python daily_digest.py
+        run: python daily_digest.py --send

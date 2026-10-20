@@ -14,7 +14,11 @@ run in progress is a minute nothing was watching. Three numbers, all in minutes 
              every 15. NOT downtime in any useful sense, reported so nobody mistakes the other number for the whole story
   unplanned  no run in progress, in a gap LONGER than GAP_MIN: a lost run, a queue stall, a GitHub incident
 It is a proxy: a successful run is assumed to have run its protective passes. It cannot see a run that succeeded but whose
-state push was lost. Not a trading input; read-only.
+state push was lost. It also counts a run's WHOLE run_started_at..updated_at span as coverage, so (a) time a run spent waiting
+for a machine counts as watched, and (b) when GitHub delays a run's completion event the span is overlong. 2026-10-19 showed (b):
+two runs whose jobs finished at 15:44 and 15:56 were recorded as ending 16:08 and 16:16 during an Actions incident, while their
+jobs had started within five seconds and run their normal ten minutes, so the figure was right that day for the wrong reason.
+The live check for (a) is ARM A WATCH's 'waiting for a machine' signal; this tool does not duplicate it. Not a trading input; read-only.
 
 Run:  python arm_a_downtime.py [--since YYYY-MM-DD[THH:MM]] [--until YYYY-MM-DD[THH:MM]] [--episodes]
 """
