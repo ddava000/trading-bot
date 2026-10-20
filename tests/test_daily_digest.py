@@ -126,13 +126,18 @@ class AlreadySentIsReadFromGitHub(unittest.TestCase):
             D.digest_already_sent = orig
 
 
+MACHINE = {"guards": {"fast_startup": 1, "hmb_policy": 0}, "keep_awake": True,
+           "last_unclean_shutdown": {"bugcheck": 0, "bugcheck_hex": "0x0", "connected_standby": False,
+                                     "logged_at": "2026-10-08T15:32:19", "sleep_in_progress": 6}}
+
+
 def facts(**kw):
     f = {"date": "2026-10-13", "weekday": "Tue", "trading_day": True,
          "runs": {"by_name": {"Alpaca Trading Bot": {"total": 28, "bad": [], "cancelled": 0}}, "bad": []}, "ci": "success", "ci_when": "10-13 11:25",
          "incidents": [],
          "status": {"equity": 231.0, "day_pnl": -1.5, "vs_baseline_pct": -6.8, "halted": False, "vix_live": True},
          "arm_a_finished": 25, "arm_a_expected": 24, "arm_a_unplanned": 0.0,
-         "rh": {"equity": 308.0, "ts": "2026-10-13T15:54", "degraded": None},
+         "rh": {"equity": 308.0, "ts": "2026-10-13T15:54", "degraded": None, "machine": dict(MACHINE)},
          "arm_b": {"degraded": 0.0, "no_push": 11.0, "edge": 11.0},
          "realized_lines": ["Arm A line", "Arm B line"], "mail_today": 3}
     f.update(kw)
@@ -158,8 +163,8 @@ class TheReport(unittest.TestCase):
         self.assertNotIn("—", subject + body)
 
     def test_a_failed_run_is_a_flag(self):
-        f = self.flags(runs={"by_name": {"ci": {"total": 1, "bad": ["failure"], "cancelled": 0}}, "bad": [("ci", "failure", "14:15")]})
-        self.assertTrue(any("FAILURE" in x and "ci" in x for x in f), f)
+        f = self.flags(runs={"by_name": {"RH laptop watchdog": {"total": 1, "bad": ["failure"], "cancelled": 0}}, "bad": [("RH laptop watchdog", "failure", "14:15")]})
+        self.assertTrue(any("FAILURE" in x and "RH laptop watchdog" in x for x in f), f)
 
     def test_a_cancelled_run_is_reported_but_is_not_a_flag(self):
         """2026-10-19: a laptop watchdog run was cancelled during a GitHub Actions incident and the first digest cried wolf about it."""
@@ -169,6 +174,14 @@ class TheReport(unittest.TestCase):
         self.assertEqual((verdict, flags), ("OK", []))
         self.assertIn("1 cancelled", body)
         self.assertIn("critical incident 11:49 to 12:56 ET", body)
+
+    def test_a_ci_failure_that_a_later_push_fixed_is_not_a_flag_but_one_still_red_is(self):
+        """2026-10-20: CI went red at 11:04 on a push and green at 11:25 on its fix; the evening digest should not call the day red."""
+        bad = {"by_name": {"ci": {"total": 3, "bad": ["failure"], "cancelled": 0}}, "bad": [("ci", "failure", "11:04")]}
+        self.assertEqual(self.flags(runs=bad, ci="success"), [])
+        self.assertTrue(any("CI latest run is failure" in x for x in self.flags(runs=bad, ci="failure")))
+        other = {"by_name": {"ARM A WATCH": {"total": 28, "bad": ["failure"], "cancelled": 0}}, "bad": [("ARM A WATCH", "failure", "11:04")]}
+        self.assertTrue(any("ARM A WATCH" in x for x in self.flags(runs=other, ci="success")))      # a red watcher is never excused by CI
 
     def test_red_ci_is_a_flag_and_a_missing_ci_is_a_flag_but_an_old_green_one_is_fine(self):
         self.assertTrue(any("CI latest run is failure" in x for x in self.flags(ci="failure")))
@@ -194,7 +207,7 @@ class TheReport(unittest.TestCase):
         self.assertEqual(self.flags(arm_b={"degraded": 0.0, "no_push": 40.0, "edge": 30.0}), [])
 
     def test_a_held_back_equity_reading_is_a_flag(self):
-        f = self.flags(rh={"equity": 308.0, "ts": "x", "degraded": None, "broker_total_value_held_back": 318.6})
+        f = self.flags(rh={"equity": 308.0, "ts": "x", "degraded": None, "broker_total_value_held_back": 318.6, "machine": dict(MACHINE)})
         self.assertTrue(any("held back" in x for x in f))
 
     def test_an_unreadable_source_is_never_called_calm(self):
@@ -210,6 +223,49 @@ class TheReport(unittest.TestCase):
         loud = D.build_report(facts(runs={"by_name": {"DAILY DIGEST": {"total": 28, "bad": ["failure"], "cancelled": 0}},
                                           "bad": [("DAILY DIGEST", "failure", "16:05")]}))
         self.assertTrue(any("DAILY DIGEST" in x for x in loud[1]))
+
+
+class TheLaptopsMachineFacts(unittest.TestCase):
+    """rh_daemon publishes rh_status.json["machine"] (65d342f) because nothing else can see these three facts, and the retired laptop daily
+    check was their only reader. An absent or unreadable one is a flag, never a pass."""
+
+    def flags(self, **machine_changes):
+        m = {**MACHINE, **machine_changes}
+        return D.build_report(facts(rh={"equity": 308.0, "ts": "x", "degraded": None, "machine": m}))[1]
+
+    def test_a_healthy_machine_block_raises_nothing_and_is_shown(self):
+        verdict, flags, _, body = D.build_report(facts())
+        self.assertEqual(flags, [])
+        self.assertIn("keep-awake held, HMB policy 0 (want 0), Fast Startup 1 (want 1)", body)
+        self.assertIn("last unclean shutdown logged 2026-10-08 11:32 ET, bugcheck 0x0, connected standby False", body)
+
+    def test_keep_awake_not_held_or_unknown_is_a_flag(self):
+        self.assertTrue(any("keep-awake is NOT HELD" in x for x in self.flags(keep_awake=False)))
+        self.assertTrue(any("keep-awake is unknown" in x for x in self.flags(keep_awake=None)))
+
+    def test_hmb_back_on_or_unset_voids_the_experiment_and_is_a_flag(self):
+        self.assertTrue(any("hmb_policy is 1" in x for x in self.flags(guards={"fast_startup": 1, "hmb_policy": 1})))
+        self.assertTrue(any("hmb_policy is None" in x and "ON again" in x for x in self.flags(guards={"fast_startup": 1, "hmb_policy": None})))
+
+    def test_fast_startup_changing_is_a_flag_in_either_direction(self):
+        self.assertTrue(any("fast_startup is 0" in x for x in self.flags(guards={"fast_startup": 0, "hmb_policy": 0})))
+
+    def test_an_unclean_shutdown_logged_today_is_a_flag_and_an_old_one_is_not(self):
+        today = {"bugcheck": 340, "bugcheck_hex": "0x154", "connected_standby": False, "logged_at": "2026-10-13T14:16:00", "sleep_in_progress": 0}
+        f = self.flags(last_unclean_shutdown=today)                                           # 10:16 ET on the 13th
+        self.assertTrue(any("UNCLEAN SHUTDOWN today at 10:16 ET (bugcheck 0x154" in x for x in f), f)
+        self.assertEqual(self.flags(), [])                                                    # the 10-08 one, control
+
+    def test_the_event_time_is_read_as_utc_so_a_late_evening_event_lands_on_the_right_eastern_day(self):
+        late = {"bugcheck": 0, "bugcheck_hex": "0x0", "connected_standby": False, "logged_at": "2026-10-14T01:30:00", "sleep_in_progress": 0}   # 21:30 ET on the 13th
+        self.assertTrue(any("UNCLEAN SHUTDOWN today" in x for x in self.flags(last_unclean_shutdown=late)))
+
+    def test_an_unreadable_event_log_or_a_missing_block_is_never_called_calm(self):
+        self.assertTrue(any("COULD NOT READ the laptop's last unclean shutdown" in x for x in self.flags(last_unclean_shutdown=None)))
+        f = D.build_report(facts(rh={"equity": 308.0, "ts": "x", "degraded": None}))[1]
+        self.assertTrue(any("no machine block" in x for x in f))
+        f = D.build_report(facts(rh={"equity": 308.0, "ts": "x", "degraded": None, "machine": {}}))[1]
+        self.assertTrue(any("no machine block" in x for x in f))
 
 
 class ANonTradingDay(unittest.TestCase):

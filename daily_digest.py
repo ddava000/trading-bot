@@ -47,6 +47,10 @@ OWN_NAME = "DAILY DIGEST"
 ARM_A_RUN_FLOOR = 0.75         # fewer finished Arm A runs than this share of the session's cadence is a flag
 ARM_A_UNPLANNED_FLAG_MIN = 15  # window minutes of unplanned Arm A gap in one day
 ARM_B_BLIND_FLAG_MIN = 15      # headline blind market-minutes in one day
+# What the laptop's machine block (rh_status.json["machine"], published by rh_daemon) should say. HMB off is the live crash experiment (set
+# 2026-10-08, 0 = disabled; an absent value means HMB is back at its default ON). Fast Startup is ON because Devon chose to leave it on
+# (2026-10-08); if he turns it off, change this and the digest will start flagging a turn-on instead.
+EXPECTED_MACHINE = {"hmb_policy": 0, "fast_startup": 1}
 BAD = ("failure", "timed_out", "startup_failure", "action_required")
 # A cancelled run is reported but is not a flag by itself: GitHub cancels runs during its own Actions incidents (a laptop watchdog run
 # was cancelled that way on 2026-10-19), and a dropped Arm A run shows up in the cadence and unplanned-gap checks anyway.
@@ -94,6 +98,8 @@ def build_report(f):
         flags.append("COULD NOT READ today's workflow runs from the Actions API")
     else:
         for name, conclusion, when in runs["bad"]:
+            if name == "ci" and f.get("ci") == "success":
+                continue            # CI fails per push and is fixed by the next one; the CI line below says the latest is green
             flags.append("RUN %s: %s at %s ET" % (conclusion.upper(), name, when))
     ci = f.get("ci")
     if ci is None:
@@ -144,6 +150,37 @@ def build_report(f):
         L.append("  equity $%.2f, last heartbeat %s ET, degraded %s" % (b.get("equity", 0), b.get("ts"), b.get("degraded")))
         if b.get("broker_total_value_held_back") is not None:
             flags.append("Arm B equity guard held back a reading (%s); the published figure is unconfirmed" % b["broker_total_value_held_back"])
+    mc = (b or {}).get("machine") if b is not None else None
+    if b is not None:
+        if not mc:
+            flags.append("COULD NOT READ the laptop's machine facts (rh_status.json has no machine block)")
+            L.append("  laptop machine facts: unreadable")
+        else:
+            g = mc.get("guards") or {}
+            ka = mc.get("keep_awake")
+            L.append("  laptop: keep-awake %s, HMB policy %s (want %s), Fast Startup %s (want %s)" % (
+                "held" if ka else ("NOT HELD" if ka is not None else "unknown"), g.get("hmb_policy"), EXPECTED_MACHINE["hmb_policy"],
+                g.get("fast_startup"), EXPECTED_MACHINE["fast_startup"]))
+            if ka is not True:
+                flags.append("Arm B keep-awake is %s: the laptop can enter Modern Standby again" % ("NOT HELD" if ka is False else "unknown"))
+            for k, want in EXPECTED_MACHINE.items():
+                if g.get(k) != want:
+                    flags.append("Laptop setting %s is %r, expected %r (None means not set; for HMB that means ON again, which voids the crash experiment)"
+                                 % (k, g.get(k), want))
+            u = mc.get("last_unclean_shutdown")
+            if u is None:
+                flags.append("COULD NOT READ the laptop's last unclean shutdown from the Windows event log")
+            else:
+                when = None
+                try:
+                    when = datetime.strptime(u["logged_at"], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=UTC).astimezone(ET)
+                except Exception:
+                    pass
+                L.append("  last unclean shutdown logged %s ET, bugcheck %s, connected standby %s" % (
+                    when.strftime("%Y-%m-%d %H:%M") if when else u.get("logged_at"), u.get("bugcheck_hex"), u.get("connected_standby")))
+                if when is not None and when.date().isoformat() == d:
+                    flags.append("The laptop logged an UNCLEAN SHUTDOWN today at %s ET (bugcheck %s, connected standby %s)" % (
+                        when.strftime("%H:%M"), u.get("bugcheck_hex"), u.get("connected_standby")))
     m = f.get("arm_b")
     if not td:
         L.append("  not a trading day: no blind minutes to measure")
