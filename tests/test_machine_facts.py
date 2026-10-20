@@ -129,16 +129,35 @@ class MachineGuards(unittest.TestCase):
         self.assertIn("hmb_policy", got)
         self.assertIn("fast_startup", got)
 
+    # winreg exists only on Windows. These two patch it, so they must be SKIPPED
+    # elsewhere, not merely expected to pass: a bare `import winreg` in a test body is
+    # an ImportError on ubuntu-latest and turned CI red on 2026-10-20 (run #109, exit 1,
+    # 18 s, commit 65d342f). The suite was 594 green on this laptop at the time, which is
+    # exactly why a Windows-only dependency inside a test needs the guard on the test and
+    # not on the machine that happens to run it.
+    @unittest.skipUnless(os.name == "nt", "winreg is Windows-only")
     def test_an_absent_value_is_None_which_is_a_real_answer(self):
         """HMB unset means the default, which is ON - so None must not read as 'disabled'."""
         import winreg
         with mock.patch.object(winreg, "QueryValueEx", side_effect=FileNotFoundError):
             self.assertEqual(D.machine_guards(), {"hmb_policy": None, "fast_startup": None})
 
-    def test_it_never_raises(self):
+    @unittest.skipUnless(os.name == "nt", "winreg is Windows-only")
+    def test_it_never_raises_when_the_registry_refuses(self):
         import winreg
         with mock.patch.object(winreg, "OpenKey", side_effect=OSError("denied")), \
              mock.patch.object(D, "log", lambda m: None):
+            self.assertIsInstance(D.machine_guards(), dict)
+
+    def test_it_returns_a_dict_on_every_platform(self):
+        """Runs EVERYWHERE, including where winreg does not exist.
+
+        That is the real contract persist() depends on: off Windows the import inside
+        machine_guards() fails, the except catches it, and the caller still gets a dict
+        it can publish. Without a test that runs on Linux, nothing covered that path -
+        and the path is what CI executes.
+        """
+        with mock.patch.object(D, "log", lambda m: None):
             self.assertIsInstance(D.machine_guards(), dict)
 
 
