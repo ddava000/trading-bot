@@ -302,8 +302,9 @@ class DowntimeReportTests(unittest.TestCase):
         """
         import ast
 
-        src = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                "rh_daemon.py"), encoding="utf-8").read()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            src = f.read()
         main = next(n for n in ast.walk(ast.parse(src))
                     if isinstance(n, ast.FunctionDef) and n.name == "main")
         loop = next(n for n in ast.walk(main) if isinstance(n, ast.While))

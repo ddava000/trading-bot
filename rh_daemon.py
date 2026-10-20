@@ -131,6 +131,12 @@ _selftest_fails, _selftest_alert_at = 0, 0.0
 _last_reconcile = 0.0    # 0 => the first full cycle after start reconciles, which
                          # is also how a fresh start picks up a deposit made while
                          # the laptop was off or since the last session open.
+_MACHINE = {}            # laptop-local facts GitHub cannot see: whether keep-awake is
+                         # held, the last unclean shutdown's cause, and the two settings
+                         # the crash hypothesis turns on. Read once per start, published
+                         # on every status write so the daily digest can carry them.
+                         # A module global is right here precisely BECAUSE a restart
+                         # should re-read it - a reboot is when all three can change.
 _run_head = None         # git commit whose CODE is loaded in memory, captured at
                          # startup. Code-change detection compares against THIS, not
                          # against sync_code's own pull, because the status-push path
@@ -1134,6 +1140,12 @@ def persist(led, res, placed):
                  "positions": {p["symbol"]: round(p["qty"], 6) for p in led["positions"]},
                  "holds": sorted(led.get("holds") or {}),
                  "orders_today": led.get("orders_today", 0), "dry": DRY})
+    # Laptop-local facts for the GitHub daily digest, which replaced the retired daily
+    # checks on 2026-10-17 and runs where none of this is visible. Free here: read once
+    # at startup, copied in. A missing or None value is a FLAG, not a pass - the digest
+    # treats an unreadable source that way and so should any other reader.
+    if _MACHINE:
+        snap["machine"] = _MACHINE
 
     # REALIZED (taxable) gain/loss, for Devon's tax tracking. Devon asked both arms to
     # carry a running realized total; cloud built the shared reader and asked the laptop
@@ -1642,6 +1654,120 @@ def _implied_boot_epoch():
         return None
 
 
+def alert_keep_awake(led, held):
+    """Tell Devon when the Modern Standby hold did not take. Once a day. Never raises.
+
+    keep_awake() only ever LOGGED its failures, and the retired laptop daily check's
+    check C was the only thing that read those lines. Every unclean shutdown before
+    2026-10-08 happened in Modern Standby (08-04, 09-02, 09-21), and 09-21 hung there and
+    stayed dead for twelve hours until someone pressed power - auto-logon cannot help a
+    machine that never boots. So a silently broken hold is the condition that precedes the
+    worst outage this experiment has had.
+
+    A function rather than four lines in main() so the dampener is testable: this file has
+    got a dampener wrong five times, every time by keeping it somewhere a restart cleared.
+    The day stamp lives on the ledger, so a restart loop cannot turn one broken hold into
+    an alert per restart.
+    """
+    try:
+        if held or os.name != "nt":
+            return False
+        today = now_et().strftime("%Y-%m-%d")
+        if (led.get("alerts") or {}).get("keep_awake_alert_day") == today:
+            return False
+        _remember_alerts(led, keep_awake_alert_day=today)
+        return notify(
+            f"{SESSION_NAME}: KEEP-AWAKE IS NOT HELD - the laptop can sleep again",
+            "SetThreadExecutionState did not take, so nothing is stopping this laptop "
+            "entering Modern Standby while the bot runs.\n\n"
+            "Every unclean shutdown before 2026-10-08 happened in Modern Standby (08-04, "
+            "09-02, 09-21), and 09-21 hung there and stayed dead for twelve hours until "
+            "someone pressed power - auto-logon cannot help a machine that never boots.\n\n"
+            "Arm B holds index positions with no stops, so this is not an emergency for the "
+            "money; it is the condition that preceded the longest outage this experiment has "
+            "had. Restarting the scheduled task rh-trading-bot is the first thing to try. "
+            "The daemon keeps running and trading meanwhile.")
+    except Exception as e:
+        log(f"alert_keep_awake failed ({e}) - not fatal, startup continues")
+        return False
+
+
+def last_unclean_shutdown():
+    """The last Kernel-Power 41 and WHY, from the Windows event log. None if unreadable.
+
+    Nothing else in this system can see it. report_downtime says the machine went away;
+    only BugcheckCode and ConnectedStandbyInProgress say what took it. That mattered
+    enough to be the laptop daily check's check B, and when Devon retired that session on
+    2026-10-17 (four Claude sessions was too many) it left no reader at all: every mention
+    of event 41 in this file was a COMMENT, and rh_watchdog.py and daily_digest.py have
+    none. Verified by grep before writing this, not assumed.
+
+    It is not a nicety while the HMB experiment runs. The question that experiment answers
+    is "does this laptop still crash with the SSD's host memory buffer disabled", and
+    ConnectedStandbyInProgress is how we tell the old Modern Standby cause (true on
+    08-04, 09-02, 09-21) from a new one (false on both 10-08 events). A crash read against
+    the wrong hypothesis is worse than no crash data.
+
+    wevtutil, not PowerShell: a plain exe, measured at 69 ms here, run once per daemon
+    start rather than per pass. Never raises - an unreadable log must not stop a
+    heartbeat, and the caller publishes None as a flag rather than as a pass.
+    """
+    try:
+        import xml.etree.ElementTree as ET
+        r = subprocess.run(["wevtutil", "qe", "System", "/q:*[System[(EventID=41)]]",
+                            "/c:1", "/rd:true", "/f:xml"],
+                           capture_output=True, text=True, timeout=30)
+        if r.returncode != 0 or not (r.stdout or "").strip():
+            return None
+        ns = {"e": "http://schemas.microsoft.com/win/2004/08/events/event"}
+        root = ET.fromstring(r.stdout.strip())
+        when = root.find(".//e:TimeCreated", ns)
+        data = {d.get("Name"): d.text for d in root.findall(".//e:EventData/e:Data", ns)}
+        code = int(data.get("BugcheckCode") or 0)
+        return {
+            # The event is written when Windows comes BACK, so this is the recovery time,
+            # not the moment it died; EventLog 6008 carries the latter and report_downtime
+            # already measures the gap from the heartbeat, which is the figure that counts.
+            "logged_at": (when.get("SystemTime") or "")[:19] if when is not None else None,
+            "bugcheck": code,
+            "bugcheck_hex": "0x%x" % code,
+            "connected_standby": str(data.get("ConnectedStandbyInProgress")).lower() == "true",
+            "sleep_in_progress": int(data.get("SleepInProgress") or 0),
+        }
+    except Exception as e:
+        log(f"could not read the last unclean shutdown ({e}); publishing it as unknown")
+        return None
+
+
+def machine_guards():
+    """The two settings the crash hypothesis depends on. Values, never changes.
+
+    Devon changes these; this only reports them, because a guard nobody watches is a
+    guard that can be switched off by a Windows update without anyone noticing. HMB is
+    the live experiment (0 = disabled, set 2026-10-08); HiberbootEnabled is Fast Startup,
+    which Devon chose to leave ON and which failed its own resume on 10-08. Read through
+    winreg, so no subprocess at all. The AC sleep timeouts are deliberately NOT here:
+    keep_awake's ES_CONTINUOUS hold supersedes them, and that hold now alerts when it
+    fails, which is the protection those timeouts were a proxy for.
+    """
+    out = {}
+    try:
+        import winreg
+        for key, name, label in (
+            (r"SYSTEM\CurrentControlSet\Control\StorPort", "HmbAllocationPolicy", "hmb_policy"),
+            (r"SYSTEM\CurrentControlSet\Control\Session Manager\Power",
+             "HiberbootEnabled", "fast_startup"),
+        ):
+            try:
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key) as k:
+                    out[label] = winreg.QueryValueEx(k, name)[0]
+            except FileNotFoundError:
+                out[label] = None          # absent is a real answer: HMB unset = default ON
+    except Exception as e:
+        log(f"could not read the machine guards ({e})")
+    return out
+
+
 def retry_pending_downtime(led):
     """Send a parked downtime report, and keep trying until it is away. Never raises.
 
@@ -1747,12 +1873,30 @@ def report_downtime(led):
             cause = ("Could not read this machine's boot time, so whether the LAPTOP went away or "
                      "only this daemon did is unknown.")
         elif rebooted:
+            # Name the cause in the mail rather than sending Devon to Event Viewer. On
+            # 2026-10-08 the first version of this pointed only at Kernel-Power 41 and
+            # 6008, and the 42-minute gap it was reporting turned out to be Devon's own
+            # memory test - so it sent him hunting a bugcheck that did not exist.
+            _u = (_MACHINE or {}).get("last_unclean_shutdown")
+            if _u is None:
+                _why = ("The Windows event log could not be read, so the cause is UNKNOWN - treat that "
+                        "as a missing answer, not a clean bill. Event Viewer / Windows Logs / System: "
+                        "Kernel-Power 41 for the bugcheck, EventLog 6008 for when it went down, "
+                        "User32 1074 if a human or an update asked for it.")
+            elif _u.get("bugcheck"):
+                _why = (f"The last unclean shutdown was a BUGCHECK {_u['bugcheck_hex']} "
+                        f"(connected standby {_u['connected_standby']}), logged "
+                        f"{_u.get('logged_at')}. Windows crashed and restarted itself.")
+            else:
+                _why = (f"The last unclean shutdown has NO bugcheck code (connected standby "
+                        f"{_u['connected_standby']}, sleep-in-progress {_u['sleep_in_progress']}), "
+                        f"logged {_u.get('logged_at')} - a hang, a power loss, or a shutdown that "
+                        "never finished writing its records. Check User32 1074 before assuming a "
+                        "crash: a memory test or an update reboot lands here too, and one did on "
+                        "2026-10-08.")
             cause = ("The LAPTOP went down and came back: it booted "
                      f"{datetime.fromtimestamp(boot, bot.ET_TZ).strftime('%H:%M ET')}, inside the gap. "
-                     "Event Viewer / Windows Logs / System has the cause: Kernel-Power 41 carries the "
-                     "bugcheck code, EventLog 6008 the time it went down, User32 1074 says a human or "
-                     "an update asked for it instead - a memory test or an update reboot lands here too, "
-                     "so check 1074 before assuming a crash.")
+                     + _why)
         else:
             # Deliberately weaker than it used to read. The uptime counter is the only
             # thing consulted, and cloud's 2026-10-08 audit raised that Fast Startup
@@ -1798,7 +1942,7 @@ def main():
     if not acquire_singleton():
         log("another rh_daemon is already running — this instance is exiting")
         return 0
-    keep_awake()
+    _awake = keep_awake()
     if _detach_from_console():
         log("running detached: console Ctrl+C ignored, use rh_HALT to stop")
     if not ACCOUNT:
@@ -1838,6 +1982,23 @@ def main():
     if _broker_alert_at or _selftest_alert_at or _deposit_alert_on:
         log(f"restored alert state from the ledger: broker_fails={_reconcile_fails} "
             f"selftest_fails={_selftest_fails} deposit_alert_on={_deposit_alert_on}")
+    # Read once per start, not per pass: wevtutil is ~70 ms and these change only across
+    # a reboot or a settings edit. persist() copies the block into rh_status.json every
+    # pass for free, which is how the GitHub digest gets to see a laptop-local fact.
+    global _MACHINE
+    _MACHINE = {"keep_awake": bool(_awake),
+                "last_unclean_shutdown": last_unclean_shutdown(),
+                "guards": machine_guards()}
+    log("machine: keep_awake=%s guards=%s last_unclean=%s"
+        % (_MACHINE["keep_awake"], _MACHINE["guards"],
+           (_MACHINE["last_unclean_shutdown"] or {}).get("logged_at") or "none/unreadable"))
+    # KEEP-AWAKE FAILING USED TO BE LOG-ONLY. The retired daily check's check C was its
+    # only reader, and Modern Standby is where this laptop died three times out of three,
+    # so a silently broken hold is the failure that precedes the failure. Alerted here
+    # rather than inside keep_awake() because the dampener belongs on the ledger, and the
+    # ledger is not loaded that early - module globals have lost restart-critical state in
+    # this file five times. Once a day, so a restart loop cannot spam.
+    alert_keep_awake(led, _MACHINE["keep_awake"])
     report_downtime(led)   # a gap nothing could alert from while it was happening
     last_full = 0.0
     while True:
