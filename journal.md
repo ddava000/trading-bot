@@ -2262,3 +2262,9 @@
 - avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
 - notes: After-hours check: tape finished constructive today with the AI dip-buy holding, VIX at 18.4 and Day P&L green, but hot September CPI and a heavy bank-earnings week keep risk two-sided. Maintaining neutral/0.45 with only $16 cash capping new buys anyway.
 - journal: Mon 10/19 17:47: Post-close — no change in posture, VIX 18.4, MSFT +6%, PLTR +4%, ARQT +15% at new 52wk high. Holding neutral/0.45. Watching bank earnings and CPI-driven inflation fears for overnight gap risk; SNDK/IWM still broken and avoided.
+
+### 2026-10-20T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
+- notes: Futures mixed with chipmakers back under pressure after yesterday's rebound; VIX firmed to 18.7 and hot September CPI plus a busy bank-earnings week keep risk two-sided. Holding neutral but nudging risk to 0.40, and only $16 cash caps new buys regardless.
+- journal: Tue 10/20 09:00: Chip weakness resurfacing pre-market, VIX up to 18.7 from 18.4. Trimmed risk_scale to 0.40. ARQT still strong on fresh analyst upgrades, added to favor; MSFT/PLTR/BKH constructive. Still avoiding SNDK/IWM/NVDA wreckage; watching CPI inflation fears and bank earnings for landmines.
