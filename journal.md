@@ -2298,3 +2298,9 @@
 - avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
 - notes: Constructive midday tape — tech rally resumed, Dow +500, VIX calm at 16.7, Fed overhang cleared. Holding risk 0.50; ARQT stays avoid on earnings within ~7 days, SNDK/IWM/NVDA wreckage excluded; $22 cash caps new buys anyway.
 - journal: Wed 10/21 13:25: Tape steady-green, VIX ticked down to 16.7, Day P&L +$2. Maintaining risk-on/0.50 and same avoid/favor lists. Watching SNDK (-12%)/IWM (-8%) laggards and NVDA chip softness; ARQT earnings landmine still pending.
+
+### 2026-10-21T15:28 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive into the close — tech/AI rally holding, Dow up, VIX calm at 17.2, Fed overhang cleared. Holding risk 0.50; ARQT stays avoid on earnings within ~7 days, SNDK/IWM/NVDA/FTRE/HONA wreckage excluded; $22 cash caps new buys anyway.
+- journal: Wed 10/21 15:28: Final-half-hour tape steady-green, VIX 17.2, Day P&L +$2. Same risk-on/0.50 and avoid/favor lists into close. Watching SNDK (-12.6%)/IWM (-8.3%) laggards and NVDA (-2.5%) chip softness; ARQT earnings landmine still pending within ~7 days.
