@@ -121,6 +121,36 @@ RECONCILE_BACKOFF_MAX = 900   # cap retry spacing at 15 min during an outage
 AUTH_BACKOFF_MAX = 120        # but cap it at 2 min when the cause is an expired LOGIN
 
 
+def retry_wait(fails, err, reset_wait):
+    """Seconds to wait before the next broker attempt. One function, so it is testable.
+
+    The curve doubles to RECONCILE_BACKOFF_MAX because each broker snapshot is a real
+    agent turn, and retrying every 60 s through a usage-limit outage burns the quota being
+    waited on. A reset time the bridge NAMED beats a blind curve. An expired LOGIN is
+    neither: it fails at authentication before any model call, so the retry is free, and
+    its fix is a human running `claude auth login` - worth noticing in two minutes rather
+    than fifteen.
+
+    PRECEDENCE MATTERS AND I GOT IT WRONG FIRST. e906b0c7 applied the auth cap after the
+    quota override with only a needs_human() test, so a message matching BOTH classes had
+    its parsed quota wait rewritten to 120 s: cloud's example, "Failed to authenticate
+    while checking quota: You've hit your session limit - resets 1:40pm", parses to
+    14845 s and would have become 124 retries through a quota outage. The cap now requires
+    NO quota evidence of any kind - not the self-healing class, and no parsed reset. Either
+    test alone leaves a hole: reset-is-None misses a limit message whose reset does not
+    parse, and class-only misses limit wording self_heals does not match but the parser
+    does. The asymmetry is why quota wins when a message says both - reading it as quota
+    costs a quarter-hour of blindness at worst, reading it as auth costs hours of hammering
+    the resource we are waiting for.
+    """
+    wait = min(FAST_PASS_SEC * (2 ** min(fails - 1, 4)), RECONCILE_BACKOFF_MAX)
+    if reset_wait is not None:
+        wait = reset_wait
+    if needs_human(err) and not self_heals(err) and reset_wait is None:
+        wait = min(wait, AUTH_BACKOFF_MAX)
+    return wait
+
+
 def needs_human(err):
     """Is this broker error the class that NEVER recovers on its own? One definition.
 
@@ -2117,28 +2147,16 @@ def main():
                     _remember_alerts(led, reconcile_fails=_reconcile_fails)
                     if not _broker_down_since:
                         _broker_down_since = time.time()
-                    wait = min(FAST_PASS_SEC * (2 ** min(_reconcile_fails - 1, 4)),
-                               RECONCILE_BACKOFF_MAX)
-                    # Prefer the reset time the bridge NAMED over a blind curve. Usage limits are
-                    # the largest single source of this bot's blindness, and the exact moment the
-                    # quota returns is sitting in the error text we already logged.
+                    # The whole decision - curve, named reset, auth cap and the precedence
+                    # between them - lives in retry_wait(). It was inline here, which is
+                    # how a mutation deleting the auth cap left the tests green: they
+                    # replayed the arithmetic instead of calling the code.
+                    # The reset time the bridge NAMED beats a blind curve: usage limits are
+                    # the largest single source of this bot's blindness and the exact moment
+                    # the quota returns is in the error text we already logged.
                     _reset_wait = quota_reset_wait(_last_agent_error)
-                    if _reset_wait is not None:
-                        wait = _reset_wait
                     _waiting_on_reset = _reset_wait is not None
-                    # AN EXPIRED LOGIN IS NOT A QUOTA PROBLEM, so do not back off like one.
-                    # This curve exists to protect the Claude quota: each broker snapshot is
-                    # a real agent turn, and retrying every 60 s through a usage-limit outage
-                    # burns the resource being waited on. That reasoning does not hold for an
-                    # auth failure, which fails AT AUTHENTICATION, before any model call, so
-                    # the retry costs nothing - and the fix is a human running `claude auth
-                    # login`, which we want noticed in seconds, not in a quarter of an hour.
-                    # 2026-10-21 is the case: failures at 09:45 drove the curve to its 900 s
-                    # cap by 10:00:39, Devon fixed the login about 10:02, and the daemon did
-                    # not find out until 10:16:11 - 31 blind market-minutes, of which about
-                    # 13 were this wait running after the problem was already solved.
-                    if needs_human(_last_agent_error):
-                        wait = min(wait, AUTH_BACKOFF_MAX)
+                    wait = retry_wait(_reconcile_fails, _last_agent_error, _reset_wait)
                     _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
                         f"trading nothing this pass, next try in {int(wait)}s"

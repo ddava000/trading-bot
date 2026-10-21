@@ -350,21 +350,36 @@ class TheAuthClassDoesNotBackOffLikeAQuotaOutage(unittest.TestCase):
         return ast, next(n for n in ast.walk(tree)
                          if isinstance(n, ast.FunctionDef) and n.name == "main")
 
-    def test_the_auth_cap_is_actually_WIRED_INTO_main(self):
-        """A mutation run caught this: my arithmetic test replayed the curve itself.
+    def test_the_auth_cap_lives_WHERE_main_actually_gets_its_wait(self):
+        """A mutation run caught the original of this: the test replayed the curve itself.
 
         test_the_incident_curve_would_have_been_capped computes the waits in the TEST, so
-        deleting the cap from main() left it green. That is the same miss as the
+        deleting the cap from main() left it green - the same miss as the
         retry_pending_downtime call site a week earlier, and the same lesson: when the fix
-        is "call X from Y", a test has to assert the CALL, because a function passing its
-        own tests says nothing about whether anything invokes it.
+        is "call X from Y", assert the CALL.
+
+        Rewritten 2026-10-21 when the decision moved out of main() into retry_wait(). The
+        first version asserted needs_human and AUTH_BACKOFF_MAX appeared inside main(),
+        which was true of the inline code and false of the better structure - so it failed
+        on a change that improved what it was protecting. The guarantee belongs on whichever
+        function main() takes its wait FROM, not on main().
         """
         ast, main = self._main_ast()
         called = [c.func.id for c in ast.walk(main)
                   if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
-        self.assertIn("needs_human", called, "main() must classify the error for the backoff")
-        names = [n.id for n in ast.walk(main) if isinstance(n, ast.Name)]
-        self.assertIn("AUTH_BACKOFF_MAX", names, "main() must apply the auth cap")
+        self.assertIn("retry_wait", called, "main() must get its wait from retry_wait")
+
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        rw = next(n for n in ast.walk(tree)
+                  if isinstance(n, ast.FunctionDef) and n.name == "retry_wait")
+        inner = [c.func.id for c in ast.walk(rw)
+                 if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+        self.assertIn("needs_human", inner, "retry_wait must classify the error")
+        self.assertIn("self_heals", inner, "and must let quota evidence win")
+        names = [n.id for n in ast.walk(rw) if isinstance(n, ast.Name)]
+        self.assertIn("AUTH_BACKOFF_MAX", names)
 
     def test_alert_keep_awake_is_called_from_the_main_LOOP(self):
         """Once at startup is not enough: a send that failed needs a later pass."""
@@ -373,3 +388,89 @@ class TheAuthClassDoesNotBackOffLikeAQuotaOutage(unittest.TestCase):
         called = [c.func.id for stmt in loop.body for c in ast.walk(stmt)
                   if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
         self.assertIn("alert_keep_awake", called)
+
+
+class QuotaEvidenceBeatsTheAuthCap(unittest.TestCase):
+    """FINDING (cloud, 2026-10-21), reproduced: the auth cap ran AFTER the quota override.
+
+    e906b0c7 capped the retry wait at AUTH_BACKOFF_MAX whenever needs_human(err), and that
+    line sits after `wait = reset_wait`. On a message matching BOTH classes the cap
+    rewrote a parsed quota wait:
+        "Failed to authenticate while checking quota: You've hit your session limit -
+         resets 1:40pm (America/Chicago)"
+        needs_human True, self_heals True, quota_reset_wait 14845 s -> capped to 120 s
+    124 retries through a quota outage instead of one, which is the exact burn the curve
+    exists to prevent. My fix would have made the worst case worse.
+
+    Latent, not observed: the two real messages separate cleanly. But `auth` is a broad
+    substring and the bridge's wording is not ours. The asymmetry settles it - reading a
+    mixed message as QUOTA costs at most a quarter-hour of extra blindness on a login fix,
+    reading it as AUTH costs hours of hammering the resource being waited for.
+
+    These tests were written BEFORE the fix, call site first, because the two mutations
+    that got away this morning were both wiring.
+    """
+
+    MIXED = ("Failed to authenticate while checking quota: You've hit your session limit "
+             "- resets 1:40pm (America/Chicago)")
+    AUTH = "Failed to authenticate: OAuth session expired and could not be refreshed"
+    LIMIT = "You've hit your session limit - resets 1:40pm (America/Chicago)"
+
+    def test_the_decision_is_ONE_function_that_main_calls(self):
+        """Written first. The arithmetic must not live inline where only a test replays it."""
+        import ast
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        names = [n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]
+        self.assertIn("retry_wait", names)
+        main = next(n for n in ast.walk(tree)
+                    if isinstance(n, ast.FunctionDef) and n.name == "main")
+        called = [c.func.id for c in ast.walk(main)
+                  if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+        self.assertIn("retry_wait", called, "main() must use it, not reimplement it")
+
+    def test_a_mixed_message_keeps_the_quota_wait(self):
+        got = D.retry_wait(5, self.MIXED, 14845)
+        self.assertEqual(got, 14845, "quota evidence must win over the auth cap")
+
+    def test_a_limit_message_whose_reset_does_not_parse_is_still_not_capped(self):
+        """Why 'reset is None' alone is not enough as a guard."""
+        got = D.retry_wait(5, "You've hit your session limit, try later", None)
+        self.assertEqual(got, D.RECONCILE_BACKOFF_MAX)
+
+    def test_a_pure_auth_failure_IS_capped(self):
+        self.assertEqual(D.retry_wait(5, self.AUTH, None), D.AUTH_BACKOFF_MAX)
+        self.assertEqual(D.retry_wait(1, self.AUTH, None), D.FAST_PASS_SEC)
+
+    def test_a_plain_limit_message_uses_the_named_reset(self):
+        self.assertEqual(D.retry_wait(5, self.LIMIT, 14845), 14845)
+
+    def test_an_unknown_error_keeps_the_quota_curve(self):
+        self.assertEqual(D.retry_wait(5, "broker returned 503", None), D.RECONCILE_BACKOFF_MAX)
+        self.assertEqual(D.retry_wait(2, "broker returned 503", None), D.FAST_PASS_SEC * 2)
+
+    def test_the_curve_still_doubles_and_caps_as_it_always_did(self):
+        waits = [D.retry_wait(f, "broker returned 503", None) for f in range(1, 7)]
+        self.assertEqual(waits, [60, 120, 240, 480, 900, 900])
+
+    def test_auth_wording_WITH_a_named_reset_still_waits_for_the_reset(self):
+        """Why `reset_wait is None` is load-bearing and not belt-and-braces.
+
+        A mutation dropping it survived every other test here: the gap is a message with
+        AUTH wording whose reset time parses but which self_heals does not match. If the
+        bridge ever says that, a named reset is still hard evidence that waiting is the
+        right move, and the cap must not override it.
+
+        The reset is INJECTED rather than parsed from the string. My first version asserted
+        quota_reset_wait() parsed it, which made the test depend on the wall clock: the
+        parser rolls a time already past to tomorrow and then declines it as over six
+        hours, so the test passed before 1:40pm Central and failed after. It failed on this
+        laptop at 15:32 ET and would have failed on a UTC runner most of the day. retry_wait
+        takes reset_wait as an argument, so the behaviour under test needs no parsing at all.
+        """
+        msg = "Failed to authenticate: token expired, resets 1:40pm (America/Chicago)"
+        self.assertTrue(D.needs_human(msg))
+        self.assertFalse(D.self_heals(msg), "fixture must not match the self-healing class")
+        self.assertEqual(D.retry_wait(5, msg, 14845), 14845,
+                         "a named reset outranks the auth cap")
