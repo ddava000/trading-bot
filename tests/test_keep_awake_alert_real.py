@@ -50,7 +50,6 @@ class KeepAwakeAlert(unittest.TestCase):
         self.assertFalse(D.alert_keep_awake(self.led, held=True))
         self.assertEqual(self.sent, [])
 
-    @unittest.expectedFailure
     def test_a_first_send_that_failed_because_the_network_was_down_is_retried_later_the_same_day(self):
         if os.name != "nt":
             self.skipTest("alert_keep_awake only acts on Windows")

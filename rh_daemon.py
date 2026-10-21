@@ -118,6 +118,25 @@ BROKER_ALERT_AFTER_SEC = 900  # ...or once an outage has lasted this long, howev
                              # attempts it took; see _maybe_alert_broker
 
 RECONCILE_BACKOFF_MAX = 900   # cap retry spacing at 15 min during an outage
+AUTH_BACKOFF_MAX = 120        # but cap it at 2 min when the cause is an expired LOGIN
+
+
+def needs_human(err):
+    """Is this broker error the class that NEVER recovers on its own? One definition.
+
+    It used to be two: _maybe_alert_broker classified the error to pick a subject line,
+    and the retry backoff did not classify at all. Keeping the same test in two places is
+    how an early close gets modelled in one and missed in the other, so both now call
+    this.
+    """
+    e = (err or "").lower()
+    return ("oauth" in e or "authenticate" in e or "session expired" in e or "auth" in e)
+
+
+def self_heals(err):
+    """Is it the class that comes back on a timer, with no human needed?"""
+    e = (err or "").lower()
+    return ("session limit" in e or "usage limit" in e or "rate limit" in e)
 DEGRADED_PUSH_SEC  = 300    # min spacing between degraded git pushes; see publish_degraded
 
 _reconcile_fails, _broker_alert_at = 0, 0.0
@@ -1578,11 +1597,8 @@ def _maybe_alert_broker(led):
     # "when convenient". Being trained by true-but-unimportant alerts to ignore the
     # one that matters is how alerting dies. The subject line has to carry the
     # difference, because that is all that is visible in an inbox.
-    _err = (_last_agent_error or "").lower()
-    _needs_human = ("oauth" in _err or "authenticate" in _err
-                    or "session expired" in _err or "auth" in _err)
-    _self_heals = ("session limit" in _err or "usage limit" in _err
-                   or "rate limit" in _err)
+    _needs_human = needs_human(_last_agent_error)
+    _self_heals = self_heals(_last_agent_error)
     if _broker_alert_at and _self_heals and _waiting_on_reset and not _needs_human:
         return
     if _needs_human:
@@ -1675,8 +1691,15 @@ def alert_keep_awake(led, held):
         today = now_et().strftime("%Y-%m-%d")
         if (led.get("alerts") or {}).get("keep_awake_alert_day") == today:
             return False
-        _remember_alerts(led, keep_awake_alert_day=today)
-        return notify(
+        # STAMP ONLY ON A DELIVERED SEND, and let the main loop call this every pass so a
+        # failure is retried. The first version wrote the stamp FIRST and ignored notify's
+        # verdict, and main() calls this seconds after boot - 40 s on 10-08 - which is
+        # exactly when the network may not be up. Network down on that one call meant zero
+        # mails and a ledger saying "alerted today". Cloud reproduced it on 10-20.
+        # It is the same mistake I had already fixed in report_downtime on 10-13, made
+        # again in a new function seven days later: the dampener has to record the SEND,
+        # not the attempt.
+        delivered = notify(
             f"{SESSION_NAME}: KEEP-AWAKE IS NOT HELD - the laptop can sleep again",
             "SetThreadExecutionState did not take, so nothing is stopping this laptop "
             "entering Modern Standby while the bot runs.\n\n"
@@ -1687,6 +1710,11 @@ def alert_keep_awake(led, held):
             "money; it is the condition that preceded the longest outage this experiment has "
             "had. Restarting the scheduled task rh-trading-bot is the first thing to try. "
             "The daemon keeps running and trading meanwhile.")
+        if delivered:
+            _remember_alerts(led, keep_awake_alert_day=today)
+        else:
+            log("keep-awake alert NOT delivered; leaving it unstamped so the next pass retries")
+        return delivered
     except Exception as e:
         log(f"alert_keep_awake failed ({e}) - not fatal, startup continues")
         return False
@@ -2009,6 +2037,11 @@ def main():
         # had gone down. Cheap and quota-free: it returns immediately with nothing
         # parked, which is every pass but the handful after a failure.
         retry_pending_downtime(led)
+        # Every pass, not once at startup: a send that failed because the network was not
+        # up yet must be retried, and the day stamp is written only on delivery. Cheap -
+        # it returns immediately when the hold took or when today is already stamped,
+        # which is every pass but the handful after a genuine failure.
+        alert_keep_awake(led, (_MACHINE or {}).get("keep_awake", True))
         if os.path.exists(HALT_F):
             log("rh_HALT present — trading paused")
             if "--once" in sys.argv:      # otherwise --once spins here forever
@@ -2093,6 +2126,19 @@ def main():
                     if _reset_wait is not None:
                         wait = _reset_wait
                     _waiting_on_reset = _reset_wait is not None
+                    # AN EXPIRED LOGIN IS NOT A QUOTA PROBLEM, so do not back off like one.
+                    # This curve exists to protect the Claude quota: each broker snapshot is
+                    # a real agent turn, and retrying every 60 s through a usage-limit outage
+                    # burns the resource being waited on. That reasoning does not hold for an
+                    # auth failure, which fails AT AUTHENTICATION, before any model call, so
+                    # the retry costs nothing - and the fix is a human running `claude auth
+                    # login`, which we want noticed in seconds, not in a quarter of an hour.
+                    # 2026-10-21 is the case: failures at 09:45 drove the curve to its 900 s
+                    # cap by 10:00:39, Devon fixed the login about 10:02, and the daemon did
+                    # not find out until 10:16:11 - 31 blind market-minutes, of which about
+                    # 13 were this wait running after the problem was already solved.
+                    if needs_human(_last_agent_error):
+                        wait = min(wait, AUTH_BACKOFF_MAX)
                     _next_reconcile_try = time.time() + wait
                     log(f"broker snapshot unavailable ({_reconcile_fails}x), "
                         f"trading nothing this pass, next try in {int(wait)}s"

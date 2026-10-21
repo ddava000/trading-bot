@@ -286,3 +286,90 @@ class TheDowntimeMailNamesTheCause(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheAuthClassDoesNotBackOffLikeAQuotaOutage(unittest.TestCase):
+    """2026-10-21: the backoff curve ran for 13 minutes after Devon had fixed the login.
+
+    The curve protects the Claude quota - each broker snapshot is a real agent turn, and
+    retrying every 60 s through a usage-limit outage burns the resource being waited on.
+    An auth failure fails AT AUTHENTICATION, before any model call, so it costs nothing,
+    and the fix is a human running `claude auth login`. Failures at 09:45 drove the curve
+    to its 900 s cap by 10:00:39; the login was fixed about 10:02; the daemon learned at
+    10:16:11. 31 blind market-minutes, about 13 of them this wait.
+    """
+
+    REAL_AUTH_ERROR = "Failed to authenticate: OAuth session expired and could not be refreshed"
+
+    def test_the_real_error_string_from_the_incident_is_classified_as_needing_a_human(self):
+        self.assertTrue(D.needs_human(self.REAL_AUTH_ERROR))
+        self.assertFalse(D.self_heals(self.REAL_AUTH_ERROR))
+
+    def test_a_usage_limit_is_not_the_auth_class(self):
+        msg = "You've hit your session limit - resets 1:40pm (America/Chicago)"
+        self.assertFalse(D.needs_human(msg))
+        self.assertTrue(D.self_heals(msg))
+
+    def test_the_auth_cap_is_far_below_the_quota_cap(self):
+        self.assertLess(D.AUTH_BACKOFF_MAX, D.RECONCILE_BACKOFF_MAX)
+        self.assertLessEqual(D.AUTH_BACKOFF_MAX, 120)
+
+    def test_the_incident_curve_would_have_been_capped(self):
+        """Replay the five failures: the quota curve reaches 900 s, the auth cap holds 120."""
+        waits = []
+        for fails in range(1, 6):
+            quota = min(D.FAST_PASS_SEC * (2 ** min(fails - 1, 4)), D.RECONCILE_BACKOFF_MAX)
+            waits.append(min(quota, D.AUTH_BACKOFF_MAX)
+                         if D.needs_human(self.REAL_AUTH_ERROR) else quota)
+        self.assertEqual(max(waits), D.AUTH_BACKOFF_MAX)
+        self.assertLessEqual(max(waits), 120, "a fixed login must be noticed in ~2 min, not 15")
+
+    def test_neither_classifier_fires_on_an_unknown_error(self):
+        """An unknown cause must keep the quota curve: it might be anything."""
+        self.assertFalse(D.needs_human("broker returned 503"))
+        self.assertFalse(D.self_heals("broker returned 503"))
+
+    def test_the_classification_has_ONE_definition(self):
+        """It used to be inline in _maybe_alert_broker and absent from the backoff."""
+        import ast
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            src = f.read()
+        inline = src.count('"oauth" in')
+        self.assertEqual(inline, 1, "the oauth test must exist in exactly one place, not %d" % inline)
+        tree = ast.parse(src)
+        names = [n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]
+        self.assertIn("needs_human", names)
+        self.assertIn("self_heals", names)
+
+    def _main_ast(self):
+        import ast
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            tree = ast.parse(f.read())
+        return ast, next(n for n in ast.walk(tree)
+                         if isinstance(n, ast.FunctionDef) and n.name == "main")
+
+    def test_the_auth_cap_is_actually_WIRED_INTO_main(self):
+        """A mutation run caught this: my arithmetic test replayed the curve itself.
+
+        test_the_incident_curve_would_have_been_capped computes the waits in the TEST, so
+        deleting the cap from main() left it green. That is the same miss as the
+        retry_pending_downtime call site a week earlier, and the same lesson: when the fix
+        is "call X from Y", a test has to assert the CALL, because a function passing its
+        own tests says nothing about whether anything invokes it.
+        """
+        ast, main = self._main_ast()
+        called = [c.func.id for c in ast.walk(main)
+                  if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+        self.assertIn("needs_human", called, "main() must classify the error for the backoff")
+        names = [n.id for n in ast.walk(main) if isinstance(n, ast.Name)]
+        self.assertIn("AUTH_BACKOFF_MAX", names, "main() must apply the auth cap")
+
+    def test_alert_keep_awake_is_called_from_the_main_LOOP(self):
+        """Once at startup is not enough: a send that failed needs a later pass."""
+        ast, main = self._main_ast()
+        loop = next(n for n in ast.walk(main) if isinstance(n, ast.While))
+        called = [c.func.id for stmt in loop.body for c in ast.walk(stmt)
+                  if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+        self.assertIn("alert_keep_awake", called)
