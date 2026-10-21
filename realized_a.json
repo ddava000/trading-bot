@@ -325,6 +325,11 @@
    "qty": 0.034038238,
    "symbol": "VST",
    "t": "2026-10-19"
+  },
+  {
+   "qty": 0.06624135,
+   "symbol": "BKH",
+   "t": "2026-10-21"
   }
  ],
  "closed": [
@@ -958,7 +963,7 @@
  "open": {
   "ARQT": 0.198701484,
   "ARXS": 0.119971392,
-  "BKH": 0.077735908,
+  "BKH": 0.143977258,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
   "HONA": 0.03993923,
@@ -991,8 +996,8 @@
     }
    }
   },
-  "fills": 107,
-  "last_fill": "2026-10-20T13:45:19.924819Z",
+  "fills": 108,
+  "last_fill": "2026-10-21T13:45:24.777569Z",
   "last_sale": "2026-10-20",
   "lt": {
    "gains": 0.0,
@@ -1002,7 +1007,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -21.23,
-  "reconciliation_residual": -0.0555,
+  "reconciliation_residual": -0.0455,
   "sales": 41,
   "since": "2026-08-12",
   "st": {
