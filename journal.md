@@ -2292,3 +2292,9 @@
 - avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
 - notes: Constructive open — futures up on earnings optimism, Dow +500 prior session, VIX calm at 17.2, Fed overhang cleared. Holding risk 0.50; ARQT stays on avoid (earnings within ~7 days) and SNDK/IWM/NVDA wreckage still excluded; only $21 cash caps new buys anyway.
 - journal: Wed 10/21 09:00: Calm constructive open, VIX eased to 17.2, Day P&L +$1. Maintaining risk-on/0.50. ARQT earnings landmine within ~7 days keeps it on avoid; CTSH strong (+12% last week) added to favor alongside MSFT/PLTR/BKH. Watching SNDK (-11%)/IWM (-8%) laggards and any chip wobble in NVDA.
+
+### 2026-10-21T13:25 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive midday tape — tech rally resumed, Dow +500, VIX calm at 16.7, Fed overhang cleared. Holding risk 0.50; ARQT stays avoid on earnings within ~7 days, SNDK/IWM/NVDA wreckage excluded; $22 cash caps new buys anyway.
+- journal: Wed 10/21 13:25: Tape steady-green, VIX ticked down to 16.7, Day P&L +$2. Maintaining risk-on/0.50 and same avoid/favor lists. Watching SNDK (-12%)/IWM (-8%) laggards and NVDA chip softness; ARQT earnings landmine still pending.
