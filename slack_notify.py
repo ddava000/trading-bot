@@ -176,6 +176,8 @@ def post_mail(n=1):
 # but could not reach us. Now anything he types in the channel is picked up by
 # whichever session runs next, and --pull-ingest files it into AGENT_MAIL.md,
 # which remains the channel of record.
+PAGE_SIZE = 200                  # Slack's maximum for conversations.history
+MAX_PAGES = 15                   # 3000 messages after the last relay; past that the read says INCOMPLETE
 BOT_TOKEN = (os.environ.get("SLACK_BOT_TOKEN") or "").strip()
 CHANNEL_ID = (os.environ.get("SLACK_CHANNEL_ID") or "").strip()
 
@@ -247,14 +249,39 @@ def read_channel(limit=25, oldest=None):
     if not can_read():
         print("  [slack read unavailable - token/channel unset, or channel refused]")
         return None
-    params = {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))}
+    raw = []
     if oldest:
-        params["oldest"] = str(oldest)
-    d = _api("conversations.history", params)
-    if not d:
-        return None                     # API said no: a real failure, not an empty room
+        # WITH `oldest`, SLACK RETURNS THE OLDEST `limit` MESSAGES AFTER IT, NOT THE NEWEST (measured live
+        # 2026-10-22 with --scan 25 since: the 25 returned ran from 08-25 to 08-27). The channel holds a
+        # few dozen bot posts a day, so from the first week after the last relay on 2026-08-25 the one page
+        # this function used to read was ALL bot posts, every human message sat beyond it, and the 15-minute
+        # pull printed "read OK, no new channel messages" for eight weeks. Devon's "Test" at 10:57 ET on
+        # 2026-10-22 was the proof. So: follow the cursor to the end of everything after `oldest`.
+        cursor = None
+        for _page in range(MAX_PAGES):
+            params = {"channel": CHANNEL_ID, "limit": str(PAGE_SIZE), "oldest": str(oldest)}
+            if cursor:
+                params["cursor"] = cursor
+            d = _api("conversations.history", params)
+            if not d:
+                return None             # API said no: a real failure, not an empty room
+            raw += d.get("messages", [])
+            cursor = (d.get("response_metadata") or {}).get("next_cursor")
+            if not (d.get("has_more") and cursor):
+                break
+        else:
+            # Never report calm for a channel we did not finish reading. None is the loud answer
+            # (the step exits 1), and pages arrive oldest first so what WAS read is never skipped over.
+            print("  [slack read INCOMPLETE: more than %d messages since the last relay; the newest were NOT read]"
+                  % (MAX_PAGES * PAGE_SIZE))
+            return None
+    else:
+        d = _api("conversations.history", {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))})
+        if not d:
+            return None                 # API said no: a real failure, not an empty room
+        raw = d.get("messages", [])
     msgs = []
-    for m in d.get("messages", []):
+    for m in raw:
         sub = m.get("subtype") or ""
         # Housekeeping events carry a channel_* subtype (join, leave, rename,
         # purpose, topic, archive). The first live read filed "has renamed the
@@ -267,7 +294,7 @@ def read_channel(limit=25, oldest=None):
         txt = (m.get("text") or "").strip()
         if txt:
             msgs.append({"ts": m.get("ts", ""), "user": m.get("user", "?"), "text": txt})
-    msgs.reverse()
+    msgs.sort(key=lambda x: float(x["ts"] or 0))        # oldest first, whichever order Slack's pages came in
     return msgs
 
 
@@ -453,7 +480,7 @@ if __name__ == "__main__":
         n = next((int(w) for w in words if w.isdigit()), 50)
         since = _last_ingested_ts() if "since" in words else None
         if since:
-            print("  [scan: asking Slack exactly as pull() does: limit=%d oldest=%s]" % (n, since))
+            print("  [scan: ONE page, as pull() asked before 2026-10-22 (it now follows every page): limit=%d oldest=%s]" % (n, since))
         rows = scan_channel(n, oldest=since)
         if rows is None:
             sys.exit(1)
