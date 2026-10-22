@@ -115,15 +115,9 @@ jobs:
         env:
           SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-        run: |
-          python slack_notify.py --pull-ingest 25 || echo "slack pull errored (non-fatal)"
-          if [ -n "$(git status --porcelain -- AGENT_MAIL.md)" ]; then
-            git config user.name  "alpaca-bot"
-            git config user.email "alpaca-bot@users.noreply.github.com"
-            git add -- AGENT_MAIL.md
-            git commit -m "AGENT_MAIL: relay Slack messages from Devon $(date -u +%FT%TZ)"
-            bash .github/scripts/push_retry.sh "slack relay" warn
-          fi
+        # Files in a throwaway worktree of the newest main and never rebases (2026-10-22: another session had
+        # appended to the end of AGENT_MAIL.md, the rebase conflicted, the relay was discarded under a green run).
+        run: bash .github/scripts/slack_relay.sh
 
       - name: Persist trade log + holds ledger
         if: always()

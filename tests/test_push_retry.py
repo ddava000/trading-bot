@@ -213,9 +213,12 @@ class Wiring(unittest.TestCase):
             self.assertNotIn("|| true", "\n".join(l for l in run.splitlines() if "git push" in l), s.get("name"))
             self.assertNotRegex(run, r"git push \|\|")
 
-    def test_the_slack_relay_commit_uses_it_too(self):
+    def test_the_slack_relay_has_its_own_script_because_a_rebase_conflicts_on_an_appended_mailbox(self):
+        """It used push_retry.sh until 2026-10-22, when pull --rebase hit a conflict on AGENT_MAIL.md and the relay was
+        discarded. slack_relay.sh never rebases; tests/test_slack_relay.py reproduces the loss and the fix with real git."""
         run = self.step("Pull Slack messages")["run"]
-        self.assertIn("push_retry.sh", run)
+        self.assertIn("slack_relay.sh", run)
+        self.assertNotIn("push_retry.sh", run)
 
 
 if __name__ == "__main__":
