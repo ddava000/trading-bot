@@ -2316,3 +2316,9 @@
 - avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH', 'VST']
 - notes: Futures lower as AI trade falters on Meta/Tesla earnings and oil rallies, VIX up to 18.0 — stepping down to neutral/0.40. Earnings landmines ARQT/HONA/CTSH/FTRE excluded (CTSH moved off favor into avoid on earnings within ~7 days), SNDK/IWM/NVDA wreckage still out; $22 cash caps buys anyway.
 - journal: Thu 10/22 09:00: Tone shifted defensive overnight — AI trade cracking on Meta/Tesla, oil up, VIX 18.0 (from 16.7). Cut to neutral/0.40 and moved CTSH onto avoid (earnings soon). Watching AI/chip names NVDA/PLTR/MSFT and oil-driven inflation risk.
+
+### 2026-10-22T13:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Tape deteriorating — Nasdaq tumbling on AI-spending fears, oil surging on Mideast escalation, flight to bonds, VIX up to 19.2. Going risk-off/0.30; SNDK (-20%), IWM (-8.5%) and NVDA (-6%) in free-fall excluded, earnings landmines ARQT/HONA/CTSH/FTRE out, VST added (energy/AI-power weakness); $16 cash caps buys anyway.
+- journal: Thu 10/22 13:23: Conditions worsened since AM — AI trade cracking harder, oil spiking on Mideast, VIX 19.2, Day P&L -$4, SNDK collapsed -20%. Cut to risk-off/0.30 and added QQQ/VST to avoid. Watching for capitulation vs. stabilization in chips/AI into the close.
