@@ -176,6 +176,7 @@ def post_mail(n=1):
 # but could not reach us. Now anything he types in the channel is picked up by
 # whichever session runs next, and --pull-ingest files it into AGENT_MAIL.md,
 # which remains the channel of record.
+_READ_STATS = {"looked_at": 0}   # how many raw messages the last read_channel saw, for pull()'s quiet line
 PAGE_SIZE = 200                  # Slack's maximum for conversations.history
 MAX_PAGES = 15                   # 3000 messages after the last relay; past that the read says INCOMPLETE
 BOT_TOKEN = (os.environ.get("SLACK_BOT_TOKEN") or "").strip()
@@ -280,6 +281,7 @@ def read_channel(limit=25, oldest=None):
         if not d:
             return None                 # API said no: a real failure, not an empty room
         raw = d.get("messages", [])
+    _READ_STATS["looked_at"] = len(raw)
     msgs = []
     for m in raw:
         sub = m.get("subtype") or ""
@@ -335,7 +337,10 @@ def pull(limit=25, ingest=False):
     if since:
         msgs = [m for m in msgs if float(m["ts"] or 0) > float(since)]
     if not msgs:
-        print("  [slack: read OK, no new channel messages]")
+        # How many messages were actually looked at is the evidence that "nothing" is a finding. The same
+        # line said "read OK" for eight weeks while looking at 25 messages from August.
+        print("  [slack: read OK, no new channel messages (looked at %d message(s) since the last relay)]"
+              % _READ_STATS["looked_at"])
         return []
     for m in msgs:
         print("  [slack %s] <%s> %s" % (m["ts"], m["user"], m["text"][:200]))

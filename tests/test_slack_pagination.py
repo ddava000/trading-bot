@@ -144,6 +144,22 @@ class ReadChannelPaging(Base):
         self.assertNotIn("oldest", api.calls[0][1])
 
 
+class TheQuietLineCarriesItsEvidence(Base):
+    def test_a_quiet_read_says_how_many_messages_it_looked_at(self):
+        self.use([bot(n) for n in range(1, 450)])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            self.assertEqual(S.pull(25), [])
+        self.assertIn("looked at 449 message(s)", buf.getvalue())
+
+    def test_the_count_is_of_what_slack_returned_not_of_what_was_kept(self):
+        self.use([bot(n) for n in range(1, 11)] + [human(11, "x")])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            S.read_channel(oldest=CURSOR)
+        self.assertEqual(S._READ_STATS["looked_at"], 11)
+
+
 class PullEndToEnd(Base):
     def test_a_human_message_after_many_bot_posts_is_filed_once_and_the_cursor_moves(self):
         self.use([bot(n) for n in range(1, 301)] + [human(301, "Test")])
