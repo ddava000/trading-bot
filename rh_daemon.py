@@ -1369,8 +1369,18 @@ def check_arm_a(led):
             # rather than silent. tests/test_arm_a_mute.py builds the body from cloud's real
             # describe() so their rewording breaks my test instead of my inbox.
             if ARM_A_MUTE_QUEUED and not urgent and "give it a machine" in body:
+                # LOG THE WHOLE BODY, not just the subject. Cloud's request 2026-10-22, and
+                # it is the right one: since their evidence change the queued paragraph ends
+                # with what GitHub actually returned to THIS check - the run id, the list
+                # row's status, the jobs endpoint's statuses, and the Date, Age, X-Cache and
+                # Via headers of the response. That is the only way to tell their cache
+                # hypothesis from staleness at GitHub's origin, and a mute that drops it
+                # would make the next episode as unexaminable as today's ten were. Devon
+                # sees nothing; the log keeps everything. Flattened to one line so a day's
+                # episodes grep cleanly.
                 log(f"ARM A WATCH first-level queued alert SUPPRESSED (muted on the laptop "
-                    f"2026-10-22, Devon's call; urgent level still sends): {subject}")
+                    f"2026-10-22, Devon's call; urgent level still sends): {subject} "
+                    f"|| EVIDENCE: {' / '.join(x.strip() for x in body.splitlines() if x.strip())}")
                 return True          # handled: do not let run_once retry or go red on it
             # Cloud's subject says WHAT is wrong; Devon asked that alerts say WHO must act, and
             # for an Arm A fault that is CLOUD, not this session. Their subject is kept verbatim

@@ -83,6 +83,33 @@ class TheMuteIsNarrow(unittest.TestCase):
         self.assertEqual(self.sent, [])
         self.assertTrue(any("SUPPRESSED" in m for m in self.logged), self.logged)
 
+    def test_the_suppressed_body_is_written_to_the_log_in_full(self):
+        """Cloud's request 2026-10-22, and the reason the mute is examinable at all.
+
+        Since their evidence change the queued paragraph ends with what GitHub returned to
+        THIS check - run id, list-row status, jobs statuses, and the Date, Age, X-Cache and
+        Via headers. That is the only way to tell their shared-cache hypothesis from
+        staleness at GitHub's origin. A mute that drops it would leave the next episode as
+        unexaminable as today's ten, which left no record at all.
+        """
+        body = (real_body("queued", 6.0) + chr(10)
+                + "GitHub returned: run 123, row queued, jobs in_progress, X-Cache: HIT")
+        self.deliver(body, urgent=False)
+        self.assertEqual(self.sent, [])
+        logged = " ".join(self.logged)
+        self.assertIn("EVIDENCE:", logged)
+        self.assertIn("X-Cache: HIT", logged, "the headers are the whole point of logging it")
+        self.assertIn("give it a machine", logged, "and the signal text, so the episode is identifiable")
+
+    def test_the_logged_body_is_one_line_so_a_day_greps_cleanly(self):
+        nl = chr(10)
+        body = real_body("queued", 6.0) + nl + "second line" + nl + nl + "third line"
+        self.deliver(body, urgent=False)
+        hit = [m for m in self.logged if "EVIDENCE:" in m]
+        self.assertEqual(len(hit), 1)
+        self.assertNotIn(nl, hit[0])
+        self.assertIn("second line / third line", hit[0], "blank lines dropped, order kept")
+
     # ---- what it must NOT silence ----------------------------------------------------
 
     def test_the_urgent_queued_level_still_sends(self):
