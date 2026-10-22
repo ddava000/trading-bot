@@ -2328,3 +2328,9 @@
 - avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: Worst day since July — tech selloff deepening on AI-spend fears and oil/Mideast jitters, flight to Treasurys, VIX 20.2. Holding risk-off/0.30 into final hour; SNDK (-20%), IWM (-8%), NVDA (-6%) in free-fall out, earnings landmines ARQT/HONA/CTSH/FTRE out, VST/QQQ excluded; $16 cash caps buys regardless.
 - journal: Thu 10/22 15:21: VIX ticked up to 20.2, tape still ugly into the close, Day P&L -$4. Kept risk-off/0.30 and same avoid/favor lists. Watching whether chips/AI stabilize or capitulate into the bell; CTSH/FTRE/HONA earnings still pending next week.
+
+### 2026-10-22T16:53 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Market closed sharply lower — Nasdaq's worst day since June on revived AI-spend doubts and oil spike, though VIX eased to 19.0 off intraday highs. Holding risk-off/0.30 post-close; SNDK (-22%), IWM (-8%), NVDA (-6%) wreckage out, earnings landmines ARQT/HONA/CTSH/FTRE excluded, QQQ/VST still avoided; $16 cash caps buys regardless.
+- journal: Thu 10/22 16:53: Closing bell — tech selloff finished the session deep in red but VIX ticked down to 19.0 from 20.2, Day P&L -$4. Kept risk-off/0.30 and same lists into the close. Watching for AI/chip stabilization overnight and CTSH/FTRE/HONA earnings landing within ~7 days.
