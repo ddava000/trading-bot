@@ -77,6 +77,10 @@ class Base(unittest.TestCase):
         stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
         self.stdout = None
 
+    def slurp(self):
+        with open(self.mail, encoding="utf-8") as f:
+            return f.read()
+
     def use(self, messages):
         self.api = FakeSlack(messages)
         p = mock.patch.object(S, "_api", self.api)
@@ -165,7 +169,7 @@ class PullEndToEnd(Base):
         self.use([bot(n) for n in range(1, 301)] + [human(301, "Test")])
         msgs = S.pull(25, ingest=True)
         self.assertEqual([m["text"] for m in msgs], ["Test"])
-        text = open(self.mail, encoding="utf-8").read()
+        text = self.slurp()
         self.assertIn("slack-ts:%.6f" % (CURSOR + 301), text)
         self.assertIn("Test", text)
         self.assertEqual(S.pull(25, ingest=True), [])                       # a second pull files nothing new
@@ -174,9 +178,9 @@ class PullEndToEnd(Base):
     def test_an_incomplete_read_files_nothing_and_returns_none(self):
         with mock.patch.object(S, "PAGE_SIZE", 10), mock.patch.object(S, "MAX_PAGES", 2):
             self.use([bot(n) for n in range(1, 40)] + [human(40)])
-            before = open(self.mail, encoding="utf-8").read()
+            before = self.slurp()
             self.assertIsNone(S.pull(25, ingest=True))
-        self.assertEqual(open(self.mail, encoding="utf-8").read(), before)
+        self.assertEqual(self.slurp(), before)
 
 
 if __name__ == "__main__":

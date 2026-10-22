@@ -179,6 +179,7 @@ def post_mail(n=1):
 _READ_STATS = {"looked_at": 0}   # how many raw messages the last read_channel saw, for pull()'s quiet line
 PAGE_SIZE = 200                  # Slack's maximum for conversations.history
 MAX_PAGES = 15                   # 3000 messages after the last relay; past that the read says INCOMPLETE
+THREAD_LOOKBACK_PAGES = 3        # recent history pages searched for threads with a new reply (about 3 weeks)
 BOT_TOKEN = (os.environ.get("SLACK_BOT_TOKEN") or "").strip()
 CHANNEL_ID = (os.environ.get("SLACK_CHANNEL_ID") or "").strip()
 
@@ -281,6 +282,17 @@ def read_channel(limit=25, oldest=None):
         if not d:
             return None                 # API said no: a real failure, not an empty room
         raw = d.get("messages", [])
+    if oldest:
+        extra = _thread_replies(oldest, raw)
+        if extra is None:
+            return None
+        raw = raw + extra
+    seen_ts, uniq = set(), []
+    for m in raw:                       # a broadcast reply is in the channel history AND in its thread: once
+        if m.get("ts") not in seen_ts:
+            seen_ts.add(m.get("ts"))
+            uniq.append(m)
+    raw = uniq
     _READ_STATS["looked_at"] = len(raw)
     msgs = []
     for m in raw:
@@ -295,9 +307,59 @@ def read_channel(limit=25, oldest=None):
             continue
         txt = (m.get("text") or "").strip()
         if txt:
-            msgs.append({"ts": m.get("ts", ""), "user": m.get("user", "?"), "text": txt})
+            entry = {"ts": m.get("ts", ""), "user": m.get("user", "?"), "text": txt}
+            if m.get("thread_ts") and m.get("thread_ts") != m.get("ts"):
+                entry["thread"] = m.get("thread_ts")               # a reply; the parent's ts, so it can be found
+            msgs.append(entry)
     msgs.sort(key=lambda x: float(x["ts"] or 0))        # oldest first, whichever order Slack's pages came in
     return msgs
+
+
+def _thread_replies(oldest, raw):
+    """Thread replies newer than `oldest`, as raw Slack messages, or None if any thread could not be read.
+
+    conversations.history lists top-level posts only, so a human answering a bot alert IN ITS THREAD never
+    reached the mailbox (the second gap, after the paging one found on 2026-10-22). Two sources of parents:
+    the top-level posts already read (they carry reply_count), and the most recent THREAD_LOOKBACK_PAGES
+    pages of history, because a reply to an alert from last Tuesday has a parent older than the cursor and
+    `oldest` filters by the parent. A parent is worth a call only if latest_reply is newer than `oldest`.
+    A reply to a parent older than the lookback (about three weeks at today's traffic) is not seen; that is
+    the stated limit. Any thread that cannot be read makes the whole read None: calm must not be reported
+    for a thread that was skipped.
+    """
+    parents = {m["ts"]: m for m in raw if m.get("reply_count") and m.get("ts")}
+    cursor = None
+    for _page in range(THREAD_LOOKBACK_PAGES):
+        params = {"channel": CHANNEL_ID, "limit": str(PAGE_SIZE)}
+        if cursor:
+            params["cursor"] = cursor
+        d = _api("conversations.history", params)
+        if not d:
+            return None
+        for m in d.get("messages", []):
+            if m.get("reply_count") and m.get("ts") and float(m.get("latest_reply") or 0) > float(oldest):
+                parents.setdefault(m["ts"], m)
+        cursor = (d.get("response_metadata") or {}).get("next_cursor")
+        if not (d.get("has_more") and cursor):
+            break
+    out = []
+    for ts in sorted(parents, key=float):
+        cursor = None
+        for _page in range(MAX_PAGES):
+            params = {"channel": CHANNEL_ID, "ts": ts, "limit": str(PAGE_SIZE), "oldest": str(oldest)}
+            if cursor:
+                params["cursor"] = cursor
+            d = _api("conversations.replies", params)
+            if not d:
+                return None
+            out += [m for m in d.get("messages", []) if m.get("ts") != ts and float(m.get("ts") or 0) > float(oldest)]
+            cursor = (d.get("response_metadata") or {}).get("next_cursor")
+            if not (d.get("has_more") and cursor):
+                break
+        else:
+            print("  [slack read INCOMPLETE: more than %d replies in one thread since the last relay]" % (MAX_PAGES * PAGE_SIZE))
+            return None
+    return out
 
 
 def _last_ingested_ts():
@@ -343,7 +405,7 @@ def pull(limit=25, ingest=False):
               % _READ_STATS["looked_at"])
         return []
     for m in msgs:
-        print("  [slack %s] <%s> %s" % (m["ts"], m["user"], m["text"][:200]))
+        print("  [slack %s] <%s> %s%s" % (m["ts"], m["user"], "(in a thread) " if m.get("thread") else "", m["text"][:200]))
     if not ingest:
         return msgs
     newest = max(m["ts"] for m in msgs)
@@ -362,7 +424,7 @@ def pull(limit=25, ingest=False):
         if len(text) > MAX_INGEST_CHARS:
             text = text[:MAX_INGEST_CHARS] + "\n... (truncated on ingest)"
         safe = _HEADING_RE.sub(r"(\1) ", text).replace(_FENCE, "'''")
-        lines.append("<%s %s> %s" % (m["user"], m["ts"], safe))
+        lines.append("<%s %s> %s%s" % (m["user"], m["ts"], "(reply in a thread) " if m.get("thread") else "", safe))
     lines += [_FENCE, ""]
     try:
         with open(MAILBOX, "a", encoding="utf-8") as f:
