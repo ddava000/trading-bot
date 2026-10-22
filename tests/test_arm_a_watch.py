@@ -41,6 +41,14 @@ def run(created, status="completed", conclusion="success"):
     return {"status": status, "conclusion": conclusion, "created_at": created}
 
 
+# run_once now names who is checking in the subject (GitHub on a runner, LAPTOP BOT otherwise), so the expected
+# subjects are built the same way instead of being spelled twice; tests/test_arm_a_watch_flap.py pins both forms.
+SENDER = A.sender_label()
+LATE = "ARM A WATCH: Arm A is late (checked by %s)" % SENDER
+NOT_RUNNING = "ARM A WATCH ALERT: Arm A is not running (checked by %s)" % SENDER
+AGAIN = "ARM A WATCH: Arm A is running again (checked by %s)" % SENDER
+
+
 class SessionTests(unittest.TestCase):
     def test_a_weekday_session_is_0945_to_1555_et(self):
         self.assertEqual(A.session_bounds(at(15, 0)), (OPEN, CLOSE))
@@ -226,13 +234,13 @@ class RunOnceTests(unittest.TestCase):
         now = at(15, 37)
         runs = [run(now - timedelta(minutes=7), "queued", None), run(now - timedelta(minutes=22))]
         rc, line, sent = self.go(now, commit=now - timedelta(minutes=10), runs=runs)
-        self.assertEqual((rc, sent), (0, [("ARM A WATCH: Arm A is late", False)]))
+        self.assertEqual((rc, sent), (0, [(LATE, False)]))
         self.assertIn("ALERTED", line)
 
     def test_no_trigger_for_a_while_alerts(self):
         now = at(15, 0)
         rc, _, sent = self.go(now, commit=now - timedelta(minutes=20), runs=[run(now - timedelta(minutes=23))])
-        self.assertEqual([s for s, _ in sent], ["ARM A WATCH: Arm A is late"])
+        self.assertEqual([s for s, _ in sent], [LATE])
 
     def test_a_stale_status_alerts_even_when_runs_look_fine(self):
         now = at(15, 0)
@@ -267,9 +275,9 @@ class RunOnceTests(unittest.TestCase):
         now = at(15, 55)
         _, line, s3 = self.go(now, commit=now - timedelta(minutes=5), runs=[run(now - timedelta(minutes=3))], fired=fired)
         now = at(15, 56 - 1)
-        self.assertEqual([s for s, _ in s1], ["ARM A WATCH: Arm A is late"])
+        self.assertEqual([s for s, _ in s1], [LATE])
         self.assertEqual(s2, [])
-        self.assertEqual([s for s, _ in s3], ["ARM A WATCH: Arm A is running again"])
+        self.assertEqual([s for s, _ in s3], [AGAIN])
         self.assertFalse(s3[0][1])
         self.assertIn("RECOVERED", line)
 
@@ -283,7 +291,7 @@ class RunOnceTests(unittest.TestCase):
         kw["commit"] = now2 - timedelta(minutes=11)
         rc2, _, s2 = self.go(now2, deliver=True, **kw)
         self.assertEqual(rc1, 1)
-        self.assertEqual([s for s, _ in s2], ["ARM A WATCH: Arm A is late"])       # the lost alert is re-sent
+        self.assertEqual([s for s, _ in s2], [LATE])       # the lost alert is re-sent
         rc3, _, s3 = self.go(at(15, 39), deliver=True, commit=at(15, 39) - timedelta(minutes=12),
                              runs=[run(at(15, 39) - timedelta(minutes=9), "queued", None)], fired=fired)
         self.assertEqual(s3, [])                                                   # and then not again
@@ -345,7 +353,7 @@ class October5Replay(unittest.TestCase):
     def test_it_alerts_about_six_minutes_after_the_first_stuck_run_and_inside_market_hours(self):
         when, sent = self.first_alert()
         self.assertIsNotNone(when, "never alerted before the close")
-        self.assertEqual(sent, [("ARM A WATCH: Arm A is late", False)])
+        self.assertEqual(sent, [(LATE, False)])
         created = datetime(2026, 10, 5, 19, 30, 9, tzinfo=UTC)
         waited = (when - created).total_seconds() / 60
         self.assertGreaterEqual(waited, 6.0)                                   # never before the threshold
@@ -371,7 +379,7 @@ class October5Replay(unittest.TestCase):
             A.run_once(now=now, deliver=lambda s, b, u: sent.append((s, u)) or True, fired={},
                        get_commit_time=lambda ref: self.LAST_COMMIT, get_status=lambda ref: None,
                        get_runs=lambda: [run(datetime(2026, 10, 5, 19, 30, 9, tzinfo=UTC), "queued", None)])
-        self.assertIn(("ARM A WATCH ALERT: Arm A is not running", True), sent)
+        self.assertIn((NOT_RUNNING, True), sent)
 
 
 class Inputs(unittest.TestCase):

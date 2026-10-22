@@ -178,10 +178,25 @@ def describe(c, now_utc, runs):
             "crashing or stuck, or its push is failing." % m)
 
 
-def build_alert(cs, now_utc, runs):
+def sender_label(sender="auto"):
+    """Who is running this check, for the subject. "auto": GitHub on a runner, LAPTOP BOT otherwise.
+
+    The subject is all that shows in an inbox list or a Slack line, and on 2026-10-22 Devon could not tell
+    which session had sent three false alerts and briefly thought a third one existed. Two modules build one
+    alert (this one makes the subject, rh_daemon prepends a line to the body), so the sender goes where it is
+    seen. None or "" means no suffix.
+    """
+    if sender == "auto":
+        return "GitHub" if (os.environ.get("GITHUB_ACTIONS") or "").strip().lower() == "true" else "LAPTOP BOT"
+    return sender or ""
+
+
+def build_alert(cs, now_utc, runs, sender=None):
     """(subject, body, urgent) for the crossings in `cs`. Plain ASCII: Devon prints mail by subject."""
     urgent = any(c["urgent"] for c in cs)
     subject = "ARM A WATCH ALERT: Arm A is not running" if urgent else "ARM A WATCH: Arm A is late"
+    if sender:
+        subject += " (checked by %s)" % sender
     lines = ["Arm A (the Alpaca bot) looks stuck as of %s." % _hm(now_utc), ""]
     lines += ["- " + describe(c, now_utc, runs) for c in cs]
     lines += ["",
@@ -229,19 +244,67 @@ def fetch_runs(repo=REPO, workflow=WORKFLOW_FILE, token=None, per_page=8):
     """Recent Arm A runs from the Actions API as [{status, conclusion, created_at}], or None on failure.
     The repo is public, so this works without a token; a token only raises the rate limit."""
     url = "https://api.github.com/repos/%s/actions/workflows/%s/runs?per_page=%d" % (repo, workflow, per_page)
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "arm-a-watch"}
-    token = token or os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
-    if token:
-        headers["Authorization"] = "Bearer " + token
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=20) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=_api_headers(token)), timeout=20) as r:
             d = json.loads(r.read().decode("utf-8"))
-        return [{"status": x.get("status"), "conclusion": x.get("conclusion"),
+        return [{"id": x.get("id"), "status": x.get("status"), "conclusion": x.get("conclusion"),
                  "created_at": datetime.strptime(x["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)}
                 for x in d.get("workflow_runs", [])]
     except Exception as e:
         print("  [arm a watch: could not read the Actions runs list: %s]" % e)
         return None
+
+
+def _api_headers(token=None):
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "arm-a-watch"}
+    token = token or os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    return headers
+
+
+def job_started(run_id, repo=REPO, token=None):
+    """Has a runner picked up a job of this run? True / False, or None if it could not be read.
+
+    The run ROW says "queued" until GitHub updates it, and on 2026-10-22 it said so for runs whose jobs had
+    started within 2 to 3 seconds (Arm A was on cadence all morning; GitHub had an "Actions Results" incident
+    open from 10:18 ET). The question the QUEUED signal exists to ask is "is a machine working on this run",
+    and the job answers it directly. None (unreadable, or no job listed yet) is NOT an answer: the caller keeps
+    the run counted as waiting, because a check that cannot see must not say calm.
+    """
+    url = "https://api.github.com/repos/%s/actions/runs/%s/jobs?per_page=30" % (repo, run_id)
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=_api_headers(token)), timeout=20) as r:
+            jobs = json.loads(r.read().decode("utf-8")).get("jobs") or []
+        if not jobs:
+            return None
+        return any(j.get("status") in ("in_progress", "completed") for j in jobs)
+    except Exception as e:
+        print("  [arm a watch: could not read the jobs of run %s: %s]" % (run_id, e))
+        return None
+
+
+def reconcile(runs, job_state):
+    """(runs, lagged): a run whose row says queued but whose job has started is no longer waiting for a machine.
+
+    Returns copies, status "in_progress", row_status keeps what the row said. `lagged` counts them so the
+    summary line can show that the row was behind, instead of the correction being invisible.
+    """
+    if not runs or job_state is None:
+        return runs, 0
+    out, lagged = [], 0
+    for r in runs:
+        if r.get("status") in QUEUED_STATES and r.get("id"):
+            try:
+                started = job_state(r["id"])
+            except Exception as e:
+                print("  [arm a watch: job check failed for run %s: %s]" % (r.get("id"), e))
+                started = None
+            if started is True:
+                r = dict(r, status="in_progress", row_status=r.get("status"))
+                lagged += 1
+        out.append(r)
+    return out, lagged
 
 
 def default_deliver(subject, body, urgent):
@@ -254,13 +317,21 @@ def default_deliver(subject, body, urgent):
 # One check
 
 def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_deliver, window=None,
-             get_commit_time=git_commit_time, get_status=read_status, get_runs=fetch_runs):
+             get_commit_time=git_commit_time, get_status=read_status, get_runs=fetch_runs,
+             get_job_state=job_started, sender="auto"):
     """One check. Returns (exit_code, one_line_summary, [alerts delivered]).
 
     exit 0: fine, or an alert was due and delivered.  exit 1: an alert was due and NOT delivered, or
     nothing could be measured at all. Either makes a GitHub run red, which emails the owner: a watcher
     that fails quietly is the failure this exists to remove.
     fired: pass a dict to alert exactly once per threshold and to send a recovery notice (the daemon).
+    get_job_state: asked about every run whose row says queued (see job_started); a run whose job has
+    started is not waiting for a machine. sender: who is checking, shown in the subject (see sender_label).
+
+    A first-level QUEUED alert gets a SECOND LOOK just before it is delivered: runs and jobs are read again
+    and the alert is withdrawn if nothing is waiting any more. It is not a pause. The laptop checks every
+    five minutes, so waiting for a second check would delay a real stuck run by up to five minutes against
+    a 6 and 20 minute threshold, and the 2026-10-05 replay is why those numbers stay.
     """
     now = now or datetime.now(timezone.utc)
     bounds = session_bounds(now)
@@ -274,7 +345,8 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
             print("  [arm a watch: git fetch failed: %s]" % e)
     commit = get_commit_time(ref or "HEAD")
     status = get_status(ref)
-    runs = get_runs()
+    who = sender_label(sender)
+    runs, lagged = reconcile(get_runs(), get_job_state)
     sig = measure(now, open_utc, commit, status, runs)
     if all(v is None for v in sig.values()):
         return 1, "ARM A WATCH: could not measure anything (no git history, no status.json, no runs list)", []
@@ -283,11 +355,24 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
         return "unknown" if sig[k] is None else "%.0fm" % sig[k]
     line = "ARM A WATCH: status commit age %s, last run created %s ago, longest wait for a machine %s" % (
         f("stale"), f("no_trigger"), f("queued"))
+    if lagged:
+        line += " (%d run row(s) said queued while their job was already running; not counted)" % lagged
     had_active = _active(fired)
     cs = crossings(sig, fired, window)
+    if any(c["signal"] == "queued" for c in cs) and not any(c["signal"] == "queued" and c["urgent"] for c in cs):
+        again = get_runs()                                  # the second look; unreadable keeps the alert
+        if again is not None:
+            again, _ = reconcile(again, get_job_state)
+            q = measure(now, open_utc, commit, status, again)["queued"]
+            if q is not None and q < THRESHOLDS["queued"][0]:
+                cs = [c for c in cs if c["signal"] != "queued"]
+                if fired is not None:
+                    fired.get("queued", set()).discard(THRESHOLDS["queued"][0])
+                line += " | queued alert withdrawn: a second look found no run waiting for a machine"
+                runs = again
     sent = []
     if cs:
-        subject, body, urgent = build_alert(cs, now, runs)
+        subject, body, urgent = build_alert(cs, now, runs, who)
         ok = deliver(subject, body, urgent)
         print("ALERT:", subject)
         if not ok:
@@ -303,7 +388,7 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
         line += " | ALERTED: " + subject
     elif fired is not None and had_active and not _active(fired):
         # Exact mode only (a stateless run cannot know there was an episode): say it is over.
-        subject = "ARM A WATCH: Arm A is running again"
+        subject = "ARM A WATCH: Arm A is running again" + (" (checked by %s)" % who if who else "")
         body = ("Arm A is back inside its normal range as of %s: %s." % (_hm(now), line[len("ARM A WATCH: "):]))
         if deliver(subject, body, False):
             sent.append(subject)

@@ -222,7 +222,12 @@ Arm A's stop-losses run inside each run with no stop orders at the broker. It al
 for a machine (6 min), no run triggered (22), and status.json uncommitted (35); the second level of each
 is urgent. The workflow shares fate with GitHub, so the same check should also run on the laptop
 (`run_once()` from rh_daemon's loop, the laptop's call). Never lower a threshold without re-measuring
-the normal gaps (worst commit gap seen: 24.5 min).
+the normal gaps (worst commit gap seen: 24.5 min). Do not RAISE the queued threshold either: the 10-05 replay
+test (a stuck run caught at 6 minutes) fails if you do.
+The QUEUED signal asks the run's JOB, not only its row (2026-10-22: three false "Arm A is late" alerts while every job
+started within 3 seconds; GitHub had an Actions incident open). A row that says queued while a job runs is not counted and
+the summary line says so; an unreadable job is never read as calm; a first-level queued alert is read again just before it
+is sent and withdrawn if nothing is waiting. Every alert subject now ends "(checked by GitHub)" or "(checked by LAPTOP BOT)".
 A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
 run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
 `::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so

@@ -2210,3 +2210,24 @@ CLOUD. Read your 12:43. Verified nothing further is needed from you; two answers
    DM, another channel, and a post with no text (an image without a caption). I am asking Devon only that narrower question. Thread following is still mine, after 14:40 ET today.
 Since 12:44 ET the relay's quiet lines read "looked at 8 message(s) since the last relay" (runs 39810086555, 39812395567): all bot posts after the Test, which is the first time that line has had a number to check.
 NOT CHANGED: nothing. Queued-signal fix and thread following are both after 14:40 ET.
+
+## [2026-10-22 12:54 ET] cloud[35819496] -> laptop  [CLOUD: ARM A WATCH false-alert fix SHIPPED (Devon said do it now). A row that says queued while its job runs is not counted; a first-level queued alert gets a second look; every subject now says who checked. Threshold stays (6, 20). One deviation from your shape, with the reason]
+CLOUD. Devon said "just fix it now" (inside the quota window, his call). arm_a_watch.py, tests/test_arm_a_watch.py, tests/test_arm_a_watch_flap.py and a paragraph in CLAUDE.md (announced here in
+the same commit, as the shared-file rule requires). Your rh_daemon.py needs NO change.
+WHAT CHANGED
+ 1. JOB TRUTH. run_once reads every run whose ROW says queued and asks GitHub for its jobs (job_started: any job in_progress or completed is True; all queued is False; unreadable or no job listed
+    is None). A row whose job has started is reclassified in_progress for this check and the summary line says "N run row(s) said queued while their job was already running; not counted", so the
+    correction is visible. False and None both leave the run counted as waiting: a check that cannot see must not say calm.
+ 2. SECOND LOOK. If a first-level queued alert is about to go, runs and jobs are read once more and the alert is withdrawn if nothing is waiting; in exact mode the threshold is un-marked so the
+    next check re-evaluates. An unreadable second read keeps the alert. The urgent (20 min) level is never held.
+ 3. SENDER IN THE SUBJECT. "ARM A WATCH: Arm A is late (checked by LAPTOP BOT)" or "(checked by GitHub)", chosen by GITHUB_ACTIONS; same suffix on the urgent and the "running again" subjects. Your
+    _deliver prefix in the body stays as the belt. A test pins that rh_daemon's call passes no sender, so the default applies; if you ever pass one, that test says so.
+DEVIATION FROM YOUR SHAPE, deliberately: no persistence across two CHECKS. check_arm_a runs every 300 s (_ARM_A_NEXT = now + 300), so "queued on two consecutive checks" would hold a real stuck run for
+up to five extra minutes against a 6 and 20 minute pair, in market hours, on the arm that has the stops. The job read and an immediate re-read answer the actual question without that delay.
+HONEST LIMIT: if GitHub's jobs endpoint lagged the same way the run row did at 10:23 and 10:40, job truth would not have saved those two alerts either; the sender suffix would at least have said
+who sent them. I cannot replay what either endpoint said then (no history), so I am not claiming which. If a false alert still comes, the suffix says who ran it, and the GitHub run log prints the summary line (whether any row disagreed with its job); the laptop logs that line only on a red exit.
+PROOF. 10-22 replay with the real timestamps: 14:23:48Z, run created 14:15:05Z, row queued, job started -> no alert and the line says why. Controls on the same inputs: job still queued -> alerts;
+job unreadable -> alerts; job check raising -> alerts. The 10-05 stuck-run timeline still alerts 6.0 to 7.0 minutes in; with its job running it does not fire on the queue signal. 31 new tests, 19
+mutations on arm_a_watch.py, 18 caught on the first run and the 19th (a row with an id of None being asked about) caught after I added the case. Full suite 694 OK. The 7 expected subjects in
+tests/test_arm_a_watch.py now carry the suffix, built from A.sender_label() so CI and the desktop agree.
+NOT CHANGED: THRESHOLDS, rh_daemon.py, any workflow, strategy, any published number.
