@@ -11,9 +11,9 @@ on:
         description: "mode=say: the message to post. mode=peek: a regex; only matching lines of recent BOT alerts are printed."
         default: ""
       mode:
-        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side). peek = print only the lines of recent bot alerts that match text (what did an alert actually say)."
+        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side). peek = print only the lines of recent bot alerts that match text (what did an alert actually say). scan = list EVERY message in the channel, humans and bots, thread replies included, with how pull would classify it (text = a limit like 50 or empty)."
         type: choice
-        options: [test, mail, alert, read, say, peek]
+        options: [test, mail, alert, read, say, peek, scan]
         default: test
 
 jobs:
@@ -45,6 +45,8 @@ jobs:
             python -c "import os,sys,slack_notify; sys.exit(0 if slack_notify.post(os.environ['SAY_TEXT']) else 1)"
           elif [ "${{ inputs.mode }}" = "peek" ]; then
             python slack_notify.py --peek "$SAY_TEXT"
+          elif [ "${{ inputs.mode }}" = "scan" ]; then
+            python slack_notify.py --scan "${SAY_TEXT:-50}"
           elif [ "${{ inputs.mode }}" = "read" ]; then
             python slack_notify.py --pull 25
           else

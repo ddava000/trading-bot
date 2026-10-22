@@ -376,6 +376,49 @@ def peek_bot(pattern, limit=20):
             out.append((m.get("ts", ""), first[:80], hits[:12]))
     return out
 
+
+def _scan_row(m, where):
+    is_bot = bool(m.get("bot_id")) or m.get("subtype") == "bot_message"
+    txt = m.get("text") or ""
+    return {"ts": m.get("ts", ""), "who": "BOT" if is_bot else "HUMAN",
+            "user": m.get("user") or m.get("bot_id") or "?", "subtype": m.get("subtype") or "-",
+            "where": where, "chars": len(txt), "files": len(m.get("files") or []),
+            "replies": int(m.get("reply_count") or 0),
+            "peek": "" if is_bot else txt[:60]}
+
+
+def scan_channel(limit=50, max_threads=8):
+    """Read-only DIAGNOSTIC: one row per message in the channel, bots and humans, thread replies included.
+
+    pull() tells you only what it would file. When it says "no new channel messages" and a human says
+    they wrote something, this is the view that separates the possible causes, because it shows what is
+    in the channel and how pull() would classify it: top-level or thread reply, human or bot, subtype,
+    attachment count. A bot message carries no text here; a human message carries its first 60 characters
+    (pull() already prints 200 of them, to the same log). Returns None if the channel cannot be read.
+    """
+    if not can_read():
+        print("  [slack scan unavailable - token/channel unset, or channel refused]")
+        return None
+    d = _api("conversations.history", {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))})
+    if not d:
+        return None
+    rows, parents = [], []
+    for m in d.get("messages", []):
+        rows.append(_scan_row(m, "channel"))
+        if m.get("reply_count"):
+            parents.append(m.get("ts", ""))
+    for ts in parents[:max_threads]:
+        r = _api("conversations.replies", {"channel": CHANNEL_ID, "ts": ts, "limit": "20"})
+        if not r:
+            rows.append({"ts": ts, "who": "?", "user": "?", "subtype": "replies unreadable", "where": "thread " + ts,
+                         "chars": 0, "files": 0, "replies": 0, "peek": ""})
+            continue
+        for m in r.get("messages", [])[1:]:                 # [0] is the parent, already listed
+            rows.append(_scan_row(m, "thread " + ts))
+    rows.sort(key=lambda x: float(x["ts"] or 0))
+    return rows
+
+
 if __name__ == "__main__":
     arg = sys.argv[1] if len(sys.argv) > 1 else "--test"
     if arg == "--test":
@@ -402,6 +445,23 @@ if __name__ == "__main__":
                 print("      " + h[:220].encode("ascii", "replace").decode())
         print("  [peek: %d bot message(s) matched %r]" % (len(res), pat))
         sys.exit(0)
+    if arg == "--scan":
+        n = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else 50
+        rows = scan_channel(n)
+        if rows is None:
+            sys.exit(1)
+        for r in rows[-40:]:
+            try:
+                when = datetime.fromtimestamp(float(r["ts"]), ZoneInfo("America/New_York")).strftime("%m-%d %H:%M:%S ET")
+            except (ValueError, TypeError):
+                when = "?"
+            print("  [%s] %-5s user=%s subtype=%s where=%s chars=%d files=%d replies=%d %s" % (
+                when, r["who"], r["user"], r["subtype"], r["where"], r["chars"], r["files"], r["replies"],
+                ("text=%r" % r["peek"]).encode("ascii", "replace").decode() if r["peek"] else ""))
+        humans = [r for r in rows if r["who"] == "HUMAN"]
+        print("  [scan: %d message(s) read, %d human, %d in threads]" % (
+            len(rows), len(humans), sum(1 for r in rows if r["where"] != "channel")))
+        sys.exit(0)
     if arg in ("--pull", "--pull-ingest"):
         n = int(sys.argv[2]) if len(sys.argv) > 2 else 25
         # Exit 1 ONLY when the channel could not be read. "Read fine, nothing new"
@@ -413,5 +473,5 @@ if __name__ == "__main__":
         sys.exit(1 if pull(n, ingest=(arg == "--pull-ingest")) is None else 0)
     print(__doc__)
     print("usage: slack_notify.py [--test | --mail-latest | --mail-recent N |"
-          " --say TEXT | --pull N | --pull-ingest N | --peek PATTERN]")
+          " --say TEXT | --pull N | --pull-ingest N | --peek PATTERN | --scan N]")
     sys.exit(2)
