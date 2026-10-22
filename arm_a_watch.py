@@ -34,6 +34,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -170,12 +171,28 @@ def describe(c, now_utc, runs):
         since = _hm(min(r["created_at"] for r in waiting)) if waiting else "?"
         return ("An Arm A run created at %s has waited %d minutes for GitHub to give it a machine; a healthy "
                 "run starts within seconds. This is usually a GitHub Actions incident: "
-                "https://www.githubstatus.com" % (since, m))
+                "https://www.githubstatus.com" % (since, m)) + evidence_text(waiting)
     if c["signal"] == "no_trigger":
         return ("No Arm A run has been triggered for %d minutes. cron-job.org should trigger one every 15. "
                 "Check its job, and the Actions tab." % m)
     return ("Arm A's status.json has not been committed for %d minutes (normally every 15). A run may be "
             "crashing or stuck, or its push is failing." % m)
+
+
+def evidence_text(waiting):
+    """One ASCII sentence: what the run list and the jobs endpoint returned for the runs counted as waiting.
+
+    Appended after the sentence rh_daemon's mute matches on ("give it a machine"), never inside it.
+    """
+    if not waiting:
+        return ""
+    bits = []
+    for r in waiting[:3]:
+        j = EVIDENCE["jobs"].get(r.get("id"))
+        bits.append("run %s: list row %r, jobs %s" % (r.get("id"), r.get("status"),
+                                                       "unreadable" if j is None else (j["statuses"] or "none listed yet")))
+    meta = ", ".join("%s=%s" % (k, v) for k, v in EVIDENCE["runs_meta"].items() if k in ("Date", "Age", "X-Cache", "Via"))
+    return " Evidence (what GitHub returned to this check): %s; list response %s." % ("; ".join(bits), meta or "headers: none")
 
 
 def sender_label(sender="auto"):
@@ -245,14 +262,38 @@ def fetch_runs(repo=REPO, workflow=WORKFLOW_FILE, token=None, per_page=8):
     The repo is public, so this works without a token; a token only raises the rate limit."""
     url = "https://api.github.com/repos/%s/actions/workflows/%s/runs?per_page=%d" % (repo, workflow, per_page)
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=_api_headers(token)), timeout=20) as r:
-            d = json.loads(r.read().decode("utf-8"))
+        d, meta = _get_json(url, token)
+        EVIDENCE["runs_meta"] = meta
         return [{"id": x.get("id"), "status": x.get("status"), "conclusion": x.get("conclusion"),
                  "created_at": datetime.strptime(x["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)}
                 for x in d.get("workflow_runs", [])]
     except Exception as e:
         print("  [arm a watch: could not read the Actions runs list: %s]" % e)
         return None
+
+
+# What GitHub said, kept so an alert can show it. 2026-10-22: ten false "Arm A is late" mails from the laptop in one
+# day, none from GitHub's own copy of this check, and nobody able to say what either endpoint had returned.
+EVIDENCE = {"runs_meta": {}, "jobs": {}}
+_META_HEADERS = ("Date", "Age", "X-Cache", "Via", "Cache-Control", "X-GitHub-Request-Id")
+
+
+def _get_json(url, token=None):
+    """(parsed json, {response header: value}). The request cannot be answered from a shared cache.
+
+    An UNAUTHENTICATED read of the REST API is marked public, max-age=60, so a CDN or proxy in between may serve it,
+    and may serve it stale while GitHub is degraded; an authenticated one is private. The laptop reads without a
+    token and was the only side that false-alerted, so every read here carries a unique query parameter (a new URL is
+    a cache miss by construction) and no-cache request headers. The headers GitHub returned are kept as evidence.
+    """
+    sep = "&" if "?" in url else "?"
+    req = urllib.request.Request(url + "%s_cb=%d" % (sep, int(time.time() * 1000)),
+                                 headers=dict(_api_headers(token), **{"Cache-Control": "no-cache", "Pragma": "no-cache"}))
+    with urllib.request.urlopen(req, timeout=20) as r:
+        d = json.loads(r.read().decode("utf-8"))
+        h = getattr(r, "headers", None)
+        meta = {k: h.get(k) for k in _META_HEADERS if h is not None and h.get(k)} if h is not None else {}
+    return d, meta
 
 
 def _api_headers(token=None):
@@ -274,8 +315,11 @@ def job_started(run_id, repo=REPO, token=None):
     """
     url = "https://api.github.com/repos/%s/actions/runs/%s/jobs?per_page=30" % (repo, run_id)
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=_api_headers(token)), timeout=20) as r:
-            jobs = json.loads(r.read().decode("utf-8")).get("jobs") or []
+        d, meta = _get_json(url, token)
+        jobs = d.get("jobs") or []
+        EVIDENCE["jobs"][run_id] = {"statuses": [j.get("status") for j in jobs], "meta": meta}
+        while len(EVIDENCE["jobs"]) > 20:                      # the daemon is long-lived; keep the newest few
+            EVIDENCE["jobs"].pop(next(iter(EVIDENCE["jobs"])))
         if not jobs:
             return None
         return any(j.get("status") in ("in_progress", "completed") for j in jobs)

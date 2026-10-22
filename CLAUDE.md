@@ -228,6 +228,9 @@ The QUEUED signal asks the run's JOB, not only its row (2026-10-22: three false 
 started within 3 seconds; GitHub had an Actions incident open). A row that says queued while a job runs is not counted and
 the summary line says so; an unreadable job is never read as calm; a first-level queued alert is read again just before it
 is sent and withdrawn if nothing is waiting. Every alert subject now ends "(checked by GitHub)" or "(checked by LAPTOP BOT)".
+Every read it makes is a cache miss by construction (unique query parameter, no-cache headers; an unauthenticated REST read is
+"public, max-age=60" and only the laptop's copy, which has no token, false-alerted), and a queued alert ends with a sentence
+saying what GitHub returned to that check (run row, jobs, cache headers). Do not remove either without reading the 10-22 mailbox thread.
 A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
 run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
 `::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so
