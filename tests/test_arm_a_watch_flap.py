@@ -45,7 +45,7 @@ COMMIT = at(14, 10)                      # status.json last committed 14:10Z, as
 
 class Check:
     """One run_once with every input injected and delivery recorded."""
-    def __init__(self, now, runs_seq, jobs, fired=None, deliver_ok=True, sender="auto", commit=COMMIT):
+    def __init__(self, now, runs_seq, jobs, fired=None, deliver_ok=True, sender="LAPTOP BOT", commit=COMMIT):   # explicit: "auto" follows the environment, and CI is GitHub
         self.now, self.fired, self.sent, self.bodies, self.reads = now, fired, [], [], 0
         seq = list(runs_seq) if isinstance(runs_seq, list) and runs_seq and isinstance(runs_seq[0], list) else [runs_seq]
 
