@@ -1,5 +1,5 @@
 {
- "arm_a_watch_at": "2026-10-22T10:29",
+ "arm_a_watch_at": "2026-10-22T10:45",
  "dry": false,
  "equity": 312.89,
  "equity_source": "broker_total_value",
@@ -86,6 +86,6 @@
    }
   }
  },
- "ts": "2026-10-22T10:31",
- "unsettled_excluded_from_buying_power": 1.36
+ "ts": "2026-10-22T10:46",
+ "unsettled_excluded_from_buying_power": 1.23
 }
