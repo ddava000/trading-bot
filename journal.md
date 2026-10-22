@@ -2310,3 +2310,9 @@
 - avoid: ['ARQT', 'HONA', 'SNDK', 'IWM', 'NVDA', 'FTRE'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
 - notes: Constructive close — 3-day S&P win streak, Nasdaq +1%, VIX calm 16.7, Fed hold digested. Holding risk 0.50; ARQT/HONA stay avoid on earnings within ~7 days, SNDK/IWM/NVDA/FTRE wreckage excluded; $22 cash caps new buys anyway.
 - journal: Wed 10/21 16:56: Closed green, Day P&L +$2, VIX 16.7. Maintained risk-on/0.50 all day, same avoid/favor lists. Watching SNDK (-12.9%)/IWM (-8.4%) laggards and NVDA (-2%) softness; ARQT and HONA earnings landmines pending within ~7 days.
+
+### 2026-10-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH', 'VST']
+- notes: Futures lower as AI trade falters on Meta/Tesla earnings and oil rallies, VIX up to 18.0 — stepping down to neutral/0.40. Earnings landmines ARQT/HONA/CTSH/FTRE excluded (CTSH moved off favor into avoid on earnings within ~7 days), SNDK/IWM/NVDA wreckage still out; $22 cash caps buys anyway.
+- journal: Thu 10/22 09:00: Tone shifted defensive overnight — AI trade cracking on Meta/Tesla, oil up, VIX 18.0 (from 16.7). Cut to neutral/0.40 and moved CTSH onto avoid (earnings soon). Watching AI/chip names NVDA/PLTR/MSFT and oil-driven inflation risk.
