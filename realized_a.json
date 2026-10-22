@@ -330,6 +330,11 @@
    "qty": 0.06624135,
    "symbol": "BKH",
    "t": "2026-10-21"
+  },
+  {
+   "qty": 0.021883428,
+   "symbol": "IBM",
+   "t": "2026-10-22"
   }
  ],
  "closed": [
@@ -979,6 +984,7 @@
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
   "HONA": 0.03993923,
+  "IBM": 0.021883428,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
   "NVDA": 0.054469495,
@@ -1008,8 +1014,8 @@
     }
    }
   },
-  "fills": 109,
-  "last_fill": "2026-10-21T14:45:23.292226Z",
+  "fills": 110,
+  "last_fill": "2026-10-22T13:45:24.951907Z",
   "last_sale": "2026-10-21",
   "lt": {
    "gains": 0.0,
@@ -1019,7 +1025,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -21.7,
-  "reconciliation_residual": -0.0516,
+  "reconciliation_residual": -0.0416,
   "sales": 42,
   "since": "2026-08-12",
   "st": {
