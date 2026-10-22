@@ -387,7 +387,7 @@ def _scan_row(m, where):
             "peek": "" if is_bot else txt[:60]}
 
 
-def scan_channel(limit=50, max_threads=8):
+def scan_channel(limit=50, max_threads=8, oldest=None):
     """Read-only DIAGNOSTIC: one row per message in the channel, bots and humans, thread replies included.
 
     pull() tells you only what it would file. When it says "no new channel messages" and a human says
@@ -399,7 +399,10 @@ def scan_channel(limit=50, max_threads=8):
     if not can_read():
         print("  [slack scan unavailable - token/channel unset, or channel refused]")
         return None
-    d = _api("conversations.history", {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))})
+    params = {"channel": CHANNEL_ID, "limit": str(max(1, min(200, limit)))}
+    if oldest:
+        params["oldest"] = str(oldest)               # exactly what pull() sends, to see what Slack returns for it
+    d = _api("conversations.history", params)
     if not d:
         return None
     rows, parents = [], []
@@ -446,8 +449,12 @@ if __name__ == "__main__":
         print("  [peek: %d bot message(s) matched %r]" % (len(res), pat))
         sys.exit(0)
     if arg == "--scan":
-        n = int(sys.argv[2]) if len(sys.argv) > 2 and sys.argv[2].isdigit() else 50
-        rows = scan_channel(n)
+        words = " ".join(sys.argv[2:]).split()               # the workflow passes its whole text input as one argument
+        n = next((int(w) for w in words if w.isdigit()), 50)
+        since = _last_ingested_ts() if "since" in words else None
+        if since:
+            print("  [scan: asking Slack exactly as pull() does: limit=%d oldest=%s]" % (n, since))
+        rows = scan_channel(n, oldest=since)
         if rows is None:
             sys.exit(1)
         for r in rows[-40:]:
