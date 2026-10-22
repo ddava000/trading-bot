@@ -195,5 +195,43 @@ class Wiring(unittest.TestCase):
         self.assertIn("SLACK_CHANNEL_ID", step["env"])
 
 
+class TheStandaloneWorkflow(unittest.TestCase):
+    """Arm A's last run starts at 15:45 ET, so the step inside it cannot relay an evening message until the morning."""
+
+    def wf(self):
+        with open(os.path.join(ROOT, ".github", "workflows", "slack-relay.yml"), encoding="utf-8") as f:
+            return yaml.safe_load(f)
+
+    def test_it_runs_on_a_schedule_around_the_clock_and_on_demand(self):
+        on = self.wf().get("on") or self.wf().get(True)
+        self.assertIn("workflow_dispatch", on)
+        crons = [c["cron"] for c in on["schedule"]]
+        self.assertTrue(crons)
+        for c in crons:
+            hours = c.split()[1]
+            self.assertEqual(hours, "*", "an hours range would put the evening back outside the relay: %s" % c)
+
+    def test_it_runs_the_same_script_with_the_slack_secrets_and_may_push(self):
+        wf = self.wf()
+        job = wf["jobs"]["relay"]
+        step = next(s for s in job["steps"] if "run" in s)
+        self.assertEqual(step["run"].strip(), "bash .github/scripts/slack_relay.sh")
+        self.assertIn("SLACK_BOT_TOKEN", step["env"])
+        self.assertIn("SLACK_CHANNEL_ID", step["env"])
+        self.assertEqual(wf["permissions"], {"contents": "write"})
+
+    def test_two_relays_never_overlap_and_a_waiting_one_is_not_cancelled_mid_push(self):
+        c = self.wf()["concurrency"]
+        self.assertEqual(c["group"], "slack-relay")
+        self.assertIs(c["cancel-in-progress"], False)
+
+    def test_it_installs_nothing_because_the_reader_is_standard_library_only(self):
+        for mod in ("slack_notify.py", "mail_check.py"):
+            with open(os.path.join(ROOT, mod), encoding="utf-8") as f:
+                imports = [l.split()[1].split(".")[0].rstrip(",") for l in f.read().splitlines() if l.startswith(("import ", "from "))]
+            for name in imports:
+                self.assertIn(name, sys.stdlib_module_names, "%s imports %s, which the workflow would have to install" % (mod, name))
+
+
 if __name__ == "__main__":
     unittest.main()

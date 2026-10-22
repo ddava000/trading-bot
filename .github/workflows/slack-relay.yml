@@ -1,0 +1,43 @@
+name: SLACK RELAY
+
+# Files what Devon types in #trading-bots into AGENT_MAIL.md, on its own clock.
+#
+# The Arm A run does the same thing in a step, but Arm A only runs while the market is open (its last run starts
+# at 15:45 ET and the next at the open), so anything typed in the evening waited until the next morning
+# (found 2026-10-22, the day the relay turned out to have been broken for eight weeks). This runs around the clock.
+# Both paths use .github/scripts/slack_relay.sh, which files in a worktree of the newest main and never rebases,
+# and the cursor lives in the mailbox, so a message already filed by one path is not filed again by the other.
+#
+# Stateless and idempotent: a dropped or delayed run costs nothing, the next one reads from the cursor. GitHub
+# throttles frequent crons, so this is best effort; the Arm A step and the live read in "check mail" cover the rest.
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write            # pushes the relay commit (GITHUB_TOKEN, so it cannot trigger MAILBOX NOTIFY or loop)
+
+concurrency:
+  group: slack-relay
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: File new Slack messages into the mailbox
+        env:
+          SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: bash .github/scripts/slack_relay.sh
