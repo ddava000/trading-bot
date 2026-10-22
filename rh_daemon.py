@@ -1308,6 +1308,11 @@ MAIL_F = "AGENT_MAIL.md"
 # more accurate one. If you are about to change this back, confirm with Devon first -
 # two sessions flipping one string is worse than either value.
 SESSION_NAME = "LAPTOP BOT"
+# Stopgap, Devon's call 2026-10-22: suppress ONLY the first-level (6-minute) queued
+# alert from ARM A WATCH on this laptop. Set back to False when cloud's fix holds;
+# see _deliver in check_arm_a for the whole reason and the scope.
+ARM_A_MUTE_QUEUED = True
+
 # Devon, same day, asked directly: BOTH names stand. LAPTOP BOT is the interactive session
 # that owns this daemon; LAPTOP BOT DAILY CHECK is the scheduled daily check. Mail headed
 # `-> laptop[daily]` is for the daily check, plain `-> laptop` and broadcasts for LAPTOP BOT.
@@ -1345,6 +1350,28 @@ def check_arm_a(led):
         import arm_a_watch
 
         def _deliver(subject, body, urgent):
+            # MUTE, Devon's call 2026-10-22, FIRST-LEVEL QUEUED ONLY. Ten alerts reached him
+            # today - five late-and-recovered pairs at 10:23, 10:40, 10:51, 12:39 and 13:37 -
+            # about an Arm A that pushed status.json dead on its 15-minute cadence all day.
+            # Cloud shipped job-truth and a second look at 12:54 (live here from 13:08) and
+            # the 13:37 pair still fired, which is the honest limit they wrote down: if
+            # GitHub's jobs endpoint lags the way the run row does, job truth cannot save it.
+            # So this is Devon choosing fewer false alarms over 14 minutes of latency on a
+            # real one, with the facts in front of him, and it is a stopgap: ARM_A_MUTE_QUEUED
+            # goes back to False the moment cloud's next attempt holds.
+            #
+            # Scope is deliberately the narrowest thing that stops the noise. The URGENT
+            # 20-minute queued level still sends, and no_trigger and stale are untouched, so
+            # a run that never starts, a trigger that stops and a status file that goes stale
+            # all still reach him. The match is on the queued description's own words - cloud's
+            # tests pin "machine" in it and no other signal mentions one - and it FAILS OPEN:
+            # if that wording ever changes the alert is delivered, so a dead mute is noisy
+            # rather than silent. tests/test_arm_a_mute.py builds the body from cloud's real
+            # describe() so their rewording breaks my test instead of my inbox.
+            if ARM_A_MUTE_QUEUED and not urgent and "give it a machine" in body:
+                log(f"ARM A WATCH first-level queued alert SUPPRESSED (muted on the laptop "
+                    f"2026-10-22, Devon's call; urgent level still sends): {subject}")
+                return True          # handled: do not let run_once retry or go red on it
             # Cloud's subject says WHAT is wrong; Devon asked that alerts say WHO must act, and
             # for an Arm A fault that is CLOUD, not this session. Their subject is kept verbatim
             # (he prints mail to PDF by subject and "ARM A WATCH" sorts) and the routing goes in
