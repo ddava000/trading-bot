@@ -2334,3 +2334,9 @@
 - avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: Market closed sharply lower — Nasdaq's worst day since June on revived AI-spend doubts and oil spike, though VIX eased to 19.0 off intraday highs. Holding risk-off/0.30 post-close; SNDK (-22%), IWM (-8%), NVDA (-6%) wreckage out, earnings landmines ARQT/HONA/CTSH/FTRE excluded, QQQ/VST still avoided; $16 cash caps buys regardless.
 - journal: Thu 10/22 16:53: Closing bell — tech selloff finished the session deep in red but VIX ticked down to 19.0 from 20.2, Day P&L -$4. Kept risk-off/0.30 and same lists into the close. Watching for AI/chip stabilization overnight and CTSH/FTRE/HONA earnings landing within ~7 days.
+
+### 2026-10-23T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Tech selloff continuing into Friday with flight to Treasurys, VIX at 20.0 and a Fed meeting plus earnings flood looming as pivotal tests for the shaky AI rally. Staying risk-off/0.30: SNDK (-19%), IWM (-9%), NVDA (-6.5%) wreckage out, earnings landmines ARQT/HONA/CTSH/FTRE excluded, QQQ/VST avoided; $16 cash caps buys regardless.
+- journal: Fri 10/23 09:00: Overnight futures firmer on US-Iran talk hopes but tape still fractured — VIX 20.0, AI/chip names weak, Fed in focus. Held risk-off/0.30 and same lists; watching whether AI/chips stabilize and CTSH/FTRE/HONA earnings landing within ~7 days.
