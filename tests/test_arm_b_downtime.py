@@ -7,10 +7,13 @@ real committed history (skipped when the checkout is too shallow to hold it).
 
 Run:  python -m unittest discover -s tests -v
 """
+import contextlib
+import io
 import os
 import sys
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -111,6 +114,75 @@ class PublishedFigure(unittest.TestCase):
         r = D.measure(snaps, dt("2026-08-24 00:00"), dt("2026-09-22 11:01"), HOL)
         self.assertEqual((round(r["degraded"]), round(r["no_push"])), (852, 632))
         self.assertEqual(round(r["trading"]), 7476)
+
+
+class PerDayTests(unittest.TestCase):
+    """The 10-27 quota re-measure asks 'degraded minutes per session, with and without the login-expiry day'. One command."""
+
+    def snaps(self):
+        rows = []
+        for day in ("2026-10-12", "2026-10-13", "2026-10-14"):                       # Mon, Tue, Wed
+            t = dt("%s 09:45" % day)
+            while t <= dt("%s 15:55" % day):
+                rows.append((t.strftime("%Y-%m-%d %H:%M"), "heartbeat"))
+                t = t + timedelta(minutes=15)
+        return [(dt(t), k) for t, k in rows]
+
+    def test_a_clean_period_has_one_row_per_session_and_zero_blind_minutes(self):
+        rows = D.per_day(self.snaps(), dt("2026-10-12 00:00"), dt("2026-10-14 23:59"), HOL)
+        self.assertEqual([r["day"] for r in rows], ["2026-10-12", "2026-10-13", "2026-10-14"])
+        self.assertTrue(all(r["trading"] == 370 for r in rows))
+        self.assertTrue(all(r["blind"] == 0 and r["degraded"] == 0 for r in rows), rows)
+
+    def test_weekends_and_holidays_get_no_row(self):
+        rows = D.per_day([(dt("2026-10-09 10:00"), "heartbeat")], dt("2026-10-09 00:00"), dt("2026-10-13 23:59"), HOL)
+        self.assertEqual([r["day"] for r in rows], ["2026-10-09", "2026-10-12", "2026-10-13"])           # Fri, Mon, Tue (Sat, Sun skipped)
+
+    def test_a_degraded_stretch_lands_on_its_own_day_only(self):
+        snaps = [(t, k) for t, k in [(x[0].strftime("%Y-%m-%d %H:%M"), x[1]) for x in self.snaps()]]
+        snaps = [(dt(t), ("degraded" if "2026-10-13 11:" in t or "2026-10-13 12:00" in t else k)) for t, k in snaps]
+        rows = {r["day"]: r for r in D.per_day(snaps, dt("2026-10-12 00:00"), dt("2026-10-14 23:59"), HOL)}
+        self.assertGreater(rows["2026-10-13"]["degraded"], 60)
+        self.assertEqual(rows["2026-10-12"]["degraded"], 0)
+        self.assertEqual(rows["2026-10-14"]["degraded"], 0)
+
+    def test_the_summary_can_leave_a_named_day_out(self):
+        rows = [{"day": "d1", "degraded": 170.0, "blind": 170.0}, {"day": "d2", "degraded": 30.0, "blind": 30.0},
+                {"day": "d3", "degraded": 0.0, "blind": 0.0}]
+        allr = D.summarize_days(rows)
+        self.assertEqual((allr["sessions"], round(allr["degraded_per_session"], 1)), (3, 66.7))
+        left = D.summarize_days(rows, exclude=("d2",))
+        self.assertEqual((left["sessions"], left["degraded_per_session"], left["excluded"]), (2, 85.0, ["d2"]))
+
+    def test_an_empty_summary_is_none_not_a_zero_or_a_crash(self):
+        s = D.summarize_days([])
+        self.assertEqual((s["sessions"], s["degraded_per_session"], s["blind_per_session"]), (0, None, None))
+        s = D.summarize_days([{"day": "d1", "degraded": 5.0, "blind": 5.0}], exclude=("d1",))
+        self.assertEqual((s["sessions"], s["degraded_per_session"]), (0, None))
+
+    def test_the_published_baseline_is_86_minutes_per_session(self):
+        self.assertEqual(D.BASELINE_DEGRADED_PER_SESSION, 86)
+
+    def test_the_command_line_prints_the_table_and_both_means(self):
+        lines = ["rh bot %sT%s ET (heartbeat)" % (t[:10], t[11:]) for t, _ in [(x[0].strftime("%Y-%m-%d %H:%M"), 0) for x in self.snaps()]]
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.object(D, "git_subjects", lambda since="": lines):
+            rc = D.main(["--since", "2026-10-12", "--per-day", "--exclude", "2026-10-13"])
+        text = out.getvalue()
+        self.assertEqual(rc, 0)
+        self.assertIn("2026-10-13", text)
+        self.assertIn("(excluded below)", text)
+        self.assertIn("all sessions", text)
+        self.assertIn("without the excluded days", text)
+        self.assertIn("baseline 86", text)
+
+    def test_without_the_flag_the_output_is_the_old_one(self):
+        lines = ["rh bot %sT%s ET (heartbeat)" % (x[0].strftime("%Y-%m-%d"), x[0].strftime("%H:%M")) for x in self.snaps()]
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.object(D, "git_subjects", lambda since="": lines):
+            D.main(["--since", "2026-10-12"])
+        self.assertNotIn("min/session", out.getvalue())
+        self.assertIn("HEADLINE", out.getvalue())
 
 
 if __name__ == "__main__":

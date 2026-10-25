@@ -24,7 +24,7 @@ Heartbeats are about 15 minutes apart, so a shorter threshold would invent outag
 
 Not a trading input. Read-only: it runs `git log` and prints.
 
-Run:  python arm_b_downtime.py [--since YYYY-MM-DD[THH:MM]] [--until YYYY-MM-DD[THH:MM]] [--episodes]
+Run:  python arm_b_downtime.py [--since YYYY-MM-DD[THH:MM]] [--until YYYY-MM-DD[THH:MM]] [--episodes] [--per-day [--exclude DAY,DAY]]
 """
 import os
 import re
@@ -39,6 +39,7 @@ os.environ.setdefault("ALPACA_SECRET_KEY", "unused-in-arm-b-downtime")
 GAP_MIN = 30
 DEGRADED_COVER = 5
 EDGE_TAIL_MIN = 15      # a no-push stretch that STARTS within this many minutes of the close: those minutes are edge
+BASELINE_DEGRADED_PER_SESSION = 86   # degraded minutes per session, 2026-09-22 to 10-07, before the quota habit (experiment.json)
 EDGE_HEAD_MIN = 6       # a no-push stretch that ENDS within this many minutes of the open: those minutes are edge
 
 SUBJECT = re.compile(r"rh bot (\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2}) ET \((\w+)\)")
@@ -142,6 +143,31 @@ def measure(snaps, start, end, hol, gap_min=GAP_MIN, cover=DEGRADED_COVER):
             "episodes": episodes}
 
 
+def per_day(snaps, start, end, hol):
+    """One row per trading session between start and end: {day, trading, degraded, no_push, edge, blind}.
+
+    blind = degraded + no_push - edge, the HEADLINE rule (edge minutes excluded). Each day is measured on its own window, so
+    the rows add up to the period figure to within the edge minutes that straddle midnight.
+    """
+    rows, day = [], datetime(start.year, start.month, start.day)
+    while day <= end:
+        if session(day, hol) is not None:
+            r = measure(snaps, max(start, day), min(end, day + timedelta(days=1)), hol)
+            rows.append({"day": day.strftime("%Y-%m-%d"), "trading": r["trading"], "degraded": r["degraded"],
+                         "no_push": r["no_push"], "edge": r["edge"], "blind": r["degraded"] + r["no_push"] - r["edge"]})
+        day += timedelta(days=1)
+    return rows
+
+
+def summarize_days(rows, exclude=()):
+    """{sessions, degraded_per_session, blind_per_session, excluded}: the means over the rows not named in `exclude`."""
+    kept = [r for r in rows if r["day"] not in set(exclude)]
+    n = len(kept)
+    return {"sessions": n, "excluded": [r["day"] for r in rows if r["day"] in set(exclude)],
+            "degraded_per_session": (sum(r["degraded"] for r in kept) / n) if n else None,
+            "blind_per_session": (sum(r["blind"] for r in kept) / n) if n else None}
+
+
 def git_subjects(since="2026-08-20"):
     out = subprocess.run(["git", "log", "--since=" + since, "--format=%s", "--", "rh_status.json"],
                          capture_output=True, text=True, check=True).stdout
@@ -154,7 +180,7 @@ def _when(s):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
-    since, until, episodes = "2026-08-24", None, False
+    since, until, episodes, daily, exclude = "2026-08-24", None, False, False, ()
     i = 0
     while i < len(argv):
         if argv[i] == "--since":
@@ -165,6 +191,11 @@ def main(argv=None):
             i += 1
         elif argv[i] == "--episodes":
             episodes = True
+        elif argv[i] == "--per-day":
+            daily = True
+        elif argv[i] == "--exclude":
+            exclude = tuple(x.strip() for x in argv[i + 1].split(",") if x.strip())
+            i += 1
         i += 1
     snaps = parse_subjects(git_subjects())
     if not snaps:
@@ -179,6 +210,19 @@ def main(argv=None):
         for e in r["episodes"]:
             print("  %-8s %s -> %s %6.0f min%s" % (e["kind"], e["start"].strftime("%m-%d %H:%M"), e["end"].strftime("%m-%d %H:%M"),
                                                    e["minutes"], ("  (edge %.0f)" % e["edge"]) if e["edge"] else ""))
+    if daily:
+        rows = per_day(snaps, start, end, holidays())
+        print("%-11s %7s %9s %8s %5s %7s" % ("day", "minutes", "degraded", "no-push", "edge", "blind"))
+        for x in rows:
+            print("%-11s %7.0f %9.0f %8.0f %5.0f %7.0f%s" % (x["day"], x["trading"], x["degraded"], x["no_push"], x["edge"], x["blind"],
+                                                           "   (excluded below)" if x["day"] in exclude else ""))
+        for label, ex in (("all sessions", ()), ("without the excluded days", exclude)):
+            if label != "all sessions" and not exclude:
+                continue
+            sm = summarize_days(rows, ex)
+            if sm["sessions"]:
+                print("%-27s %d sessions: degraded %.1f min/session (baseline %d), blind %.1f min/session" % (
+                    label, sm["sessions"], sm["degraded_per_session"], BASELINE_DEGRADED_PER_SESSION, sm["blind_per_session"]))
     t = r["trading"] or 1.0
     print("HEADLINE (edge minutes excluded): %.0f blind market-minutes = %.1f%% of trading time" % (blind - r["edge"], 100.0 * (blind - r["edge"]) / t))
     print("upper bound (edge minutes in):    degraded %.0f + no-push %.0f = %.0f = %.1f%%  (%.0f of the no-push are close/open edge minutes)" % (
