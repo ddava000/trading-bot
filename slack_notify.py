@@ -529,10 +529,14 @@ if __name__ == "__main__":
         sys.exit(0 if post(" ".join(sys.argv[2:])) else 1)
     if arg == "--peek":
         pat = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else "realized"
-        res = peek_bot(pat)
+        try:
+            depth = int(os.environ.get("PEEK_LIMIT") or 20)       # how many recent messages to look through
+        except ValueError:
+            depth = 20
+        res = peek_bot(pat, limit=depth)
         if res is None:
             sys.exit(1)
-        for ts, subj, hits in res[:5]:
+        for ts, subj, hits in res[:max(5, min(len(res), 25))]:
             try:
                 when = datetime.fromtimestamp(float(ts), ZoneInfo("America/New_York")).strftime("%m-%d %H:%M ET")
             except (ValueError, TypeError):
@@ -540,7 +544,7 @@ if __name__ == "__main__":
             print("  [%s] %s" % (when, subj.encode("ascii", "replace").decode()))
             for h in hits:
                 print("      " + h[:220].encode("ascii", "replace").decode())
-        print("  [peek: %d bot message(s) matched %r]" % (len(res), pat))
+        print("  [peek: %d bot message(s) matched %r, looking through the newest %d]" % (len(res), pat, depth))
         sys.exit(0)
     if arg == "--scan":
         words = " ".join(sys.argv[2:]).split()               # the workflow passes its whole text input as one argument

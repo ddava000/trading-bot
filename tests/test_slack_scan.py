@@ -117,6 +117,31 @@ class ScanTests(unittest.TestCase):
         self.assertEqual(sum(1 for c in api.calls if c[0] == "conversations.replies"), 8)
 
 
+class PeekDepth(unittest.TestCase):
+    """mode=peek looked through only the newest 20 messages, so a bot alert from two days ago could not be read back."""
+
+    def test_the_dispatch_form_has_a_limit_and_passes_it_to_the_step(self):
+        with open(os.path.join(ROOT, ".github", "workflows", "slack-test.yml"), encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("      limit:", text)
+        self.assertIn("PEEK_LIMIT:", text)
+
+    def test_the_cli_reads_the_depth_from_the_environment_and_says_how_deep_it_looked(self):
+        src = open(os.path.join(ROOT, "slack_notify.py"), encoding="utf-8").read()
+        self.assertIn('os.environ.get("PEEK_LIMIT")', src)
+        self.assertIn("peek_bot(pat, limit=depth)", src)
+        self.assertIn("looking through the newest %d", src)
+
+    def test_peek_bot_passes_the_depth_to_slack(self):
+        api = Api([bot("1790000000.000100", "ARM A alert")])
+        with configured(), mock.patch.object(S, "_api", api):
+            S.peek_bot("ARM A", limit=150)
+        self.assertEqual(api.calls[0][1]["limit"], "150")
+        with configured(), mock.patch.object(S, "_api", api):
+            S.peek_bot("ARM A", limit=9999)
+        self.assertEqual(api.calls[1][1]["limit"], "200")                  # Slack's maximum
+
+
 class WorkflowWiring(unittest.TestCase):
     def test_the_dispatch_offers_scan_and_runs_the_scan_command(self):
         text = open(os.path.join(ROOT, ".github", "workflows", "slack-test.yml"), encoding="utf-8").read()
