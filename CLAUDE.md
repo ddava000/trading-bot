@@ -186,7 +186,10 @@ sends the daily summary. They stay in `mail_check.DISPLAY` as `RETIRED`: mail ad
 `python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by HEADING against the list you have already seen,
 never by comparing timestamps and not by position: a merge can put another session's entry above your own), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
 entry `-> all` after reading ECOSYSTEM.md. If no `ALIGNMENT CHECK` is open, open one. Devon is messaged
-automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. The
+automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. CLOUD's "check mail" ALSO starts with a LIVE read of Slack (Devon 2026-10-22): `python slack_live.py`. CLOUD has no Slack token and the
+relay that files Slack into the mailbox lags by minutes to hours (a run, or GitHub's schedule), so the mailbox alone can be stale. A
+quiet answer ends "(looked at N message(s) since the last relay)"; judge "nothing" by that N. The other sessions read only the mailbox.
+The
 full order is in ECOSYSTEM.md.
 
 **Trading window (2026-10-13).** The bots' window is `alpaca_bot.session_bounds(day)`: 09:45 to 15:55 ET, 09:45 to 12:55 on

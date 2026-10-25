@@ -127,6 +127,38 @@ class WhoseMailIsIt(Box):
                          ["daily check broadcast", "for the audit"])
 
 
+class SlackReminderForCloud(Box):
+    """Devon 2026-10-22: "you should always check slack as well when i ask you to check mail".
+
+    CLOUD has no Slack token and the relay into this file lags, so a cold CLOUD session is told, in the very output it runs
+    first, to read Slack live. It is CLOUD's alone: the other sessions cannot do it and would only be told something false.
+    """
+
+    def test_cloud_is_told_to_read_slack_live_even_when_there_is_no_unread_mail(self):
+        self.write(SCENARIO)
+        self.cli("--inbox", "CLOUD", "--ack")
+        rc, out = self.cli("--inbox", "CLOUD")
+        self.assertEqual(rc, 0)
+        self.assertIn("python slack_live.py", out)
+        self.assertIn("LIVE", out)
+
+    def test_cloud_is_told_when_there_is_unread_mail_too(self):
+        self.write(SCENARIO)
+        rc, out = self.cli("--inbox", "CLOUD")
+        self.assertEqual(rc, 1)
+        self.assertIn("python slack_live.py", out)
+
+    def test_the_other_sessions_are_not_told_something_they_cannot_do(self):
+        self.write(SCENARIO)
+        for name in ("LAPTOP BOT", "AUDIT", "BOT WEEKLY AUDIT"):
+            rc, out = self.cli("--inbox", name)
+            self.assertNotIn("slack_live", out, name)
+
+    def test_the_command_the_reminder_names_exists(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.assertTrue(os.path.exists(os.path.join(root, "slack_live.py")))
+
+
 class MarkersAndTheCommand(Box):
     def test_ack_moves_the_marker_and_the_next_check_is_empty(self):
         self.write(SCENARIO)
@@ -201,7 +233,9 @@ class LineNumbersAreRealLineNumbers(Box):
             text = f.read()
         lines = text.split("\n")
         es = M.entries(text)
-        self.assertGreater(len(es), 40)
+        # Not a count of today's mailbox: the weekly audit archives settled threads (50 on 2026-10-25, 77 entries down to 27),
+        # and this assertion used to say 40, which turned the next push red. It only has to prove the parser found entries.
+        self.assertGreater(len(es), 5)
         for x in es:
             self.assertEqual(lines[x["line"] - 1].rstrip("\r").strip(), x["line_text"])
 

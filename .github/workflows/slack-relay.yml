@@ -40,4 +40,5 @@ jobs:
         env:
           SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          RELAY_STRICT:     "1"            # a relay that cannot read or cannot land is a RED run here, not a green one with a note
         run: bash .github/scripts/slack_relay.sh

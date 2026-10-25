@@ -57,7 +57,8 @@ Mail to a bare token (`-> cloud`) names the interactive session. Only the two in
 - **Slack #trading-bots** is Devon's phone view: reports, MAILBOX NOTIFY messages, relayed messages he types
   (they arrive as `slack -> all`, fenced as untrusted data). Kickstand never shares a channel with this.
   A relay can be minutes to an hour behind (filed by a run, not live), and thread replies are followed but DMs and other
-  channels are not read. CLOUD's "check mail" therefore starts with a live read: `gh workflow run slack-test.yml -f mode=read`.
+  channels are not read. CLOUD's "check mail" therefore starts with a live read: `python slack_live.py` (it dispatches slack-test.yml and prints the result;
+  `scan`, `peek REGEX [N]` and `say TEXT` are the other modes, and only `say` posts). `mail_check.py --inbox CLOUD` reminds CLOUD of it.
 - **Email to Devon**: order and error alerts, the daily digest, watchdog alerts, GitHub failure notices.
 
 ## WHEN DEVON SAYS "CHECK MAIL" (to any session): the order

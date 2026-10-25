@@ -166,6 +166,43 @@ class RelayBehaviour(unittest.TestCase):
         self.relay()
         self.assertEqual(self.remote_mailbox().count("devon says hi"), 1)
 
+    # -- STRICT mode (the standalone workflow): a relay that cannot read or cannot land is a RED run -----------------
+    def test_strict_a_server_that_never_accepts_fails_the_run_with_an_error_annotation(self):
+        self.reject_pushes(99)
+        r = self.relay(RELAY_TRIES="2", RELAY_STRICT="1")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("::error title=Slack relay not filed", r.stdout)
+        self.assertIn("::warning title=Slack relay not filed", r.stdout)
+
+    def test_strict_a_read_that_failed_with_nothing_to_file_fails_the_run(self):
+        r = self.relay(STUB_MODE="FAIL", RELAY_STRICT="1")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("Slack read failed", r.stdout)
+
+    def test_strict_a_quiet_channel_is_still_green(self):
+        r = self.relay(STUB_MODE="quiet", RELAY_STRICT="1")
+        self.assertEqual(r.returncode, 0)
+        self.assertNotIn("::error", r.stdout)
+
+    def test_strict_a_relay_that_lands_is_green(self):
+        r = self.relay(RELAY_STRICT="1")
+        self.assertEqual(r.returncode, 0)
+        self.assertIn("devon says hi", self.remote_mailbox())
+
+    def test_strict_a_branch_that_cannot_be_fetched_fails_the_run(self):
+        r = self.relay(RELAY_STRICT="1", RELAY_BRANCH="no-such-branch")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("::error title=Slack relay not run", r.stdout)
+
+    def test_not_strict_the_same_failures_stay_green_with_a_warning_only(self):
+        r = self.relay(STUB_MODE="FAIL")
+        self.assertEqual(r.returncode, 0)
+        self.assertIn("::warning title=Slack read failed", r.stdout)
+        self.assertNotIn("::error", r.stdout)
+        r = self.relay(RELAY_BRANCH="no-such-branch")
+        self.assertEqual(r.returncode, 0)
+        self.assertNotIn("::error", r.stdout)
+
     def test_it_never_force_pushes_and_never_rebases_or_merges(self):
         with open(RELAY, encoding="utf-8") as f:
             code = "\n".join(l for l in f.read().splitlines() if not l.lstrip().startswith("#"))
@@ -219,6 +256,12 @@ class TheStandaloneWorkflow(unittest.TestCase):
         self.assertIn("SLACK_BOT_TOKEN", step["env"])
         self.assertIn("SLACK_CHANNEL_ID", step["env"])
         self.assertEqual(wf["permissions"], {"contents": "write"})
+
+    def test_only_the_standalone_workflow_is_strict_the_trading_runs_step_never_is(self):
+        step = self.wf()["jobs"]["relay"]["steps"][-1]
+        self.assertEqual(step["env"].get("RELAY_STRICT"), "1")
+        with open(os.path.join(ROOT, ".github", "workflows", "alpaca-bot.yml"), encoding="utf-8") as f:
+            self.assertNotIn("RELAY_STRICT", f.read(), "a Slack relay must never fail the live-money run that carries it")
 
     def test_two_relays_never_overlap_and_a_waiting_one_is_not_cancelled_mid_push(self):
         c = self.wf()["concurrency"]

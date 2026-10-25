@@ -308,6 +308,12 @@ def _read_entries():
     return all_e
 
 
+# Devon 2026-10-22: "you should always check slack as well when i ask you to check mail". CLOUD has no Slack token and the
+# relay that files Slack into this mailbox lags (a run, or GitHub's schedule), so the mailbox alone can be hours behind.
+SLACK_REMINDER = ("SLACK: this file is not all of it. Read #trading-bots LIVE before you answer: python slack_live.py "
+                  "(what Devon typed after the last relay; the relay lags by minutes to hours).")
+
+
 def inbox_cli(argv):
     i = argv.index("--inbox")
     name = argv[i + 1] if len(argv) > i + 1 else ""
@@ -328,6 +334,8 @@ def inbox_cli(argv):
     if unread:
         print("Read each from its line (sed -n 'LINE,+40p' AGENT_MAIL.md), act, REPLY by appending, then confirm "
               "with the ALIGNED reply if an ALIGNMENT CHECK is open (python mail_check.py --aligned).")
+    if key == "cloud":
+        print(SLACK_REMINDER)
     if "--ack" in argv:
         cursors[key] = {"seen": identities(all_e)}
         _save_cursors(cursors)
