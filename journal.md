@@ -2370,3 +2370,9 @@
 - avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: Constructive midday — Nasdaq +1% on Anthropic IPO/AI enthusiasm, oil lower, VIX easing to 18.4; but a Fed decision and a flood of Big Tech earnings loom this week, so posture stays measured. Nudging to 0.45; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM losers stay off the buy list.
 - journal: Mon 10/26 14:44: Tape firmly green, VIX down to 18.4 from this morning's 19.2, Day P&L +$2 — lifted risk to 0.45, staying neutral given Fed decision and Big Tech earnings ahead. SNDK still bleeding (-19.8%), kept it plus NVDA/IWM and CTSH/FTRE earnings names excluded; $17 cash caps buys regardless. Watching the Fed and tech earnings deluge.
+
+### 2026-10-26T16:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Closing on a green day — tech up on Anthropic IPO buzz, oil lower, VIX steady at 18.4, Day P&L +$2; but a Fed decision and a flood of Big Tech earnings dominate this week, so posture stays measured. Holding 0.45 neutral into the close; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM losers stay off the buy list.
+- journal: Mon 10/26 16:40: Closing bell, calm constructive tape, VIX 18.4, Day P&L +$2 — kept risk 0.45/neutral with same lists. SNDK still deep red (-20.5%); $17 cash caps any buys anyway. Watching the Fed decision and Big Tech earnings deluge midweek — expect to dial defensive around those events.
