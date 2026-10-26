@@ -2358,3 +2358,9 @@
 - avoid: ['ARQT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: End of a fractured risk-off Friday: Dow down 600+ on rising oil and renewed AI doubts, selloff broadening across sectors; VIX 19.5 with weekend plus next-week Fed meeting and earnings flood as event risk. Holding 0.30: SNDK (-21.6%), IWM (-8.5%), NVDA (-6.9%) wreckage out, CTSH/FTRE/ARQT earnings landmines excluded, QQQ/VST avoided; $23 cash caps buys regardless.
 - journal: Fri 10/23 16:41: Closing bell on a rough week — Dow off 600+, AI/tech sold hard, VIX 19.5, Day P&L -$1. Stayed risk-off/0.30 into the weekend with same lists. Watching for AI/chip stabilization, Mideast/oil headlines, and CTSH/FTRE earnings plus the Fed meeting next week.
+
+### 2026-10-26T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Constructive open — futures up, oil retreating, VIX easing to 19.2 after a rough Friday; but a Fed decision and a flood of Big Tech earnings loom this week, so posture stays cautious. Lifting to 0.40 from 0.30 as the tape steadies; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM wreckage stay off the buy list.
+- journal: Mon 10/26 09:00: Week opens with futures higher and oil dropping, VIX down to 19.2 from Friday's 19.5 — nudged risk to 0.40 and shifted to neutral. Trimmed QQQ/VST/ARQT off avoid as tech bounces, kept CTSH/FTRE (earnings ~7d) and SNDK/NVDA/IWM losers out. Watching the Fed decision and Big Tech earnings deluge this week; $23 cash still caps any buys.
