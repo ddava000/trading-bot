@@ -335,6 +335,11 @@
    "qty": 0.021883428,
    "symbol": "IBM",
    "t": "2026-10-22"
+  },
+  {
+   "qty": 0.178741507,
+   "symbol": "ARQT",
+   "t": "2026-10-26"
   }
  ],
  "closed": [
@@ -992,7 +997,7 @@
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "ARQT": 0.198701484,
+  "ARQT": 0.377442991,
   "BKH": 0.143977258,
   "CTSH": 0.101851287,
   "FTRE": 0.253369023,
@@ -1026,8 +1031,8 @@
     }
    }
   },
-  "fills": 111,
-  "last_fill": "2026-10-23T13:45:35.421134Z",
+  "fills": 112,
+  "last_fill": "2026-10-26T13:45:25.631942Z",
   "last_sale": "2026-10-23",
   "lt": {
    "gains": 0.0,
@@ -1037,7 +1042,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -22.12,
-  "reconciliation_residual": -0.0551,
+  "reconciliation_residual": -0.0451,
   "sales": 43,
   "since": "2026-08-12",
   "st": {
