@@ -109,13 +109,20 @@ class Controls(Base):
 
 
 class WhatTheMuteLets_Slip(Base):
-    @unittest.expectedFailure
     def test_a_stale_status_line_that_arrives_with_a_queued_line_is_still_delivered(self):
         """queued 7 min AND status.json uncommitted 36 min at the same check: the stale line is real and non-queued."""
         self.deliver_combined({"queued": 7.0, "no_trigger": 0.0, "stale": 36.0})
         self.assertTrue(any("has not been committed" in body for _, body in self.sent),
                         "the whole body was dropped, including the stale line: %r" % (self.sent,))
 
+    # MARKER KEPT ON PURPOSE (laptop, 2026-10-26). The defect IS fixed, and this harness
+    # cannot show it: Base stubs _remember_alerts to a no-op and episode() passes a fresh
+    # {} to each check, so a fix that remembers the muted alert anywhere durable is
+    # invisible here, and the only fix this test could accept is a module global - the
+    # thing this file has got wrong five times. Proof in the production shape (one ledger,
+    # a recorder that records, plus a restart mid-episode) is tests/test_arm_a_mute_ledger.py.
+    # Cloud's call: share one dict across the two calls and let the recorder mutate it, and
+    # this flips too.
     @unittest.expectedFailure
     def test_no_running_again_notice_is_sent_for_an_alert_the_mute_swallowed(self):
         subjects = self.episode(muted=True)

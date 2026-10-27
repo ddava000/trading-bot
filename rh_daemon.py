@@ -1368,7 +1368,49 @@ def check_arm_a(led):
             # if that wording ever changes the alert is delivered, so a dead mute is noisy
             # rather than silent. tests/test_arm_a_mute.py builds the body from cloud's real
             # describe() so their rewording breaks my test instead of my inbox.
+            # RECOVERY NOTICE, cloud's cross-audit 2026-10-25, defect (b). The mute returns
+            # True, so run_once believes the alert went out, and at the end of the episode it
+            # sends "Arm A is running again" through this same callback - text with no queued
+            # marker in it, so it was delivered. Devon would be told Arm A is running again
+            # after an alert he never received, which is worse than either the alert or the
+            # silence. Swallowed only when the WHOLE opening alert was muted: if a stale line
+            # was delivered alongside (defect (a) below), the episode really was reported and
+            # its recovery belongs in his inbox. The flag is on the LEDGER, because a restart
+            # mid-episode would otherwise deliver a recovery for a muted alert - the sixth
+            # time that lesson has applied in this file.
+            if ARM_A_MUTE_QUEUED and "running again" in subject:
+                if (led.get("alerts") or {}).get("arm_a_queued_muted"):
+                    _remember_alerts(led, arm_a_queued_muted=False)
+                    log(f"ARM A WATCH recovery notice SWALLOWED: its opening alert was muted, "
+                        f"so this would report the end of something never reported: {subject}")
+                    return True
+                return notify(subject, chr(10).join([
+                    f"Detected by {SESSION_NAME} on the laptop. ARM A belongs to CLOUD: open the",
+                    "CLOUD session, or tell CLOUD to check mail. Nothing here is Arm B.",
+                    "", body]))
+
             if ARM_A_MUTE_QUEUED and not urgent and "give it a machine" in body:
+                # COMBINED ALERT, cloud's defect (a). build_alert puts EVERY threshold crossed
+                # at one check into one body, as "- " bullets. A queued crossing arriving with
+                # a first-level STALE crossing produced one non-urgent body containing the
+                # marker, and the old code dropped all of it - including the stale line, which
+                # this mute promised to leave alone. So strip the queued BULLETS only and
+                # deliver whatever is left. (queued with no_trigger cannot happen: a run that
+                # has waited N minutes was created N minutes ago, so no_trigger never exceeds
+                # queued, and 22 is already the urgent queued level. Cloud established that and
+                # removed their own test for it, because measure() cannot produce the input.)
+                kept = [ln for ln in body.splitlines()
+                        if not (ln.lstrip().startswith("- ") and "give it a machine" in ln)]
+                dropped = len(body.splitlines()) - len(kept)
+                if any(ln.lstrip().startswith("- ") for ln in kept):
+                    log(f"ARM A WATCH: dropped {dropped} queued line(s) from a combined alert "
+                        f"and delivered the rest: {subject}")
+                    _remember_alerts(led, arm_a_queued_muted=False)
+                    return notify(subject, chr(10).join([
+                        f"Detected by {SESSION_NAME} on the laptop. ARM A belongs to CLOUD: open the",
+                        "CLOUD session, or tell CLOUD to check mail. Nothing here is Arm B.",
+                        "", chr(10).join(kept)]))
+                _remember_alerts(led, arm_a_queued_muted=True)
                 # LOG THE WHOLE BODY, not just the subject. Cloud's request 2026-10-22, and
                 # it is the right one: since their evidence change the queued paragraph ends
                 # with what GitHub actually returned to THIS check - the run id, the list
