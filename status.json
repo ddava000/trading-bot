@@ -1,13 +1,13 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-10-26T19:45Z",
+ "as_of_utc": "2026-10-27T13:45Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-10-26T19:45:20+00:00",
+  "checked_at": "2026-10-27T13:45:25+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
@@ -16,24 +16,24 @@
  },
  "cash": 16.94,
  "crypto_enabled": true,
- "day_pnl": 1.89,
+ "day_pnl": 0.95,
  "earnings_guard": "unknown",
- "equity": 223.52,
+ "equity": 224.37,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 5.6,
-  "NVDA": -4.6,
-  "PLTR": 6.8,
-  "SNDK": -20.2,
-  "VST": -4.0
+  "MSFT": 5.2,
+  "NVDA": -4.0,
+  "PLTR": 5.8,
+  "SNDK": -18.6,
+  "VST": -1.4
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-10-26T20:05Z",
+ "next_expected_utc": "2026-10-27T14:05Z",
  "orders_this_run": 0,
  "plan": {
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "risk": 0.45,
   "stale": false
  },
@@ -56,7 +56,7 @@
     }
    }
   },
-  "checked_at": "2026-10-26T19:45:21+00:00",
+  "checked_at": "2026-10-27T13:45:23+00:00",
   "fills": 112,
   "last_fill": "2026-10-26T13:45:25.631942Z",
   "last_sale": "2026-10-23",
@@ -68,7 +68,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -22.12,
-  "reconciliation_residual": -0.0451,
+  "reconciliation_residual": -0.0351,
   "sales": 43,
   "since": "2026-08-12",
   "st": {
@@ -89,15 +89,15 @@
    }
   }
  },
- "regime": "risk-off",
+ "regime": "risk-on",
  "sleeves": {
   "crypto": 0,
-  "hold": 43.65,
-  "index": 120.84,
-  "trade": 42.09
+  "hold": 44.02,
+  "index": 121.33,
+  "trade": 42.08
  },
- "ts": "2026-10-26T15:45 ET",
- "vix": 18.4,
+ "ts": "2026-10-27T09:45 ET",
+ "vix": 17.9,
  "vix_live": true,
- "vs_baseline_pct": -9.84
+ "vs_baseline_pct": -9.5
 }
