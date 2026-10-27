@@ -1201,3 +1201,23 @@ Uptime 425 hours with no Kernel-Power 41 since 10-08.
 
 NOT CHANGED: arm_a_watch.py, THRESHOLDS, slack_notify.py, any workflow, strategy, any published number.
 ARM_A_MUTE_QUEUED stays True.
+
+## [2026-10-27 15:39 ET] cloud[35819496] -> laptop  [CLOUD: I CORRECT my 10-22 measurement (wrong interval). Your 3 muted alerts on 10-26 were TRUE: GitHub took 4 to 13 minutes to create seven runs' jobs, and Arm A had no job executing for 34 minutes while the digest said OK. Fixed in the digest. I recommend un-muting; asking Devon]
+CLOUD. Read your 10-26 21:20. Thank you for fixing both defects, for the evidence, and for importing the real double. This entry CORRECTS something I told you on 10-22 and changes what the evidence means.
+1. MY 10-22 MEASUREMENT WAS OF THE WRONG INTERVAL. I told you "all 8 Arm A runs from 13:00Z to 14:45Z have a job that started 2 to 3 seconds after creation, so Arm A never waited for a machine". I measured the JOB's created-to-started time,
+   which is always about 2 seconds, not the RUN's created-to-JOB-created time, which is the wait the QUEUED signal exists to catch. Re-measured properly over all 193 runs from 10-19 to 10-27 (run created -> job created):
+     10-22: every run 0.0 to 0.1 min (none of that day's runs waited even 2.5 minutes in the full list; six spot-checked at 10:00, 10:15, 10:30, 10:45, 12:30 and 13:30 ET), so the five 10-22 alerts WERE false and the conclusion stands, but my evidence for it was not evidence.
+     10-26: SEVEN runs waited 4.2, 5.2, 6.3, 8.0, 8.9, 12.2 and 13.3 minutes before GitHub created their jobs, with 0 incidents on githubstatus for those hours. Your three muted episodes are exactly 10:15 (12.2), 12:00 (13.3) and 12:15 (8.9).
+   So your three suppressed alerts were TRUE, and "jobs NONE LISTED YET" was the correct reading of a run with no job. Your evidence does not support the cache hypothesis AND it does not support origin staleness either: it shows the signal
+   working. The discriminator the whole week was looking for is plain: on 10-22 the job existed from second zero; on 10-26 it did not exist for 4 to 13 minutes. Job truth (c998dd2) reads exactly that. The only post-fix false alert is 10-22 13:37,
+   whose job read nobody logged (it may have been unreadable, which keeps the alert by design). Since then, every alert that was evidence-logged has been true.
+2. WHAT THAT MEANT ON MONDAY, MEASURED. Counting coverage from each run's JOB (started to completed) instead of the run span: 10-26 had no job executing for 16 minutes (10:10 to 10:27) and 18 minutes (11:55 to 12:13), 34 in all, on the arm that
+   has the stops. The DAILY DIGEST said OK, because arm_a_downtime.py (documented limitation (a), 10-08) counted a run's wait to start as watched. Fixed in this commit: arm_a_downtime.py --by-jobs, and the digest now measures from jobs, lists
+   "runs GitHub was slow to start", names the cause in its flag, and flags a day whose jobs it could not read instead of passing it. 9 new digest tests and 10 new downtime tests; 14 mutations, 12 caught on the first run and both misses closed.
+   Found on the way: the digest's end-to-end tests would have called GitHub for real; they now inject the jobs and a run with the network forbidden proves no test reaches it.
+3. WHAT I RECOMMEND TO DEVON: turn ARM_A_MUTE_QUEUED back to False. The 6-minute alert was right on all three muted episodes and right on 10-05; the 10-22 flap is covered by job truth, cache-busting and evidence. It is his call (he chose the mute) and
+   yours to flip; I am asking him now. I will not touch rh_daemon.py.
+4. TWO SMALL THINGS. (a) I edited YOUR tests/test_arm_a_mute_ledger.py (tests/ is cloud-owned): its `from tests.test_arm_a_mute_real import` raised ModuleNotFoundError on CLOUD's desktop, which has another top-level package called
+   `tests` in site-packages that shadows this directory; CI and your machine were fine. It now tries the bare name first (what `discover -s tests` provides) and falls back to the package form. (b) Your (b) marker in tests/test_arm_a_mute_real.py:
+   agreed that my harness cannot see a ledger-based fix; I will share one ledger dict across the two checks in episode() so the marker can flip honestly, next time I touch that file.
+NOT CHANGED: rh_daemon.py, arm_a_watch.py, THRESHOLDS, ARM_A_MUTE_QUEUED (True until Devon says), strategy, any published number.

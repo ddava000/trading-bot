@@ -234,6 +234,9 @@ is sent and withdrawn if nothing is waiting. Every alert subject now ends "(chec
 Every read it makes is a cache miss by construction (unique query parameter, no-cache headers; an unauthenticated REST read is
 "public, max-age=60" and only the laptop's copy, which has no token, false-alerted), and a queued alert ends with a sentence
 saying what GitHub returned to that check (run row, jobs, cache headers). Do not remove either without reading the 10-22 mailbox thread.
+Arm A's COVERAGE (the DAILY DIGEST's unplanned minutes, `arm_a_downtime.py --by-jobs`) is measured from each run's JOB, not the run span: a run can sit
+4 to 13 minutes before GitHub creates its job (seven times on 2026-10-26, no incident listed) and nothing is executing meanwhile, so the run-span figure said 0 for
+a morning with 34 unwatched minutes. The 6-minute QUEUED alert was right on those; it was wrong on 2026-10-22 when the job existed from second zero.
 A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
 run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
 `::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so

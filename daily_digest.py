@@ -46,6 +46,7 @@ WORKFLOW_FILE = "daily-digest.yml"
 OWN_NAME = "DAILY DIGEST"
 ARM_A_RUN_FLOOR = 0.75         # fewer finished Arm A runs than this share of the session's cadence is a flag
 ARM_A_UNPLANNED_FLAG_MIN = 15  # window minutes of unplanned Arm A gap in one day
+SLOW_START_MIN = 4             # a run whose job did not exist until this many minutes after the run was created: GitHub was slow to start it
 ARM_B_BLIND_FLAG_MIN = 15      # headline blind market-minutes in one day
 # What the laptop's machine block (rh_status.json["machine"], published by rh_daemon) should say. HMB off is the live crash experiment (set
 # 2026-10-08, 0 = disabled; an absent value means HMB is back at its default ON). Fast Startup is ON because Devon chose to leave it on
@@ -137,8 +138,19 @@ def build_report(f):
         flags.append("COULD NOT MEASURE Arm A's unplanned gaps")
     else:
         L.append("  unplanned unwatched minutes today: %.0f" % ua)
+        slow = f.get("arm_a_slow_starts") or []
+        js = f.get("arm_a_job_stats")
+        if slow:
+            L.append("  runs GitHub was slow to start (%d+ minutes before the job existed): %d, worst %.0f min" % (SLOW_START_MIN, len(slow), slow[-1][1]))
+        if js is None:
+            flags.append("COULD NOT READ today's Arm A jobs: the gap figure counts time spent waiting to start as watched and can hide a delayed run")
+        elif js.get("fallback") and not js.get("job"):
+            flags.append("COULD NOT READ any of today's Arm A jobs (%d run(s)): the gap figure counts time spent waiting to start as watched" % js["fallback"])
+        elif js.get("fallback"):
+            L.append("  (%d of %d run(s) measured by run span because their job could not be read)" % (js["fallback"], js["fallback"] + js.get("job", 0)))
         if ua >= ARM_A_UNPLANNED_FLAG_MIN:
-            flags.append("Arm A was unwatched for %.0f unplanned minutes" % ua)
+            flags.append("Arm A was unwatched for %.0f unplanned minutes%s" % (
+                ua, (" (GitHub started %d run(s) %d or more minutes late)" % (len(slow), SLOW_START_MIN)) if slow else ""))
 
     # ---- Arm B
     b = f.get("rh")
@@ -271,6 +283,19 @@ def fetch_runs_since(day_iso):
         return None
 
 
+def fetch_job_spans(raw, day, fetch=None):
+    """{run id: {start, end, wait_min}} for today's successful Arm A runs, from each run's JOB. Runs whose job cannot be read are absent.
+
+    The run's own created-to-updated span counts the time GitHub kept it waiting as watched, which made 2026-10-26 look clean while
+    no job was executing for 16 and 18 minutes (see arm_a_downtime.py). Returns {} when there is nothing to read, None if `raw` is None.
+    """
+    if raw is None:
+        return None
+    todays = [r for r in raw if r.get("name") == "Alpaca Trading Bot" and r.get("created_at")
+              and _utc(r["created_at"]).astimezone(ET).date() == day]
+    return A.job_spans(todays, fetch=fetch)
+
+
 def fetch_ci(fetch=None):
     """{conclusion, when} for the latest COMPLETED ci run, whatever day it was (CI runs only on pushes), or None if unreadable."""
     try:
@@ -358,7 +383,7 @@ def arm_a_finished(raw, day):
     return out
 
 
-def gather(now, raw, repo_root=".", ci_info=None, incidents=None):
+def gather(now, raw, repo_root=".", ci_info=None, incidents=None, job_spans=None):
     day = now.astimezone(ET).date()
     bounds = bot.session_bounds(day)
     f = {"date": day.isoformat(), "weekday": day.strftime("%a"), "trading_day": bounds is not None,
@@ -373,7 +398,14 @@ def gather(now, raw, repo_root=".", ci_info=None, incidents=None):
         f["arm_a_finished"] = len(inside)
         f["arm_a_expected"] = int(((bounds[1] - bounds[0]).total_seconds() / 60.0) / 15.0) if bounds else None
         try:
-            ivs = A.intervals([r for r in raw if r.get("name") == "Alpaca Trading Bot"])
+            stats = {}
+            arm_a_runs = [r for r in raw if r.get("name") == "Alpaca Trading Bot"]
+            ivs = A.intervals(arm_a_runs, job_spans, stats)
+            f["arm_a_job_stats"] = stats if job_spans is not None else None
+            f["arm_a_slow_starts"] = sorted(
+                ((rid, s["wait_min"]) for rid, s in (job_spans or {}).items()
+                 if s["wait_min"] >= SLOW_START_MIN and bounds and bounds[0] <= s["start"].replace(tzinfo=ET) <= bounds[1]),
+                key=lambda x: x[1]) if job_spans else []
             if bounds and ivs:
                 res = A.measure(ivs, bounds[0].replace(tzinfo=None), bounds[1].replace(tzinfo=None), B.holidays())
                 f["arm_a_unplanned"] = res["unplanned"]
@@ -430,7 +462,7 @@ def decide(now=None, force=False, sent_today=None):
     return should_send(now, sent_today, force)
 
 
-def send(now=None, raw=False, deliver=default_deliver, repo_root=".", ci_info=False, incidents=False):
+def send(now=None, raw=False, deliver=default_deliver, repo_root=".", ci_info=False, incidents=False, job_spans=False):
     """Build and deliver. (exit_code, one_line_summary). raw/ci_info/incidents default to fetching; tests inject (None = a failed read)."""
     now = now or datetime.now(UTC)
     day = now.astimezone(ET).date()
@@ -440,7 +472,9 @@ def send(now=None, raw=False, deliver=default_deliver, repo_root=".", ci_info=Fa
         ci_info = fetch_ci()
     if incidents is False:
         incidents = fetch_incidents(day)
-    facts = gather(now, raw, repo_root, ci_info, incidents)
+    if job_spans is False:
+        job_spans = fetch_job_spans(raw, day)
+    facts = gather(now, raw, repo_root, ci_info, incidents, job_spans)
     verdict, flags, subject, body = build_report(facts)
     print(body)
     sent = deliver(subject, body)

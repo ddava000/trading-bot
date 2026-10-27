@@ -16,6 +16,7 @@ import os
 import sys
 import unittest
 from datetime import datetime, timedelta, timezone
+from unittest import mock
 from zoneinfo import ZoneInfo
 
 import yaml
@@ -137,6 +138,7 @@ def facts(**kw):
          "incidents": [],
          "status": {"equity": 231.0, "day_pnl": -1.5, "vs_baseline_pct": -6.8, "halted": False, "vix_live": True},
          "arm_a_finished": 25, "arm_a_expected": 24, "arm_a_unplanned": 0.0,
+         "arm_a_job_stats": {"job": 25, "fallback": 0}, "arm_a_slow_starts": [],
          "rh": {"equity": 308.0, "ts": "2026-10-13T15:54", "degraded": None, "machine": dict(MACHINE)},
          "arm_b": {"degraded": 0.0, "no_push": 11.0, "edge": 11.0},
          "realized_lines": ["Arm A line", "Arm B line"], "mail_today": 3}
@@ -373,9 +375,14 @@ class RunOnce(unittest.TestCase):
         return [{"name": "Alpaca Trading Bot", "created_at": "2026-10-13T19:45:09Z", "updated_at": "2026-10-13T19:55:45Z",
                  "run_started_at": "2026-10-13T19:45:10Z", "status": "completed", "conclusion": "success", "id": 77}]
 
+    def spans(self):
+        """The job of run 77, as the digest's own reader would return it. Injected so no test here ever calls GitHub."""
+        return {77: {"start": datetime(2026, 10, 13, 15, 45, 12), "end": datetime(2026, 10, 13, 15, 55, 45), "wait_min": 0.0}}
+
     def go(self, deliver, **kw):
         os.chdir(ROOT)
-        args = dict(now=self.NOW, sent_today=False, raw=self.raw(), ci_info={"conclusion": "success", "when": "10-13 11:25"}, incidents=[], deliver=deliver)
+        args = dict(now=self.NOW, sent_today=False, raw=self.raw(), ci_info={"conclusion": "success", "when": "10-13 11:25"}, incidents=[], deliver=deliver,
+                    job_spans=self.spans())
         args.update(kw)
         with contextlib.redirect_stdout(io.StringIO()):
             return D.run_once(**args)
@@ -403,6 +410,19 @@ class RunOnce(unittest.TestCase):
         self.assertEqual(rc, 0, line)
         self.assertIn("slack,email", line)
         self.assertIn("Trading bots daily digest 2026-10-13", got[0][0])
+
+    def test_the_default_path_reads_the_jobs_of_todays_runs_and_the_report_uses_them(self):
+        seen = []
+        delayed = {77: {"start": datetime(2026, 10, 13, 15, 47, 0), "end": datetime(2026, 10, 13, 15, 55, 45), "wait_min": 9.0}}
+
+        def fake_fetch(raw, day, fetch=None):
+            seen.append((len(raw), day.isoformat()))
+            return delayed
+        got = []
+        with mock.patch.object(D, "fetch_job_spans", fake_fetch):
+            rc, line = self.go(lambda s, b: (got.append(b), ["slack"])[1], job_spans=False)
+        self.assertEqual(seen, [(1, "2026-10-13")])
+        self.assertIn("runs GitHub was slow to start", got[0])
 
     def test_an_unreadable_runs_list_still_sends_and_says_so(self):
         got = []
@@ -478,6 +498,98 @@ class Wiring(unittest.TestCase):
 
     def test_permissions_are_read_only(self):
         self.assertEqual(self.wf()["permissions"], {"contents": "read", "actions": "read"})
+
+
+class TheJobBasedGapMeasure(unittest.TestCase):
+    """2026-10-26: seven Arm A runs sat 4 to 13 minutes before GitHub even created their job. The digest counted each run's whole
+    created-to-updated span as watched, reported 0 unplanned minutes and said OK, while no job was executing for 16 minutes at
+    10:10 and 18 at 11:55. The coverage is now each JOB's started-to-completed span; a run whose job cannot be read falls back to
+    its run span, and that is said, never silent."""
+
+    DAY = datetime(2026, 10, 26).date()
+
+    def run_rows(self):
+        """Real shape of the morning: runs created every 15 minutes; two of them (10:15 and 12:00 ET) not started for 12 and 13 minutes."""
+        rows, spans = [], {}
+        t = datetime(2026, 10, 26, 13, 45, tzinfo=timezone.utc)                     # 09:45 ET
+        n = 0
+        while t < datetime(2026, 10, 26, 19, 46, tzinfo=timezone.utc):
+            delay = 12 if t.strftime("%H:%M") == "14:15" else 13 if t.strftime("%H:%M") == "16:00" else 0
+            start = t + timedelta(minutes=delay)
+            end = start + timedelta(minutes=10.5)
+            n += 1
+            rows.append({"id": n, "name": "Alpaca Trading Bot", "status": "completed", "conclusion": "success",
+                         "created_at": t.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_started_at": t.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                         "updated_at": end.strftime("%Y-%m-%dT%H:%M:%SZ")})
+            spans[n] = {"start": start.astimezone(ET).replace(tzinfo=None), "end": end.astimezone(ET).replace(tzinfo=None), "wait_min": float(delay)}
+            t += timedelta(minutes=15)
+        return rows, spans
+
+    def facts_for(self, spans):
+        rows, all_spans = self.run_rows()
+        return D.gather(et(2026, 10, 26, 16, 0), rows, ROOT, job_spans=all_spans if spans == "all" else spans)
+
+    def test_control_the_run_span_measure_cannot_see_a_delayed_start_which_is_the_bug(self):
+        f = self.facts_for({})                                                      # no job spans at all: the old behaviour
+        self.assertEqual(f["arm_a_unplanned"], 0.0)
+
+    def test_the_job_span_measure_finds_the_two_gaps_where_nothing_was_executing(self):
+        f = self.facts_for("all")
+        self.assertGreater(f["arm_a_unplanned"], 25.0)
+        self.assertEqual(len(f["arm_a_slow_starts"]), 2)
+        self.assertEqual(round(f["arm_a_slow_starts"][-1][1]), 13)
+
+    def test_the_report_flags_it_and_names_the_cause(self):
+        f = self.facts_for("all")
+        verdict, flags, subject, body = D.build_report(dict(facts(), **{k: f[k] for k in ("arm_a_unplanned", "arm_a_slow_starts", "arm_a_job_stats")}))
+        self.assertNotEqual(verdict, "OK")
+        self.assertTrue(any("GitHub started 2 run(s) 4 or more minutes late" in x for x in flags), flags)
+        self.assertIn("runs GitHub was slow to start", body)
+        self.assertIn("worst 13 min", body)
+
+    def test_unreadable_jobs_are_a_flag_not_a_calm_pass(self):
+        f = self.facts_for(None)
+        self.assertIsNone(f["arm_a_job_stats"])
+        flags = D.build_report(dict(facts(), **{k: f[k] for k in ("arm_a_unplanned", "arm_a_slow_starts", "arm_a_job_stats")}))[1]
+        self.assertTrue(any("COULD NOT READ today's Arm A jobs" in x for x in flags), flags)
+
+    def test_no_job_read_at_all_when_runs_exist_is_a_flag(self):
+        flags = D.build_report(facts(arm_a_job_stats={"job": 0, "fallback": 27}))[1]
+        self.assertTrue(any("COULD NOT READ any of today's Arm A jobs" in x for x in flags), flags)
+
+    def test_a_few_unreadable_jobs_are_shown_as_a_line_not_a_flag(self):
+        verdict, flags, _, body = D.build_report(facts(arm_a_job_stats={"job": 25, "fallback": 2}))
+        self.assertEqual(flags, [])
+        self.assertIn("2 of 27 run(s) measured by run span", body)
+
+    def test_a_clean_day_by_jobs_is_ok(self):
+        rows, spans = self.run_rows()
+        spans = {k: dict(v, wait_min=0.0, start=v["start"], end=v["end"]) for k, v in spans.items()}
+        # remove the delays: every job starts when its run was created
+        for r in rows:
+            n = r["id"]
+            c = datetime.strptime(r["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            spans[n] = {"start": c.astimezone(ET).replace(tzinfo=None), "end": (c + timedelta(minutes=10.5)).astimezone(ET).replace(tzinfo=None), "wait_min": 0.0}
+        f = D.gather(et(2026, 10, 26, 16, 0), rows, ROOT, job_spans=spans)
+        self.assertEqual(f["arm_a_unplanned"], 0.0)
+        self.assertEqual(f["arm_a_slow_starts"], [])
+
+    def test_fetch_job_spans_reads_only_todays_successful_arm_a_runs(self):
+        seen = []
+
+        def fake(run):
+            seen.append(run["id"])
+            return [{"created_at": run["created_at"], "started_at": run["created_at"], "completed_at": run["updated_at"]}]
+        rows = [
+            {"id": 1, "name": "Alpaca Trading Bot", "status": "completed", "conclusion": "success", "created_at": "2026-10-26T14:00:00Z", "updated_at": "2026-10-26T14:10:00Z"},
+            {"id": 2, "name": "Alpaca Trading Bot", "status": "completed", "conclusion": "failure", "created_at": "2026-10-26T14:15:00Z", "updated_at": "2026-10-26T14:25:00Z"},
+            {"id": 3, "name": "Alpaca Trading Bot", "status": "completed", "conclusion": "success", "created_at": "2026-10-25T14:15:00Z", "updated_at": "2026-10-25T14:25:00Z"},
+            {"id": 4, "name": "ARM A WATCH", "status": "completed", "conclusion": "success", "created_at": "2026-10-26T14:20:00Z", "updated_at": "2026-10-26T14:21:00Z"},
+        ]
+        out = D.fetch_job_spans(rows, self.DAY, fetch=fake)
+        self.assertEqual(seen, [1])
+        self.assertEqual(list(out), [1])
+        self.assertIsNone(D.fetch_job_spans(None, self.DAY))
 
 
 if __name__ == "__main__":

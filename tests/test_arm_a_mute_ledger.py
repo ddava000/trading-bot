@@ -38,7 +38,13 @@ os.environ.setdefault("ALPACA_SECRET_KEY", "x")
 
 import rh_daemon as D
 import arm_a_watch as A
-from tests.test_arm_a_mute_real import NOW, REAL_RUN_ONCE, row   # cloud's verified double
+try:
+    # `discover -s tests` puts tests/ itself on the path, so the bare name works everywhere it is run that way (CI included). The
+    # package form `tests.test_...` breaks on any machine that has ANOTHER top-level package called `tests` installed (CLOUD's
+    # desktop does, in site-packages, and it shadows this directory): ModuleNotFoundError at import, 2026-10-27.
+    from test_arm_a_mute_real import NOW, REAL_RUN_ONCE, row   # cloud's verified double
+except ImportError:
+    from tests.test_arm_a_mute_real import NOW, REAL_RUN_ONCE, row
 
 
 class TheMuteRemembersAcrossChecks(unittest.TestCase):

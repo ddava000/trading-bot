@@ -102,5 +102,107 @@ class MeasureTests(unittest.TestCase):
         self.assertAlmostEqual(r["covered"] + r["by_design"] + r["unplanned"], r["trading"])
 
 
+class JobSpanTests(unittest.TestCase):
+    """2026-10-26: seven runs waited 4 to 13 minutes before their JOB existed; the run span counted that wait as watched."""
+
+    @staticmethod
+    def job(created, started, completed):
+        return {"created_at": created, "started_at": started, "completed_at": completed}
+
+    def run_row(self, rid=1, created="2026-10-26T14:15:06Z", updated="2026-10-26T14:38:08Z", conclusion="success"):
+        return {"id": rid, "status": "completed", "conclusion": conclusion, "created_at": created, "run_started_at": created, "updated_at": updated}
+
+    def test_the_span_is_the_jobs_start_and_end_and_the_wait_is_run_created_to_job_created(self):
+        run = self.run_row()
+        sp = A.job_span(run, fetch=lambda r: [self.job("2026-10-26T14:27:18Z", "2026-10-26T14:27:20Z", "2026-10-26T14:38:08Z")])
+        self.assertEqual(sp["start"], dt("2026-10-26 10:27:20"))
+        self.assertEqual(sp["end"], dt("2026-10-26 10:38:08"))
+        self.assertAlmostEqual(sp["wait_min"], 12.2, places=1)
+
+    def test_the_wait_is_for_the_job_to_EXIST_not_for_a_machine_once_it_does(self):
+        """Job created 12 minutes after the run but only started 2 minutes after that: the wait the signal cares about is 12, not 14."""
+        sp = A.job_span(self.run_row(), fetch=lambda r: [self.job("2026-10-26T14:27:06Z", "2026-10-26T14:29:06Z", "2026-10-26T14:40:00Z")])
+        self.assertAlmostEqual(sp["wait_min"], 12.0, places=1)
+
+    def test_several_jobs_take_the_first_start_and_the_last_end(self):
+        sp = A.job_span(self.run_row(), fetch=lambda r: [self.job("2026-10-26T14:15:08Z", "2026-10-26T14:15:10Z", "2026-10-26T14:20:00Z"),
+                                                        self.job("2026-10-26T14:15:08Z", "2026-10-26T14:16:00Z", "2026-10-26T14:26:00Z")])
+        self.assertEqual((sp["start"], sp["end"]), (dt("2026-10-26 10:15:10"), dt("2026-10-26 10:26:00")))
+
+    def test_a_job_that_never_started_or_finished_or_a_failed_read_is_none_not_a_guess(self):
+        run = self.run_row()
+        self.assertIsNone(A.job_span(run, fetch=lambda r: []))
+        self.assertIsNone(A.job_span(run, fetch=lambda r: [{"created_at": "2026-10-26T14:15:08Z", "started_at": None, "completed_at": None}]))
+
+        def boom(r):
+            raise OSError("api down")
+        self.assertIsNone(A.job_span(run, fetch=boom))
+
+    def test_only_successful_completed_runs_are_read(self):
+        seen = []
+
+        def fetch(r):
+            seen.append(r["id"])
+            return [self.job("2026-10-26T14:15:08Z", "2026-10-26T14:15:10Z", "2026-10-26T14:26:00Z")]
+        rows = [self.run_row(1), self.run_row(2, conclusion="failure"), dict(self.run_row(3), status="in_progress"), self.run_row(4)]
+        out = A.job_spans(rows, fetch=fetch)
+        self.assertEqual(sorted(seen), [1, 4])
+        self.assertEqual(sorted(out), [1, 4])
+
+    def test_intervals_use_the_job_span_when_there_is_one_and_the_run_span_when_there_is_not_and_say_which(self):
+        a, b = self.run_row(1), self.run_row(2, created="2026-10-26T14:30:09Z", updated="2026-10-26T14:41:00Z")
+        spans = {1: {"start": dt("2026-10-26 10:27:20"), "end": dt("2026-10-26 10:38:08"), "wait_min": 12.2}}
+        stats = {}
+        got = A.intervals([a, b], spans, stats)
+        self.assertEqual(got[0], (dt("2026-10-26 10:27:20"), dt("2026-10-26 10:38:08")))
+        self.assertEqual(got[1], (dt("2026-10-26 10:30:09"), dt("2026-10-26 10:41:00")))
+        self.assertEqual(stats, {"job": 1, "fallback": 1})
+
+    def test_without_spans_intervals_are_exactly_the_old_run_spans(self):
+        a = self.run_row(1)
+        self.assertEqual(A.intervals([a]), [(dt("2026-10-26 10:15:06"), dt("2026-10-26 10:38:08"))])
+
+    def test_the_delayed_morning_is_invisible_by_run_span_and_found_by_job_span(self):
+        """The control and the fix on the same data: run 10:00 ends 10:10, the 10:15 run's job only starts at 10:27."""
+        rows = [self.run_row(1, "2026-10-26T14:00:08Z", "2026-10-26T14:10:40Z"), self.run_row(2, "2026-10-26T14:15:06Z", "2026-10-26T14:38:08Z"),
+                self.run_row(3, "2026-10-26T14:30:09Z", "2026-10-26T14:41:00Z")]
+        spans = {1: {"start": dt("2026-10-26 10:00:10"), "end": dt("2026-10-26 10:10:40"), "wait_min": 0.0},
+                 2: {"start": dt("2026-10-26 10:27:20"), "end": dt("2026-10-26 10:38:08"), "wait_min": 12.2},
+                 3: {"start": dt("2026-10-26 10:38:10"), "end": dt("2026-10-26 10:49:00"), "wait_min": 8.0}}
+        by_run = A.measure(A.intervals(rows), dt("2026-10-26 09:45"), dt("2026-10-26 15:55"), HOL)
+        by_job = A.measure(A.intervals(rows, spans), dt("2026-10-26 09:45"), dt("2026-10-26 15:55"), HOL)
+        self.assertEqual(by_run["unplanned"], 0.0)
+        self.assertGreaterEqual(by_job["unplanned"], 16.0)
+        self.assertEqual(by_job["episodes"][0]["start"], dt("2026-10-26 10:10:40"))
+
+    def test_the_command_line_says_how_many_runs_were_measured_by_job_and_how_many_were_slow(self):
+        import contextlib
+        import io
+        from unittest import mock
+        rows = [dict(self.run_row(1, "2026-10-26T14:00:08Z", "2026-10-26T14:10:40Z")), dict(self.run_row(2, "2026-10-26T14:15:06Z", "2026-10-26T14:38:08Z"))]
+        spans = {1: {"start": dt("2026-10-26 10:00:10"), "end": dt("2026-10-26 10:10:40"), "wait_min": 0.0},
+                 2: {"start": dt("2026-10-26 10:27:20"), "end": dt("2026-10-26 10:38:08"), "wait_min": 12.2}}
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.object(A, "fetch_runs", lambda: rows), mock.patch.object(A, "job_spans", lambda r: spans):
+            rc = A.main(["--since", "2026-10-26", "--until", "2026-10-27", "--by-jobs", "--episodes"])
+        text = out.getvalue()
+        self.assertEqual(rc, 0)
+        self.assertIn("2 runs by job, 0 by run span", text)
+        self.assertIn("took 4+ minutes to start: 1 (worst 12 min)", text)
+        self.assertIn("unplanned 10-26 10:10", text)
+
+    def test_without_the_flag_the_command_line_reads_nothing_extra(self):
+        import contextlib
+        import io
+        from unittest import mock
+        rows = [self.run_row(1, "2026-10-26T14:00:08Z", "2026-10-26T14:10:40Z")]
+        called = []
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), mock.patch.object(A, "fetch_runs", lambda: rows), mock.patch.object(A, "job_spans", lambda r: called.append(1) or {}):
+            A.main(["--since", "2026-10-26", "--until", "2026-10-27"])
+        self.assertEqual(called, [])
+        self.assertNotIn("measured from each run's JOB", out.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()
