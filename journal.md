@@ -2394,3 +2394,9 @@
 - avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: Midday tape constructive — chips leading a second-day tech bid on Anthropic IPO buzz, VIX eased to 17.7, oil lower, Day P&L +$2; but the Fed decision and a megacap earnings flood loom, so we stay measured at 0.45. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM remain off the buy list.
 - journal: Tue 10/27 14:07: Calm green session, VIX 17.7, chip-led tech strength, Day P&L +$2 — held 0.45/neutral, same lists. SNDK still deepest loser (-18.1%); $17 cash caps buys anyway. Planning to dial defensive into the Fed decision and Big Tech earnings midweek.
+
+### 2026-10-27T16:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Closing bell of a second straight green day — chips led, oil slid, VIX calm at 17.6, Day P&L +$2; but a Fed decision and a Big Tech earnings deluge dominate midweek, so we trim slightly to 0.4 into the event risk. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM stay off the buy list.
+- journal: Tue 10/27 16:10: Constructive close, VIX eased to 17.6, chip-led tech bid held, Day P&L +$2 — nudged risk to 0.4 ahead of Fed/earnings week. SNDK still deepest loser (-18.5%); $17 cash caps buys regardless. Watching the Fed decision and megacap reports to dial further defensive.
