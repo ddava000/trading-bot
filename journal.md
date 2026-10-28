@@ -2406,3 +2406,9 @@
 - avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
 - notes: After-hours check on a calm second green day — VIX 17.5, chips led, oil slid, Day P&L +$2; but tomorrow's Fed decision and a megacap earnings deluge are imminent event risk, so we hold a trimmed 0.4. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM stay off the buy list.
 - journal: Tue 10/27 17:30: Session closed constructive, VIX 17.5, Day P&L +$2 — holding 0.4/neutral, same lists. SNDK still deepest loser (-18.5%); $17 cash caps buys anyway. Key watch: Fed decision + Big Tech earnings midweek, ready to dial further defensive.
+
+### 2026-10-28T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['BKH', 'PLTR']
+- notes: Fed rate decision this afternoon plus Microsoft and Alphabet earnings tonight make today a double event-risk landmine; VIX calm at 17.4 but the tape is drifting cautiously, so we cut to 0.3 risk-off. MSFT moves off the favor list onto avoid (reports tonight), CTSH/FTRE stay earnings landmines, SNDK/NVDA/IWM remain losers off the buy list.
+- journal: Wed 10/28 09:00: Event day — Fed decision + MSFT/GOOGL earnings tonight. Dropped to 0.3/risk-off and moved MSFT to avoid ahead of its print. VIX 17.4 but caution dominates; $17 cash caps buys anyway. Watching Fed outcome and megacap reactions to reset posture after the dust settles.
