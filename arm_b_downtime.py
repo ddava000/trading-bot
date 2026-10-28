@@ -153,6 +153,9 @@ def per_day(snaps, start, end, hol):
     while day <= end:
         if session(day, hol) is not None:
             r = measure(snaps, max(start, day), min(end, day + timedelta(days=1)), hol)
+            if not r["trading"]:
+                day += timedelta(days=1)                    # a window that holds no trading minute (--until midnight) is not a session
+                continue
             rows.append({"day": day.strftime("%Y-%m-%d"), "trading": r["trading"], "degraded": r["degraded"],
                          "no_push": r["no_push"], "edge": r["edge"], "blind": r["degraded"] + r["no_push"] - r["edge"]})
         day += timedelta(days=1)

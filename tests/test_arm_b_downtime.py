@@ -160,6 +160,12 @@ class PerDayTests(unittest.TestCase):
         s = D.summarize_days([{"day": "d1", "degraded": 5.0, "blind": 5.0}], exclude=("d1",))
         self.assertEqual((s["sessions"], s["degraded_per_session"]), (0, None))
 
+    def test_an_until_date_at_midnight_does_not_add_an_empty_session_that_dilutes_the_mean(self):
+        """2026-10-28: --until 2026-10-28 listed 10-28 as a session with 0 minutes, so 201 degraded minutes over 10 sessions read 18.3, not 20.1."""
+        rows = D.per_day(self.snaps(), dt("2026-10-12 00:00"), dt("2026-10-14 00:00"), HOL)
+        self.assertEqual([r["day"] for r in rows], ["2026-10-12", "2026-10-13"])
+        self.assertTrue(all(r["trading"] > 0 for r in rows))
+
     def test_the_published_baseline_is_86_minutes_per_session(self):
         self.assertEqual(D.BASELINE_DEGRADED_PER_SESSION, 86)
 

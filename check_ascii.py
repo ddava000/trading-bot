@@ -23,7 +23,9 @@ SHARED = ["alpaca_bot.py", "slack_notify.py", "rh_watchdog.py", "mail_check.py",
           # run by hand on the Windows laptop for the experiment's downtime figure:
           "arm_b_downtime.py", "arm_a_downtime.py",
           # run by hand from CLOUD's Windows console at the start of every "check mail":
-          "slack_live.py"]
+          "slack_live.py",
+          # run by hand on the Windows console for the 11-24 decision:
+          "ab_compare.py"]
 EXEMPT = {"\u2500"}
 # f-strings tokenize as FSTRING_MIDDLE on 3.12+, NOT as STRING. Missing that is how
 # the first sweep reported "0 dangerous" while every order-placement and halt message
