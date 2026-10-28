@@ -2418,3 +2418,9 @@
 - avoid: ['MSFT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['BKH', 'PLTR']
 - notes: Fed held rates steady as expected and the S&P sits higher, but MSFT and Alphabet earnings tonight remain a megacap landmine, so we hold 0.3 risk-off into the close. VIX calm at 17.4 yet IWM/NVDA/SNDK are red and CTSH/FTRE still carry ~7d earnings risk.
 - journal: Wed 10/28 14:24: Fed left rates unchanged, market firm but churning ahead of MSFT/GOOGL tonight — stayed 0.3/risk-off, same lists. SNDK deepest loser (-13.1%), IWM -7.3%; $17 cash caps buys regardless. Watching tonight's megacap prints to reset posture tomorrow.
+
+### 2026-10-28T16:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'ARQT', 'BKH', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['PLTR', 'IBM']
+- notes: Fed held as expected and the tape closed higher for a third day with VIX calm at 16.9, but MSFT and Alphabet report after the bell tonight — a megacap landmine — so we stay 0.3 risk-off into the close. Added ARQT/BKH (now ~7d earnings) to the avoid list alongside CTSH/FTRE; SNDK/NVDA/IWM remain red and off the buy list.
+- journal: Wed 10/28 16:27: Near the close, Fed non-event behind us, VIX eased to 16.9, Day P&L flat. Held 0.3/risk-off ahead of tonight's MSFT/GOOGL prints; moved ARQT and BKH to avoid as earnings near. $17 cash caps buys regardless. Watching megacap reactions overnight to reset posture tomorrow.
