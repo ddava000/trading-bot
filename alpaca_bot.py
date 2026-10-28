@@ -828,7 +828,10 @@ def alpaca_open_orders():
     try:
         return {o["symbol"] for o in alpaca_get("/v2/orders?status=open&limit=100")
                 if o.get("symbol")}
-    except Exception:
+    except Exception as e:
+        # Fail OPEN on purpose (a cycle that cannot read orders must still run its stops), but say so:
+        # until now an error reply silently switched the double-buy guard off (2026-10-28 cold review).
+        print(f"  [open orders unreadable ({type(e).__name__}) - double-buy guard OFF for this read]")
         return set()
 
 # ── Contributed-capital detector ──────────────────────────────────────────────
@@ -1157,9 +1160,17 @@ def alpaca_position_gone(sym):
     of riding their -25% hold stops.)"""
     try:
         p = alpaca_get(f"/v2/positions/{sym}")
-        if isinstance(p, dict) and p.get("code"):     # Alpaca 404 body: {"code": 40410000, ...}
-            return True
-        return float((p or {}).get("qty") or 0) <= 0
+        if not isinstance(p, dict):
+            return False
+        if p.get("code") or p.get("message"):
+            # Alpaca error bodies all look like {"code": N, "message": ...}; ONLY a 404 (40410000,
+            # "position does not exist") means the position is gone. A 429/403/500 body is doubt, not
+            # confirmation (2026-10-28 cold review: it used to count as gone and cleared the ledger).
+            msg = str(p.get("message") or "").lower()
+            return str(p.get("code") or "").startswith("404") or "does not exist" in msg
+        if "qty" not in p:
+            return False
+        return float(p["qty"]) <= 0
     except Exception:
         return False
 
@@ -1229,14 +1240,28 @@ def load_holds():
     """The buy-and-hold ledger (holds.json, committed back to the repo like the
     trade log). Maps symbol -> {ts, basis, notional}. Symbols here are EXEMPT from
     sell signals - only the HOLD_STOP disaster stop exits them."""
+    if not os.path.exists("holds.json"):
+        return {}
     try:
-        return json.load(open("holds.json"))
-    except Exception:
+        with open("holds.json") as f:
+            return json.load(f)
+    except Exception as e:
+        # No ledger means every hold is judged as a TRADE position (-7% stop, not -25%), so an unreadable
+        # file must never be silent (2026-10-28 cold review).
+        print(f"! holds.json UNREADABLE ({type(e).__name__}: {e}) - treating the hold ledger as EMPTY this pass")
         return {}
 
 def save_holds(holds):
-    with open("holds.json", "w") as f:
-        json.dump(holds, f, indent=1, sort_keys=True)
+    # Write beside, then replace: a crash mid-write used to leave a truncated file, which load_holds read as "no holds".
+    tmp = "holds.json.tmp"
+    try:
+        with open(tmp, "w") as f:
+            json.dump(holds, f, indent=1, sort_keys=True)
+        os.replace(tmp, "holds.json")
+    except BaseException:
+        try: os.remove(tmp)
+        except OSError: pass
+        raise
 
 def recent_stop_outs(days=STOP_COOLDOWN_D):
     """Symbols whose stop fired within the cooldown window - no revenge re-entry.
@@ -1457,12 +1482,18 @@ def run_bot():
             return
     # Prune a hold only on positive confirmation it's gone (per-symbol 404), never
     # on its mere absence from one batch positions read.
+    # A hold whose ENTRY order is still resting (a sub-$5 marketable limit writes holds.json at order time)
+    # has no position yet and a real 404, but it is not gone: pruning it re-labelled the name a trade
+    # position the moment it filled (-7% stop, signal sells). Wait for the order to fill or expire.
     stale = [s for s in holds if s in INDEX_ETFS
-             or (s not in positions and alpaca_position_gone(s))]
+             or (s not in positions and s not in pending and alpaca_position_gone(s))]
     for s in stale: holds.pop(s); holds_dirty = True
-    hold_val    = sum(positions[s]["mkt_val"] for s in holds)
-    cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds
-                         if float(positions[s].get("avg_cost") or 99) < CHEAP_PX)
+    # A hold can be absent from `positions` while still held: qty_available excludes shares reserved by an
+    # open order, so a hold fully covered by a resting sell has no entry. Count only what is visible; indexing
+    # it raised KeyError at the top of every cycle (2026-10-28 cold review).
+    hold_val    = sum(positions[s]["mkt_val"] for s in holds if s in positions)
+    cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds if s in positions
+                         and float(positions[s].get("avg_cost") or 99) < CHEAP_PX)
     crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}   # DOGEUSD -> DOGE/USD
     crypto_pos  = {s: p for s, p in positions.items() if s in crypto_flat}
     crypto_val  = sum(p["mkt_val"] for p in crypto_pos.values())
@@ -2204,6 +2235,13 @@ def exit_pass(et, alerted):
     stocks      = [s for s in positions if s not in crypto_flat and s not in INDEX_ETFS]
     lasts       = alpaca_latest_multi(stocks) if stocks else {}
     clasts      = crypto_latest_multi([crypto_flat[s] for s in positions if s in crypto_flat]) or {}
+    # A name with no price cannot be stop-checked, and nothing used to say so: when the data API failed the
+    # whole pass was a silent no-op that the caller recorded as "reached". Still cannot sell on a price it
+    # does not have, but the log now names what went unwatched (2026-10-28 cold review).
+    blind = sorted(s for s in stocks if s not in pending and not lasts.get(s))
+    if blind:
+        print(f"  [fast pass {et.strftime('%H:%M')}: no live price for {len(blind)} of {len(stocks)} "
+              f"held name(s) {blind} - their stops were NOT evaluated this pass]")
     placed = False
     holds_dirty = False
 
@@ -2355,15 +2393,26 @@ if __name__ == "__main__":
         # retrying Alpaca every ~EXIT_PASS_SEC for the rest of the window and places
         # stops the moment it comes back. Losing one BUY/rebalance cycle to an outage
         # is fine (the next 15-min trigger redoes it); the protective passes are what
-        # matter and they are preserved. Only network errors are caught; real crashes
-        # still raise (red X).
+        # matter and they are preserved. A network error is absorbed (exit 0). Any OTHER
+        # failure of the full cycle (a gateway HTML page or a JSON error body from Alpaca
+        # surfaces as JSONDecodeError / KeyError, not as a ConnectionError) ALSO runs the
+        # protective loop first, then fails the job: a crash is still a red X, but it must
+        # not cost the window its stops, since no stop orders exist at the broker
+        # (2026-10-28 cold review: it used to skip the loop entirely).
         cycle_ok = False
+        crashed = None
         try:
             run_bot()
             cycle_ok = True
         except _NET_ERRS as e:
             print(f"! Alpaca unreachable for the full cycle ({e}) - skipping to "
                   "protective passes, which retry Alpaca every pass.")
+        except Exception as e:
+            import traceback
+            crashed = e
+            print(traceback.format_exc())
+            print(f"! the full cycle CRASHED ({type(e).__name__}: {e}) - running the protective "
+                  "passes anyway, then failing the job.")
 
         # Fast protective loop: check hard stops + danger news every ~EXIT_PASS_SEC
         # until the deadline, then end so the log persists and the job finishes well
@@ -2400,6 +2449,8 @@ if __name__ == "__main__":
                 outage_note_blind()
             else:
                 outage_note_contact()
+        if crashed is not None:
+            raise crashed                    # the outer handler mails the open-of-day crash and keeps the job red
     except Exception:
         import traceback
         tb = traceback.format_exc()
