@@ -1308,10 +1308,17 @@ MAIL_F = "AGENT_MAIL.md"
 # more accurate one. If you are about to change this back, confirm with Devon first -
 # two sessions flipping one string is worse than either value.
 SESSION_NAME = "LAPTOP BOT"
-# Stopgap, Devon's call 2026-10-22: suppress ONLY the first-level (6-minute) queued
-# alert from ARM A WATCH on this laptop. Set back to False when cloud's fix holds;
-# see _deliver in check_arm_a for the whole reason and the scope.
-ARM_A_MUTE_QUEUED = True
+# OFF again, Devon's call 2026-10-29, because the mute was suppressing TRUE alerts.
+# It was on from 10-22 (also his call) to stop five false pairs in one day. What ended
+# it: cloud re-measured and found their 10-22 evidence had timed the wrong interval, and
+# the three alerts this mute swallowed on 10-26 were real - GitHub took 12.2, 13.3 and
+# 8.9 minutes to create those runs' jobs, confirmed here against the API run by run.
+# Arm A, the arm carrying the stops, had no job executing for 34 minutes that day while
+# the digest said OK. Six minutes of queued is now right more often than it is wrong.
+# The machinery below stays in place and dormant: if the signal turns noisy again this
+# is one line, and _deliver documents the scope, the fail-open and both defects cloud
+# found in it. Do not delete it to tidy up.
+ARM_A_MUTE_QUEUED = False
 
 # Devon, same day, asked directly: BOTH names stand. LAPTOP BOT is the interactive session
 # that owns this daemon; LAPTOP BOT DAILY CHECK is the scheduled daily check. Mail headed
@@ -1359,6 +1366,17 @@ def check_arm_a(led):
             # So this is Devon choosing fewer false alarms over 14 minutes of latency on a
             # real one, with the facts in front of him, and it is a stopgap: ARM_A_MUTE_QUEUED
             # goes back to False the moment cloud's next attempt holds.
+            #
+            # IT HELD, AND THE MUTE WENT OFF 2026-10-29. Read the paragraph above knowing it
+            # was built on a measurement that was withdrawn: cloud's "no Arm A run ever waited
+            # for a machine" had timed job-created to job-started (always ~2s), not run-created
+            # to job-created (the wait this signal exists to catch). Re-measured over 193 runs,
+            # 10-22's five alerts were still false - those jobs existed at second zero - but
+            # 10-26's three, which this mute swallowed, were TRUE at 12.2, 13.3 and 8.9 minutes.
+            # The 13:37 pair is the only post-fix false alert, and its job read went unlogged,
+            # so "job truth cannot save it" above is unproven rather than established. The real
+            # discriminator was never about staleness: either the job exists or it does not,
+            # and job truth reads exactly that.
             #
             # Scope is deliberately the narrowest thing that stops the noise. The URGENT
             # 20-minute queued level still sends, and no_trigger and stale are untouched, so
@@ -1757,7 +1775,18 @@ def _maybe_alert_broker(led):
                      reconcile_fails=_reconcile_fails)
 
 
-DOWNTIME_MIN_SEC = 300      # a gap under this is a code-pull restart, not an outage
+# A gap under this is a code-pull restart, not an outage. The 300 was chosen believing a
+# restart takes "well under a minute"; on this machine it did not. The daemon exits 42 and
+# waits for the scheduled task's REPEATING TRIGGER to find no instance running - the
+# configured restart-on-failure never fires, because IgnoreNew overwrites the task's last
+# result with 0x800710E0 (request refused) every time the trigger hits a live daemon. So the
+# true latency was the distance to the next trigger tick: 13 restarts from 10-08 to 10-27
+# measured 2s to 4m36s, all landing on the 5-minute grid, ~31 market minutes in all, and the
+# ones past 300s mailed Devon a TRUE "Arm B was blind" that read like a crash. Devon cut the
+# trigger to PT1M on 2026-10-27; the first restart after that took 11 SECONDS (10-29 09:45:51
+# -> 09:46:02) and sent nothing. If these emails ever come back for a code pull, read the
+# trigger interval before touching this number.
+DOWNTIME_MIN_SEC = 300
 DOWNTIME_MIN_MARKET_MIN = 2 # market minutes below this are heartbeat resolution, not blindness
 DOWNTIME_RETRY_MAX = 24     # passes to keep retrying a parked downtime report before giving up
 
@@ -1977,7 +2006,8 @@ def report_downtime(led):
         last = datetime.strptime(stamp, "%Y-%m-%dT%H:%M").replace(tzinfo=bot.ET_TZ)
         gap = (now_et() - last).total_seconds()
         if gap < DOWNTIME_MIN_SEC:
-            return                      # a restart for code takes well under a minute
+            return                      # a code-pull restart; see DOWNTIME_MIN_SEC for why
+                                        # this threshold was wrong until 2026-10-27
         if (led.get("alerts") or {}).get("downtime_reported") == stamp:
             return                      # reported already; a 2nd restart must not re-alert
 
