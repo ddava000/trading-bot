@@ -2448,3 +2448,9 @@
 - avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
 - notes: Near the close the AI-trade cracks persist — Alphabet set for a record ~$500B/-12% post-earnings drop, Nasdaq 100 -1.5%, dragging QQQ/SPY/NVDA; VIX firmed to 17.2 and Fed/CPI week keeps event risk elevated, so I hold 0.3 risk-off. Keeping ARQT/BKH earnings landmines and the deepest losers (SNDK -14%, NVDA -7%, IWM -6%, VST -6%) off the buy list.
 - journal: Thu 10/29 16:27: End of day — AI wobble held, Alphabet near record drop, VIX up to 17.2. Stayed 0.3 risk-off, same lists. $24 cash caps buys anyway. Watching megacap/AI-capex follow-through overnight and into Fed-heavy week to reset Friday.
+
+### 2026-10-29T18:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
+- notes: Post-close recap: Alphabet's record ~$482B drop revived AI-capex jitters, Nasdaq 100 -1.5% and S&P snapped a 3-day advance; VIX firmed to 17.2 with the AI trade showing cracks, so I hold 0.3 risk-off. Keeping ARQT/BKH (earnings ~7d) landmines and deepest losers SNDK -19%, NVDA -7%, IWM -6%, VST -7% off the buy list.
+- journal: Thu 10/29 18:04: After-hours confirmation — Alphabet's historic drop drove AI-capex fears, SNDK slid further to -19%. Held 0.3 risk-off, same lists; $24 cash caps buys regardless. Watching overnight megacap/AI follow-through to reset Friday morning.
