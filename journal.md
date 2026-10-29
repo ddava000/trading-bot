@@ -2436,3 +2436,9 @@
 - avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM'] | favor: ['PLTR', 'MSFT', 'IBM']
 - notes: Fed and the MSFT/GOOGL prints are now behind us — MSFT held up (+7.3%) but Alphabet and Caterpillar cracked and the tech rally is stalling, so the S&P is set for its first loss in four days. VIX calm at 17.1; I ease up to neutral/0.4 but keep earnings landmines (ARQT/BKH ~7d) and the deepest losers (SNDK -13%, NVDA -5%, IWM -6%) off the buy list.
 - journal: Thu 10/29 09:00: Megacap event risk cleared — MSFT reacted up so I pulled it off avoid and favor it; Alphabet/CAT disappointed and the broad tape is softening. Nudged from 0.3 risk-off to 0.4 neutral. Still avoiding ARQT/BKH earnings and red names SNDK/NVDA/IWM; $17 cash caps buys regardless. Watching whether the AI-rally wobble deepens today.
+
+### 2026-10-29T14:34 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
+- notes: AI-trade cracks are widening — Nasdaq 100 -1.5% with Alphabet on a record post-earnings drop and Caterpillar weak, dragging QQQ/SPY/NVDA; VIX still calm at 16.9 but the tape is deteriorating and SNDK gapped to -16%. Dialing back to 0.3 risk-off and keeping earnings landmines (ARQT/BKH ~7d) plus the deepest losers off the buy list.
+- journal: Thu 10/29 14:34: AI jitters deepened intraday — Alphabet record drop, Nasdaq leading lower, SNDK now -16% and NVDA/IWM/VST red. Stepped back from 0.4 neutral to 0.3 risk-off; added VST and QQQ to avoid given the tech/power selloff. $24 cash caps buys anyway. Watching whether the AI wobble turns into a broader flush.
