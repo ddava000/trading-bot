@@ -2454,3 +2454,9 @@
 - avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
 - notes: Post-close recap: Alphabet's record ~$482B drop revived AI-capex jitters, Nasdaq 100 -1.5% and S&P snapped a 3-day advance; VIX firmed to 17.2 with the AI trade showing cracks, so I hold 0.3 risk-off. Keeping ARQT/BKH (earnings ~7d) landmines and deepest losers SNDK -19%, NVDA -7%, IWM -6%, VST -7% off the buy list.
 - journal: Thu 10/29 18:04: After-hours confirmation — Alphabet's historic drop drove AI-capex fears, SNDK slid further to -19%. Held 0.3 risk-off, same lists; $24 cash caps buys regardless. Watching overnight megacap/AI follow-through to reset Friday morning.
+
+### 2026-10-30T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: AI-capex selloff is accelerating — Nasdaq futures -2%+ premarket as Amazon and Intel disappoint, piling onto Alphabet's record drop; VIX firmed to 18.7 and the tape is ugly, so I cut to 0.25 risk-off. Keeping ARQT/BKH earnings landmines and the deepest losers (SNDK -23%, NVDA -8%, VST -8%, IWM -6%) off the buy list; added SPY/QQQ given index weakness.
+- journal: Fri 10/30 09:00: AI wobble turned into a broad flush — Amazon/Intel misses dragged Nasdaq futures -2%+, VIX up to 18.7, SNDK now -23%. Trimmed from 0.3 to 0.25 risk-off and added SPY to avoid. $24 cash caps buys anyway; watching for a capitulation low vs. further downside into the open.
