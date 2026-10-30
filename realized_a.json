@@ -1023,6 +1023,19 @@
    "sale": "a7e5a7b2-5ba5-4dcb-8cb5-0571b10b69d8",
    "symbol": "FTRE",
    "term": "ST"
+  },
+  {
+   "basis": 7.189999,
+   "close_date": "2026-10-30",
+   "close_fill": 115,
+   "gain": -1.798989,
+   "open_date": "2026-09-02",
+   "open_fill": 36,
+   "proceeds": 5.39101,
+   "qty": 0.004539783,
+   "sale": "f26816ae-0a27-42ed-8953-9d22fcc5a01f",
+   "symbol": "SNDK",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -1037,7 +1050,6 @@
   "NVDA": 0.054469495,
   "PLTR": 0.042013208,
   "QQQ": 0.058331282,
-  "SNDK": 0.004539783,
   "SPY": 0.053798739,
   "VST": 0.069801133
  },
@@ -1051,18 +1063,18 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -22.25,
-    "sales": 45,
+    "net": -24.05,
+    "sales": 46,
     "st": {
      "gains": 0.26,
-     "losses": -22.51,
-     "net": -22.25,
-     "sales": 45
+     "losses": -24.31,
+     "net": -24.05,
+     "sales": 46
     }
    }
   },
-  "fills": 115,
-  "last_fill": "2026-10-30T14:15:31.947869Z",
+  "fills": 116,
+  "last_fill": "2026-10-30T14:24:47.229364Z",
   "last_sale": "2026-10-30",
   "lt": {
    "gains": 0.0,
@@ -1071,15 +1083,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -22.25,
-  "reconciliation_residual": -0.0561,
-  "sales": 45,
+  "net": -24.05,
+  "reconciliation_residual": -0.0571,
+  "sales": 46,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -22.51,
-   "net": -22.25,
-   "sales": 45
+   "losses": -24.31,
+   "net": -24.05,
+   "sales": 46
   },
   "state": "ok",
   "wash_watch": {
