@@ -2466,3 +2466,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
 - notes: AI-capex selloff persists into midday with VIX up to 21.6 and the tape still ugly — Nasdaq at a 3-month low on Amazon/Intel/Alphabet jitters, NVDA -10.7% and indices broadly red, so I hold 0.25 risk-off. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA, IWM -7.8%, VST -7.5%, QQQ, SPY) off the buy list.
 - journal: Fri 10/30 14:06: Selloff deepened intraday — VIX climbed from 18.7 to 21.6, NVDA sliding to -10.7%, IWM -7.8%. Held 0.25 risk-off, same posture; $29 cash caps buys regardless. Watching for capitulation/stabilization into the close vs. a weekend-risk flush.
+
+### 2026-10-30T15:59 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: Final bell on an ugly AI-capex flush week — Nasdaq -3%, Alphabet's record drop and Amazon/Intel misses, VIX still elevated at 20.5 and CPI tomorrow plus a Fed meeting next week keep event risk high, so I hold 0.25 risk-off into the weekend. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA -9.8%, IWM -7.4%, VST -6.5%, QQQ, SPY) off the buy list.
+- journal: Fri 10/30 15:59: VIX eased slightly from 21.6 to 20.5 but the tape closed broadly red with no clean capitulation low. Holding 0.25 risk-off into weekend/CPI/Fed-week risk; $29 cash caps buys anyway. Watching CPI print and whether AI names stabilize or extend the slide Monday.
