@@ -2460,3 +2460,9 @@
 - avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
 - notes: AI-capex selloff is accelerating — Nasdaq futures -2%+ premarket as Amazon and Intel disappoint, piling onto Alphabet's record drop; VIX firmed to 18.7 and the tape is ugly, so I cut to 0.25 risk-off. Keeping ARQT/BKH earnings landmines and the deepest losers (SNDK -23%, NVDA -8%, VST -8%, IWM -6%) off the buy list; added SPY/QQQ given index weakness.
 - journal: Fri 10/30 09:00: AI wobble turned into a broad flush — Amazon/Intel misses dragged Nasdaq futures -2%+, VIX up to 18.7, SNDK now -23%. Trimmed from 0.3 to 0.25 risk-off and added SPY to avoid. $24 cash caps buys anyway; watching for a capitulation low vs. further downside into the open.
+
+### 2026-10-30T14:06 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: AI-capex selloff persists into midday with VIX up to 21.6 and the tape still ugly — Nasdaq at a 3-month low on Amazon/Intel/Alphabet jitters, NVDA -10.7% and indices broadly red, so I hold 0.25 risk-off. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA, IWM -7.8%, VST -7.5%, QQQ, SPY) off the buy list.
+- journal: Fri 10/30 14:06: Selloff deepened intraday — VIX climbed from 18.7 to 21.6, NVDA sliding to -10.7%, IWM -7.8%. Held 0.25 risk-off, same posture; $29 cash caps buys regardless. Watching for capitulation/stabilization into the close vs. a weekend-risk flush.
