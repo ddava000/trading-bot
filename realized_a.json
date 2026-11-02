@@ -345,6 +345,11 @@
    "qty": 0.029423365,
    "symbol": "AN",
    "t": "2026-10-30"
+  },
+  {
+   "qty": 0.364830722,
+   "symbol": "CPRI",
+   "t": "2026-11-02"
   }
  ],
  "closed": [
@@ -1044,6 +1049,7 @@
   "AN": 0.029423365,
   "ARQT": 0.377442991,
   "BKH": 0.143977258,
+  "CPRI": 0.364830722,
   "IBM": 0.021883428,
   "IWM": 0.137264116,
   "MSFT": 0.014695966,
@@ -1073,8 +1079,8 @@
     }
    }
   },
-  "fills": 116,
-  "last_fill": "2026-10-30T14:24:47.229364Z",
+  "fills": 117,
+  "last_fill": "2026-11-02T14:45:29.214496Z",
   "last_sale": "2026-10-30",
   "lt": {
    "gains": 0.0,
@@ -1084,7 +1090,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -24.05,
-  "reconciliation_residual": -0.0571,
+  "reconciliation_residual": -0.0471,
   "sales": 46,
   "since": "2026-08-12",
   "st": {
