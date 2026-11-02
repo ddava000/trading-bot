@@ -1,9 +1,9 @@
 {
- "arm_a_watch_at": "2026-11-02T14:36",
- "broker_total_value_delta": 10.54,
+ "arm_a_watch_at": "2026-11-02T14:53",
+ "broker_total_value_delta": 10.51,
  "broker_total_value_held_back": 338.97,
  "dry": false,
- "equity": 328.43,
+ "equity": 328.46,
  "equity_source": "computed (broker_total_value held back)",
  "held": [
   "IWM",
@@ -88,5 +88,5 @@
    }
   }
  },
- "ts": "2026-11-02T14:39"
+ "ts": "2026-11-02T14:54"
 }
