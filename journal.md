@@ -2478,3 +2478,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
 - notes: After-hours on an ugly AI-capex flush week — Nasdaq worst day since June, VIX 19.4 still elevated, with CPI due tomorrow and a Fed meeting next week keeping event risk high, so I hold 0.25 risk-off into the weekend. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA -9.7%, IWM -7.4%, VST -6.2%, QQQ, SPY) off the buy list.
 - journal: Fri 10/30 17:43: Post-close recap confirms the broad tech selloff; VIX settled to 19.4 but no clean capitulation. Holding 0.25 risk-off into weekend/CPI/Fed-week risk; $29 cash caps buys regardless. Watching CPI print and whether AI names stabilize Monday.
+
+### 2026-11-02T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: Tape is stabilizing — VIX eased to 18.9, futures up as oil tumbles and AI names rebound after last week's capex flush, so I lift to neutral/0.4. But a loaded week (midterms, jobs data, Apple earnings, CPI/Fed) keeps me cautious, and ARQT/BKH earnings (~7d) plus the deepest losers (NVDA -8.7%, IWM, VST) stay off the buy list.
+- journal: Mon 11/2 10:00: Relief bounce off Friday's flush — VIX 19.4→18.9, futures green on oil drop/tech rebound. Upgraded risk-off→neutral, 0.4 (from 0.25). Dropped QQQ/SPY from avoid as broad tape steadies; still blocking ARQT/BKH earnings and NVDA/IWM/VST. Watching CPI, Fed, jobs, Apple earnings this week; $29 cash still caps buys.
