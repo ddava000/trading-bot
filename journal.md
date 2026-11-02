@@ -2484,3 +2484,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST'] | favor: ['IBM', 'MSFT', 'PLTR']
 - notes: Tape is stabilizing — VIX eased to 18.9, futures up as oil tumbles and AI names rebound after last week's capex flush, so I lift to neutral/0.4. But a loaded week (midterms, jobs data, Apple earnings, CPI/Fed) keeps me cautious, and ARQT/BKH earnings (~7d) plus the deepest losers (NVDA -8.7%, IWM, VST) stay off the buy list.
 - journal: Mon 11/2 10:00: Relief bounce off Friday's flush — VIX 19.4→18.9, futures green on oil drop/tech rebound. Upgraded risk-off→neutral, 0.4 (from 0.25). Dropped QQQ/SPY from avoid as broad tape steadies; still blocking ARQT/BKH earnings and NVDA/IWM/VST. Watching CPI, Fed, jobs, Apple earnings this week; $29 cash still caps buys.
+
+### 2026-11-02T17:49 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI', 'BKH']
+- notes: Morning bounce failed — Nasdaq melting down again, VIX back up to 21.1 and tech selling off hard (NVDA -10.8%, QQQ -5.7%, VST -8.6%, IWM -7.4%). Cutting back to risk-off/0.3 ahead of a loaded week (Apple earnings, midterms, jobs data) and keeping earnings landmines ARQT/BKH plus the deepest losers off the buy list.
+- journal: Mon 11/2 17:49: Downgraded neutral→risk-off (0.4→0.3). The relief bounce reversed — VIX 18.9→21.1, tech rolled over again. Re-added QQQ/SPY to avoid and flagged PLTR (post-earnings, -3.5%). $16 cash caps buys anyway. Watching for capitulation low, jobs data, and Apple earnings this week.
