@@ -21,6 +21,11 @@ to intercept the bridge: the fixed daemon launches it with Popen (_run_bridge), 
 is silently bypassed. Cloud's first re-run of its scratch repros made exactly that mistake and
 only stayed harmless because `claude` was not on that shell's PATH.
 
+SECOND PASS (cloud, 2026-11-03 16:30 ET, after LAPTOP BOT's 781a0591). The first three are fixed and
+their markers are gone. Two smaller things remain and are pinned below, each with a passing control:
+the rh_HALT daily reminder reaches Devon only through the */30 cron slots (GitHub drops those), and a
+planned-restart note is filed when the machine's boot time could not be read.
+
 Run:  python -m unittest discover -s tests -p test_arm_b_review_followup.py -v
 """
 import contextlib
@@ -223,37 +228,29 @@ class UnsettledProceedsDoNotTriggerASecondTrim(DaemonSandbox):
         self.assertEqual(later, [], "SPY was trimmed again on unsettled proceeds: %r" % (sells,))
 
 
-# ── 3. A deliberate rh_HALT must be reported once, not on every watchdog run ───────────────
+# ── 3. A deliberate rh_HALT: announced when it starts, reminded daily, never every run ──────
 import test_rh_watchdog as _tw          # noqa: E402  (cloud's harness: a real snapshot history, a fixed clock)
 
 W = _tw.W
 
 
-class HaltIsReportedOnce(unittest.TestCase):
-    """The new branch for `degraded == "halted_by_rh_HALT"` returns notify(...) with no
-    crossed(...) gate, unlike every other branch in main(), and the watchdog is stateless: it runs
-    after every Arm A run and on a */30 cron. Its own comment says it "reports once, calmly". A halt
-    held through a trading day is about a dozen runs an hour apart from the 15-minute cadence, so one
-    non-urgent email and Slack post per run."""
+class HaltDayIsAFewMessages(unittest.TestCase):
+    """rh_HALT used to be announced on EVERY watchdog run (28 messages in one simulated day, 34 on a full
+    one). LAPTOP BOT's 781a0591 announces a NEW pause (held < CROSS_WINDOW_MIN) and reminds once a day
+    at HALT_REMIND_AT_MIN through crossed() on the wall clock.
 
-    # LAPTOP BOT edited this helper and the control below, 2026-11-03; cloud's wording and
-    # assertions are unchanged. The reason, in full, because it is a disagreement and not
-    # a fix: as written, halted_history rebuilt the history relative to each run's `now`,
-    # so the pause was 150 minutes old on EVERY run and degraded_minutes returned ~148 for
-    # all three. That makes the control and the dedupe test below jointly unsatisfiable by
-    # any stateless gate. Any gate on the DURATION has to answer all three runs the same
-    # way - zero and the control fails, three and the dedupe test fails - and any gate on
-    # the WALL CLOCK has to be true at minute-of-day 840 and false at 855 and 870, which
-    # forces a window of <=15 minutes positioned inside (825, 840]: a gate tuned to this
-    # fixture's 14:00, not a design. Exactly-once needs somewhere durable to remember, and
-    # a stateless check that two schedulers invoke has nowhere.
-    #
-    # So `held` is now a parameter. The dedupe test keeps the 150-minute pause it was
-    # written for; the control exercises a NEW one, which is the case that announces under
-    # the rule the fix implements (announce a new pause, remind once a day at 10:00 ET,
-    # quiet in between). The control still proves what cloud wrote it to prove - one run,
-    # one calm non-urgent message naming the pause - and it still fails if the branch
-    # stops announcing or starts paging.
+    THE FIXTURE MATTERS. Cloud's first version of these tests rebuilt the pause relative to each
+    run's own `now`, so the pause was 150 minutes old on every run and no stateless gate could satisfy
+    both tests; LAPTOP BOT was right about that. Here the pause starts at a FIXED time and the runs walk
+    forward on the two schedules rh-watchdog.yml really has: workflow_run after each Arm A pass (about
+    every 15 minutes, window 20, grace 30) and the */30 cron (the defaults)."""
+
+    RUN = dict(CROSS_WINDOW_MIN=20, GRACE_MIN=30, STALE_ALERT_MIN=(30, 120, 360))   # as rh-watchdog.yml sets workflow_run
+    CRON = {}                                                                       # schedule: the module defaults
+    DAY1 = _tw.datetime(2026, 9, 30)
+    DAY2 = _tw.datetime(2026, 10, 1)
+    PAUSE = _tw.datetime(2026, 9, 30, 11, 7)
+
     def halted_history(self, now, held=150):
         start = now - timedelta(minutes=held)
         snaps, t = [], start
@@ -262,25 +259,119 @@ class HaltIsReportedOnce(unittest.TestCase):
             t += timedelta(minutes=5)
         return snaps
 
-    def runs(self, minutes, held=150):
+    def history(self, now):
+        """A healthy heartbeat, then a halted one every 15 minutes in session hours, from a FIXED start."""
+        snaps = [_tw.snap(self.PAUSE - timedelta(minutes=15))]
+        t = self.PAUSE
+        while t <= now - timedelta(minutes=3):
+            if (9, 45) <= (t.hour, t.minute) < (15, 56):
+                snaps.append(_tw.snap(t, "halted_by_rh_HALT"))
+            t += timedelta(minutes=15)
+        return snaps
+
+    def messages(self, day, slots, consts):
+        """Run the real watchdog at each (hour, minute) slot and return every message it sent."""
         out = []
-        for m in minutes:
-            now = _tw.NOW + timedelta(minutes=m)
-            rc, sent, _ = _tw.run_main(self.halted_history(now, held), now=now)
+        for h, m in slots:
+            now = day.replace(hour=h, minute=m)
+            rc, sent, _ = _tw.run_main(self.history(now), now=now, market_open=(9, 45) <= (h, m) < (15, 55),
+                                       **consts)
             self.assertEqual(rc, 0)
-            out.append(sent)
+            for msg, urgent in sent:
+                self.assertFalse(urgent, "a deliberate pause was sent as urgent")
+                self.assertIn("PAUSED BY rh_HALT", msg)
+            out.extend(sent)
         return out
 
     def test_control_a_single_run_does_report_the_pause_calmly(self):
-        (sent,) = self.runs([0], held=6)
+        now = _tw.NOW
+        rc, sent, _ = _tw.run_main(self.halted_history(now, held=6), now=now)
+        self.assertEqual(rc, 0)
         self.assertEqual(len(sent), 1, "%r" % (sent,))
         self.assertIn("PAUSED BY rh_HALT", sent[0][0])
         self.assertFalse(sent[0][1])
 
-    def test_three_runs_in_forty_five_minutes_send_one_message_not_three(self):
-        per_run = self.runs([0, 15, 30])
-        self.assertLessEqual(sum(len(s) for s in per_run), 1,
-                             "the same pause was announced %d times: %r" % (sum(len(s) for s in per_run), per_run))
+    def test_a_pause_that_begins_mid_session_is_announced_a_few_times_not_every_run(self):
+        # 11:00-12:59 on both schedules is 8 workflow_run passes and 4 cron slots. The pre-fix watchdog
+        # sent one message for EACH of those 12 runs (28 across the whole simulated day).
+        slots_run = [(h, m) for h in (11, 12) for m in (14, 29, 44, 59)]
+        slots_cron = [(h, m) for h in (11, 12) for m in (0, 30)]
+        sent = (self.messages(self.DAY1, slots_run, self.RUN)
+                + self.messages(self.DAY1, slots_cron, self.CRON))
+        self.assertGreaterEqual(len(sent), 1, "a new pause was never announced")
+        self.assertLessEqual(len(sent), 3, "%d messages for one pause in two hours" % len(sent))
+
+    def test_control_the_daily_reminder_does_arrive_on_the_cron_slots(self):
+        sent = self.messages(self.DAY2, [(9, 30), (10, 0), (10, 30), (11, 0)], self.CRON)
+        self.assertGreaterEqual(len(sent), 1)
+        self.assertLessEqual(len(sent), 2, "a daily reminder is not a stream: %d" % len(sent))
+
+    @unittest.expectedFailure
+    def test_the_daily_reminder_does_not_depend_on_the_cron_slots(self):
+        """The same next morning, workflow_run alone. 0 messages: HALT_REMIND_AT_MIN is 10:00, the
+        workflow_run trigger passes GRACE_MIN=30 (silent until 10:15) and a 20-minute window, so only
+        10:15-10:19 qualifies and the 15-minute cadence usually misses it. The reminder therefore rides on
+        the */30 cron, which GitHub ran 1 to 3 times a day when it was measured (rh-watchdog.yml). With the
+        reminder at 10:15 (615) the same simulation sends exactly one from this trigger. The pause
+        notice was added so Devon does not forget the bot is paused; it should not depend on a dropped cron."""
+        slots = [(9, 44), (9, 59), (10, 14), (10, 29), (10, 44), (10, 59)]
+        sent = self.messages(self.DAY2, slots, self.RUN)
+        self.assertGreaterEqual(len(sent), 1, "no reminder from the workflow_run trigger on a held pause")
+
+
+# ── 4. A planned-restart note must not be filed when the boot time could not be read ────────
+class PlannedRestartBootTimeUnreadable(unittest.TestCase):
+    """781a0591 files a quiet 'adopted new code' note when the daemon's own restart marked the gap. The
+    marker is bounded to PLANNED_RESTART_MAX_MIN market minutes (verified here with the REAL
+    market_minutes_since: 2 and 5 note, 6 and 45 alert). One hole inside the bound: when the boot time
+    cannot be read, the unmarked report says so ('Could not read this machine's boot time, so whether
+    the LAPTOP went away ... is unknown') and the marked one drops that sentence and says it needs no
+    action. This file's standing rule is that an unmeasurable thing is never read as fine. At most
+    PLANNED_RESTART_MAX_MIN market minutes, and it needs the boot read to fail too, so it is small."""
+
+    def setUp(self):
+        self.sent, self.logged = [], []
+        for name, fn in (
+            ("notify", lambda s, b, untrusted=False: (self.sent.append((s, b)), True)[1]),
+            ("log", self.logged.append),
+            ("_remember_alerts", lambda led, **kw: led.setdefault("alerts", {}).update(kw)),
+            ("save_ledger", lambda led: None),
+            ("_save", self._refuse_write),
+        ):
+            p = mock.patch.object(D, name, fn)
+            p.start()
+            self.addCleanup(p.stop)
+
+    @staticmethod
+    def _refuse_write(path, obj):
+        raise AssertionError("a test tried to write the real file %r" % path)
+
+    def report(self, boot, marked, mins=3):
+        stamp = (D.now_et() - timedelta(minutes=4000)).strftime("%Y-%m-%dT%H:%M")
+        led = ({"alerts": {"planned_restart_stamp": stamp, "planned_restart_to": "ccac4de"}}
+               if marked else {})
+        with mock.patch.object(D, "_load", lambda p, d=None: {"ts": stamp}), \
+             mock.patch.object(D, "market_minutes_since", lambda ts: mins), \
+             mock.patch.object(D, "_implied_boot_epoch", lambda: boot):
+            D.report_downtime(led)
+        self.assertEqual(len(self.sent), 1, self.sent)
+        return self.sent[0]
+
+    def test_control_unmarked_with_an_unreadable_boot_time_says_so(self):
+        subject, body = self.report(None, marked=False)
+        self.assertIn("blind 3 market minute(s)", subject)
+        self.assertIn("boot time", body)
+
+    def test_control_marked_with_a_readable_old_boot_is_the_quiet_note(self):
+        import time
+        subject, body = self.report(time.time() - 999999, marked=True)
+        self.assertIn("adopted new code", subject)
+
+    @unittest.expectedFailure
+    def test_marked_with_an_unreadable_boot_time_still_says_the_boot_time_is_unknown(self):
+        subject, body = self.report(None, marked=True)
+        self.assertIn("boot time", body,
+                      "filed as %r with no mention that the boot time could not be read" % subject)
 
 
 if __name__ == "__main__":
