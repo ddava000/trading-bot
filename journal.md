@@ -2496,3 +2496,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI']
 - notes: Tech selloff persists with VIX at 21.1; NVDA -10.4%, VST -8.5%, PLTR -7.4%, IWM -7.4% and broad indices red into a loaded event week (midterms, jobs, Apple earnings, Fed uncertainty from Waller). Holding risk-off/0.3 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
 - journal: Mon 11/2 19:10: Posture unchanged risk-off/0.3. Tech still bleeding, VIX sticky at 21.1, no capitulation yet. $16 cash caps buys regardless. Watching for a washout low, midterm results, jobs data, and Apple earnings; IBM/CPRI are the only relative green holds.
+
+### 2026-11-02T20:05 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI', 'BKH']
+- notes: Tech melting down again to start November, VIX sticky at 21.1 with NVDA -10.2%, VST -9.0%, PLTR -7.1%, IWM -7.3% and broad indices red into a loaded event week (midterms, jobs data, Apple earnings). Holding risk-off/0.3 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
+- journal: Mon 11/2 20:05: Posture unchanged risk-off/0.3. No capitulation yet — tech still bleeding into the close, VIX 21.1. $16 cash caps buys regardless. IBM/CPRI/BKH the only relative-green holds; watching for a washout low, midterms, jobs data, Apple earnings.
