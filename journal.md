@@ -2508,3 +2508,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
 - notes: Modest relief this morning — S&P futures rebound, chips bounce, VIX easing to 20.8 — but it's Election Day with a loaded event week (jobs, Fed, midterm results) and AI names remain shaky. Holding risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers (NVDA -8.8%, PLTR -10.5%, VST -7.3%, IWM -7.0%) off the buy list.
 - journal: Tue 11/3 10:00: Nudged 0.3→0.35 on a steadier tape (VIX 21.1→20.8, chip bounce) but staying risk-off into midterms/jobs/Fed. $16 cash caps buys regardless. Watching for midterm results and whether the morning bounce holds; IBM/CPRI/AN relative strength.
+
+### 2026-11-03T15:39 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Tape stabilizing into the close — Nasdaq rebounds on a chip bounce, oil falling, VIX easing to 20.6 — but it's Election Day with midterm results tonight plus jobs data and Fed uncertainty (Waller) ahead. Staying risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers (NVDA -8.8%, QQQ -5.4%, VST -5.0%, IWM -7.0%, PLTR -7.0%) off the buy list.
+- journal: Tue 11/3 15:39: Posture held risk-off/0.35. Afternoon tape steadier (VIX 20.8→20.6, chips bounced, Dow dragged by Apple) but no catalyst to add risk into midterm results tonight + jobs/Fed this week. $16 cash caps buys regardless. IBM/CPRI/AN the relative-strength names; watching midterm outcome and whether the bounce holds tomorrow.
