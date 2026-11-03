@@ -681,8 +681,16 @@ class BridgeTimeout(unittest.TestCase):
 
 
 # ── Mine, not cloud's: the uptime counter wrapped at 24.86 days ───────────────
-class ImpliedBootEpoch(unittest.TestCase):
+class ImpliedBootEpoch(Floor):
     """Found by my own test on 2026-11-02, the day the laptop crossed 2**31 ms of uptime.
+
+    THIS CLASS MUST STUB log(). It extended unittest.TestCase directly at first, so the
+    wrapped-counter test below called the REAL log() and appended 13 lines reading
+    "uptime counter returned 18446744073709552s" into the live rh_daemon.log - one per
+    suite run. Nothing was published (that file is gitignored) and no money was
+    touched, but it is the operational log I grep during an incident, and a line no
+    production event ever produced is the phantom evidence this whole review was about.
+    Floor stubs log, notify, save_ledger and _save.
 
     ctypes defaults a foreign function's return to c_int - 32 bits, SIGNED - while
     GetTickCount64 returns ULONGLONG, so the counter went negative past 24.86 days and
