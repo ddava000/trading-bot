@@ -2520,3 +2520,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
 - notes: Tape firmed slightly — S&P snapped a 3-day skid on a chip rebound, oil lower, VIX easing to 20.7 — but it's Election Day with midterm results tonight plus jobs data and AMD earnings ahead, and AI holdings (NVDA -8.6%, QQQ -5.4%, IWM -7.3%) remain weak. Holding risk-off/0.35 with earnings landmines ARQT/BKH and deepest losers off the buy list.
 - journal: Tue 11/3 17:11: Posture unchanged risk-off/0.35. Chips rebounded and VIX ticked to 20.7 but no catalyst to add risk into midterm results tonight + jobs/AMD earnings. $16 cash caps buys regardless. IBM/CPRI/AN the relative-strength holds; watching election outcome and whether the bounce extends tomorrow.
+
+### 2026-11-03T18:37 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Day flat (+$2) with a modest chip-led rebound and VIX easing to 20.8, but it's Election Day with midterm results tonight plus jobs data and AMD earnings ahead; AI holdings (NVDA -7.7%, QQQ -5.0%, IWM -7.2%, PLTR -6.3%) remain weak. Staying risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
+- journal: Tue 11/3 18:37: Posture unchanged risk-off/0.35 into the close. Chips bounced and VIX steadied at 20.8 but no catalyst to add risk ahead of midterm results tonight + jobs/AMD this week. $16 cash caps buys regardless. IBM/CPRI/AN remain relative-strength holds; watching election outcome and whether the bounce extends tomorrow.
