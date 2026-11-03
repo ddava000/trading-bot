@@ -102,6 +102,109 @@ class DowntimeReportTests(unittest.TestCase):
         self.assertEqual(len(self.sent), 1, "at the floor it must mail")
         self.assertIn("blind 2 market minute(s)", self.sent[0][0])
 
+    # ---- the daemon's OWN restart is a note, not an alert (Devon, 2026-11-03) --------
+    #
+    # report_downtime is cause-agnostic on purpose, and that is right for every cause it
+    # was written for: a bugcheck, a power loss, a stopped task and a closed lid all cost
+    # the same blind minutes. A restart the daemon SCHEDULED for itself is different - it
+    # passed the selftest gate, it logged the exit on the way down, and the ~50s before
+    # the task trigger brings it back was arriving as "Arm B was blind 2 market minute(s)"
+    # every morning after a push. The minutes are real, so they are still reported and
+    # still counted; only the framing changes. Every test below has the same gap WITHOUT
+    # the mark as its control, because what must not change is everything else.
+    #
+    # THE MARK EXPLAINS THE MARKET MINUTES, NOT THE GAP, and the fixtures here use a
+    # multi-day gap deliberately. The stamp it keys on is the heartbeat rh_status.json
+    # held when sync_code ran, and the daemon does not run overnight, so at the open
+    # that heartbeat is the previous session's last pass and the gap is ~18h of shut
+    # market. A mid-day adoption cannot reach this branch at all: its gap is one
+    # heartbeat plus the restart, ~110s, well under DOWNTIME_MIN_SEC. So the bound
+    # below is not belt-and-braces, it is the whole safety property.
+
+    PLANNED_SHA = "ccac4de"
+
+    def _marked(self, stamp):
+        """A ledger carrying the mark sync_code leaves just before it exits 42."""
+        return {"alerts": {"planned_restart_stamp": stamp,
+                           "planned_restart_to": self.PLANNED_SHA}}
+
+    def test_the_daemons_own_code_restart_is_reported_as_a_note(self):
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 2, time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1, "the minutes are real and still get reported")
+        subject, body = sent[0]
+        self.assertIn("adopted new code at ccac4de", subject)
+        self.assertNotIn("blind", subject, "a restart the daemon scheduled is not blindness")
+        self.assertIn("MARKET MINUTES in this gap are the daemon's own restart", body)
+        self.assertIn("the market was shut", body,
+                      "it must disclaim the overnight remainder, not bill 66h as a restart")
+        self.assertNotIn("stops could not have", body,
+                         "the unmanaged-positions warning belongs to a real outage")
+
+    def test_the_same_gap_without_the_mark_is_still_an_alert(self):
+        """The control. Only sync_code sets the mark, and only after the gate passed."""
+        sent, _ = self.call(self.stamp_ago(4000), 2, time.time() - 999999)
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind 2 market minute(s)", sent[0][0])
+
+    def test_the_mark_cannot_excuse_more_minutes_than_a_restart_can_cost(self):
+        """The safety control, and the only reason the bound exists.
+
+        A morning where the scheduled task failed to fire until 10:30 carries the SAME
+        mark and the SAME stamp as a clean adoption - sync_code sets it on the first
+        full pass either way, and the stamp is yesterday's heartbeat in both cases.
+        Nothing in the mark distinguishes them. The market minutes do: a 52s restart
+        costs two, a task that fired 45 minutes late costs 45. Without this bound that
+        second morning would have arrived as "nothing was wrong, it needs no action".
+        """
+        stamp = self.stamp_ago(4000)
+        over = D.PLANNED_RESTART_MAX_MIN + 1
+        sent, _ = self.call(stamp, over, time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind %d market minute(s)" % over, sent[0][0],
+                      "past the bound it is blindness again, mark or no mark")
+        self.assertIn("stops could not have", sent[0][1],
+                      "and the unmanaged-positions warning comes back with it")
+
+    def test_the_mark_still_covers_a_restart_at_the_bound(self):
+        """The other side of the line, so the bound is pinned from both directions."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, D.PLANNED_RESTART_MAX_MIN, time.time() - 999999,
+                            led=self._marked(stamp))
+        self.assertIn("adopted new code", sent[0][0])
+
+    def test_a_mark_from_an_earlier_restart_cannot_quiet_a_later_gap(self):
+        """It is keyed to ONE heartbeat - the same key the dedupe uses - so it can never
+        become a standing permission to go quiet."""
+        sent, _ = self.call(self.stamp_ago(4000), 2, time.time() - 999999,
+                            led=self._marked("2026-01-01T09:45"))
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind 2 market minute(s)", sent[0][0])
+
+    def test_a_reboot_inside_a_planned_restart_is_still_an_outage(self):
+        """A machine that went away during what we thought was a clean restart is exactly
+        what this function was written for, so `rebooted` overrides the mark."""
+        stamp = self.stamp_ago(31)
+        sent, _ = self.call(stamp, 31, time.time() - 300, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        self.assertNotIn("adopted new code", sent[0][0])
+        self.assertIn("The LAPTOP went down", sent[0][1])
+
+    def test_a_planned_restart_that_cost_no_market_minutes_sends_nothing_at_all(self):
+        """The floor is untouched: the ordinary case is a restart inside a closed market."""
+        stamp = self.stamp_ago(4000)
+        sent, logged = self.call(stamp, D.DOWNTIME_MIN_MARKET_MIN - 1,
+                                 time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(sent, [])
+        self.assertTrue(any("not alerting" in m for m in logged), logged)
+
+    def test_the_note_is_deduped_like_any_other_report(self):
+        led = self._marked(self.stamp_ago(4000))
+        stamp = led["alerts"]["planned_restart_stamp"]
+        self.call(stamp, 2, time.time() - 999999, led=led)
+        self.call(stamp, 2, time.time() - 999999, led=led)
+        self.assertEqual(len(self.sent), 1, "a second restart must not re-send the note")
+
     # ---- what it must actually report ------------------------------------------------
 
     def test_market_minutes_lost_are_named_in_the_subject(self):
@@ -334,6 +437,79 @@ class DowntimeReportTests(unittest.TestCase):
             self.skipTest("no uptime counter on this platform")
         self.assertLess(boot, time.time())
         self.assertGreater(boot, time.time() - 400 * 24 * 3600, "implausible boot time")
+
+
+class SyncCodeLeavesTheMark(unittest.TestCase):
+    """THE WIRING. Without this, every planned-restart test above still passes while the
+    feature never fires once in production.
+
+    report_downtime compares its mark against the heartbeat stamp it reads out of
+    rh_status.json, so sync_code has to store THAT value and nothing else. A mark under a
+    different key, or holding the sha where the stamp belongs, would be silently inert -
+    which is the exact shape of the bug that had three of my tests passing against
+    unfixed code last week. So this drives the real sync_code, with only git and the
+    gate's child process standing in.
+    """
+
+    HEARTBEAT = "2026-11-03T09:46"
+
+    def test_it_records_the_heartbeat_the_report_will_compare_against(self):
+        seen = {}
+
+        class _R:
+            returncode, stdout, stderr = 0, "", ""
+
+        def fake_run(cmd, **kw):
+            r = _R()
+            if cmd and cmd[0] == "git":
+                if cmd[1] == "rev-parse":
+                    r.stdout = "newsha0000000\n"        # HEAD has moved past _run_head
+                elif cmd[1] == "diff":
+                    r.stdout = "rh_daemon.py\n"          # ...and a CODE_FILE changed
+            return r                                     # the gate's child exits 0
+
+        led = {}
+        with mock.patch.object(D, "subprocess", mock.Mock(run=fake_run)), \
+             mock.patch.object(D, "_run_head", "oldsha0000000"), \
+             mock.patch.object(D, "_load", lambda p, d=None: {"ts": self.HEARTBEAT}), \
+             mock.patch.object(D, "log", lambda *a, **k: None), \
+             mock.patch.object(D, "_remember_alerts", lambda l, **kw: seen.update(kw)):
+            self.assertTrue(D.sync_code(led),
+                            "the gate passed, so sync_code must ask for the restart")
+        self.assertEqual(seen.get("planned_restart_stamp"), self.HEARTBEAT,
+                         "report_downtime compares the mark against the status heartbeat, "
+                         "so the mark must BE that heartbeat: %r" % (seen,))
+        self.assertEqual(seen.get("planned_restart_to"), "newsha0",
+                         "the note names the commit it came back on: %r" % (seen,))
+
+    def test_a_refused_restart_leaves_no_mark(self):
+        """A gate rejection keeps the daemon on known-good code - no gap, so no mark. One
+        left behind here would quiet the NEXT real outage that happened to share its
+        heartbeat."""
+        seen = {}
+
+        class _R:
+            returncode, stdout, stderr = 0, "", ""
+
+        def fake_run(cmd, **kw):
+            r = _R()
+            if cmd and cmd[0] == "git":
+                if cmd[1] == "rev-parse":
+                    r.stdout = "newsha0000000\n"
+                elif cmd[1] == "diff":
+                    r.stdout = "rh_daemon.py\n"
+            else:
+                r.returncode = 1                         # the selftest gate REFUSES
+            return r
+
+        with mock.patch.object(D, "subprocess", mock.Mock(run=fake_run)), \
+             mock.patch.object(D, "_run_head", "oldsha0000000"), \
+             mock.patch.object(D, "_load", lambda p, d=None: {"ts": self.HEARTBEAT}), \
+             mock.patch.object(D, "log", lambda *a, **k: None), \
+             mock.patch.object(D, "notify", lambda *a, **k: True), \
+             mock.patch.object(D, "_remember_alerts", lambda l, **kw: seen.update(kw)):
+            self.assertFalse(D.sync_code({}), "a failed gate must not restart")
+        self.assertNotIn("planned_restart_stamp", seen, "%r" % (seen,))
 
 
 if __name__ == "__main__":

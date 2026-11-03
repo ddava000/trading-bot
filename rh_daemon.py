@@ -1170,7 +1170,17 @@ def apply_fills(led, orders, placed, prices):
                 sell_qty = min(float(o.get("qty") or cur["qty"]), cur["qty"])
                 proceeds = sell_qty * px
                 cur["qty"] -= sell_qty
-                led["cash"] += proceeds
+                # Proceeds go to sold_today ONLY, never into led["cash"]. led["cash"] is
+                # the broker's BUYING POWER everywhere - that is what adopt_truth writes
+                # it from - and buying power does not move on a sale until T+1 settles.
+                # Adding them here gave the field two meanings depending on whether a
+                # reconcile had run since the fill, and decide() then subtracted the same
+                # proceeds twice (settled = cash - unsettled) while leaving them out of
+                # equity. That understated equity by the proceeds, shrank the per-ETF
+                # target, and trimmed the same ETF a SECOND time on the next pass: cloud
+                # measured $133.33 sold against a $100 intent. Keeping one meaning fixes
+                # it in every state, including the one where the post-trade adopt_truth
+                # refuses a partial snapshot and the ledger keeps these figures.
                 led["sold_today"] += proceeds         # T+1: unspendable until tomorrow
                 if cur["qty"] <= 1e-9:
                     pos.pop(sym, None); led["holds"].pop(sym, None)
@@ -1475,6 +1485,20 @@ def _pick_equity(computed, broker, prev_broker, last_published):
 def persist(led, res, placed):
     """Write the ledger locally; commit the shareable log/status for monitoring."""
     global _last_push_at, _last_push_material
+    # place() returns None for "the executor turn produced no usable order report" and
+    # [] only for a dry run or a genuinely empty one. apply_fills and email_trades both
+    # branch on that distinction; persist only ever ITERATES placed, so None belongs
+    # here as an empty report rather than as a third path. I introduced this fixing
+    # cloud's item 3 and it cost the whole trade log: `for p in placed` raised
+    # TypeError, cycle() swallowed it as "cycle error (loop continues)", and the
+    # orders that went unlogged were exactly the ones whose outcome nobody saw - the
+    # records the "unknown" status below exists to keep, and that
+    # realized.arm_b_block()'s sells-logged tripwire deliberately counts. The ledger
+    # and status file were already written by then, so needs_reconcile and
+    # orders_today survived and only the log lost them, which is why it was silent.
+    # Found by cloud's follow-up review, 2026-11-03.
+    if placed is None:
+        placed = []
     save_ledger(led)
     snap = dict(res.get("snapshot") or {})
     # T+1 TRAP: decide() computes equity as cash + invested, and `cash` is broker
@@ -2015,6 +2039,23 @@ def sync_code(led=None):
             if led is not None:
                 _remember_alerts(led, selftest_alert_at=0.0, selftest_fails=0)
         log("new code passed selftest - restarting to load it")
+        # MARK THE GAP WE ARE ABOUT TO OPEN AS OURS. report_downtime is deliberately
+        # cause-agnostic and so reported this restart as "Arm B was blind 2 market
+        # minute(s)" - true, since the task trigger takes ~50s to bring us back, but it
+        # is a gap the daemon scheduled for itself, logged on the way down, and gated by
+        # the selftest above. Devon asked for those to arrive as a quiet note instead of
+        # an alert, 2026-11-03.
+        #
+        # Keyed on the heartbeat rh_status.json carries RIGHT NOW, which is the same key
+        # report_downtime dedupes on: nothing writes a new status between here and the
+        # restart, so the stamp it reads on the way up is exactly this one. A crash, a
+        # power loss, a stopped task or a closed lid cannot set this, so none of them
+        # are quieted - and report_downtime still overrides it if the machine actually
+        # rebooted inside the gap, because that is not the thing we planned.
+        if led is not None:
+            _remember_alerts(led,
+                             planned_restart_stamp=(_load(STATUS_F, {}) or {}).get("ts"),
+                             planned_restart_to=head[:7])
         return True
     except Exception as e:
         log(f"code sync skipped ({e}) - continuing on current code")
@@ -2077,7 +2118,15 @@ def _watch_rebalance_block(led, res):
 
 def cycle(led, fast):
     prices = {}
-    state = {"cash": led["cash"], "unsettled": led.get("sold_today", 0.0),
+    # decide() wants TOTAL cash and the unspendable share of it separately: it takes
+    # settled = cash - unsettled for sizing buys, and equity = cash + invested for the
+    # per-ETF target. led["cash"] is buying power, which already excludes unsettled
+    # proceeds, so the total is buying power PLUS sold_today. Handing it buying power
+    # alone subtracted the proceeds a second time and left them out of equity entirely
+    # - the repeat-trim bug. The settlement guard is unchanged and still exact:
+    # settled comes back to buying power, so unsettled proceeds still buy nothing.
+    sold = float(led.get("sold_today") or 0.0)
+    state = {"cash": led["cash"] + sold, "unsettled": sold,
              "positions": led["positions"], "holds": led.get("holds") or {},
              "last_buy": led.get("last_buy") or {}}
     res = rh_bot.decide(state, fast=fast)
@@ -2260,6 +2309,16 @@ def _maybe_alert_broker(led):
 # trigger interval before touching this number.
 DOWNTIME_MIN_SEC = 300
 DOWNTIME_MIN_MARKET_MIN = 2 # market minutes below this are heartbeat resolution, not blindness
+# Market minutes a code-adoption restart is allowed to EXPLAIN. The planned-restart mark
+# below is keyed on the heartbeat rh_status.json held when sync_code ran, and at the
+# session open that heartbeat is YESTERDAY'S - so the gap the mark matches is the
+# overnight one, not the restart. The mark therefore excuses the market minutes only,
+# and only this many: measured restart latencies are 2s to 4m36s across 13 restarts on
+# the old 5-minute trigger grid and 52s on 2026-11-03 under PT1M, so 5 covers a slow
+# restart with room to spare while still refusing to explain a daemon that started
+# genuinely late. Without this bound a task that failed to fire until 10:30 would have
+# its 45 blind minutes reported as "nothing was wrong, it needs no action".
+PLANNED_RESTART_MAX_MIN = 5
 DOWNTIME_RETRY_MAX = 24     # passes to keep retrying a parked downtime report before giving up
 
 
@@ -2573,17 +2632,57 @@ def report_downtime(led):
                      "alone: the scheduled task was stopped, killed, or did not restart. Treat that as "
                      "the counter's reading, not proof - with Fast Startup on, a Shut down and power on "
                      "may not reset it. Windows power events settle it.")
-        if lost:
+        # OUR OWN RESTART EXPLAINS THE MARKET MINUTES, NEVER THE GAP. Only sync_code sets
+        # this stamp, and only after the selftest gate passed, so the cost is explained
+        # before it is incurred - but the stamp is the heartbeat rh_status.json HELD AT
+        # THAT MOMENT, and at the session open that is the previous session's last pass.
+        # The daemon does not run overnight, so the gap this mark matches is routinely
+        # ~18h of shut market: claiming it as the restart would be false, and on a
+        # morning the task fired late it would excuse real blindness. Hence the bound.
+        # The mechanism it exists for is narrow: a mid-day adoption's gap is one
+        # heartbeat plus the restart, ~110s, which never reaches DOWNTIME_MIN_SEC and is
+        # already silent. What reaches the mail is the OPEN, where a 52s restart pushes
+        # the day's first heartbeat from 09:45 to 09:47 and the overnight gap bills 2
+        # market minutes - exactly DOWNTIME_MIN_MARKET_MIN. That is the email Devon
+        # asked to quiet, and it is the only case this branch ever sees.
+        # `rebooted` still wins: a machine that went away during what we thought was a
+        # clean restart is not the thing we planned, and that is the case this function
+        # was written for. The market-minute floor above is untouched, so a restart that
+        # cost nothing tradeable still sends nothing at all.
+        _al = led.get("alerts") or {}
+        planned = (bool(_al.get("planned_restart_stamp") == stamp) and not rebooted
+                   and mins <= PLANNED_RESTART_MAX_MIN)
+        if planned:
+            _to = _al.get("planned_restart_to") or "?"
+            cause = ("The MARKET MINUTES in this gap are the daemon's own restart to load new "
+                     "code: it verified the new commit against the selftest gate, logged the "
+                     f"exit, and came back on {_to}, and the delay is the scheduled task's "
+                     "trigger interval rather than a fault. The rest of the gap above is time "
+                     "the market was shut, which is where this daemon normally spends its "
+                     "nights; the mark does not claim it and nothing here measured it. "
+                     "Suppression is bounded on purpose - a crash, a power loss, a stopped "
+                     "task and a closed lid never carry this mark, and neither does a gap "
+                     f"that cost more than {PLANNED_RESTART_MAX_MIN} market minutes, so a "
+                     "daemon that started genuinely late still reports as blind.")
+            subject = (f"{SESSION_NAME}: adopted new code at {_to} - {mins} market "
+                       f"minute(s) to restart")
+        elif lost:
             subject = f"{SESSION_NAME}: Arm B was blind {mins} market minute(s) - daemon gap"
         else:
             subject = f"{SESSION_NAME}: laptop rebooted while the market was shut ({wall} gap)"
+        if planned:
+            tail = ("Arm B placed nothing and cancelled nothing in the gap. This is recorded so "
+                    "the downtime figures stay complete and so a restart can never hide inside "
+                    "them; it needs no action. The daemon has reconciled with the broker on "
+                    "this cycle.")
+        else:
+            tail = ("In the gap Arm B placed nothing and cancelled nothing, and its stops could "
+                    "not have fired either - positions were held unmanaged. The daemon is "
+                    "running again and will reconcile with the broker on this cycle.")
         body = (f"Arm B published no heartbeat between {stamp} ET and "
                 f"{now_et().strftime('%Y-%m-%dT%H:%M')} ET.\n"
                 f"Gap: {wall} of wall clock, {mins} minute(s) of it inside 09:45-15:55 ET on a "
-                f"trading day.\n\n{cause}\n\n"
-                "In the gap Arm B placed nothing and cancelled nothing, and its stops could not have "
-                "fired either - positions were held unmanaged. The daemon is running again and will "
-                "reconcile with the broker on this cycle.")
+                f"trading day.\n\n{cause}\n\n{tail}")
         # PARK IT ON THE LEDGER BEFORE SENDING, then let the retry path do the send and
         # all the bookkeeping. The first version recorded the dampener only on a True,
         # which stopped a failed send being filed as delivered but left the report with
@@ -2596,8 +2695,8 @@ def report_downtime(led):
         a = led.setdefault("alerts", {})
         a["pending_downtime"] = {"stamp": stamp, "subject": subject, "body": body, "tries": 0}
         save_ledger(led)
-        log(f"downtime detected: gap {wall} since {stamp} ET, {mins} market minute(s), "
-            f"rebooted={rebooted}")
+        log(f"{'planned restart' if planned else 'downtime detected'}: gap {wall} since "
+            f"{stamp} ET, {mins} market minute(s), rebooted={rebooted}")
         retry_pending_downtime(led)
     except Exception as e:
         log(f"report_downtime failed ({e}) — not fatal, startup continues")

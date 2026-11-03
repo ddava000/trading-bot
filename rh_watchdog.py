@@ -73,6 +73,11 @@ STALE_ALERT_MIN = _env_tuple("WATCHDOG_STALE_ALERT_MIN", ())
 # First threshold 60, not 45: since dd21a55 the daemon itself alerts at 15 min, so
 # this is the independent BACKSTOP, not a second copy of the same mail.
 DEGRADED_ALERT_MIN = (60, 180, 360)
+# Minute-of-day for the once-a-day rh_HALT reminder. 10:00 ET deliberately: the pause is
+# not urgent, and this is the first slot after the open where knowing about it still lets
+# Devon act on the same trading day. Gated through crossed() on the WALL CLOCK rather
+# than on a duration, because the watchdog keeps no state between runs.
+HALT_REMIND_AT_MIN = 10 * 60
 GRACE_MIN = _env_int("WATCHDOG_GRACE_MIN", 5)     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
@@ -292,7 +297,7 @@ def main():
     # A DELIBERATE PAUSE IS NOT AN OUTAGE. rh_HALT is Devon's kill switch; the daemon
     # now keeps the heartbeat up while it is held so monitoring can tell the pause
     # from a dead machine (cloud's review, item 10). Paging about a state someone
-    # chose on purpose is how a watchdog gets muted, so this reports once, calmly,
+    # chose on purpose is how a watchdog gets muted, so this reports calmly, rarely,
     # and never as urgent. If the heartbeat then goes stale the checks below still
     # fire: a halted bot that stops reporting really is a dead laptop.
     if status.get("degraded") == "halted_by_rh_HALT" and stale < STALE_MIN:
@@ -303,10 +308,40 @@ def main():
         # TypeError the first time rh_HALT existed; the suite stayed green because
         # nothing exercised this branch, which is precisely what the surviving mutant
         # for it was saying. So the distinguishing words lead the BODY instead.
-        return notify("PAUSED BY rh_HALT, not broken. The laptop is alive and reporting "
-                      "normally; nothing is trading and no stops are being enforced "
-                      "because nothing is being managed. Delete the rh_HALT file in the "
-                      "repo folder to resume.", urgent=False)
+        #
+        # A REMINDER, NOT A STREAM - AND NOT ONCE EVER EITHER. This branch shipped with
+        # no gate at all, unlike every other branch below, so it announced the same pause
+        # on every run: the watchdog is stateless and runs after each Arm A pass plus a
+        # */30 cron, which made a halt held through one trading day a few dozen identical
+        # emails. The comment above this `if` claimed it "reported once" and the code
+        # never did. Cloud's follow-up review, 2026-11-03.
+        #
+        # Exactly once is not available here and is not the right target. crossed() is
+        # the only dedupe this file has and it is deliberately "at least one, maybe two"
+        # (see its docstring); a stateless check invoked by two schedulers has nowhere
+        # durable to remember what it already said. Nor should a pause be announced a
+        # single time and never again - the failure mode of that is Devon forgetting the
+        # bot is paused while deposits sit uninvested, which is the whole reason a halt
+        # is worth an email in the first place. So: announce a NEW pause, then remind
+        # once a day, and stay quiet in between. A few per day, not a few dozen.
+        #
+        # held is None (shallow checkout, no history) counts as NEW and announces. I had
+        # it the other way first, reasoning that for a deliberate pause the storm is the
+        # dangerous direction and a delay costs nothing. Cloud's control test said no:
+        # with no measurable duration the pause went unannounced entirely, and this
+        # file's standing rule - an unmeasurable duration is never read as zero, say so
+        # and alert rather than infer fine - is the right one here too. A pause nobody
+        # is told about is the failure that matters; repeating it is only noise.
+        held = degraded_minutes(et)
+        new_pause = held is None or held < CROSS_WINDOW_MIN
+        if new_pause or crossed(et.hour * 60 + et.minute, (HALT_REMIND_AT_MIN,)):
+            return notify("PAUSED BY rh_HALT, not broken. The laptop is alive and reporting "
+                          "normally; nothing is trading and no stops are being enforced "
+                          "because nothing is being managed. Delete the rh_HALT file in the "
+                          "repo folder to resume.", urgent=False)
+        print("the pause has already been reported; next reminder at "
+              f"{HALT_REMIND_AT_MIN // 60:02d}:{HALT_REMIND_AT_MIN % 60:02d} ET")
+        return 0
     if status.get("degraded") and stale < STALE_MIN:
         why = str(status.get("degraded"))
         mins = degraded_minutes(et)

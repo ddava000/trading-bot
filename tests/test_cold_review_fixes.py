@@ -202,6 +202,31 @@ class FailedExecutorTurn(Floor):
         self.assertIs(led["needs_reconcile"], True)
         self.assertEqual(led["orders_today"], 2, "unaccounted orders still charge the breaker")
 
+    def test_persist_logs_unknown_rather_than_crashing_on_no_report(self):
+        """Cloud's follow-up, 2026-11-03, and a bug I introduced with the None/[] split.
+
+        persist only ITERATES placed, so None raised TypeError there while the ledger and
+        status file had already been written - cycle() swallowed it as "cycle error (loop
+        continues)" and the trade log silently lost the orders. The ones lost are exactly
+        the orders whose outcome nobody saw, which is what the "unknown" status and
+        realized.arm_b_block()'s sells-logged tripwire exist to preserve.
+        """
+        res = {"orders": list(self.ORDERS), "snapshot": {}, "notes": []}
+        led = {"cash": 100.0, "positions": [], "holds": {}, "last_buy": {},
+               "sold_today": 0.0, "orders_today": 0}
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+            log_f = os.path.join(td, "trade_log.jsonl")
+            with mock.patch.object(D, "LOG_F", log_f), \
+                 mock.patch.object(D, "DRY", False), \
+                 mock.patch.object(D, "_save", lambda p, o: None), \
+                 mock.patch.object(D, "_push_status", lambda r: False):
+                D.persist(led, res, None)                  # must not raise
+            with open(log_f, encoding="utf-8") as fh:
+                lines = [json.loads(l) for l in fh.read().splitlines() if l.strip()]
+        self.assertEqual([l["status"] for l in lines], ["unknown", "unknown"],
+                         "an unknown outcome must still be recorded, not dropped: %r" % (lines,))
+        self.assertEqual([l["symbol"] for l in lines], ["SPY", "QQQ"], "%r" % (lines,))
+
     def test_an_empty_report_in_a_live_run_books_nothing_either(self):
         led = {"cash": 100.0, "positions": [], "holds": {}, "last_buy": {},
                "sold_today": 0.0, "orders_today": 0}
@@ -437,7 +462,10 @@ class SelftestGate(unittest.TestCase):
             for f in D.CODE_FILES:
                 with self.subTest(f):
                     target = os.path.join(td, f)
-                    good = open(target, encoding="utf-8").read()
+                    # Closed explicitly: CI runs -W error::ResourceWarning, so a leaked
+                    # handle here is a failure whenever the collector happens to run.
+                    with open(target, encoding="utf-8") as fh:
+                        good = fh.read()
                     try:
                         with open(target, "a", encoding="utf-8") as fh:
                             fh.write("\nthis is not valid python $$$\n")
@@ -905,6 +933,162 @@ class WatchdogHalt(unittest.TestCase):
         self.assertIn("stopped reporting", sent[0][0])
         self.assertNotIn("PAUSED BY rh_HALT", sent[0][0],
                          "a stale heartbeat is a dead laptop, whatever it last said")
+
+
+class SettledIsAlwaysBuyingPower(Floor):
+    """Mine, guarding the repeat-trim fix in the DANGEROUS direction.
+
+    cycle() now hands decide() cash = buying power PLUS sold_today, with unsettled =
+    sold_today, so equity (cash + invested) finally includes unsettled proceeds. The risk
+    I introduced is the other side of that trade: if those two figures ever disagree, the
+    settled number decide() sizes BUYS from could rise above the cash that actually
+    exists, which is a real order the broker would reject - or worse, accept. It cannot,
+    because settled = (bp + sold) - sold = bp identically, and this pins that algebra
+    across a range of sold_today values instead of trusting me to have done it right.
+
+    Driven through the real cycle() so it reads the real construction. Asserting the
+    formula in the test instead would just restate the code and agree with it either way.
+    """
+
+    def _state_decide_saw(self, sold):
+        seen = {}
+        led = {"cash": 42.0, "positions": [], "holds": {}, "last_buy": {},
+               "sold_today": sold, "orders_today": 0, "day": "2026-11-03"}
+
+        def capture(state, fast=False):
+            seen.update(state)
+            return {"orders": [], "notes": [], "snapshot": {}}
+
+        with mock.patch.object(D.rh_bot, "decide", capture), \
+             mock.patch.object(D, "persist", lambda *a, **k: None):
+            D.cycle(led, fast=True)
+        self.assertTrue(seen, "decide() was never reached")
+        return seen
+
+    def test_settled_is_exactly_buying_power_whatever_the_unsettled_proceeds(self):
+        for sold in (0.0, 0.01, 50.0, 1000.0):
+            with self.subTest(sold=sold):
+                s = self._state_decide_saw(sold)
+                # The same expression decide() uses, rh_bot.py:69.
+                settled = max(0.0, float(s["cash"]) - float(s["unsettled"]))
+                self.assertAlmostEqual(settled, 42.0, places=6,
+                                       msg="settled must stay AT buying power: a buy sized "
+                                           "from more than that spends cash the account "
+                                           "does not have")
+
+    def test_a_sale_does_not_move_buying_power(self):
+        """The WRITE side of the one-meaning fix, and the half my own tests were missing:
+        a mutation that restored `led["cash"] += proceeds` in apply_fills survived both my
+        files, caught only by cloud's. led["cash"] is buying power everywhere now, and
+        buying power does not move on a sale until T+1 settles - the proceeds belong to
+        sold_today alone. Counting them in both places is what gave the field two meanings.
+        """
+        led = {"cash": 2.0, "positions": [{"symbol": "SPY", "qty": 1.0, "avg_cost": 100.0}],
+               "holds": {}, "last_buy": {}, "sold_today": 0.0, "orders_today": 0}
+        orders = [{"action": "sell", "symbol": "SPY", "qty": 1.0, "notional": 100.0,
+                   "reason": "trim to target"}]
+        placed = [{"symbol": "SPY", "action": "sell", "status": "ok"}]
+        with mock.patch.object(D, "DRY", False):
+            D.apply_fills(led, orders, placed, {"SPY": 100.0})
+        self.assertEqual(led["sold_today"], 100.0, "the proceeds are recorded as unsettled")
+        self.assertEqual(led["cash"], 2.0,
+                         "buying power must not move on a sale: the proceeds are unsettled "
+                         "until T+1, and counting them here as well as in sold_today is the "
+                         "double-count that trimmed the same ETF twice")
+
+    def test_equity_now_includes_the_unsettled_proceeds(self):
+        """The bug itself. Proceeds left out of equity shrink the per-ETF target, and the
+        next pass trims the same ETF a second time - $133.33 sold against a $100 intent."""
+        s = self._state_decide_saw(50.0)
+        self.assertAlmostEqual(float(s["cash"]), 92.0, places=6,
+                               msg="equity is cash + invested, so the proceeds have to be "
+                                   "inside cash or the target shrinks")
+
+
+class HaltIsAReminderNotAStream(unittest.TestCase):
+    """Mine, from cloud's follow-up review 2026-11-03: the halt branch had NO gate.
+
+    Every other branch in main() goes through crossed(); this one returned notify()
+    unconditionally, and the watchdog is stateless and runs after each Arm A pass plus a
+    */30 cron - so a halt held through one trading day was a few dozen identical emails,
+    while the comment directly above the branch claimed it "reported once".
+
+    Exactly-once is not reachable without durable state, and cloud's own pair of tests is
+    the proof: their fixture rebuilds the history so the pause is 150 minutes old on EVERY
+    run, so any function of the duration alone has to answer all three runs identically -
+    zero, and their control fails; three, and their dedupe test fails. A wall-clock gate
+    that is true at 14:00 and false at 14:15 and 14:30 is a window tuned to their
+    fixture's clock, not a design. So the property pinned here is the one I chose and can
+    defend: announce a NEW pause, remind once a day, stay quiet in between.
+
+    The duration and the gate are tested SEPARATELY, by patching degraded_minutes. Going
+    through the fixture's history for the boundary cases would make these tests agree with
+    whatever that history happens to measure, which is how test 3 of mine passed against
+    unfixed code last week.
+    """
+
+    AGED = 150                      # well past CROSS_WINDOW_MIN
+    OFF_WINDOW = 14 * 60            # 14:00 ET, nowhere near the 10:00 reminder
+
+    def _history(self, now, minutes):
+        from datetime import timedelta
+        t, snaps = now - timedelta(minutes=minutes), []
+        while t <= now - timedelta(minutes=2):
+            snaps.append(snap(t, "halted_by_rh_HALT"))
+            t += timedelta(minutes=5)
+        return snaps
+
+    def _run(self, at, **consts):
+        now = W.datetime(2026, 9, 30, at // 60, at % 60)
+        return run_main(self._history(now, self.AGED), now=now, **consts)
+
+    # ── the bug itself ────────────────────────────────────────────────────────
+    def test_an_aged_pause_outside_the_reminder_window_says_nothing(self):
+        rc, sent, out = self._run(self.OFF_WINDOW)
+        self.assertEqual(sent, [], "the same pause was announced again: %r" % (sent,))
+        self.assertEqual(rc, 0)
+
+    def test_going_quiet_does_not_fall_through_to_the_broker_outage_alert(self):
+        """The gate must RETURN. Falling through reaches the generic degraded branch,
+        which would turn a deliberate pause into an Arm B DEGRADED alert - louder than
+        the bug I was fixing."""
+        rc, sent, out = self._run(self.OFF_WINDOW)
+        self.assertNotIn("DEGRADED", "".join(m for m, _u in sent))
+        self.assertIn("already been reported", out)
+
+    def test_three_runs_fifteen_minutes_apart_on_an_aged_pause_are_all_silent(self):
+        per_run = [self._run(m)[1] for m in
+                   (self.OFF_WINDOW, self.OFF_WINDOW + 15, self.OFF_WINDOW + 30)]
+        self.assertEqual(sum(len(s) for s in per_run), 0, "%r" % (per_run,))
+
+    # ── but not silent forever ────────────────────────────────────────────────
+    def test_the_daily_reminder_still_fires(self):
+        """Once ever is the wrong target: the failure mode of announcing a pause a single
+        time is Devon forgetting the bot is paused while deposits sit uninvested."""
+        rc, sent, out = self._run(W.HALT_REMIND_AT_MIN)
+        self.assertEqual(len(sent), 1, "%r" % (sent,))
+        self.assertIn("PAUSED BY rh_HALT", sent[0][0])
+        self.assertFalse(sent[0][1], "a deliberate pause is never urgent")
+
+    # ── the boundary, with the measurement held fixed ─────────────────────────
+    def test_a_new_pause_is_announced_even_outside_the_window(self):
+        rc, sent, out = self._run(self.OFF_WINDOW, degraded_minutes=lambda _et: 3.0)
+        self.assertEqual(len(sent), 1, "%r" % (sent,))
+        self.assertIn("PAUSED BY rh_HALT", sent[0][0])
+
+    def test_a_pause_just_past_the_new_window_is_not_announced_again(self):
+        rc, sent, out = self._run(self.OFF_WINDOW,
+                                  degraded_minutes=lambda _et: float(W.CROSS_WINDOW_MIN))
+        self.assertEqual(sent, [], "%r" % (sent,))
+
+    def test_a_pause_whose_duration_cannot_be_measured_is_still_announced(self):
+        """Cloud's control test caught this one. I had `held is None` counting as NOT new,
+        on the reasoning that for a deliberate pause the storm is the dangerous direction
+        and a delay costs nothing - and a pause with no measurable history then went
+        unannounced entirely. An unmeasurable duration is never read as zero here."""
+        rc, sent, out = self._run(self.OFF_WINDOW, degraded_minutes=lambda _et: None)
+        self.assertEqual(len(sent), 1, "%r" % (sent,))
+        self.assertIn("PAUSED BY rh_HALT", sent[0][0])
 
 
 class HaltHeartbeatIsMarketGated(Floor):
