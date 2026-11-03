@@ -147,17 +147,25 @@ def alert(msg, urgent=False, subject=None, title=None):
         to, misrouted = frm, True
         print("ALERT_EMAIL unset/blank - falling back to the SENDER address so this "
               "still reaches an inbox; set the repo secret to fix routing")
+    # THE NOTE GOES ON THE EMAIL ONLY (cloud's review, item 10). It was prepended to
+    # `msg` itself, and the urgent SMS below sends msg[:140] - so 127 of those 140
+    # characters were this note about email routing, leaving thirteen for the actual
+    # emergency. The note is also meaningless on SMS and ntfy, which do not use
+    # ALERT_EMAIL at all. Only fires when the secret is blank, which is why it went
+    # unnoticed: it breaks the urgent path precisely when configuration is already
+    # wrong, i.e. exactly when the alert matters most.
+    email_msg = msg
     if misrouted:
-        msg = ("[ALERT_EMAIL is not set, so this went to the sender address instead "
-               "of Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
-               + chr(10) + chr(10) + msg)
+        email_msg = ("[ALERT_EMAIL is not set, so this went to the sender address instead "
+                     "of Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
+                     + chr(10) + chr(10) + msg)
 
     # Email - subject carries no emoji; Devon prints mail to PDF by subject.
     if pw and frm and to:
         try:
             subject = subject or ("ALERT: RH laptop bot needs attention" if urgent
                                   else "RH laptop bot is not reporting (not urgent)")
-            _email(frm, pw, to, subject, msg)
+            _email(frm, pw, to, subject, email_msg)
             sent.append("email")
         except Exception as e:
             print("email failed:", e)
@@ -249,7 +257,17 @@ def main():
         print("market closed, weekend, or holiday - nothing to check")
         return 0
 
-    since_open = (et - et.replace(hour=9, minute=30, second=0, microsecond=0)).total_seconds() / 60
+    # MEASURED FROM THE BOT'S OWN OPEN, NOT THE EXCHANGE'S (cloud's review, item 10).
+    # This was hardcoded to 09:30 while the daemon's window opens at 09:45, so with
+    # GRACE_MIN at 5 the grace expired at 09:35 - ten minutes before the bot was even
+    # supposed to be working, which is a window where "not reporting" is the correct
+    # state and alerting on it is a false alarm. since_open also caps the staleness
+    # figures below, so every one of them read 15 minutes worse than the truth.
+    # session_bounds is the single authority the docstring asks everything to use, so
+    # an early close is modelled here too instead of being missed in this one file.
+    _b = bot.session_bounds(et)
+    _open = _b[0] if _b else et.replace(hour=9, minute=45, second=0, microsecond=0)
+    since_open = (et - _open).total_seconds() / 60
     if since_open < GRACE_MIN:
         print(f"within {GRACE_MIN}m grace after the open - skipping")
         return 0
@@ -271,6 +289,24 @@ def main():
     # That is a dead laptop, not a live one waiting on the broker: fall through to the
     # stale alert below. Without this the degraded branch returned early forever and
     # the watchdog went permanently silent, saying "the laptop is ALIVE".
+    # A DELIBERATE PAUSE IS NOT AN OUTAGE. rh_HALT is Devon's kill switch; the daemon
+    # now keeps the heartbeat up while it is held so monitoring can tell the pause
+    # from a dead machine (cloud's review, item 10). Paging about a state someone
+    # chose on purpose is how a watchdog gets muted, so this reports once, calmly,
+    # and never as urgent. If the heartbeat then goes stale the checks below still
+    # fire: a halted bot that stops reporting really is a dead laptop.
+    if status.get("degraded") == "halted_by_rh_HALT" and stale < STALE_MIN:
+        print(f"rh_HALT is present and the laptop is reporting normally "
+              f"({stale:.0f}m since the last heartbeat) - trading is paused on purpose")
+        # notify() carries no subject - it is notify(msg, urgent) and forwards only
+        # those two to alert(). My first version passed subject= and would have raised
+        # TypeError the first time rh_HALT existed; the suite stayed green because
+        # nothing exercised this branch, which is precisely what the surviving mutant
+        # for it was saying. So the distinguishing words lead the BODY instead.
+        return notify("PAUSED BY rh_HALT, not broken. The laptop is alive and reporting "
+                      "normally; nothing is trading and no stops are being enforced "
+                      "because nothing is being managed. Delete the rh_HALT file in the "
+                      "repo folder to resume.", urgent=False)
     if status.get("degraded") and stale < STALE_MIN:
         why = str(status.get("degraded"))
         mins = degraded_minutes(et)

@@ -92,6 +92,17 @@ FULL_CYCLE_SEC = 900     # 15 min, matches the cloud bot's trigger cadence
 FAST_PASS_SEC  = 60      # 60 s, matches the cloud bot's protective pass
 MAX_ORDERS_DAY = 40      # circuit breaker: a runaway loop can't machine-gun orders
 AGENT_TIMEOUT  = 240
+# How far the broker's own total_value may sit above the cash+positions it lists
+# before a snapshot that DROPPED a held name is treated as partial rather than
+# real. See adopt_truth. 8% comfortably exceeds cost-basis drift on a weeks-old
+# index book while sitting far below one missing holding (~33% of three equal
+# weights); the absolute floor keeps it meaningful on a small account, where 8%
+# of $300 is only $24.
+PARTIAL_SNAPSHOT_TOL = 0.08
+PARTIAL_SNAPSHOT_MIN = 15.00
+BOOT_UPTIME_MAX_SEC = 10 * 365 * 24 * 3600   # a decade; see _implied_boot_epoch. Only
+                                             # has to reject a wrapped or garbage
+                                             # counter, not judge a real uptime.
 PUSH_HEARTBEAT_SEC = 900 # liveness ping when nothing changed, so a quiet laptop
                          # and a dead one don't look the same to whoever watches
 RECONCILE_MAX_AGE_SEC = 1800  # 30 min. The bot only learned its cash at session
@@ -592,13 +603,65 @@ def _remember_alerts(led, **kw):
     save_ledger(led)
 
 
+def _kill_tree(pid):
+    """Kill a process and everything it spawned. Windows-specific, never raises."""
+    try:
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)],
+                       capture_output=True, timeout=20)
+    except Exception as e:
+        log(f"taskkill on bridge pid {pid} failed ({e})")
+
+
+def _run_bridge(cmd):
+    """Run the bridge with a timeout that actually bounds the loop.
+
+    subprocess.run's timeout kills only the DIRECT child and then keeps reading
+    until every holder of the stdout pipe closes it, so a grandchild that outlives
+    its parent can hold this single-threaded loop well past AGENT_TIMEOUT - and this
+    loop is what enforces the stop rails. Cloud raised it (review item 13) and
+    measured a stand-in holding 25.2s against timeout=3, but could not tell how
+    claude is installed here; it is C:\\Users\\devon\\.local\\bin\\claude.exe, a real
+    executable rather than the .cmd shim they hypothesised, so their exact scenario
+    does not apply. The mechanism does: anything the bridge spawns inherits the
+    handle. Unreproduced on this binary and fixed anyway, because the fix is a tree
+    kill on a path that is already failing and the downside of being wrong is a
+    protective pass that never comes back.
+    """
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            cwd=BRIDGE_CWD, text=True, encoding="utf-8",
+                            errors="replace")
+    try:
+        out, err = proc.communicate(timeout=AGENT_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        log(f"bridge exceeded {AGENT_TIMEOUT}s - killing its whole process tree")
+        _kill_tree(proc.pid)
+        try:
+            out, err = proc.communicate(timeout=30)
+        except Exception:
+            out, err = "", ""
+            try:
+                proc.kill()
+            except Exception:
+                pass
+        raise subprocess.TimeoutExpired(cmd, AGENT_TIMEOUT, output=out, stderr=err)
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+
+
 def agent(prompt):
     """Run a headless Claude turn and return the JSON object it printed."""
+    global _last_agent_error
     try:
-        r = subprocess.run([CLAUDE_BIN, "-p", RH_PREAMBLE + prompt,
-                            "--allowedTools", RH_ALLOWED],
-                           capture_output=True, cwd=BRIDGE_CWD,
-                           text=True, timeout=AGENT_TIMEOUT)
+        # encoding/errors EXPLICITLY (cloud's review, item 3, second route). text=True
+        # decodes with the locale codec, which on this machine is cp1252 in STRICT
+        # mode. A single byte cp1252 leaves undefined - and the bridge is an LLM that
+        # emits U+274C, U+23F3, U+1F44D in ordinary status chatter - raised inside
+        # subprocess.run and took the ENTIRE reply with it, including the JSON
+        # describing orders that had already executed. That surfaced as place()
+        # returning nothing, which is the phantom-fill path. utf-8 with errors=replace
+        # keeps the JSON readable and turns an exotic character into a visible
+        # placeholder instead of a lost trade report.
+        r = _run_bridge([CLAUDE_BIN, "-p", RH_PREAMBLE + prompt,
+                         "--allowedTools", RH_ALLOWED])
         out = (r.stdout or "").strip()
         i, j = out.find("{"), out.rfind("}")
         if i >= 0 and j > i:
@@ -607,14 +670,28 @@ def agent(prompt):
             # rather than "the bridge is broken", which is how a dead bridge
             # spent a whole session looking like a calm day.
             if isinstance(res, dict) and res.get("error") == "no_tools":
+                # A real, current diagnosis - record it, replacing any older one.
+                _last_agent_error = "no_tools: the bridge could not load the "\
+                                    "Robinhood MCP tools"
                 log("agent could NOT load the Robinhood MCP tools, skipping "
                     "this pass rather than acting on missing data")
                 return None
+            # CLEARED ON SUCCESS (cloud's review, item 7). This was only ever written,
+            # never reset, so a quota message captured on one day classified an
+            # unrelated failure on the next: a plain timeout inherited "resets 1:40pm",
+            # and retry_wait parked the broker retry for 13830s - 3.84 hours - while
+            # _maybe_alert_broker worded the alert as self-healing. The reply in hand
+            # is the only evidence about the bridge's current state, and a good reply
+            # is evidence there is nothing wrong with it.
+            _last_agent_error = ""
             return res
-        global _last_agent_error
         _last_agent_error = out[:200]
         log(f"agent returned no JSON: {out[:200]}")
     except Exception as e:
+        # Record THIS failure, not whatever was captured days ago. A timeout used to
+        # leave the previous value standing, which is how a plain timeout got
+        # classified from a stale quota message and parked the retry for hours.
+        _last_agent_error = f"{type(e).__name__}: {e}"[:200]
         log(f"agent call failed: {e}")
     return None
 
@@ -742,6 +819,39 @@ def _recompute_deposit_totals(doc):
     return doc
 
 
+_deposits_alert_at = 0.0
+DEPOSITS_ALERT_SEC = 3600
+
+
+def _alert_deposits_unreadable(amount):
+    """Tell Devon the deposit file needs a human. Throttled, never raises.
+
+    The throttle is a module global, which usually means "this will be lost on a
+    restart" - here that is the safe direction, because a restart re-alerting about
+    a file that is still corrupt is better than silence about one.
+    """
+    global _deposits_alert_at
+    try:
+        if time.time() - _deposits_alert_at < DEPOSITS_ALERT_SEC:
+            return
+        _deposits_alert_at = time.time()
+        notify("RH laptop bot: rh_deposits.json cannot be read", chr(10).join([
+            f"A ${float(amount):.2f} deposit was detected and deliberately NOT recorded,",
+            f"because {DEPOSITS_F} exists but does not parse as a deposit history.",
+            "",
+            "Nothing is wrong with the account and trading continues normally. The bot",
+            "refused to write rather than replace the file, because rewriting it would",
+            "destroy the contributed-capital baseline that Arm B's performance is",
+            "measured against - and that number is what the 11-24 comparison uses.",
+            "",
+            "Most likely cause: git conflict markers left in the file by a pull, or a",
+            "truncated write. Open it, make it valid JSON again, and the deposit will",
+            "be captured on a later pass; the watermark was left untouched on purpose.",
+        ]))
+    except Exception as e:
+        log(f"deposit-file alert skipped ({e})")
+
+
 def record_deposit(amount, source, note=""):
     """Append a deposit event to the COMMITTED rh_deposits.json.
 
@@ -751,8 +861,32 @@ def record_deposit(amount, source, note=""):
     normally; only the performance math subtracts this file's total.
     """
     try:
-        doc = _load(DEPOSITS_F, None) or {"currency": "USD", "events": [],
-                                          "total_deposited": 0.0}
+        # NEVER OVERWRITE A FILE WE COULD NOT READ (cloud's review, item 5(c)). _load
+        # returns its default when the file EXISTS but will not parse - conflict
+        # markers after an autostash pull, a truncated write - and `or {...}` then
+        # built a brand new document whose only event was this one. _save committed
+        # it and _push_status pushed it: 16 events became 1, total_contributed_capital
+        # 324.92 became 10.00, and the baseline Arm B's whole performance number is
+        # computed against was gone from the public repo. A missing file is still
+        # created, because that is a real first run; an unreadable one is a human's
+        # problem and the deposit is retried once it is fixed, since (a) above now
+        # leaves the watermark alone when this returns False.
+        # EXISTENCE is the discriminator, not _load's return: _load gives back its
+        # default for a missing file AND for one that exists but will not parse, which
+        # is exactly the conflation this guard has to undo. My first version of this
+        # fix used a sentinel default and therefore still rewrote a corrupt file; the
+        # test below caught it.
+        existed = os.path.exists(DEPOSITS_F)
+        doc = _load(DEPOSITS_F, None)
+        if not existed and doc is None:
+            doc = {"currency": "USD", "events": [], "total_deposited": 0.0}
+        elif not isinstance(doc, dict) or not isinstance(doc.get("events"), list):
+            log(f"!! REFUSING to write {DEPOSITS_F}: it exists but did not parse into a "
+                f"deposit history, and rewriting it would destroy the contributed-capital "
+                f"baseline. The ${float(amount):.2f} deposit is NOT recorded; fix the file "
+                f"and it will be captured on a later pass.")
+            _alert_deposits_unreadable(amount)
+            return False
         doc.setdefault("events", []).append({
             "date": now_et().strftime("%Y-%m-%d"),
             "amount": round(float(amount), 2),
@@ -791,9 +925,75 @@ def adopt_truth(led, truth):
     """
     if not truth:
         return False
-    positions = [{"symbol": p["symbol"], "qty": float(p["qty"]),
-                  "avg_cost": float(p.get("avg_cost") or 0)}
-                 for p in truth.get("positions") or [] if float(p["qty"]) > 0]
+    # MALFORMED ELEMENTS DO NOT RAISE OUT OF HERE (cloud's review, item 4). The old
+    # comprehension called float(p["qty"]) directly, so qty null, qty "0.17 shares",
+    # a missing symbol or cash "$40.00" raised TypeError/ValueError/KeyError straight
+    # through adopt_truth and cycle(). Two consequences, both silent: called after a
+    # trade there is no guard between place() and persist(), so the trade-log lines
+    # for fills that REALLY HAPPENED are never written; called at session open the
+    # raise lands in main's catch-all before any failure bookkeeping, so the retry
+    # clock, the failure counter and _broker_down_since all stay untouched and the
+    # loop runs a full agent turn every 60s against the shared quota while the cloud
+    # watchdog reads the missing heartbeat as a dead laptop - the 08-18 and 08-20
+    # misdiagnoses exactly. A bad element now means the SNAPSHOT is unusable, not
+    # that one line is dropped: dropping it silently would manufacture the partial
+    # snapshot the guard below exists to refuse.
+    try:
+        positions = [{"symbol": str(p["symbol"]), "qty": float(p["qty"]),
+                      "avg_cost": float(p.get("avg_cost") or 0)}
+                     for p in truth.get("positions") or [] if float(p["qty"]) > 0]
+    except (TypeError, ValueError, KeyError, AttributeError) as e:
+        log(f"!! broker snapshot has an unreadable position element ({type(e).__name__}: {e}) "
+            f"- refusing the whole snapshot and keeping the ledger")
+        return False
+    # A PARTIAL snapshot, not just an empty one. The guard below catches the
+    # degenerate case (zero positions); cloud's 2026-10-30 cold review found the
+    # general one, and I reproduced it before fixing it: the executor is an LLM
+    # summarising get_equity_positions, so a reply that simply OMITS one holding is
+    # adopted whole, led["positions"] shrinks, holds for the dropped name are pruned
+    # with it, and decide() in the SAME pass reads the understated equity and emits
+    # real INDEX-TRIM market sells. Measured on a $255.50 book of SPY/QQQ/IWM with
+    # IWM omitted: equity read 170.50 and the pass sold $56.33 of real shares, 22%
+    # of the account, with no note of any kind. rh_bot's quote-gap guard cannot see
+    # this - it compares the ledger's own positions against the ones that quoted, and
+    # a name missing from the LEDGER is missing from both sides.
+    #
+    # The discriminator is NOT plausibility, which is the mistake _pick_equity was
+    # built to avoid: a partial book is perfectly plausible. It is the reply's own
+    # total_value, which the old code stored and never read. A genuine sale lowers
+    # the listed positions AND total_value together; a dropped line lowers only the
+    # positions while total_value still describes the fuller account. So this fires
+    # only when a name the ledger holds has vanished, and then asks whether the
+    # broker's own total agrees. avg_cost stands in for market value, which is the
+    # weak part: the gap it must resolve is a whole missing holding (~33% of an
+    # equal-weight three-ETF book) against cost-basis drift of a few percent, so the
+    # tolerance sits well clear of both. It fails CLOSED - an unusable total_value
+    # means the snapshot is refused and the ledger kept, because the cost of waiting
+    # one cycle is a delayed purchase and the cost of being wrong is sold shares.
+    held_now = {p["symbol"] for p in positions}
+    dropped = [p for p in (led.get("positions") or []) if p["symbol"] not in held_now]
+    if positions and dropped and not DRY:
+        implied = float(truth.get("cash") or 0) + sum(
+            float(p.get("qty") or 0) * float(p.get("avg_cost") or 0) for p in positions)
+        try:
+            total = float(truth.get("total_value") or 0)
+        except (TypeError, ValueError):
+            total = 0.0
+        gap = total - implied
+        if total <= 0:
+            log(f"!! broker snapshot dropped {[p['symbol'] for p in dropped]} and carries no "
+                f"usable total_value to corroborate it: refusing it and keeping the ledger")
+            return False
+        if gap > max(total * PARTIAL_SNAPSHOT_TOL, PARTIAL_SNAPSHOT_MIN):
+            log(f"!! PARTIAL SNAPSHOT REFUSED: dropped {[p['symbol'] for p in dropped]} but the "
+                f"reply's own total_value ${total:.2f} still exceeds its listed cash+positions "
+                f"${implied:.2f} by ${gap:.2f} - the names are missing from the reply, not from "
+                f"the account. Keeping the ledger; nothing is sold on this.")
+            return False
+        log(f"broker snapshot drops {[p['symbol'] for p in dropped]} and its own total_value "
+            f"${total:.2f} agrees with cash+positions ${implied:.2f}: treating the holding(s) "
+            f"as genuinely gone (sold away from the bot, or settled out)")
+
     if not positions and led.get("positions"):
         if DRY:
             # Dry fills are simulated, so the real book disagreeing is expected,
@@ -805,7 +1005,20 @@ def adopt_truth(led, truth):
             log(f"!! broker reported ZERO positions but the ledger holds "
                 f"{len(led['positions'])} name(s): corrupt snapshot, keeping the ledger")
         return False
-    led["cash"] = float(truth.get("cash") or led["cash"])
+    # A TRUE BROKER ZERO IS NOT A MISSING VALUE (cloud's review, item 2(i)). `or`
+    # treats 0.0 as absent and keeps the stale ledger cash, so a swept account reading
+    # 0.00 left the ledger at 60.00 and decide() ordered $57 of buys the broker must
+    # reject - burning the daily order budget and an agent turn each pass. It also
+    # masked 2(ii) whenever post-sale buying power was exactly 0. Missing or
+    # unreadable still falls back; zero is now believed.
+    raw_cash = truth.get("cash")
+    if raw_cash is None:
+        log("broker snapshot carries no cash field; keeping the ledger's cash")
+    else:
+        try:
+            led["cash"] = float(raw_cash)
+        except (TypeError, ValueError):
+            log(f"broker snapshot cash {raw_cash!r} is unreadable; keeping the ledger's cash")
     # Broker TOTAL value, which unlike buying_power includes unsettled proceeds.
     # Published equity uses this; see persist(). Sizing deliberately does NOT,
     # because unsettled cash genuinely cannot be spent.
@@ -825,13 +1038,33 @@ def adopt_truth(led, truth):
     # which is exactly what made the retroactive log archaeology imprecise).
     # Recorded once on the rising edge, so it is not double counted when the
     # deposit later settles and pending drops back to 0.
+    # Two ways this lost or doubled a deposit before cloud's review (item 5), and
+    # this is the number November's comparison is computed from, so both are fixed
+    # here. (a) `seen` advanced even when record_deposit returned False (a OneDrive
+    # lock on the file), which marks the rising edge consumed with nothing written:
+    # the deposit vanishes, 16 events stay 16. It now advances ONLY on a successful
+    # write, so a failed write is retried on the next pass while pending is still up.
+    # (b) a reply with pending_deposits null was read by `or 0` as an authoritative
+    # zero, which RESET seen, so the same still-pending $10 was recorded again on the
+    # next rising edge: total_deposited_since_start 265 -> 285. Null is now "unknown,
+    # keep seen" - only a number the broker actually stated may move it.
     try:
-        pend = float(truth.get("pending_deposits") or 0)
-        seen = float(led.get("pending_deposits_seen") or 0)
-        if pend > seen + 0.005:
-            record_deposit(pend - seen, "broker pending_deposits (rising edge)",
-                           f"pending went {seen:.2f} -> {pend:.2f}")
-        led["pending_deposits_seen"] = pend
+        raw_pend = truth.get("pending_deposits")
+        if raw_pend is None:
+            log("broker snapshot carries no pending_deposits figure; "
+                "leaving the deposit watermark where it is")
+        else:
+            pend = float(raw_pend)
+            seen = float(led.get("pending_deposits_seen") or 0)
+            if pend > seen + 0.005:
+                if record_deposit(pend - seen, "broker pending_deposits (rising edge)",
+                                  f"pending went {seen:.2f} -> {pend:.2f}"):
+                    led["pending_deposits_seen"] = pend
+                else:
+                    log(f"!! deposit of {pend - seen:.2f} was NOT recorded, so the watermark "
+                        f"stays at {seen:.2f} and the next pass will try again")
+            else:
+                led["pending_deposits_seen"] = pend
     except Exception as e:
         log(f"deposit check skipped ({e})")
 
@@ -841,7 +1074,17 @@ def adopt_truth(led, truth):
 
 
 def place(orders):
-    """Hand the agent an exact order list. Returns the fills it reports."""
+    """Hand the agent an exact order list. Returns the fills it reports.
+
+    [] and None mean DIFFERENT things and the caller depends on it (cloud's review,
+    item 3). [] is an answer: the bridge replied and placed nothing. None is the
+    absence of an answer: a timeout, no_tools, no JSON, an exception, an undecodable
+    byte. The old code returned [] for every one of those, and apply_fills' DRY-run
+    simulation path reads [] as "every order filled" - so a turn that never reached
+    the broker booked phantom positions into the ledger, stamped last_buy, credited
+    the cash for sells that never happened, and left needs_reconcile unset so
+    nothing retried until the 30-minute periodic reconcile.
+    """
     if DRY:
         log(f"DRY RUN — would place {len(orders)} order(s)")
         return []
@@ -854,7 +1097,11 @@ def place(orders):
         'Then reply with ONLY a JSON object, no prose:\n'
         '{"placed": [{"symbol": "X", "action": "buy|sell", "status": "ok|rejected", '
         '"detail": "<broker message if rejected>"}]}')
-    return (res or {}).get("placed") or []
+    if not isinstance(res, dict) or not isinstance(res.get("placed"), list):
+        log("!! the executor turn produced no usable order report, so what reached the "
+            "broker is UNKNOWN: booking nothing and forcing a reconcile")
+        return None
+    return res["placed"]
 
 
 # ── Ledger ──────────────────────────────────────────────────────────────────
@@ -872,15 +1119,37 @@ def roll_day(led, today):
 
 
 def apply_fills(led, orders, placed, prices):
-    """Update the local ledger from what actually got placed."""
-    ok = {(p.get("symbol"), p.get("action")) for p in placed if p.get("status") == "ok"}
+    """Update the local ledger from what actually got placed.
+
+    `placed is None` means the executor turn gave no usable report (see place()):
+    the orders may have reached the broker or not, and the ledger must not invent
+    either answer. Book nothing, flag needs_reconcile so the next pass asks the
+    broker instead of guessing, and still charge the order budget, because orders
+    we cannot account for are exactly the ones a circuit breaker is for.
+    """
+    if placed is None:
+        led["needs_reconcile"] = True
+        if not DRY:
+            led["orders_today"] = led.get("orders_today", 0) + len(orders)
+        log(f"ledger UNCHANGED for {len(orders)} order(s) of unknown outcome; "
+            f"needs_reconcile set so the broker is asked before anything else is decided")
+        return
+    # In a real run an EMPTY report is also an answer - the bridge placed nothing - so
+    # nothing may be booked from it. Only a dry run, whose fills are simulated by
+    # definition, treats an empty report as "all of them".
+    if DRY:
+        ok = {(o["symbol"], o["action"]) for o in orders}
+    else:
+        ok = {(p.get("symbol"), p.get("action")) for p in placed if p.get("status") == "ok"}
+        if not ok:
+            log(f"executor reported 0 of {len(orders)} order(s) filled; ledger untouched")
     today = now_et().strftime("%Y-%m-%d")     # ET: roll_day stamps the ET date too,
                                               # and last_buy feeds the time stop
     pos = {p["symbol"]: p for p in led["positions"]}
     for o in orders:
         sym, act = o["symbol"], o["action"]
-        if placed and (sym, act) not in ok:
-            continue                                  # rejected — ledger untouched
+        if (sym, act) not in ok:
+            continue                                  # rejected, or never reported — untouched
         px = prices.get(sym) or 0
         if act == "buy" and px > 0:
             qty = o["notional"] / px
@@ -955,17 +1224,53 @@ def _push_status(reason):
         if subprocess.run(["git", "diff", "--cached", "--quiet"],
                           capture_output=True, timeout=15).returncode == 0:
             return False                      # nothing staged, nothing to say
+        # COMMIT THESE THREE FILES AND NOTHING ELSE (cloud's review, item 8). The add
+        # above is specific but the commit was not, so it took whatever was already in
+        # the index: an interactive session with a staged file - and both sessions
+        # stage files in this very tree - had its work committed into an "rh bot"
+        # heartbeat and pushed to a PUBLIC repo. Cloud reproduced it in a throwaway
+        # repo by staging AGENT_MAIL.md. The pathspec makes the commit match the add;
+        # staged work belonging to anyone else now stays staged.
         subprocess.run(["git", "commit", "-m",
-                        f"rh bot {now_et().strftime('%Y-%m-%dT%H:%M')} ET ({reason})"],
+                        f"rh bot {now_et().strftime('%Y-%m-%dT%H:%M')} ET ({reason})",
+                        "--", STATUS_F, LOG_F, DEPOSITS_F],
                        capture_output=True, timeout=20)
-        if subprocess.run(["git", "push"], capture_output=True, timeout=30).returncode != 0:
-            subprocess.run(["git", "pull", "--rebase", "--autostash"],
-                           capture_output=True, timeout=30)
-            subprocess.run(["git", "push"], capture_output=True, timeout=30)
-        return True
+        # And report the TRUTH about the push. This returned True after a failed
+        # retry, and persist() reads that as "published", suppressing the next
+        # heartbeat for PUSH_HEARTBEAT_SEC with the commit still sitting local - so
+        # whoever is watching sees a fresh timestamp that was never actually pushed.
+        if subprocess.run(["git", "push"], capture_output=True, timeout=30).returncode == 0:
+            return True
+        subprocess.run(["git", "pull", "--rebase", "--autostash"],
+                       capture_output=True, timeout=30)
+        if subprocess.run(["git", "push"], capture_output=True, timeout=30).returncode == 0:
+            return True
+        log("!! status push FAILED twice (commit is local, not published) - "
+            "not suppressing the next heartbeat")
+        return False
     except Exception as e:
         log(f"git persist skipped: {e}")
         return False
+
+
+_last_notify_reach = "both"
+
+
+def _set_notify_reach(where):
+    global _last_notify_reach
+    _last_notify_reach = where
+
+
+def reached_nobody():
+    """True when the last notify() got through to neither email nor Slack.
+
+    notify() returns an EMAIL verdict, which is not the same question. An alert
+    throttle wants to know "did this reach him at all", because email failing while
+    the Slack mirror posted is a delivered alert, and treating that as a failure
+    would re-send every operational notice twice. Only honest for the notify() call
+    immediately preceding it, which is how all three call sites use it.
+    """
+    return _last_notify_reach == "nobody"
 
 
 def notify(subject, body, untrusted=False):
@@ -1004,8 +1309,19 @@ def notify(subject, body, untrusted=False):
         # exported it 2026-09-01 at my request and post() delegates to that same one.
         # This replaces an inlined copy - two copies of a security control is how one
         # gets improved and the other quietly does not.
-        import slack_notify
-        body = slack_notify.fence(body)
+        # Guarded: this docstring promises "never raises", and an ImportError here
+        # used to break that promise on the one path carrying untrusted text - which
+        # is also a path called from inside cycle() after orders are away (cloud's
+        # review, item 4). Falling back to a local fence keeps the security control
+        # rather than dropping it, and says so, because a silently unfenced body is
+        # the failure this branch exists to prevent.
+        try:
+            import slack_notify
+            body = slack_notify.fence(body)
+        except Exception as e:
+            log(f"!! slack_notify.fence unavailable ({type(e).__name__}: {e}); fencing "
+                f"locally so untrusted text is still not read as instructions")
+            body = "```\n" + str(body).replace("```", "'''") + "\n```"
 
     # No early return on a missing password. send_email mirrors to Slack BEFORE
     # its Gmail guard, so letting it run is what keeps Slack alive when Gmail is
@@ -1013,9 +1329,18 @@ def notify(subject, body, untrusted=False):
     try:
         delivered = bot.send_email(subject, body)
     except Exception as e:                 # send_email swallows its own errors
+        # The ONLY branch where nothing reached Devon anywhere. send_email mirrors to
+        # Slack before its own Gmail guard, so a missing password or an SMTP refusal
+        # below still posted; a raise out of it means neither mirror ran. Alert
+        # throttles must distinguish these: stamping "already told him" on a message
+        # that reached nobody is how a one-off delivery failure becomes permanent
+        # silence (cloud's review, item 7, and its caveat about what the verdict can
+        # honestly mean).
+        _set_notify_reach("nobody")
         log(f"notify FAILED ({e}): {subject}")
         return False
     if not bot.GMAIL_APP_PW:
+        _set_notify_reach("slack")
         log(f"NOT emailed ({subject}): no gmail_app_password set; Slack still posted")
         return False
     # send_email now RETURNS a delivery verdict (cloud added it 2026-09-01 at my
@@ -1025,8 +1350,10 @@ def notify(subject, body, untrusted=False):
     # Slack is deliberately NOT part of the verdict, so False here means email
     # failed - never that nothing was sent anywhere.
     if delivered:
+        _set_notify_reach("both")
         log(f"emailed: {subject}")
         return True
+    _set_notify_reach("slack")
     log(f"email NOT delivered ({subject}); Slack mirror still posted")
     return False
 
@@ -1036,6 +1363,29 @@ def email_trades(res, placed, led):
     these to PDF and the subject becomes the filename."""
     orders = res.get("orders") or []
     if not orders:
+        return
+    if placed is None:
+        # place() could not tell us what happened, so this email must not imply
+        # either outcome. Devon gets the order list and the plain statement that the
+        # result is unknown, which is the one thing worth saying: the ledger was left
+        # alone and the next pass asks the broker.
+        notify(f"RH laptop bot: {len(orders)} order(s) sent, OUTCOME UNKNOWN",
+               chr(10).join([
+                   f"Robinhood laptop bot ({'DRY' if DRY else 'LIVE'})",
+                   f"{now_et().strftime('%Y-%m-%d %H:%M ET')}", "",
+                   "The executor turn did not come back with a readable report, so",
+                   "whether these orders reached the broker is NOT known:", ""]
+                  + [f"  {o['action'].upper():4} {o['symbol']:6} "
+                     f"{('$%.2f' % o['notional']) if o.get('notional') else str(o.get('qty')) + ' sh':>9}"
+                     f"  {o['reason']}" for o in orders]
+                  + ["",
+                     "The ledger was deliberately left unchanged rather than assume",
+                     "they filled, and a reconcile is forced on the next pass, which",
+                     "will show the broker's real positions. Check Robinhood directly",
+                     "if you want to know sooner.",
+                     "",
+                     "Nothing was retried automatically: re-sending orders whose fate",
+                     "is unknown is how you buy the same thing twice."]))
         return
     ok = sum(1 for p in placed if p.get("status") == "ok")
     bad = [p for p in placed if p.get("status") != "ok"]
@@ -1442,6 +1792,19 @@ def check_arm_a(led):
                     f"2026-10-22, Devon's call; urgent level still sends): {subject} "
                     f"|| EVIDENCE: {' / '.join(x.strip() for x in body.splitlines() if x.strip())}")
                 return True          # handled: do not let run_once retry or go red on it
+            # ANY DELIVERED ALERT ENDS THE MUTED EPISODE (cloud's review, item 11 - a
+            # third defect in this stopgap, found after the first two were fixed). The
+            # flag used to be cleared only by a combined-alert delivery or by the
+            # recovery notice itself, so a muted 6-minute alert followed by a DELIVERED
+            # 20-minute urgent one left it True: Devon was told Arm A was down, and the
+            # recovery was then swallowed as "its opening alert was muted". Told it
+            # broke, never told it recovered - the worst of the three outcomes. Once
+            # anything about this episode has reached him, the episode is reported and
+            # its recovery belongs in his inbox.
+            if ARM_A_MUTE_QUEUED and (led.get("alerts") or {}).get("arm_a_queued_muted"):
+                log("ARM A WATCH: an alert for this episode is being DELIVERED, so the "
+                    "muted-episode flag is cleared and its recovery will be sent")
+                _remember_alerts(led, arm_a_queued_muted=False)
             # Cloud's subject says WHAT is wrong; Devon asked that alerts say WHO must act, and
             # for an Arm A fault that is CLOUD, not this session. Their subject is kept verbatim
             # (he prints mail to PDF by subject and "ARM A WATCH" sorts) and the routing goes in
@@ -1507,8 +1870,8 @@ def check_mail(led):
         fresh = [h for h in heads[start:]
                  if h[2].strip().lower() in ("laptop", "both", "all")
                  and h[1].strip().lower() != "laptop"]
-        led["last_mail_seen"] = keys[-1]
         if not fresh:
+            led["last_mail_seen"] = keys[-1]
             return
         who = " and ".join(dict.fromkeys(
             DAILY_NAME if (h[2].lower() == "laptop" and h[3].lower() == "daily") else SESSION_NAME
@@ -1525,6 +1888,17 @@ def check_mail(led):
             "The daemon cannot act on these; it only reports that they arrived.",
             f"Open the {who} session on the laptop and say: check mail.",
         ]))
+        # Mark seen only once it got somewhere (cloud's review, item 7). The old
+        # order advanced the watermark BEFORE notifying, so a single failed delivery
+        # consumed the entries permanently - exactly the shape that lost a thread
+        # reply before, and worse here because mail is how the two sessions
+        # coordinate. An entry re-reported once is noise; one never reported is a
+        # time-sensitive message nobody reads.
+        if reached_nobody():
+            log("mail notice reached NOBODY - leaving last_mail_seen where it is "
+                "so the next full cycle reports these entries again")
+            return
+        led["last_mail_seen"] = keys[-1]
     except Exception as e:
         log(f"mail check skipped ({e})")
 
@@ -1572,8 +1946,27 @@ def sync_code(led=None):
             return False
         log(f"code changed ({', '.join(code_changed)}) {base[:7]} -> {head[:7]} "
             f"— verifying before use")
-        chk = subprocess.run([sys.executable, "rh_bot.py", "--selftest"],
-                             capture_output=True, text=True, timeout=180)
+        # IMPORT EVERY CODE_FILE, not just the two rh_bot happens to pull in (cloud's
+        # review, item 6). rh_bot.py --selftest imports only rh_bot and alpaca_bot, so
+        # I broke each of the six in turn and ran the real gate: rh_bot and alpaca_bot
+        # were REJECTED, and rh_daemon.py, realized.py, slack_notify.py and
+        # arm_a_watch.py all PASSED. The daemon would exit 42 into code that cannot
+        # start, and under pythonw there is no console for the traceback to reach -
+        # and since the task's trigger went to PT1M on 10-27 that became a silent
+        # relaunch attempt every 60 seconds instead of every 5 minutes. A broken
+        # arm_a_watch.py is the quietest of all: it only logs "arm a watch skipped",
+        # so the dead-man switch dies without a word. CLAUDE.md's manual
+        # `python -c "import rh_daemon"` rule was standing in for a gate; now the
+        # gate does it. Compile-only would miss an import-time failure, so this
+        # really imports them, in a child process so a half-imported module cannot
+        # contaminate the running daemon.
+        imports = ", ".join(f[:-3] for f in CODE_FILES if f.endswith(".py"))
+        chk = subprocess.run([sys.executable, "-c",
+                              f"import {imports}; "
+                              f"import runpy, sys; sys.argv=['rh_bot.py','--selftest']; "
+                              f"runpy.run_module('rh_bot', run_name='__main__')"],
+                             capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=180)
         if chk.returncode != 0:
             # Do not reset the shared tree (that would fight the cloud's commits).
             # The good code is already in memory; just refuse to restart into the
@@ -1629,6 +2022,59 @@ def sync_code(led=None):
 
 
 # ── Main loop ───────────────────────────────────────────────────────────────
+REBALANCE_BLOCK_ALERT = 24   # full cycles (~6 market hours) before this is a fault
+
+
+def _watch_rebalance_block(led, res):
+    """Notice when the quote-gap guard has stopped being temporary.
+
+    rh_bot skips the whole index rebalance when any held name fails to quote, which
+    is right - trimming on understated equity sells real shares. But the skip is
+    indefinite, and cloud's review (item 9) points out the case where it never
+    clears: one legacy non-index holding Yahoo cannot quote at all blocks every
+    INDEX buy forever, and the note wording says "delayed" while the truth is
+    "stopped". The guard stays exactly as it is; what changes is that a permanent
+    data gap becomes a condition Devon can fix instead of silent paralysis. Counted
+    on the ledger, because a restart must not reset the count - that is how a
+    permanent block would hide indefinitely behind a daily restart.
+    """
+    try:
+        note = next((n for n in res.get("notes") or []
+                     if "index rebalance skipped" in n), None)
+        a = led.get("alerts") or {}
+        if not note:
+            if a.get("rebalance_blocked"):
+                log("index rebalance is no longer blocked; quote gap cleared")
+                _remember_alerts(led, rebalance_blocked=0, rebalance_alerted=False)
+            return
+        n = int(a.get("rebalance_blocked") or 0) + 1
+        _remember_alerts(led, rebalance_blocked=n)
+        if n < REBALANCE_BLOCK_ALERT or a.get("rebalance_alerted"):
+            return
+        notify("RH laptop bot: index buys have been blocked all day", chr(10).join([
+            f"The index rebalance has been skipped {n} cycles in a row, which is about",
+            "six market hours. Nothing is being sold and nothing is wrong with the",
+            "account, but no index BUYS are happening either, so deposited cash is",
+            "sitting idle.",
+            "",
+            f"The bot's own note: {note}",
+            "",
+            "Why it refuses: equity is summed only over holdings that returned a price,",
+            "so a missing quote understates it, and acting on that understated figure",
+            "would emit real trim sells. Skipping is correct. Skipping FOREVER is not,",
+            "and that is what this message is about.",
+            "",
+            "Most likely cause: a holding whose symbol Yahoo will not quote at all",
+            "(delisted, renamed, or never quotable), as opposed to a transient outage.",
+            "If so it needs a human: the position has to leave the book, or the symbol",
+            "has to be corrected, before index buying resumes.",
+        ]))
+        if not reached_nobody():
+            _remember_alerts(led, rebalance_alerted=True)
+    except Exception as e:
+        log(f"rebalance-block watch skipped ({e})")
+
+
 def cycle(led, fast):
     prices = {}
     state = {"cash": led["cash"], "unsettled": led.get("sold_today", 0.0),
@@ -1658,10 +2104,26 @@ def cycle(led, fast):
             apply_fills(led, res["orders"], placed, prices)
             # Truth up after every trade. The orders are already away, so a
             # corrupt snapshot here means keep the local ledger, not skip.
-            adopt_truth(led, reconcile())
-            email_trades(res, placed, led)      # after reconcile: report real state
+            #
+            # GUARDED, because persist() below writes rh_trade_log.jsonl and the
+            # orders above are already at the broker (cloud's review, item 4(a)).
+            # Anything raising between the two - a malformed broker element, an
+            # import failure inside notify's untrusted branch - meant the trade log
+            # lines for fills that REALLY HAPPENED were never written, which also
+            # defeats realized.arm_b_block()'s sells-logged tripwire on a sell. The
+            # reconcile and the email are both improvements on the record; neither
+            # is worth the record itself.
+            try:
+                adopt_truth(led, reconcile())
+                email_trades(res, placed, led)   # after reconcile: report real state
+            except Exception as e:
+                led["needs_reconcile"] = True
+                log(f"!! post-trade reconcile/report failed ({type(e).__name__}: {e}) - the "
+                    f"orders are already placed, so continuing to persist the trade log and "
+                    f"forcing a reconcile next pass")
     for n in res.get("notes", []):
         log(f"  note: {n}")
+    _watch_rebalance_block(led, res)
     persist(led, res, placed)
     return res
 
@@ -1770,6 +2232,16 @@ def _maybe_alert_broker(led):
         "If it succeeds but Robinhood tools are missing, reconnect that",
         "connector:  claude mcp login \"claude.ai Robinhood\"",
     ]))
+    # Stamp only if it got somewhere (cloud's review, item 7). Stamping
+    # unconditionally meant one failed delivery silenced this alert for a whole
+    # BROKER_REALERT_SEC window, on the alert whose entire purpose is to say the
+    # bridge is down - the condition most likely to break delivery in the first
+    # place. Email failing while Slack posted still counts as delivered; see
+    # reached_nobody() for why the email verdict alone is the wrong question.
+    if reached_nobody():
+        log("broker alert reached NOBODY (neither email nor Slack) - not stamping, "
+            "so the next degraded pass tries again")
+        return
     _broker_alert_at = time.time()
     _remember_alerts(led, broker_alert_at=_broker_alert_at,
                      reconcile_fails=_reconcile_fails)
@@ -1800,10 +2272,36 @@ def _implied_boot_epoch():
     2026-10-08: implied 10:32:11 local against a real boot of 10:32:12. Should the
     counter ever exclude time spent asleep it implies a LATER boot, which can only
     make a sleep look like the outage it was - the error runs the safe way.
+
+    restype IS NOT OPTIONAL, and omitting it was a live bug for 25 days. ctypes
+    defaults a foreign function's return to c_int - 32 bits, SIGNED - while this one
+    returns ULONGLONG, so the millisecond counter was truncated and went NEGATIVE
+    once uptime passed 2**31 ms = 24.86 days. Measured here 2026-11-02, the day the
+    laptop crossed it: the call returned -2108184093, implying a boot of 2026-11-27,
+    in the future. report_downtime then reads `rebooted = boot > last` as True
+    forever, which disables the quiet path that exists to stop false alarms and
+    makes every gap claim the machine restarted. With restype set: 2186783203 ms,
+    implied boot 10-08 14:56:53 against Windows' own LastBootUpTime of 14:56:45.
+    My own test caught it, and only because the uptime happened to cross the wrap
+    while the suite was running - which is the argument for the range check below
+    rather than trusting one 8-second agreement. A value in the future or implying
+    an implausible uptime is not a boot time; None says "unreadable" and the
+    reboot-dependent branches are written to handle that.
     """
     try:
         import ctypes
-        return time.time() - ctypes.windll.kernel32.GetTickCount64() / 1000.0
+        fn = ctypes.windll.kernel32.GetTickCount64
+        fn.restype = ctypes.c_ulonglong
+        ticks = fn() / 1000.0
+        if ticks <= 0 or ticks > BOOT_UPTIME_MAX_SEC:
+            log(f"uptime counter returned {ticks:.0f}s, which is not a plausible "
+                f"uptime - treating the boot time as unreadable")
+            return None
+        boot = time.time() - ticks
+        if boot > time.time():
+            log("implied boot time is in the future - treating it as unreadable")
+            return None
+        return boot
     except Exception:
         return None
 
@@ -2183,6 +2681,22 @@ def main():
         alert_keep_awake(led, (_MACHINE or {}).get("keep_awake", True))
         if os.path.exists(HALT_F):
             log("rh_HALT present — trading paused")
+            # KEEP THE HEARTBEAT UP WHILE HALTED (cloud's review, item 10). The halt
+            # branch wrote no status at all, so a deliberate pause looked exactly like
+            # a dead laptop and the cloud watchdog duly paged Devon about the machine -
+            # the same confusion publish_degraded was written to end for a dead broker,
+            # reappearing on the one path that is intentional. The kill switch is
+            # unchanged: nothing trades, nothing reconciles. Monitoring just gets to
+            # know WHY, and rh_watchdog reads this reason and says "paused on purpose"
+            # instead of raising an outage.
+            # ONLY DURING MARKET HOURS. This branch sits above the market gate, so an
+            # unconditional publish would commit and push around the clock for as long
+            # as the halt is held - the exact commit storm publish_degraded's own
+            # docstring was written about, which buried the one substantive commit of
+            # an afternoon in the log both sessions read. rh_watchdog returns early on
+            # a closed market anyway, so a heartbeat outside the window informs nobody.
+            if bot.check_market()[0]:
+                publish_degraded(led, "halted_by_rh_HALT")
             if "--once" in sys.argv:      # otherwise --once spins here forever
                 return 0
             time.sleep(FAST_PASS_SEC); continue
@@ -2204,6 +2718,39 @@ def main():
             # spends an extra reconcile here.
             elif full and (time.time() - _last_reconcile) >= RECONCILE_MAX_AGE_SEC:
                 led["needs_reconcile"] = True   # logged at the actual attempt below
+            # THESE RUN BEFORE THE BROKER GATE, deliberately (cloud's review, item 12).
+            # None of them needs broker truth: the Arm A watch reads GitHub, the mail
+            # check reads a file, sync_code reads git. They used to sit AFTER the
+            # needs_reconcile gate, whose two degraded paths both end in `continue`, so
+            # an Arm B broker outage took them all down with it - and those outages have
+            # run 90 to 165 minutes in the usage-limit cases. The worst of that is the
+            # Arm A watch: Arm A is the arm that actually has stops, this is its
+            # dead-man switch, and the case where both arms are in trouble at once is
+            # precisely when it must still fire. Adopting new code mid-outage is also
+            # right, since the outage may be what the new code fixes.
+            # EVERY pass, fast included, not just the full cycle: a stuck Arm A run is exactly the
+            # case where minutes matter, and full cycles are 15 minutes apart. check_arm_a()
+            # self-throttles to 5 minutes and returns immediately outside 09:45-15:55 ET.
+            check_arm_a(led)
+            if full:
+                check_mail(led)   # surface new mailbox entries for this session
+                check_deposit_overdue(led)   # ask, never invent, a missed deposit
+            if full and sync_code(led):
+                save_ledger(led)          # ledger is the source of truth across restarts
+                # Do NOT execv on Windows: it spawns rather than replaces, which is
+                # how three daemons ended up running at once. Exit non-zero and let
+                # Task Scheduler restart exactly one managed instance. The singleton
+                # mutex backs this up if a restart ever races.
+                if sys.platform == "win32":
+                    log("updated code pulled — exiting 42 for a clean task restart")
+                    return 42
+                log("restarting into updated code")
+                try:
+                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                except Exception as e:
+                    log(f"execv failed ({e}) - exiting 42 so the scheduled task restarts us")
+                    return 42
+
             # Held as a ledger flag, not a local variable: if the snapshot is bad
             # we must retry next pass, and roll_day only fires once per day.
             if led.get("needs_reconcile"):
@@ -2277,28 +2824,6 @@ def main():
                         return 0
                     time.sleep(FAST_PASS_SEC)
                     continue
-            # EVERY pass, fast included, not just the full cycle: a stuck Arm A run is exactly the
-            # case where minutes matter, and full cycles are 15 minutes apart. check_arm_a()
-            # self-throttles to 5 minutes and returns immediately outside 09:45-15:55 ET.
-            check_arm_a(led)
-            if full:
-                check_mail(led)   # surface new mailbox entries for this session
-                check_deposit_overdue(led)   # ask, never invent, a missed deposit
-            if full and sync_code(led):
-                save_ledger(led)          # ledger is the source of truth across restarts
-                # Do NOT execv on Windows: it spawns rather than replaces, which is
-                # how three daemons ended up running at once. Exit non-zero and let
-                # Task Scheduler restart exactly one managed instance. The singleton
-                # mutex backs this up if a restart ever races.
-                if sys.platform == "win32":
-                    log("updated code pulled — exiting 42 for a clean task restart")
-                    return 42
-                log("restarting into updated code")
-                try:
-                    os.execv(sys.executable, [sys.executable] + sys.argv)
-                except Exception as e:
-                    log(f"execv failed ({e}) - exiting 42 so the scheduled task restarts us")
-                    return 42
             res = cycle(led, fast=not full)
             if full:
                 last_full = time.time()

@@ -100,8 +100,28 @@ def decide(state, fast=False):
     # ── EXITS (identical rails; always run, even on a halt/fast pass) ─────────
     sold = set()
     for sym, h in held.items():
-        if sym in bot.INDEX_ETFS or h["qty"] <= 0 or h["cost"] <= 0:
+        if sym in bot.INDEX_ETFS:
             continue                                  # index core is buy-and-hold
+        if h["qty"] <= 0:
+            continue
+        if h["cost"] <= 0:
+            # No basis, so every PRICED rail (stop, take-profit, trail, time stop) has
+            # nothing to compare against. WIND-DOWN is the exception and cloud's review
+            # (item 9) is right that it was wrongly caught here: it liquidates to index
+            # regardless of where a name sits, which is the whole point, and these
+            # basis-less legacy holdings are exactly what it exists to clear. The only
+            # reason it was excluded is that the reason string divides by cost, so it
+            # would have raised ZeroDivisionError - a crash dressed as a guard. Now the
+            # wind-down sells it with a basis-free reason, and every other case says so
+            # out loud instead of skipping in silence, because a position no rail can
+            # act on must never be invisible. Dormant today: the book is three ETFs.
+            if WIND_DOWN:
+                _sell(sym, h["qty"], "WIND-DOWN to index (no cost basis on record)")
+                sold.add(sym)
+            else:
+                notes.append(f"{sym}: no usable cost basis (cost {h['cost']}) — priced "
+                             f"exit rails cannot evaluate it, left untouched")
+            continue
         if WIND_DOWN:
             # Exit the whole legacy book regardless of where it sits against
             # its rails. These are being liquidated into ETFs, so a stop level

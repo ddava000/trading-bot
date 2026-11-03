@@ -230,15 +230,23 @@ class OvernightCarryOverTests(unittest.TestCase):
         self.assertGreater(raw, 1000)
         self.assertTrue(all(raw - t >= W.CROSS_WINDOW_MIN for t in W.DEGRADED_ALERT_MIN))
 
+    # CLOCK SHIFTED +15m 2026-11-02 (laptop). These three timestamps were arithmetic
+    # against a 09:30 open, which is the exchange's; rh_watchdog now measures since_open
+    # from session_bounds, i.e. the BOT's 09:45 window, because the old clock expired the
+    # grace ten minutes before the daemon was supposed to be working and overstated every
+    # staleness figure by 15 minutes (cloud's review, item 10). Each value moves by the
+    # same 15 minutes so each test still asserts exactly what it asserted before - 70
+    # minutes into the session, 35 minutes past the grace, between two thresholds. Your
+    # file: re-word freely, the behaviour is what I changed.
     def test_it_alerts_on_the_minutes_of_this_session(self):
-        now = datetime(2026, 9, 30, 10, 40)                                # 70 minutes after the open
+        now = datetime(2026, 9, 30, 10, 55)                                # 70 minutes after the 09:45 open
         rc, sent, _ = run_main(self.history(now), now=now)
         self.assertEqual(rc, 0)
         self.assertEqual(len(sent), 1)
         self.assertIn("about 70 minutes", sent[0][0])
 
     def test_and_stays_quiet_between_thresholds_of_the_new_day(self):
-        now = datetime(2026, 9, 30, 11, 50)                                # 140 minutes in
+        now = datetime(2026, 9, 30, 12, 5)                                 # 140 minutes in
         self.assertEqual(run_main(self.history(now), now=now)[1], [])
 
 
@@ -269,13 +277,13 @@ class DenseTriggerTests(unittest.TestCase):
 
     def test_a_heartbeat_missing_since_yesterday_counts_from_the_open(self):
         y = snap(datetime(2026, 9, 29, 15, 55))
-        first = datetime(2026, 9, 30, 10, 5)                               # 35 minutes after the open
+        first = datetime(2026, 9, 30, 10, 20)                              # 35 minutes after the 09:45 open
         self.assertEqual(len(run_main([y], now=first, **self.DENSE)[1]), 1)
-        later = datetime(2026, 9, 30, 10, 50)                              # 80 minutes after
+        later = datetime(2026, 9, 30, 11, 5)                               # 80 minutes after
         self.assertEqual(run_main([y], now=later, **self.DENSE)[1], [])
 
     def test_the_longer_grace_holds_the_first_check_until_about_ten(self):
-        now = datetime(2026, 9, 30, 9, 50)                                 # 20 minutes after the open
+        now = datetime(2026, 9, 30, 10, 5)                                 # 20 minutes after the 09:45 open
         rc, sent, out = run_main([snap(datetime(2026, 9, 29, 15, 55))], now=now, **self.DENSE)
         self.assertEqual(sent, [])
         self.assertIn("grace", out)
