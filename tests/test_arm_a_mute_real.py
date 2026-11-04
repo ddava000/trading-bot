@@ -13,8 +13,11 @@ cannot see, both reproducible with cloud's real arm_a_watch functions and the da
      "Arm A is running again" through the same callback. That text does not contain the marker, so it is delivered: Devon is
      told Arm A is running again after an alert he never received.
 
-The defect tests are EXPECTED FAILURES: they go red as "unexpected success" when the owner (LAPTOP BOT) fixes the mute; delete
-the markers then. The controls prove the setup can deliver and can suppress.
+History: both defects were found here as EXPECTED FAILURES and fixed by the owner (LAPTOP BOT). The recovery-notice marker was kept
+on purpose for a while because this harness could not show the fix: each check got a fresh {} ledger and _remember_alerts was a no-op,
+so a fix that remembers the muted alert on the ledger was invisible. Now `episode()` hands ONE ledger to both checks and the stub
+records into it exactly as the real _remember_alerts does (setdefault("alerts").update, minus the disk write), and the marker is gone.
+The controls prove the setup can deliver and can suppress, and that a LOST ledger still produces the misleading notice.
 
 Run:  python -m unittest discover -s tests -v
 """
@@ -47,12 +50,17 @@ class Base(unittest.TestCase):
         self.sent, self.logged = [], []
         for name, fn in (("notify", lambda s, b, untrusted=False: (self.sent.append((s, b)), True)[1]),
                          ("log", self.logged.append),
-                         ("_remember_alerts", lambda l, **k: None)):
+                         ("_remember_alerts", self.remember)):
             p = mock.patch.object(D, name, fn)
             p.start()
             self.addCleanup(p.stop)
         D._ARM_A_FIRED.clear()
         self.addCleanup(D._ARM_A_FIRED.clear)
+
+    @staticmethod
+    def remember(led, **kw):
+        """rh_daemon._remember_alerts without save_ledger: what the daemon keeps on its ledger survives into the next check."""
+        led.setdefault("alerts", {}).update(kw)
 
     def deliver_combined(self, levels, muted=True):
         """The daemon's real _deliver, handed the body cloud's real build_alert makes for these signal levels."""
@@ -68,8 +76,11 @@ class Base(unittest.TestCase):
             D.check_arm_a({})
         return subject, body, urgent, captured["result"]
 
-    def episode(self, muted=True):
-        """Real run_once, real daemon callback: one check with a run waiting 7 minutes, then a healthy check 5 minutes later."""
+    def episode(self, muted=True, lose_ledger=False):
+        """Real run_once, real daemon callback: one check with a run waiting 7 minutes, then a healthy check 5 minutes later.
+        The SAME ledger dict goes to both checks, as in production (rh_daemon loads it once and passes it on). lose_ledger=True hands
+        the second check a fresh one: what a restart that lost the ledger looks like."""
+        ledger = {}
         state = {"now": NOW, "runs": [row(NOW - timedelta(minutes=7), "queued", 1)], "commit": NOW - timedelta(minutes=10)}
 
         def drive(**kw):
@@ -79,12 +90,12 @@ class Base(unittest.TestCase):
                                      get_runs=lambda: state["runs"], get_job_state=lambda rid: False, sender="LAPTOP BOT")
         with mock.patch.object(D, "ARM_A_MUTE_QUEUED", muted), mock.patch.object(A, "run_once", drive):
             D._ARM_A_NEXT = 0
-            D.check_arm_a({})                                           # the false alert (muted or not)
+            D.check_arm_a(ledger)                                       # the false alert (muted or not)
             state["now"] = NOW + timedelta(minutes=5)
             state["runs"] = [row(state["now"] - timedelta(minutes=2), "in_progress", 2)]
             state["commit"] = state["now"] - timedelta(minutes=3)
             D._ARM_A_NEXT = 0
-            D.check_arm_a({})                                           # the row finally says what it should
+            D.check_arm_a({} if lose_ledger else ledger)                # the row finally says what it should
         return [s for s, _ in self.sent]
 
 
@@ -115,19 +126,19 @@ class WhatTheMuteLets_Slip(Base):
         self.assertTrue(any("has not been committed" in body for _, body in self.sent),
                         "the whole body was dropped, including the stale line: %r" % (self.sent,))
 
-    # MARKER KEPT ON PURPOSE (laptop, 2026-10-26). The defect IS fixed, and this harness
-    # cannot show it: Base stubs _remember_alerts to a no-op and episode() passes a fresh
-    # {} to each check, so a fix that remembers the muted alert anywhere durable is
-    # invisible here, and the only fix this test could accept is a module global - the
-    # thing this file has got wrong five times. Proof in the production shape (one ledger,
-    # a recorder that records, plus a restart mid-episode) is tests/test_arm_a_mute_ledger.py.
-    # Cloud's call: share one dict across the two calls and let the recorder mutate it, and
-    # this flips too.
-    @unittest.expectedFailure
+    # The marker that stood here (laptop, 2026-10-26: "the defect IS fixed, and this harness cannot show it") is removed
+    # 2026-11-04: one ledger now goes to both checks and the stub records into it, which is the production shape. The
+    # restart-mid-episode proof is still tests/test_arm_a_mute_ledger.py.
     def test_no_running_again_notice_is_sent_for_an_alert_the_mute_swallowed(self):
         subjects = self.episode(muted=True)
         self.assertEqual([s for s in subjects if "running again" in s], [],
                          "Devon was told Arm A is running again after an alert he never received: %r" % (subjects,))
+
+    def test_control_a_lost_ledger_still_produces_the_misleading_notice(self):
+        """So the test above is green because the ledger remembers, not because nothing can send the notice: with the ledger lost
+        between the two checks (the state a restart WITHOUT the persisted flag leaves), the notice is delivered."""
+        subjects = self.episode(muted=True, lose_ledger=True)
+        self.assertTrue([s for s in subjects if "running again" in s], "a lost ledger must still deliver the notice: %r" % (subjects,))
 
 
 if __name__ == "__main__":
