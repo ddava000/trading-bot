@@ -2596,6 +2596,14 @@ def report_downtime(led):
         if boot is None:
             cause = ("Could not read this machine's boot time, so whether the LAPTOP went away or "
                      "only this daemon did is unknown.")
+            # A planned adoption on record does NOT downgrade this to a note (cloud's D2,
+            # 2026-11-03). The mark's whole premise is that only the daemon went away, and an
+            # unreadable boot time is precisely what cannot establish that - a reboot inside
+            # the gap already overrides the mark, so a FAILED READ has to fall to the same
+            # side rather than the reassuring one. Say what is on record and keep the alert.
+            if (led.get("alerts") or {}).get("planned_restart_stamp") == stamp:
+                cause += (" A code-adoption restart IS on record for this gap and may account for "
+                          "part of it, but with no boot time that cannot be confirmed.")
         elif rebooted:
             # Name the cause in the mail rather than sending Devon to Event Viewer. On
             # 2026-10-08 the first version of this pointed only at Kernel-Power 41 and
@@ -2636,9 +2644,16 @@ def report_downtime(led):
         # this stamp, and only after the selftest gate passed, so the cost is explained
         # before it is incurred - but the stamp is the heartbeat rh_status.json HELD AT
         # THAT MOMENT, and at the session open that is the previous session's last pass.
-        # The daemon does not run overnight, so the gap this mark matches is routinely
-        # ~18h of shut market: claiming it as the restart would be false, and on a
-        # morning the task fired late it would excuse real blindness. Hence the bound.
+        # The gap this mark matches is therefore routinely ~18h of shut market: claiming
+        # it as the restart would be false, and on a morning the task fired late it would
+        # excuse real blindness. Hence the bound. (Why that stamp is stale is NOT that the
+        # process died - I wrote "the daemon does not run overnight" here on 2026-11-03 and
+        # it is false. Status is only written during market hours, so the held heartbeat is
+        # the previous session's last pass whether or not the daemon survived the night, and
+        # measured 10-27 to 11-04 it usually DOES survive: the day roll logs "new session"
+        # every trading morning while "rh_daemon starting" appears only when something
+        # actually restarted it. The conclusion the bound rests on is unchanged either way,
+        # but anyone reasoning about in-process state from that sentence would be wrong.)
         # The mechanism it exists for is narrow: a mid-day adoption's gap is one
         # heartbeat plus the restart, ~110s, which never reaches DOWNTIME_MIN_SEC and is
         # already silent. What reaches the mail is the OPEN, where a 52s restart pushes
@@ -2651,7 +2666,7 @@ def report_downtime(led):
         # cost nothing tradeable still sends nothing at all.
         _al = led.get("alerts") or {}
         planned = (bool(_al.get("planned_restart_stamp") == stamp) and not rebooted
-                   and mins <= PLANNED_RESTART_MAX_MIN)
+                   and boot is not None and mins <= PLANNED_RESTART_MAX_MIN)
         if planned:
             _to = _al.get("planned_restart_to") or "?"
             cause = ("The MARKET MINUTES in this gap are the daemon's own restart to load new "

@@ -1090,6 +1090,42 @@ class HaltIsAReminderNotAStream(unittest.TestCase):
         self.assertEqual(len(sent), 1, "%r" % (sent,))
         self.assertIn("PAUSED BY rh_HALT", sent[0][0])
 
+    # -- cloud's D1, 2026-11-03: the reminder must not ride on a dropped cron ---------
+    # rh-watchdog.yml's own per-trigger overrides for workflow_run (after each Arm A pass).
+    RUN_TRIGGER = dict(GRACE_MIN=30, CROSS_WINDOW_MIN=20)
+
+    def test_the_daily_reminder_reaches_the_narrow_window_trigger(self):
+        """Cloud measured ZERO reminders on day two of a held pause from workflow_run alone:
+        the reminder rode entirely on the */30 cron, which rh-watchdog.yml records GitHub
+        running 1 to 3 times a day. The notice exists so Devon does not forget the bot is
+        paused while deposits sit uninvested, so it must not depend on a schedule GitHub
+        drops. Real main(), that trigger's own constants, Arm A's real 15-minute spacing."""
+        sent = []
+        for at in (9 * 60 + 44, 9 * 60 + 59, 10 * 60 + 14,
+                   10 * 60 + 29, 10 * 60 + 44, 10 * 60 + 59):
+            now = W.datetime(2026, 9, 30, at // 60, at % 60)
+            sent += run_main(self._history(now, self.AGED), now=now, **self.RUN_TRIGGER)[1]
+        self.assertGreaterEqual(len(sent), 1,
+                                "a held pause got no reminder from workflow_run alone")
+        self.assertLessEqual(len(sent), 2, "a reminder is not a stream: %d" % len(sent))
+
+    def test_the_reminder_minute_clears_the_narrow_triggers_grace(self):
+        """The RELATION, not the number - this is how D1 happened and how it would return.
+        The grace runs from the bot's 09:45 open, so the workflow_run trigger is silent
+        until 09:45+GRACE_MIN, while crossed() stops accepting the threshold
+        CROSS_WINDOW_MIN after it. A reminder set BEFORE the grace expires forfeits that
+        overlap, and what is left can be narrower than the run spacing: at 10:00 it was
+        five minutes against runs every fifteen. Asserted so that moving the grace fails
+        here rather than quietly re-silencing the reminder."""
+        expires = (9 * 60 + 45) + self.RUN_TRIGGER["GRACE_MIN"]
+        self.assertGreaterEqual(W.HALT_REMIND_AT_MIN, expires,
+                                "the reminder at %d is inside the grace, which expires at %d"
+                                % (W.HALT_REMIND_AT_MIN, expires))
+        usable = (W.HALT_REMIND_AT_MIN + self.RUN_TRIGGER["CROSS_WINDOW_MIN"]) - expires
+        self.assertGreaterEqual(usable, 15,
+                                "only %dm of the window is reachable; Arm A runs every 15m"
+                                % usable)
+
 
 class HaltHeartbeatIsMarketGated(Floor):
     """Mine, found reviewing my own fix: the halt branch sits ABOVE the market gate.

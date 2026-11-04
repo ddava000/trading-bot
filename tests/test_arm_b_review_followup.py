@@ -306,7 +306,6 @@ class HaltDayIsAFewMessages(unittest.TestCase):
         self.assertGreaterEqual(len(sent), 1)
         self.assertLessEqual(len(sent), 2, "a daily reminder is not a stream: %d" % len(sent))
 
-    @unittest.expectedFailure
     def test_the_daily_reminder_does_not_depend_on_the_cron_slots(self):
         """The same next morning, workflow_run alone. 0 messages: HALT_REMIND_AT_MIN is 10:00, the
         workflow_run trigger passes GRACE_MIN=30 (silent until 10:15) and a 20-minute window, so only
@@ -367,7 +366,6 @@ class PlannedRestartBootTimeUnreadable(unittest.TestCase):
         subject, body = self.report(time.time() - 999999, marked=True)
         self.assertIn("adopted new code", subject)
 
-    @unittest.expectedFailure
     def test_marked_with_an_unreadable_boot_time_still_says_the_boot_time_is_unknown(self):
         subject, body = self.report(None, marked=True)
         self.assertIn("boot time", body,

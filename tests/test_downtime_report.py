@@ -115,9 +115,10 @@ class DowntimeReportTests(unittest.TestCase):
     #
     # THE MARK EXPLAINS THE MARKET MINUTES, NOT THE GAP, and the fixtures here use a
     # multi-day gap deliberately. The stamp it keys on is the heartbeat rh_status.json
-    # held when sync_code ran, and the daemon does not run overnight, so at the open
-    # that heartbeat is the previous session's last pass and the gap is ~18h of shut
-    # market. A mid-day adoption cannot reach this branch at all: its gap is one
+    # held when sync_code ran, and status is only written during market hours, so at the
+    # open that heartbeat is the previous session's last pass - whether or not the daemon
+    # survived the night, which measured 10-27 to 11-04 it usually does - and the gap is
+    # ~18h of shut market. A mid-day adoption cannot reach this branch at all: its gap is one
     # heartbeat plus the restart, ~110s, well under DOWNTIME_MIN_SEC. So the bound
     # below is not belt-and-braces, it is the whole safety property.
 
@@ -171,6 +172,30 @@ class DowntimeReportTests(unittest.TestCase):
         stamp = self.stamp_ago(4000)
         sent, _ = self.call(stamp, D.PLANNED_RESTART_MAX_MIN, time.time() - 999999,
                             led=self._marked(stamp))
+        self.assertIn("adopted new code", sent[0][0])
+
+    def test_a_mark_cannot_file_a_quiet_note_when_the_boot_time_is_unreadable(self):
+        """Cloud's D2, 2026-11-03. The mark's premise is that ONLY the daemon went away, and
+        an unreadable boot time is exactly what cannot establish that - a reboot inside the
+        gap already overrides the mark, so a failed read has to fall to the same side. Before
+        the fix the planned branch overwrote the cause the boot-is-None branch had just set,
+        so the sentence saying the boot time was unknown vanished and the mail said the gap
+        needed no action: this file's rule is that an unmeasurable thing is never read as
+        fine, and I had broken it in the one branch where it was convenient."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 3, None, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        subject, body = sent[0]
+        self.assertIn("blind 3 market minute(s)", subject,
+                      "a mark filed a gap nobody could measure as needing no action")
+        self.assertIn("boot time", body)
+        self.assertIn("code-adoption restart IS on record", body,
+                      "falling back to the alert must not throw away what we do know")
+
+    def test_control_a_mark_with_a_readable_boot_is_still_the_quiet_note(self):
+        """The control, so the fix above is a narrowing and not a removal."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 3, time.time() - 999999, led=self._marked(stamp))
         self.assertIn("adopted new code", sent[0][0])
 
     def test_a_mark_from_an_earlier_restart_cannot_quiet_a_later_gap(self):

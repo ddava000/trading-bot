@@ -73,11 +73,27 @@ STALE_ALERT_MIN = _env_tuple("WATCHDOG_STALE_ALERT_MIN", ())
 # First threshold 60, not 45: since dd21a55 the daemon itself alerts at 15 min, so
 # this is the independent BACKSTOP, not a second copy of the same mail.
 DEGRADED_ALERT_MIN = (60, 180, 360)
-# Minute-of-day for the once-a-day rh_HALT reminder. 10:00 ET deliberately: the pause is
-# not urgent, and this is the first slot after the open where knowing about it still lets
-# Devon act on the same trading day. Gated through crossed() on the WALL CLOCK rather
-# than on a duration, because the watchdog keeps no state between runs.
-HALT_REMIND_AT_MIN = 10 * 60
+# Minute-of-day for the once-a-day rh_HALT reminder. The pause is not urgent, so this is
+# the first slot after the open where knowing still lets Devon act the same trading day.
+# Gated through crossed() on the WALL CLOCK rather than on a duration, because the
+# watchdog keeps no state between runs.
+#
+# 10:15, NOT 10:00, AND IT MUST NOT PRECEDE THE GRACE EXPIRY. Cloud measured this on
+# 2026-11-03: at 10:00 the reminder arrived only on the */30 cron slots, and the header
+# above records GitHub running that cron 1 to 3 times a day, so a held pause often got no
+# reminder at all. The cause is an OVERLAP, not the cadence. The workflow_run trigger
+# passes GRACE_MIN=30 and CROSS_WINDOW_MIN=20, and the grace is measured from the bot's
+# 09:45 open, so that trigger is silent until 10:15 - while crossed() stops accepting a
+# 10:00 threshold at 10:20. That left 10:15 to 10:19, five minutes, for runs arriving
+# every fifteen. Putting the reminder AT the grace expiry opens the whole 20-minute
+# window, which is wider than the run spacing and therefore guarantees a run lands in it:
+# the property crossed()'s own docstring is built on.
+#
+# COUPLED to WATCHDOG_GRACE_MIN and to session_bounds' 09:45 open - it must stay >= open
+# + grace, or the narrow-window trigger goes back to missing it silently. The test pins
+# that RELATION rather than this number, so moving the grace fails a test instead of
+# quietly un-fixing the reminder.
+HALT_REMIND_AT_MIN = 10 * 60 + 15
 GRACE_MIN = _env_int("WATCHDOG_GRACE_MIN", 5)     # Devon 2026-08-04: minimal delay after the open. The 30-min
                   # workflow schedule still lands the first live check at ~10:00 ET
                   # (first run once the market is open), which is right after the
