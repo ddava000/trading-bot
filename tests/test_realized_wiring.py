@@ -97,6 +97,27 @@ class FailureModeTests(FakeBrokerCase):
         self.assertIn("unavailable", s["reason"])
         self.assertEqual(s["as_of"], "2026-08-13T14:00:00Z")
 
+    def test_an_unverified_ledger_is_not_relabelled_stale_when_the_refresh_fails(self):
+        """2026-11-04: the carry-forward used to set state "stale" whatever the last ledger said, so an UNVERIFIED figure (fills that
+        never reconciled with the broker) printed as "STALE, last good" and lost its warning. Arm B's block already kept it.
+        NOTE: if this regresses it reports as ERROR "'bool' object is not callable", not FAIL: this harness uses `self.fail` as a
+        boolean flag, which shadows TestCase.fail. The assertion that raised it is the line that names the state."""
+        self.pos_qty = 7.0
+        self.assertEqual(self.fresh()["state"], "unverified")              # the committed ledger now says so
+        self.fail = True
+        s = self.fresh()
+        self.assertEqual(s["state"], "unverified")
+        self.assertIn("AAA", s["reason"])                                  # the original warning survives
+        self.assertIn("refresh failed", s["reason"])                       # and so does the fact that this is carried forward
+        line = R.report_line("Arm A", s, 2026)
+        self.assertIn("UNVERIFIED", line)
+        self.assertNotIn("STALE", line)
+
+    def test_control_an_ok_ledger_is_still_carried_forward_as_stale(self):
+        self.fresh()
+        self.fail = True
+        self.assertEqual(self.fresh()["state"], "stale")
+
     def test_no_ledger_and_api_down_is_unknown_never_zero(self):
         self.fail = True
         s = self.fresh()

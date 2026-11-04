@@ -28,8 +28,10 @@ METHOD, stated so a cold reader can challenge it:
   5. Dividends, interest and fees are excluded. Realized capital gain/loss only.
 
 WASH SALES: a loss is not deductible (yet) if the same security was bought within 30
-days before or after the sale. This module only WATCHES for them: it reports an UPPER
-BOUND on the affected loss so the number is not read as a clean deduction. It does not
+days before or after the sale. The watch is LOT BY LOT: a sale is netted for the realized
+totals above, but a sale that closes a winning and a losing lot has a loss lot a replacement
+purchase can still disallow, so the watch looks at the losing lots alone. This module only
+WATCHES for them: it reports an UPPER BOUND on the affected loss so the number is not read as a clean deduction. It does not
 adjust any total, and only Devon's tax preparer can decide what applies. The rule also
 spans ALL of a taxpayer's accounts, including IRAs, and a broker only reports the
 wash sales it can see within one account.
@@ -177,13 +179,14 @@ def summarize_by_year(closed):
     return {y: summarize([l for l in closed if l["close_date"][:4] == y]) for y in years}
 
 
-def cross_watch(ledger_x, ledger_y, days=WASH_DAYS):
+def cross_watch(ledger_x, ledger_y, days=WASH_DAYS, extra_buys=None):
     """Loss sales in account X that MAY be wash sales because account Y bought the same
     symbol within 30 days either side. The rule spans accounts, but a broker only sees
-    its own, so nobody reports these on a 1099-B. Buys come from Y's ledger.
+    its own, so nobody reports these on a 1099-B. Buys come from Y's ledger, plus
+    `extra_buys` (see log_buys_after): purchases the ledger has not been re-pulled for yet.
     Returns the same list shape as wash_watch, all scope 'cross-account'."""
     buys = [{"t": b["t"], "symbol": b["symbol"], "side": "buy", "qty": b["qty"]}
-            for b in (ledger_y.get("buys") or [])]
+            for b in (ledger_y.get("buys") or [])] + list(extra_buys or [])
     return [w for w in wash_watch(ledger_x.get("closed") or [], [], buys, days)
             if w["scope"] == "cross-account"]
 
@@ -196,35 +199,49 @@ def wash_watch(closed, fills, other_fills=None, days=WASH_DAYS):
     several loss sales, so the total can overstate; that is why it is an upper bound.
     other_fills is the OTHER account's fills, checked as 'cross-account': the rule
     spans accounts but no broker will report a cross-account wash sale.
+
+    LOT BY LOT. A sale that closes a winning lot and a losing lot nets to a gain in the
+    realized totals, but the wash-sale rule disallows the losing lot's loss regardless of
+    the other lot's gain, so the watch judges the LOSING lots only (their loss, their
+    quantity). Netting the sale first dropped such a sale from the watch altogether.
+    A replacement buy whose quantity is None (the Arm B log records dollars, not shares)
+    is counted as replacing the whole loss: the upper bound cannot be lower than that.
     """
     by_sale = {}
     for l in closed:
         by_sale.setdefault(l["sale"], []).append(l)
     out = []
     for lots in by_sale.values():
-        loss = round(sum(l["gain"] for l in lots), 2)
+        losers = [l for l in lots if l["gain"] < 0]
+        loss = round(sum(l["gain"] for l in losers), 2)
         if loss >= 0:
             continue
         sym = lots[0]["symbol"]
         cd = date.fromisoformat(lots[0]["close_date"])
-        sold = sum(l["qty"] for l in lots)
-        own = {l["open_fill"] for l in lots}
+        sold = sum(l["qty"] for l in losers)
+        own = {l["open_fill"] for l in lots}           # everything the sale itself consumed, winners included
         for scope, src in (("same-account", fills), ("cross-account", other_fills or [])):
-            rq, n = 0.0, 0
+            rq, n, unknown = 0.0, 0, 0
             for i, f in enumerate(src):
                 if str(f["side"]).lower() != "buy" or f["symbol"] != sym:
                     continue
                 if scope == "same-account" and i in own:
                     continue
                 if abs((trade_date(f["t"]) - cd).days) <= days:
-                    rq += float(f["qty"])
+                    if f.get("qty") is None:
+                        unknown += 1
+                    else:
+                        rq += float(f["qty"])
                     n += 1
-            if rq > EPS:
-                frac = min(1.0, rq / sold) if sold > EPS else 1.0
-                out.append({"symbol": sym, "sale_date": cd.isoformat(), "loss": loss,
-                            "sold_qty": round(sold, 6), "replacement_qty": round(rq, 6),
-                            "replacement_buys": n, "upper_bound": round(loss * frac, 2),
-                            "scope": scope})
+            if rq > EPS or unknown:
+                frac = 1.0 if unknown else (min(1.0, rq / sold) if sold > EPS else 1.0)
+                entry = {"symbol": sym, "sale_date": cd.isoformat(), "loss": loss,
+                         "sold_qty": round(sold, 6), "replacement_qty": round(rq, 6),
+                         "replacement_buys": n, "upper_bound": round(loss * frac, 2),
+                         "scope": scope}
+                if unknown:
+                    entry["replacement_buys_qty_unknown"] = unknown
+                out.append(entry)
     return sorted(out, key=lambda w: (w["sale_date"], w["symbol"], w["scope"]))
 
 
@@ -384,6 +401,36 @@ def rh_sells_logged(log_path="rh_trade_log.jsonl"):
     return n
 
 
+def log_buys_after(after, log_path="rh_trade_log.jsonl"):
+    """Arm B buys the daemon logged on a date STRICTLY AFTER `after` (an ISO date, or "" for all), as cross_watch buys.
+
+    realized_b.json is re-pulled from the broker only when a sale makes it stale, so its buys can end weeks before today
+    (2026-09-28 while the log held buys to 11-02), and Arm B buys SPY, QQQ and IWM every week, which Arm A also trades. The
+    log records DOLLARS, so the quantity is None and wash_watch counts such a buy as replacing the whole loss. Everything
+    except an explicit rejection counts, like rh_sells_logged: a buy logged "unknown" may really have filled. Dates
+    after the ledger's newest buy avoid double counting; a buy missing from the ledger on that same day is the one limit.
+    Returns None if the log cannot be read (the caller says so rather than reporting calm).
+    """
+    import json
+    out = []
+    try:
+        with open(log_path, encoding="utf-8") as f:
+            for ln in f:
+                ln = ln.strip()
+                if not ln:
+                    continue
+                try:
+                    r = json.loads(ln)
+                except Exception:
+                    continue
+                day = str(r.get("ts") or "")[:10]
+                if r.get("action") == "buy" and r.get("status") != "rejected" and r.get("symbol") and day > (after or ""):
+                    out.append({"t": day, "symbol": r["symbol"], "side": "buy", "qty": None})
+    except OSError:
+        return None
+    return out
+
+
 def arm_b_block(ledger_path="realized_b.json", log_path="rh_trade_log.jsonl",
                 status_path="rh_status.json"):
     """Arm B's realized block, with staleness detected rather than assumed away.
@@ -465,12 +512,13 @@ def combined_line(a, b, year=None):
     return line
 
 
-def cross_totals(ledger_a, ledger_b, year=None):
+def cross_totals(ledger_a, ledger_b, year=None, b_log_buys=None):
     """Loss-sale exposure BETWEEN the accounts, upper bound, both directions. With `year`,
-    only losses SOLD in that year (see watch_for_year)."""
+    only losses SOLD in that year (see watch_for_year). b_log_buys: Arm B buys newer than its
+    ledger (log_buys_after); Arm A's ledger is rewritten every run, so only B's side needs them."""
     if not ledger_a or not ledger_b:
         return None
-    ab = cross_watch(ledger_a, ledger_b)      # A's losses vs B's later/earlier buys
+    ab = cross_watch(ledger_a, ledger_b, extra_buys=b_log_buys)      # A's losses vs B's later/earlier buys
     ba = cross_watch(ledger_b, ledger_a)
     if year is not None:
         ab, ba = watch_for_year(ab, year), watch_for_year(ba, year)
@@ -515,12 +563,17 @@ def repo_report_lines(a_block=None, year=None, status_path="status.json",
     yr = int(year or today.year)
     wa, wb = [(led or {}).get("wash_watch") for led in (la, lb)]
     wa, wb = (wa if isinstance(wa, list) else None), (wb if isinstance(wb, list) else None)
+    newest_b_buy = max((b.get("t", "") for b in ((lb or {}).get("buys") or [])), default="")
+    b_log_buys = log_buys_after(newest_b_buy, log_path) if lb else None
 
     def year_lines(y):
         out = [report_line("Arm A (Alpaca)", a_block, y, wa),
                report_line("Arm B (Robinhood)", b_block, y, wb),
                combined_line(a_block, b_block, y)]
-        x = cross_totals(la, lb, y)
+        x = cross_totals(la, lb, y, b_log_buys)
+        if lb and b_log_buys is None:
+            out.append("Cross-account wash-sale watch %d: Arm B's recent buys could not be read, so Arm A's exposure "
+                       "may be understated" % y)
         if x:
             a, b = x["a_losses_vs_b_buys"], x["b_losses_vs_a_buys"]
             if a["sales"] or b["sales"]:

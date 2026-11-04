@@ -1132,8 +1132,14 @@ def realized_for_run():
             with open(REALIZED_F, encoding="utf-8") as _rf:
                 last = json.load(_rf)["summary"]
             last = dict(last)
-            last.update({"state": "stale", "reason": block.get("reason", "refresh failed"),
-                         "as_of": last.get("last_fill")})
+            why = block.get("reason", "refresh failed")
+            if last.get("state") == "unverified":
+                # An UNVERIFIED ledger stays unverified: relabelling it "stale, last good" would drop the warning that
+                # its fills never reconciled with the broker and present it as a number that was once fine.
+                last.update({"reason": "%s [refresh failed, carried forward: %s]" % (last.get("reason") or "does not reconcile", why),
+                             "as_of": last.get("last_fill")})
+            else:
+                last.update({"state": "stale", "reason": why, "as_of": last.get("last_fill")})
             block = last
         except Exception:
             pass                                 # nothing to carry forward: stay unknown
