@@ -20,6 +20,36 @@ order to follow when Devon says "check mail".
 - **Backtests are hypothetical by default.** Running `backtest.py` touches nothing
   live. Never apply a backtest finding to a live bot without Devon saying so.
 
+## EVIDENCE RULES (Devon 2026-11-04: "no more sloppy decisions"). Both sessions, no exceptions.
+Why they exist: in the fortnight before this was written, wrong statements reached Devon or reached code. An
+"Arm A is late" alert was false (2026-11-04 11:11, status.json 40 seconds old). A run was reported as having
+overrun its timeout and left stops uncovered; it had not, the report came from a stale run row. "The daemon does
+not run overnight" went into code and tests as the reason for a safety bound; it usually does. A comment calling
+the repeat-trim "deliberate" survived four reviews. A mailbox entry described a state the commit was not in.
+A rule cannot make a mistake impossible. Rules 2 and 3 are the ones a test can enforce, and each gets a test
+that fails the build (the arm_a_watch fix of 2026-11-04 adds them; until that lands, nothing enforces them).
+The others are discipline, and a reviewer should check them.
+1. **A fact is something you reproduced in this session.** Anything you tell Devon or write into mail, a
+   comment or a test as fact (what happened, why, for how long, whether money or stops were exposed) comes from
+   output you read: a command, a run id, a commit, a log line, a file:line. Say which. Say what you did NOT
+   check in the same breath ("not verified: ..."). A cause nobody measured is a hypothesis and is labelled one,
+   never a "because". Do not repeat the other session's or a subagent's claim as fact; verify it or attribute it.
+2. **No first-level alert rests on one source.** An alert that can mail Devon needs a second signal that shares
+   no failure mode with the first (git against the Actions API, the broker against the laptop's own counter).
+   If a source can lie (GitHub served job state 21 minutes stale on 2026-11-04), say what corroborates it, or the
+   alert is not allowed to fire alone. An unreadable source is "cannot tell", never "fine".
+3. **Replay before you change an alarm.** Any change to when an alert fires (threshold, mute, gate, dedupe, a
+   new signal) is run against EVERY dated past episode on record, the real alarms that must still fire AND
+   the false ones that must now stay quiet, in a test that loads the recorded episodes and calls the real
+   function. The episode table lives in tests/ and grows with every incident. No replay, not done. A change
+   that quiets a path must carry the control proving a true event still gets through.
+4. **A false alert is a defect with a deadline.** Keep the evidence next to the alert (written to disk or into
+   the body, never only a module global that a restart wipes). Name the owner in the next mail. Fix it or
+   replace the signal within one trading day. Tell Devon once, what it was and what changed, not in pieces.
+5. **Re-read before you send.** Before a mailbox entry, commit message or report to Devon goes out, check every
+   sentence that describes a state (what the repo contains, what a test does, what a file says) against the
+   final diff or data with a command, not from memory. If the draft predates the last change, redo it.
+
 ## The two bots (both trade REAL money; corrected 2026-09-30, this section used to say paper)
 - **Arm A, the cloud bot** (`alpaca_bot.py`): Alpaca LIVE, ~$240, the HYBRID: index 50 /
   hold 25 / trade 20 / crypto 0. Runs in GitHub Actions every 15 min (triggered by
