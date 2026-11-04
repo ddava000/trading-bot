@@ -26,9 +26,13 @@ Why they exist: in the fortnight before this was written, wrong statements reach
 overrun its timeout and left stops uncovered; it had not, the report came from a stale run row. "The daemon does
 not run overnight" went into code and tests as the reason for a safety bound; it usually does. A comment calling
 the repeat-trim "deliberate" survived four reviews. A mailbox entry described a state the commit was not in.
-A rule cannot make a mistake impossible. Rules 2 and 3 are the ones a test can enforce, and each gets a test
-that fails the build (the arm_a_watch fix of 2026-11-04 adds them; until that lands, nothing enforces them).
-The others are discipline, and a reviewer should check them.
+A rule cannot make a mistake impossible. Rules 2 and 3 are the ones a test can enforce. For Arm A's QUEUED alert they
+are enforced as of 2026-11-04: tests/test_arm_a_watch_replay.py replays 12 recorded instants through the real
+run_once, each with a control that must say the opposite, and pins that a first-level queued alert stays quiet when
+git shows the run's own pass committed even though both Actions endpoints say queued. It does NOT close the class
+where a stale read lands while the pass is still running (wait 6 to about 10.5 minutes): there git has no evidence
+yet, so that alert still rests on the Actions API alone, and a test says so. Every OTHER alert (the Arm B watchdog,
+the daily digest) is still discipline, and so are rules 1, 4, 5 and 6; a reviewer should check them.
 1. **A fact is something you reproduced in this session.** Anything you tell Devon or write into mail, a
    comment or a test as fact (what happened, why, for how long, whether money or stops were exposed) comes from
    output you read: a command, a run id, a commit, a log line, a file:line. Say which. Say what you did NOT
@@ -49,6 +53,16 @@ The others are discipline, and a reviewer should check them.
 5. **Re-read before you send.** Before a mailbox entry, commit message or report to Devon goes out, check every
    sentence that describes a state (what the repo contains, what a test does, what a file says) against the
    final diff or data with a command, not from memory. If the draft predates the last change, redo it.
+6. **Think it through before you code (Devon 2026-11-04: "sloppy coding without thinking it through").** For a
+   change to a money path, an alert or a monitor, write the design down BEFORE the first edit (in the commit body
+   or the mail, short): what each input can do wrong (stale, missing, late, wrong, unreadable); what each of those
+   does to the output (who is mailed, what trades or stops are affected); which recorded constraint the change
+   must not break (find the existing test or replay that pins it and RUN it first); and which cases must still
+   work afterwards. A design that was not run against the recorded episodes is a guess. A suggestion from
+   another session or a subagent is a hypothesis: run it through the same steps before you write it. Example,
+   2026-11-04: LAPTOP BOT suggested suppressing first-level "queued" while status.json is under 13 minutes old.
+   On the recorded 2026-10-05 stuck run that moves the detection from 6.8 to 9.8 minutes and fails the test that
+   pins the six-minute detection; it was caught because the code and that test were read before anything was written.
 
 ## The two bots (both trade REAL money; corrected 2026-09-30, this section used to say paper)
 - **Arm A, the cloud bot** (`alpaca_bot.py`): Alpaca LIVE, ~$240, the HYBRID: index 50 /
@@ -211,7 +225,8 @@ it). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, la
 never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
 line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test. BOT DAILY CHECK and LAPTOP BOT DAILY CHECK were RETIRED
 2026-10-17 (Devon): one froze, one was killed by the shared Claude limit, both silently, and a GitHub workflow (DAILY DIGEST) now
-sends the daily summary. They stay in `mail_check.DISPLAY` as `RETIRED`: mail addressed to them wakes nobody.
+sends the daily summary. They stay in `mail_check.DISPLAY` under their plain names (so old headings still parse) and are marked retired by
+the separate `mail_check.RETIRED` dict (`--aligned` reads that): mail addressed to them wakes nobody.
 **"Check mail" (Devon 2026-10-01) means the same thing to every session**: `git pull`, then
 `python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by HEADING against the list you have already seen,
 never by comparing timestamps and not by position: a merge can put another session's entry above your own), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
@@ -264,6 +279,15 @@ is sent and withdrawn if nothing is waiting. Every alert subject now ends "(chec
 Every read it makes is a cache miss by construction (unique query parameter, no-cache headers; an unauthenticated REST read is
 "public, max-age=60" and only the laptop's copy, which has no token, false-alerted), and a queued alert ends with a sentence
 saying what GitHub returned to that check (run row, jobs, cache headers). Do not remove either without reading the 10-22 mailbox thread.
+The QUEUED signal has a second source that is NOT the Actions API (2026-11-04: the API served a finished job as queued for 6 minutes and
+a false alert went out 32 s after the run completed). status.json's `ts` is when a pass STARTED, and the workflow runs passes one at a time
+in creation order, so a queued run is not waiting if the newest status.json commit holds a pass that started at or after that run was
+created (`arm_a_watch.pass_started_after`). Not a commit age (a healthy pass and the 10-05 stuck run both show ~10 minutes at the six-minute
+mark; a 13-minute guard moved 10-05 from 6.8 to 9.8 minutes) and not "any commit since" (a slow predecessor's commit would hide a run still
+waiting). It corrects the FIRST level only: urgent (20 min), no_trigger and stale are judged on the raw data. A job counts as started on a
+step that ran or a runner assigned as well as its status word; started_at, completed_at and conclusion are NOT proof (the 10-05 job that never
+got a machine carries all three). Missing or inconsistent git data leaves the run counted as waiting. Residual: a stale read before the pass's
+own commit exists (the five 10-22 mails) has no git evidence; and a stale "queued" row that outlives 20 minutes still pages as urgent.
 Arm A's COVERAGE (the DAILY DIGEST's unplanned minutes, `arm_a_downtime.py --by-jobs`) is measured from each run's JOB, not the run span: a run can sit
 4 to 13 minutes before GitHub creates its job (seven times on 2026-10-26, no incident listed) and nothing is executing meanwhile, so the run-span figure said 0 for
 a morning with 34 unwatched minutes. The 6-minute QUEUED alert was right on those; it was wrong on 2026-10-22 when the job existed from second zero.
