@@ -28,6 +28,11 @@ Usage:
   python mail_check.py --for audit              # only entries addressed to audit/both/all
   python mail_check.py --for audit --since-hours 24   # stateless, for a daily cron
   python mail_check.py --quiet                  # no email, exit code only (0 none, 1 new)
+  python mail_check.py --inbox "<NAME>" [--ack] # what is unread for one session (see the INBOX section)
+  python mail_check.py --aligned                # who has confirmed the latest ALIGNMENT CHECK
+  python mail_check.py --help                   # this text; touches nothing
+Any other --flag is an error (exit 2) and touches nothing: the stateful default below writes a state file and can
+send email, so a typo of --inbox must not fall into it.
 """
 import os, re, json, sys, smtplib
 
@@ -416,7 +421,19 @@ def send(subject, body):
         print(f"[email failed: {e}]"); return False
 
 
+KNOWN_FLAGS = ("--ack", "--aligned", "--for", "--inbox", "--quiet", "--since-hours")
+
+
 def main():
+    # Before ANYTHING is read or written. 2026-11-04: `mail_check.py --help` fell through to the stateful default, created
+    # .mail_check_state.json and adopted a 23-entry backlog; the same path can SEND mail, so a mistyped flag must stop here.
+    if "-h" in sys.argv[1:] or "--help" in sys.argv[1:]:
+        print((__doc__ or "").split("Usage:", 1)[-1].rstrip())
+        return 0
+    unknown = [a for a in sys.argv[1:] if a.startswith("--") and a not in KNOWN_FLAGS]
+    if unknown:
+        print("unknown argument(s) %s; known: %s (see --help). Nothing was read or written." % (unknown, ", ".join(KNOWN_FLAGS)))
+        return 2
     if "--inbox" in sys.argv:
         return inbox_cli(sys.argv)
     if "--aligned" in sys.argv:

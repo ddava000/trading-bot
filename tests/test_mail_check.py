@@ -173,6 +173,50 @@ class StatelessDigestTests(Runner):
         self.assertEqual(self.main("--for", "laptop", "--since-hours", "24", "--quiet")[0], 2)
 
 
+class UnknownFlagTests(Runner):
+    """2026-11-04 (LAPTOP BOT): `--help` is not a handled flag, so it fell into the stateful default, which writes
+    .mail_check_state.json (and can send mail). An unknown flag must stop before anything is read or written."""
+
+    def state_files(self):
+        return sorted(f for f in os.listdir(self.tmp.name) if f.startswith(".mail"))
+
+    def test_help_prints_usage_and_touches_nothing(self):
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        for flag in ("--help", "-h"):
+            rc, out = self.main(flag)
+            self.assertEqual(rc, 0, flag)
+            self.assertIn("--since-hours", out)
+            self.assertIn("--inbox", out)
+            self.assertEqual(self.state_files(), [], flag)
+
+    def test_a_mistyped_flag_is_an_error_and_writes_no_state(self):
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        for argv in (("--inbx", "LAPTOP BOT"), ("--sinse-hours", "24"), ("--for", "cloud", "--nope"), ("--quiett",)):
+            rc, out = self.main(*argv)
+            self.assertEqual(rc, 2, argv)
+            self.assertIn("unknown argument", out)
+            self.assertIn("Nothing was read or written", out)
+            self.assertEqual(self.state_files(), [], argv)
+
+    def test_control_the_same_mailbox_without_the_typo_still_works(self):
+        """So the two tests above are not green only because everything is rejected."""
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        rc, out = self.main("--for", "laptop", "--since-hours", "24", "--quiet")
+        self.assertEqual(rc, 1)
+        self.assertIn("1 for %s" % M.display("laptop"), out)
+        rc, out = self.main("--quiet")                                              # the stateful default, no flags: unchanged
+        self.assertIn(".mail_check_state.json", self.state_files())
+
+    def test_every_flag_the_module_dispatches_on_is_known(self):
+        """A flag added to main() later must be added to KNOWN_FLAGS or this fails, instead of being rejected in production."""
+        import re
+        src = open(M.__file__, encoding="utf-8").read()
+        used = set(re.findall(r'"(--[a-z-]+)" in sys\.argv|sys\.argv\.index\("(--[a-z-]+)"\)', src))
+        flat = {a or b for a, b in used}
+        self.assertTrue(flat)
+        self.assertEqual(flat - set(M.KNOWN_FLAGS) - {"--help"}, set())            # --help is answered by the guard itself, before dispatch
+
+
 class StatefulTests(Runner):
     def test_first_run_adopts_the_backlog_then_only_new_mail_is_reported(self):
         self.write_mail(entry(NOW - timedelta(days=3), "cloud[35819496]", "laptop", "old"))
