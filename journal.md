@@ -2538,3 +2538,9 @@
 - avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
 - notes: Broad relief rally — Dow +1,500 on election clarity and plunging oil, VIX down to 16.8 — supports a modest lift to neutral/0.6, but Friday's jobs report is a real repricing risk and several holdings (VST -19.6%, NVDA -10.7%, PLTR -8.5%) keep bleeding. ARQT/BKH stay off for earnings within ~7 days and AN after the JPMorgan downgrade.
 - journal: Wed 11/4 15:55: Nudged to neutral/0.6 as the post-election rally broadened and VIX fell 18.2→16.8 into the close. Still cautious ahead of Friday jobs; keeping earnings names (ARQT/BKH), AN, and deep losers (VST/NVDA/PLTR) off the buy list. $16 cash caps adds regardless — watching whether the bounce holds and the jobs print tomorrow.
+
+### 2026-11-04T17:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
+- notes: Calm constructive tape — Dow's best day since April 2025 on election clarity and falling oil, VIX steady at 16.7 — keeps posture at neutral/0.6, but data-center names are being hit hard (NVDA -11.4%, VST -18.1%, PLTR -7.7%) and Friday's jobs report is a real repricing risk. ARQT/BKH stay off for earnings, AN after the JPMorgan downgrade, deep losers off the buy list.
+- journal: Wed 11/4 17:26: Holding neutral/0.6 into the close; VIX 16.7 and broad relief rally intact but data-center/AI holdings keep bleeding (NVDA -11.4%, VST -18.1%). Main risk is Friday jobs — watching for a hawkish repricing. $16 cash caps any adds regardless.
