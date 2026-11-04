@@ -21,10 +21,12 @@ to intercept the bridge: the fixed daemon launches it with Popen (_run_bridge), 
 is silently bypassed. Cloud's first re-run of its scratch repros made exactly that mistake and
 only stayed harmless because `claude` was not on that shell's PATH.
 
-SECOND PASS (cloud, 2026-11-03 16:30 ET, after LAPTOP BOT's 781a0591). The first three are fixed and
-their markers are gone. Two smaller things remain and are pinned below, each with a passing control:
-the rh_HALT daily reminder reaches Devon only through the */30 cron slots (GitHub drops those), and a
-planned-restart note is filed when the machine's boot time could not be read.
+SECOND PASS (cloud, 2026-11-03 16:30 ET, after LAPTOP BOT's 781a0591). The first three were fixed
+and their markers are gone. Two smaller things were pinned, each with a passing control: the rh_HALT
+daily reminder reached Devon only through the */30 cron slots (GitHub drops those), and a
+planned-restart note was filed when the machine's boot time could not be read. LAPTOP BOT fixed both
+in 2203086a (2026-11-04) and removed those two markers; the tests stay as plain regression tests,
+and no expectedFailure is left in this file.
 
 Run:  python -m unittest discover -s tests -p test_arm_b_review_followup.py -v
 """
@@ -307,12 +309,12 @@ class HaltDayIsAFewMessages(unittest.TestCase):
         self.assertLessEqual(len(sent), 2, "a daily reminder is not a stream: %d" % len(sent))
 
     def test_the_daily_reminder_does_not_depend_on_the_cron_slots(self):
-        """The same next morning, workflow_run alone. 0 messages: HALT_REMIND_AT_MIN is 10:00, the
-        workflow_run trigger passes GRACE_MIN=30 (silent until 10:15) and a 20-minute window, so only
-        10:15-10:19 qualifies and the 15-minute cadence usually misses it. The reminder therefore rides on
-        the */30 cron, which GitHub ran 1 to 3 times a day when it was measured (rh-watchdog.yml). With the
-        reminder at 10:15 (615) the same simulation sends exactly one from this trigger. The pause
-        notice was added so Devon does not forget the bot is paused; it should not depend on a dropped cron."""
+        """The same next morning, workflow_run alone. FOUND at HALT_REMIND_AT_MIN = 10:00: 0 messages.
+        The workflow_run trigger passes GRACE_MIN=30 (silent until 10:15) and a 20-minute window, so only
+        10:15-10:19 qualified and the 15-minute cadence usually missed it. The reminder therefore rode on
+        the */30 cron, which GitHub ran 1 to 3 times a day when it was measured (rh-watchdog.yml). FIXED
+        2026-11-04 (2203086a) by moving the reminder to 10:15 (615): exactly one from this trigger. The
+        pause notice exists so Devon does not forget the bot is paused; it must not depend on a dropped cron."""
         slots = [(9, 44), (9, 59), (10, 14), (10, 29), (10, 44), (10, 59)]
         sent = self.messages(self.DAY2, slots, self.RUN)
         self.assertGreaterEqual(len(sent), 1, "no reminder from the workflow_run trigger on a held pause")
