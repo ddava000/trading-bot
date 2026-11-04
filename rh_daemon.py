@@ -1694,11 +1694,23 @@ SESSION_NAME = "LAPTOP BOT"
 # found in it. Do not delete it to tidy up.
 ARM_A_MUTE_QUEUED = False
 
-# Devon, same day, asked directly: BOTH names stand. LAPTOP BOT is the interactive session
-# that owns this daemon; LAPTOP BOT DAILY CHECK is the scheduled daily check. Mail headed
-# `-> laptop[daily]` is for the daily check, plain `-> laptop` and broadcasts for LAPTOP BOT.
-# Same rule as DISPLAY in mail_check.py.
+# Devon, same day, asked directly: BOTH names stood. LAPTOP BOT is the interactive session
+# that owns this daemon; LAPTOP BOT DAILY CHECK was the scheduled daily check, and mail headed
+# `-> laptop[daily]` was for it.
+#
+# SUPERSEDED 2026-10-17, Devon's call: both daily checks were RETIRED (one froze and skipped
+# two days unnoticed, the other was killed by the shared Claude limit; a GitHub DAILY DIGEST
+# replaced their report). Commit ced73e41 taught the other paths - mail_check.RETIRED, which
+# `--aligned` reads, and MAILBOX NOTIFY, which posts nothing for such an entry - and MISSED
+# this notifier, which went on emailing "have LAPTOP BOT DAILY CHECK check mail" about a
+# session that wakes nobody. Found 2026-11-04 while reading my own file to answer cloud.
+# This path does NOT go silent like the Slack one: the entry still has to be read by someone,
+# so it names the live session and says the heading was addressed to a retired one. DAILY_NAME
+# survives for that sentence only.
+# mail_check.RETIRED is the authority on which qualifiers are retired; RETIRED_TAGS is a copy
+# kept in step by a test, the same idiom as SESSION_NAME.
 DAILY_NAME = "LAPTOP BOT DAILY CHECK"
+RETIRED_TAGS = ("daily",)
 # The sender may carry a [qualifier] (cloud[daily], cloud[35819496]). The old pattern could
 # not match those at all, so this notifier never saw mail from a cloud session. Group 4 is
 # the RECIPIENT qualifier.
@@ -1707,6 +1719,12 @@ _MAIL_HEAD = re.compile(r"^## \[([^\]]+)\]\s*(\w+)(?:\[[^\]]*\])?\s*->\s*([A-Za-
 
 _ARM_A_FIRED, _ARM_A_NEXT = {}, 0.0
 _ARM_A_RAN_AT = 0.0        # last time the Arm A watch actually executed
+# Cloud's own phrase in arm_a_watch's summary line for a row it decided NOT to count. Both
+# clauses that can discount a row use it: the lagged-jobs one and the git one they added on
+# 2026-11-04. Kept as one named constant because check_arm_a below keys the laptop's only
+# record of a suppression on it; tests/test_arm_a_trace.py builds the real line through their
+# run_once and fails if their wording ever stops containing it.
+ARM_A_NOT_COUNTED = "not counted"
 
 
 def check_arm_a(led):
@@ -1850,7 +1868,20 @@ def check_arm_a(led):
         # most one retried delivery, and it is keyed by tuples.
         _remember_alerts(led, arm_a_fired={k: sorted(v) for k, v in _ARM_A_FIRED.items()
                                            if isinstance(v, set)})
-        if rc:
+        # THE SUMMARY LINE, not just failures. run_once returns rc 0 on every normal pass,
+        # so `if rc:` alone kept the measurement out of rh_daemon.log unless the check broke
+        # or a delivery failed. Cloud asked for this on 2026-11-04 after shipping their git
+        # corroboration: a run row that says queued while status.json proves its pass already
+        # committed is discounted inside that line, so a suppression left NO trace on this
+        # machine - the GitHub-hosted copy prints the line, the laptop did not. The laptop's
+        # log is the copy that matters: it is where the 2026-10-26 evidence was recovered from
+        # when the muted episodes had to be replayed. notify() already logs every delivered
+        # alert, so what was missing is the measurement behind one, and the quiet passes where
+        # something was discounted and nobody was told.
+        # COUPLED to cloud's wording (ARM_A_NOT_COUNTED). This fails SILENT if they reword it,
+        # the opposite of the mute above, which is why the marker is pinned by a test against
+        # their real run_once rather than trusted.
+        if rc or ARM_A_NOT_COUNTED in line:
             log(line)
     except Exception as e:
         log(f"arm a watch skipped ({e})")
@@ -1897,9 +1928,11 @@ def check_mail(led):
         if not fresh:
             led["last_mail_seen"] = keys[-1]
             return
-        who = " and ".join(dict.fromkeys(
-            DAILY_NAME if (h[2].lower() == "laptop" and h[3].lower() == "daily") else SESSION_NAME
-            for h in fresh))
+        # Every laptop heading now wakes the one live session (see RETIRED_TAGS). findall
+        # gives "" for an absent qualifier, never None, so h[3] is always a string here.
+        who = SESSION_NAME
+        retired = sorted({h[3].lower() for h in fresh
+                          if h[2].lower() == "laptop" and h[3].lower() in RETIRED_TAGS})
         summary = "; ".join(f"{ts} {frm}->{to}" for ts, frm, to, _ in fresh)
         log(f"NEW MAIL for the laptop session: {summary}")
         notify(f"AGENT_MAIL: have {who} check mail ({len(fresh)} new)", chr(10).join([
@@ -1908,6 +1941,11 @@ def check_mail(led):
             "New AGENT_MAIL.md entries addressed to the laptop session:",
             "",
             *[f"  [{ts}] {frm} -> {to}{'[' + tag + ']' if tag else ''}" for ts, frm, to, tag in fresh],
+            *(["",
+               "NOTE: an entry above is headed `-> laptop[%s]`: %s, which Devon RETIRED"
+               % ("/".join(retired), DAILY_NAME),
+               "on 2026-10-17. That session wakes nobody, so it is reported here instead and",
+               f"{who} should read it."] if retired else []),
             "",
             "The daemon cannot act on these; it only reports that they arrived.",
             f"Open the {who} session on the laptop and say: check mail.",

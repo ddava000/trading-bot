@@ -131,11 +131,17 @@ class LaptopDaemonStaysInStepTests(unittest.TestCase):
 
     def test_the_daemons_alert_leads_with_the_same_sentence(self):
         src = self.source()
-        # `who` is SESSION_NAME, DAILY_NAME or both, picked per entry from the recipient
-        # qualifier (`-> laptop` vs `-> laptop[daily]`), since Devon named two laptop sessions.
+        # `who` was SESSION_NAME or DAILY_NAME, picked per entry from the recipient qualifier
+        # (`-> laptop` vs `-> laptop[daily]`), because Devon had named two laptop sessions. Since
+        # the daily checks were RETIRED on 2026-10-17 it is always the live session: a heading
+        # addressed to a retired one is still reported, with a note, but never named as the
+        # session to wake. Updated by laptop 2026-11-04, when this assertion caught the change.
+        # DAILY_NAME is still checked below: it names the retired session inside that note.
         self.assertIn('f"AGENT_MAIL: have {who} check mail', src)
         self.assertIn('f"Have {who} check mail."', src)
-        self.assertIn("else SESSION_NAME", src)
+        self.assertIn("who = SESSION_NAME", src)
+        self.assertNotIn("else SESSION_NAME", src,
+                         "the per-entry choice is gone: laptop[daily] was retired 2026-10-17")
 
     def test_the_daily_check_name_matches_the_shared_map(self):
         m = re.search(r'^DAILY_NAME\s*=\s*"([^"]+)"', self.source(), re.M)
