@@ -291,6 +291,9 @@ own commit exists (the five 10-22 mails) has no git evidence; and a stale "queue
 Arm A's COVERAGE (the DAILY DIGEST's unplanned minutes, `arm_a_downtime.py --by-jobs`) is measured from each run's JOB, not the run span: a run can sit
 4 to 13 minutes before GitHub creates its job (seven times on 2026-10-26, no incident listed) and nothing is executing meanwhile, so the run-span figure said 0 for
 a morning with 34 unwatched minutes. The 6-minute QUEUED alert was right on those; it was wrong on 2026-10-22 when the job existed from second zero.
+status.json `earnings_guard` is live | degraded | unknown. As of 2026-11-04 `degraded` also means a per-symbol Yahoo query failed or came back with no
+`result` during that run (the guard is still fail-open: the entry is NOT blocked); it used to say `live` whenever the crumb handshake worked. A news fetch that
+fails prints "tripwire is blind" in the run log (it used to return nothing silently). Neither changes what the bot trades.
 A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
 run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
 `::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so

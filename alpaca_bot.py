@@ -1183,19 +1183,27 @@ def alpaca_position_gone(sym):
 def alpaca_news(symbols, minutes, limit=50):
     """Headlines for symbols from Alpaca's news API (Benzinga; included with our
     keys, no extra cost). Returns [(symbols, text, created_at)] newest-first.
-    Fail-open: [] on any error - news can sharpen decisions, never break them."""
+    Fail-open: [] on any error - news can sharpen decisions, never break them. But it SAYS so: the danger-headline
+    tripwire (news_flags, run every fast pass) used to go blind on an error body or an exception without a trace.
+    One page of the newest `limit` articles is enough: they come newest first inside a short window, so a cut-off
+    can only drop headlines older than ones an earlier pass already saw."""
     if not symbols:
         return []
     try:
         start = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M:%SZ")
         d = alpaca_data_get(f"/v1beta1/news?symbols={','.join(sorted(symbols))}"
                             f"&start={start}&limit={limit}&sort=desc")
+        if not isinstance(d, dict) or "news" not in d:
+            why = (d.get("message") if isinstance(d, dict) else None) or ("no news field" if isinstance(d, dict) else type(d).__name__)
+            print(f"  [news unreadable ({why}) - the danger-headline tripwire is blind for this read]")
+            return []
         out = []
         for a in (d.get("news") or []):
             txt = f"{a.get('headline') or ''} {a.get('summary') or ''}".strip()
             out.append((a.get("symbols") or [], txt, a.get("created_at") or ""))
         return out
-    except Exception:
+    except Exception as e:
+        print(f"  [news unreadable ({type(e).__name__}) - the danger-headline tripwire is blind for this read]")
         return []
 
 def news_flags(symbols, minutes):
@@ -1216,11 +1224,18 @@ def earnings_within(sym, days=EARNINGS_BLOCK_D):
     run, fail-OPEN on any error/429 - it's a landmine guard, not a gate.
     Cache key includes `days`: keying on the symbol alone made a second call with a
     different window silently return the first window's answer (only one production
-    caller today, but it is a trap for the next one)."""
+    caller today, but it is a trap for the next one).
+
+    The published state (EARN_GUARD_STATE, status.json "earnings_guard") used to come from the crumb HANDSHAKE alone, so
+    a run where every per-symbol query was rate limited still said "live". A query that fails, or whose reply carries no
+    `result` (Yahoo's 429 / error body), now marks the guard "degraded" for the rest of the run. The answer is unchanged:
+    still fail-open, still False."""
+    global EARN_GUARD_STATE
     ck = (sym, days)
     if ck in _EARN_CACHE:
         return _EARN_CACHE[ck]
     hit = False
+    failed = False
     try:
         sess = yf_session()
         if not sess.crumb:
@@ -1228,7 +1243,10 @@ def earnings_within(sym, days=EARNINGS_BLOCK_D):
             return False
         d = sess.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
                      f"?modules=calendarEvents&crumb={sess.crumb}", timeout=8).json()
-        res = ((d.get("quoteSummary") or {}).get("result") or [{}])[0]
+        results = (d.get("quoteSummary") or {}).get("result")
+        if not results:                   # an error body has result null: the query FAILED, it did not say "no earnings"
+            failed = True
+        res = (results or [{}])[0]
         eds = ((res.get("calendarEvents") or {}).get("earnings") or {}).get("earningsDate") or []
         now = datetime.now(timezone.utc).timestamp()
         for e in eds:
@@ -1237,7 +1255,10 @@ def earnings_within(sym, days=EARNINGS_BLOCK_D):
                 hit = True
                 break
     except Exception:
-        hit = False
+        hit, failed = False, True
+    if failed:
+        EARN_GUARD_STATE = "degraded"
+        print(f"  [earnings query for {sym} failed - earnings guard degraded, entry NOT blocked (fails open)]")
     _EARN_CACHE[ck] = hit
     return hit
 

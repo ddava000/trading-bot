@@ -7,7 +7,7 @@ commit. The logs of runs 40340139520 and 40357285384 show it: they fetched +965a
 16:15:05Z tip), their jobs started at 14:38 and 16:24, the previous pass committed status.json in between (14:37:59, 16:23:52), and the
 heartbeat push failed four times with `CONFLICT (content): Merge conflict in status.json` and was discarded. The mechanism predicts
 exactly those two of the seven delayed runs of that day (a loss needs a predecessor commit AFTER the run was created) and none of the
-other five. A pass that traded would have started from a stale holds.json and trade_log.jsonl, which are the stop levels.
+other four in-session ones (the seventh is a 13:15Z pre-market run whose 7-second job left no commit; not investigated). A pass that traded would have started from a stale holds.json and trade_log.jsonl, which are the stop levels.
 
 Run:  python -m unittest discover -s tests -v      (needs PyYAML)
 """
