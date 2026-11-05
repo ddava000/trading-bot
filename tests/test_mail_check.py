@@ -207,6 +207,37 @@ class UnknownFlagTests(Runner):
         rc, out = self.main("--quiet")                                              # the stateful default, no flags: unchanged
         self.assertIn(".mail_check_state.json", self.state_files())
 
+    def test_a_known_flag_in_the_wrong_mode_is_an_error_and_writes_no_state(self):
+        """2026-11-05 (LAPTOP BOT): a bare `--ack` is KNOWN, selected no mode, and ran the stateful default: it adopted the backlog and
+        created .mail_check_state.json. A flag must belong to the mode being run."""
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        for argv in (("--ack",), ("--ack", "--quiet"), ("--ack", "--for", "cloud"), ("--inbox", "laptop", "--quiet"),
+                     ("--inbox", "laptop", "--since-hours", "24"), ("--aligned", "--ack"), ("--inbox", "laptop", "--aligned")):
+            rc, out = self.main(*argv)
+            self.assertEqual(rc, 2, argv)
+            self.assertIn("Nothing was read or written", out)
+            self.assertEqual(self.state_files(), [], argv)
+
+    def test_control_every_flag_in_its_own_mode_still_works(self):
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        rc, out = self.main("--inbox", "laptop")
+        self.assertIn("INBOX for", out)
+        self.assertEqual(self.state_files(), [])                                    # no --ack: nothing written
+        rc, out = self.main("--inbox", "laptop", "--ack")
+        self.assertIn("marked read", out)
+        self.assertTrue(self.state_files())                                         # --ack inside --inbox writes the cursor, as designed
+        self.assertNotEqual(self.main("--aligned")[0], 2)
+        self.assertEqual(self.main("--for", "laptop", "--since-hours", "24", "--quiet")[0], 1)
+
+    def test_the_documented_stateful_uses_with_no_mode_flag_are_unchanged(self):
+        self.write_mail(entry(NOW - timedelta(hours=3), "cloud", "laptop", "hello"))
+        self.assertNotEqual(self.main("--quiet")[0], 2)                             # documented: no email, exit code only
+        self.assertNotEqual(self.main("--for", "laptop", "--quiet")[0], 2)
+
+    def test_the_mode_table_covers_exactly_the_known_flags(self):
+        self.assertEqual(set(M.KNOWN_FLAGS), {f for fs in M.MODE_FLAGS.values() for f in fs})
+        self.assertEqual(set(M.MODE_FLAGS), {"inbox", "aligned", "digest"})
+
     def test_every_flag_the_module_dispatches_on_is_known(self):
         """A flag added to main() later must be added to KNOWN_FLAGS or this fails, instead of being rejected in production."""
         import re

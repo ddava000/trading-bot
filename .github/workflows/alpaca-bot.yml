@@ -49,8 +49,9 @@ jobs:
           # The CURRENT tip of the branch, fetched when this job starts. Without `ref` the action checks out the commit that was
           # current when the RUN WAS CREATED, and a run can wait 4 to 13 minutes for a machine (seven did on 2026-10-26). If the
           # previous pass committed during that wait, this pass worked from stale state files (holds.json, trade_log.jsonl) and its
-          # heartbeat push hit a merge conflict in status.json on all four attempts and was discarded: runs 40340139520 and
-          # 40357285384, the two passes of that day with no status.json commit. A pass that TRADED would have lost its stop levels.
+          # heartbeat push hit a merge conflict in status.json on all four attempts and was discarded: runs 40340139520, 40357285384
+          # and 40362102978, the three in-session passes of that day with no status.json commit (the third waited only 53 seconds: what
+          # matters is a predecessor commit AFTER the run was created, not a long wait). A pass that TRADED would have lost its stop levels.
           ref: ${{ github.ref_name }}
 
       # GitHub's native cron (brief.yml) regularly fires hours late or not at all

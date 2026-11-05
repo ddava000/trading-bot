@@ -300,8 +300,9 @@ run's heartbeat push was lost. The persist step now goes through `.github/script
 look for "Arm A heartbeat not saved" / "Arm A state not saved" in the run before calling a quiet bot dead.
 A second cause of a lost heartbeat, found 2026-11-04: a run that WAITS for a machine used to check out the commit that was current when the run was
 CREATED (actions/checkout with no `ref` uses the event's SHA), so after a 4 to 13 minute wait it worked from stale state files and, if the previous pass
-had committed meanwhile, its push hit `CONFLICT (content): Merge conflict in status.json` four times and was discarded (runs 40340139520 and 40357285384
-on 2026-10-26; the log shows `fetch ... +<creation sha>`). Fixed: the checkout names `ref: ${{ github.ref_name }}` (tests/test_arm_a_checkout.py). A pass
+had committed meanwhile, its push hit `CONFLICT (content): Merge conflict in status.json` four times and was discarded (three in-session runs on 2026-10-26:
+40340139520, 40357285384 and 40362102978, the last found by LAPTOP BOT and a wait of only 53 s: the trigger is a predecessor commit AFTER the run was
+created, not a long wait; the log shows `fetch ... +<creation sha>`). Fixed: the checkout names `ref: ${{ github.ref_name }}` (tests/test_arm_a_checkout.py). A pass
 that traded would have started from a stale holds.json, i.e. without a stop level the predecessor had just written.
 
 ## Work from your phone (Claude Code on the web)

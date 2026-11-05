@@ -32,7 +32,8 @@ Usage:
   python mail_check.py --aligned                # who has confirmed the latest ALIGNMENT CHECK
   python mail_check.py --help                   # this text; touches nothing
 Any other --flag is an error (exit 2) and touches nothing: the stateful default below writes a state file and can
-send email, so a typo of --inbox must not fall into it.
+send email, so a typo of --inbox must not fall into it. A flag is also an error in a mode it does not belong to:
+--ack means nothing without --inbox, and used alone it used to run the stateful default (2026-11-05, LAPTOP BOT).
 """
 import os, re, json, sys, smtplib
 
@@ -421,7 +422,9 @@ def send(subject, body):
         print(f"[email failed: {e}]"); return False
 
 
-KNOWN_FLAGS = ("--ack", "--aligned", "--for", "--inbox", "--quiet", "--since-hours")
+# Which flags belong to which mode. A flag that selects no mode of its own (--ack) must not reach the stateful default.
+MODE_FLAGS = {"inbox": ("--inbox", "--ack"), "aligned": ("--aligned",), "digest": ("--for", "--since-hours", "--quiet")}
+KNOWN_FLAGS = tuple(sorted({f for fs in MODE_FLAGS.values() for f in fs}))
 
 
 def main():
@@ -433,6 +436,16 @@ def main():
     unknown = [a for a in sys.argv[1:] if a.startswith("--") and a not in KNOWN_FLAGS]
     if unknown:
         print("unknown argument(s) %s; known: %s (see --help). Nothing was read or written." % (unknown, ", ".join(KNOWN_FLAGS)))
+        return 2
+    chosen = [m for m, f in (("inbox", "--inbox"), ("aligned", "--aligned")) if f in sys.argv]
+    if len(chosen) > 1:
+        print("--inbox and --aligned are separate modes; pick one. Nothing was read or written.")
+        return 2
+    mode = chosen[0] if chosen else "digest"
+    stray = [a for a in sys.argv[1:] if a.startswith("--") and a not in MODE_FLAGS[mode]]
+    if stray:
+        print("%s is not valid %s (that mode takes: %s); e.g. --ack goes with --inbox NAME. Nothing was read or written."
+              % (stray, "without --inbox/--aligned" if mode == "digest" else "with --" + mode, ", ".join(MODE_FLAGS[mode])))
         return 2
     if "--inbox" in sys.argv:
         return inbox_cli(sys.argv)
