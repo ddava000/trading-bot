@@ -2556,3 +2556,9 @@
 - avoid: ['AN', 'ARQT', 'BKH', 'NVDA', 'PLTR', 'VST'] | favor: ['IBM', 'MSFT', 'SPY']
 - notes: Dow futures +300 extend the post-election rally and VIX is calm at 16.8, but the chipmaker/data-center rotation continues (NVDA -13.2%, VST -20.7%, PLTR -10.9%) and Friday's jobs report is a real repricing risk — keeping neutral/0.6. ARQT/BKH off for earnings, AN after the JPMorgan downgrade, deep AI/utility losers off the buy list.
 - journal: Thu 11/5 10:16: Holding neutral/0.6 into the open; VIX steady 16.6->16.8 and futures green, but AI names still bleeding hard and jobs print lands tomorrow. $16 cash caps any adds regardless — watching for a hawkish jobs repricing and whether chip rotation stabilizes.
+
+### 2026-11-05T16:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'AN', 'BKH', 'SPY'] | favor: ['MSFT', 'CPRI']
+- notes: Sharp regime shift: Nasdaq -5% in a chip/data-center wipeout, VIX spiked 16.8->23.8, post-election rally fully erased and AI-slowdown fears dominating. Going risk-off/0.3 — holdings bleeding hard (NVDA -19%, VST -23%, PLTR -17%, QQQ/IWM -10%), avoid the falling knives and index proxies into tomorrow's jobs print.
+- journal: Thu 11/5 16:08: Flipped neutral/0.6 -> risk-off/0.3 as the tape broke down hard — Nasdaq -5%, VIX 16.8->23.8, AI/chip names in freefall and the whole election rally gone. Watching Friday's jobs report for a hawkish repricing; $32 cash caps adds anyway, keeping all deep losers and index ETFs off the buy list.
