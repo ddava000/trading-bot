@@ -2,21 +2,21 @@
   "regime": "neutral",
   "risk_scale": 0.6,
   "avoid_symbols": [
+    "AN",
     "ARQT",
     "BKH",
     "NVDA",
     "PLTR",
-    "VST",
-    "AN"
+    "VST"
   ],
   "favor_symbols": [
     "IBM",
-    "CPRI",
+    "MSFT",
     "SPY"
   ],
-  "notes": "Constructive post-election tape holds with VIX calm at 16.6 and the Dow's best day in 44 years, keeping posture at neutral/0.6. Data-center/AI names keep bleeding (NVDA -11.2%, VST -18.1%, PLTR -7.6%) and Friday's jobs report is a real repricing risk, so no reach.",
-  "journal_entry": "Wed 11/4 18:56: Holding neutral/0.6 after the close; VIX steady 16.7->16.6 and rally intact but AI/utility holdings still deep red. Main catalyst is Friday jobs for a hawkish repricing. $16 cash caps adds; keeping earnings names (ARQT/BKH), AN, and deep losers off the buy list.",
-  "date": "2026-11-04",
+  "notes": "Dow futures +300 extend the post-election rally and VIX is calm at 16.8, but the chipmaker/data-center rotation continues (NVDA -13.2%, VST -20.7%, PLTR -10.9%) and Friday's jobs report is a real repricing risk \u2014 keeping neutral/0.6. ARQT/BKH off for earnings, AN after the JPMorgan downgrade, deep AI/utility losers off the buy list.",
+  "journal_entry": "Thu 11/5 10:16: Holding neutral/0.6 into the open; VIX steady 16.6->16.8 and futures green, but AI names still bleeding hard and jobs print lands tomorrow. $16 cash caps any adds regardless \u2014 watching for a hawkish jobs repricing and whether chip rotation stabilizes.",
+  "date": "2026-11-05",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-04T18:56 ET"
+  "updated_at": "2026-11-05T10:16 ET"
 }
