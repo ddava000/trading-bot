@@ -1046,13 +1046,38 @@
    "sale": "f26816ae-0a27-42ed-8953-9d22fcc5a01f",
    "symbol": "SNDK",
    "term": "ST"
+  },
+  {
+   "basis": 5.57,
+   "close_date": "2026-11-05",
+   "close_fill": 118,
+   "gain": 0.001987,
+   "open_date": "2026-10-15",
+   "open_fill": 101,
+   "proceeds": 5.571987,
+   "qty": 0.198701484,
+   "sale": "f96fed51-3c87-4ea4-b71e-763bde5289ea",
+   "symbol": "ARQT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.63,
+   "close_date": "2026-11-05",
+   "close_fill": 118,
+   "gain": -0.617731,
+   "open_date": "2026-10-26",
+   "open_fill": 111,
+   "proceeds": 5.012269,
+   "qty": 0.178741507,
+   "sale": "f96fed51-3c87-4ea4-b71e-763bde5289ea",
+   "symbol": "ARQT",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
   "AN": 0.029423365,
-  "ARQT": 0.377442991,
   "BKH": 0.143977258,
   "CPRI": 0.364830722,
   "IBM": 0.021883428,
@@ -1074,19 +1099,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -24.05,
-    "sales": 46,
+    "net": -24.67,
+    "sales": 47,
     "st": {
      "gains": 0.26,
-     "losses": -24.31,
-     "net": -24.05,
-     "sales": 46
+     "losses": -24.93,
+     "net": -24.67,
+     "sales": 47
     }
    }
   },
-  "fills": 118,
-  "last_fill": "2026-11-02T18:45:21.9437Z",
-  "last_sale": "2026-10-30",
+  "fills": 119,
+  "last_fill": "2026-11-05T14:45:24.25965Z",
+  "last_sale": "2026-11-05",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1094,15 +1119,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -24.05,
-  "reconciliation_residual": -0.0371,
-  "sales": 46,
+  "net": -24.67,
+  "reconciliation_residual": -0.0614,
+  "sales": 47,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -24.31,
-   "net": -24.05,
-   "sales": 46
+   "losses": -24.93,
+   "net": -24.67,
+   "sales": 47
   },
   "state": "ok",
   "wash_watch": {
