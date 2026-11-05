@@ -822,12 +822,20 @@ def alpaca_today_sell_proceeds(et):
         print(f"  [settlement check failed ({e}) - treating all cash as settled]")
         return 0.0
 
+class _OpenOrders(set):
+    """The set of symbols with an open order, which ALSO remembers the order rows it was built from (.rows) so exit_pass can look at them
+    without a second request. Every caller and test still sees a plain set of symbols."""
+    rows = ()
+
+
 def alpaca_open_orders():
     """Symbols with a pending (unfilled) order - skipped this run so a lingering
     limit order can't double-buy or double-sell."""
     try:
-        return {o["symbol"] for o in alpaca_get("/v2/orders?status=open&limit=100")
-                if o.get("symbol")}
+        rows = alpaca_get("/v2/orders?status=open&limit=100")
+        out = _OpenOrders({o["symbol"] for o in rows if o.get("symbol")})
+        out.rows = [o for o in rows if isinstance(o, dict)]
+        return out
     except Exception as e:
         # Fail OPEN on purpose (a cycle that cannot read orders must still run its stops), but say so:
         # until now an error reply silently switched the double-buy guard off (2026-10-28 cold review).
@@ -1380,6 +1388,121 @@ def alpaca_order(payload):
 def _ok(result):
     """Alpaca accepted the order iff it echoes an id and carries no error message."""
     return bool(result) and result.get("id") and not result.get("message")
+
+
+# ── A stop sell that rests unfilled (Devon 2026-11-05, chosen from clickable options) ──────────────────────
+# Under CHEAP_PX a stop sells with a DAY limit at 98% of the price, and exit_pass skips any symbol with a resting order. If the price keeps falling
+# past that limit the sell never fills, is never re-priced, and nothing else can sell the stock that day. A resting sell of OURS that has waited
+# STALE_SELL_MIN minutes with the price below its limit is cancelled; the NEXT pass (a minute later) sees no resting order and places a fresh stop
+# at 98% of the then-current price. Cancel only, never a re-place in the same pass: Alpaca keeps the shares held for the old order until the
+# cancel lands, so an immediate new sell would be rejected.
+# ONLY the bot's own protective sells: a bracket's take-profit leg is a resting sell ABOVE the market on purpose and must be left alone. They are
+# recognised by order id in trade_log.jsonl, where every stop_loss / hold_stop / news_exit sell is logged with its id.
+STALE_SELL_MIN = 5
+
+
+def alpaca_cancel_order(order_id):
+    """Cancel one open order. True if Alpaca accepted it (204), False otherwise, logged. One attempt: a cancel is idempotent (a second one on an
+    order that is already gone answers 404 or 422), and a failure only means the next pass tries again."""
+    try:
+        r = requests.delete(ALPACA_BASE + "/v2/orders/%s" % order_id, headers=ALPACA_HDRS, timeout=15)
+        if r.status_code in (200, 204):
+            return True
+        print("    [cancel of order %s not accepted: %s %s]" % (order_id, r.status_code, (r.text or "")[:120]))
+        return False
+    except Exception as e:
+        print("    [cancel of order %s failed: %s]" % (order_id, type(e).__name__))
+        return False
+
+
+def own_stop_sell_ids(path="trade_log.jsonl", tail=600):
+    """Order ids of the bot's OWN protective sells (stop_loss, hold_stop, news_exit) from the end of the trade log."""
+    ids = set()
+    try:
+        with open(path) as f:
+            lines = f.readlines()[-tail:]
+    except OSError:
+        return ids
+    for ln in lines:
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if isinstance(d, dict) and d.get("side") == "sell" and d.get("order_id") and (d.get("stop_loss") or d.get("hold_stop") or d.get("news_exit")):
+            ids.add(str(d["order_id"]))
+    return ids
+
+
+def _order_time(s):
+    try:
+        return datetime.strptime(str(s)[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def stale_stop_sells(rows, own_ids, lasts, now_utc, min_age=STALE_SELL_MIN):
+    """Resting SELL limit orders that are the bot's own stops, have waited min_age minutes, and sit ABOVE the live price (so they cannot fill).
+    A row missing its id, side, limit, symbol or creation time is never returned: when in doubt, leave the order alone."""
+    out = []
+    for o in rows or ():
+        try:
+            if o.get("side") != "sell" or (o.get("type") or o.get("order_type")) != "limit":
+                continue
+            oid, sym = o.get("id"), o.get("symbol")
+            if not oid or not sym or str(oid) not in own_ids:
+                continue
+            limit, live, created = float(o.get("limit_price") or 0), lasts.get(sym), _order_time(o.get("created_at"))
+            if limit <= 0 or not live or created is None:
+                continue
+            age = (now_utc - created).total_seconds() / 60.0
+            if age >= min_age and live < limit:
+                out.append({"id": str(oid), "symbol": sym, "limit": limit, "live": float(live), "age": age})
+        except (TypeError, ValueError, AttributeError):
+            continue
+    return out
+
+
+# ── A held stock with no live price (Devon 2026-11-05) ─────────────────────────────────────────────────────
+# exit_pass cannot stop-check a name whose price the data API did not return, and used to say so only in the run log. Now Devon is emailed ONCE when
+# a held name has had no price for BLIND_PASSES consecutive passes (about three minutes). No trading change and no other price source: a bad
+# backup price could sell real shares. The back-off lives in outage.json, which the persist step already commits, because every run is a new
+# process (an hour-long feed gap would otherwise mean an email per 15-minute run): at most one email per OUTAGE_REALERT_H, re-armed when
+# every held name has a price again.
+BLIND_PASSES = 3
+_BLIND_STREAK = {}
+
+
+def note_blind(blind, now_utc):
+    """Count consecutive passes with no price per held name; email when one reaches BLIND_PASSES. True if an email was sent."""
+    for sym in [x for x in _BLIND_STREAK if x not in blind]:
+        del _BLIND_STREAK[sym]
+    for sym in blind:
+        _BLIND_STREAK[sym] = _BLIND_STREAK.get(sym, 0) + 1
+    st = _outage_load()
+    if not blind:
+        if st.pop("blind_alert_utc", None) is not None:
+            _outage_save(st)                                   # the episode is over: re-arm
+        return False
+    due = sorted(x for x, n in _BLIND_STREAK.items() if n >= BLIND_PASSES)
+    if not due:
+        return False
+    last = st.get("blind_alert_utc")
+    gap = None
+    if last:
+        try:
+            gap = (now_utc - datetime.fromisoformat(str(last).replace("Z", "+00:00"))).total_seconds() / 3600.0
+        except ValueError:
+            gap = None                                         # unparseable: we cannot prove he was told, so alert
+    if gap is not None and gap < OUTAGE_REALERT_H:
+        return False                                           # already told, inside the back-off
+    send_email(f"Alpaca bot ({MODE}) - no live price for held stock(s): {', '.join(due)}",
+               f"For {BLIND_PASSES} protective passes in a row (about {BLIND_PASSES} minutes) Alpaca's price feed returned nothing for: "
+               f"{', '.join(due)}.{chr(10)}{chr(10)}Their stop-loss and hold-stop checks were NOT evaluated in that time, so those positions are "
+               f"unwatched until the feed returns. Nothing was sold or changed; the bot is otherwise running."
+               f"{chr(10)}{chr(10)}Repeats are suppressed for {OUTAGE_REALERT_H:.0f}h at a time; check https://status.alpaca.markets")
+    st["blind_alert_utc"] = now_utc.isoformat(timespec="seconds")
+    _outage_save(st)
+    return True
 
 _ASSET_CACHE = {}
 def alpaca_asset(sym):
@@ -2269,6 +2392,15 @@ def exit_pass(et, alerted):
     if blind:
         print(f"  [fast pass {et.strftime('%H:%M')}: no live price for {len(blind)} of {len(stocks)} "
               f"held name(s) {blind} - their stops were NOT evaluated this pass]")
+    try:
+        note_blind(blind, et.astimezone(timezone.utc))
+    except Exception as e:                                       # an alert that fails must never cost a protective pass
+        print(f"  [blind-price alert failed ({type(e).__name__}: {e})]")
+    resting = getattr(pending, "rows", ())
+    for o in (stale_stop_sells(resting, own_stop_sell_ids(), lasts, et.astimezone(timezone.utc)) if resting else ()):
+        print(f"  STALE-STOP {o['symbol']}: our stop sell {o['id']} has rested {o['age']:.0f} min at limit ${o['limit']:.2f} while the "
+              f"price is ${o['live']:.2f}; cancelling it so the next pass re-prices at the current price [fast pass {et.strftime('%H:%M')}]")
+        alpaca_cancel_order(o["id"])
     placed = False
     holds_dirty = False
 
