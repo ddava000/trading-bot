@@ -54,12 +54,34 @@ jobs:
           # matters is a predecessor commit AFTER the run was created, not a long wait). A pass that TRADED would have lost its stop levels.
           ref: ${{ github.ref_name }}
 
+      # RUN-START MARKER (Devon 2026-11-05, chosen from clickable options). The moment this job has a machine and the code, push ONE tiny parentless
+      # commit to a SEPARATE branch whose message carries this run's id. arm_a_watch reads it through git, not through the Actions API (which served
+      # stale state on 2026-10-22 and 2026-11-04), as exact proof that this run STARTED: a run the API still calls "queued" is not waiting for a machine
+      # if its marker is there. It never touches main (ci.yml and mailbox-notify.yml trigger only on pushes to main, so no workflow starts). It is a
+      # force-push, so the branch holds only the newest marker; run ids only grow and runs execute one at a time in order, so the newest marker, for
+      # run N, proves every earlier run started or was cancelled. It must never cost the bot a run: continue-on-error, its own timeout and a hard
+      # `timeout` on the push. If it fails the only loss is the proof, and the watcher alerts exactly as it did before this step existed.
+      - name: Mark run start
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          marker="arm-a run-start run=${GITHUB_RUN_ID} attempt=${GITHUB_RUN_ATTEMPT} started=$(date -u +%FT%TZ)"
+          commit=$(git -c user.name=alpaca-bot -c user.email=alpaca-bot@users.noreply.github.com commit-tree "$(git rev-parse 'HEAD^{tree}')" -m "$marker")
+          timeout 60 git push --force origin "${commit}:refs/heads/arm-a-start"
+          echo "marker pushed: $marker"
+
       # GitHub's native cron (brief.yml) regularly fires hours late or not at all
       # (skipped entirely on 2026-06-10). cron-job.org triggers THIS workflow
       # reliably — so bootstrap the brief from here: if daily_plan.json isn't
       # today's, dispatch it. The bot trades neutral this run and picks up the
       # fresh plan next run (15 min later).
       - name: Ensure fresh research brief
+        # 2026-11-05: run 42040796649 (09:00 ET, pre-market) hung 14 minutes HERE, `gh workflow run` never returned (the log ends "Terminate orphan
+        # process: pid (gh)"), until the 14 minute job timeout cancelled the whole run. This step runs BEFORE the bot on every run, so a hang
+        # mid-session is a lost run: no bot, no stop checks. The brief is an optimisation (the bot trades neutral without it and picks it up next
+        # run), so this step may fail but must never block: a hard `timeout` on the call, a step timeout, and continue-on-error.
+        continue-on-error: true
+        timeout-minutes: 3
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -67,7 +89,7 @@ jobs:
           plan_date=$(python3 -c "import json; print(json.load(open('daily_plan.json')).get('date',''))" 2>/dev/null || echo "none")
           if [ "$plan_date" != "$today" ]; then
             echo "plan stale ($plan_date != $today) — dispatching brief.yml"
-            gh workflow run brief.yml --repo "$GITHUB_REPOSITORY" || true
+            timeout 60 gh workflow run brief.yml --repo "$GITHUB_REPOSITORY" || echo "brief dispatch did not complete (timeout or error); continuing without it"
           else
             echo "plan is fresh ($plan_date)"
           fi
