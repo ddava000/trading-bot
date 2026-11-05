@@ -72,10 +72,13 @@ def jobs_payload(kind):
     raise ValueError(kind)
 
 
+_UNSET = object()
+
+
 class Harness(unittest.TestCase):
     """The real run_once, real job_started on a stubbed _get_json, real reconcile / corroborate / measure / crossings / build_alert."""
 
-    def check(self, row, commit=None, status_ts="row", jobs="row", exact=True, now=None, fired=None, runs=None, status=None):
+    def check(self, row, commit=None, status_ts="row", jobs="row", exact=True, now=None, fired=None, runs=None, status=None, marker=_UNSET):
         commit = T(row["commit"]) if commit is None else commit
         ts = row["status_ts"] if status_ts == "row" else status_ts
         status = status if status is not None else ({"ts": ts} if ts else None)
@@ -96,7 +99,8 @@ class Harness(unittest.TestCase):
             rc, line, out = A.run_once(
                 now=now or T(row["now"]), fired=fired, deliver=lambda s, b, u: sent.append((s, b, u)) or True,
                 get_commit_time=lambda ref: commit, get_status=lambda ref: status,
-                get_runs=lambda: [dict(r, created_at=T(r["created_at"]), conclusion=None) for r in runs])
+                get_runs=lambda: [dict(r, created_at=T(r["created_at"]), conclusion=None) for r in runs],
+                get_marker=None if marker is _UNSET else (lambda: marker))
         return {"rc": rc, "line": line, "sent": sent, "bodies": [b for _, b, _ in sent], "fired": fired}
 
     def queued_alerts(self, res):

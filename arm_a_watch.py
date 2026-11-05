@@ -11,7 +11,8 @@ THREE SIGNALS, each measured on the real history before its threshold was set:
   queued      a run has waited N minutes for a machine (a healthy run starts within seconds). Catches an
               Actions incident about 6 minutes in. This is the one that would have caught 10-05. It rests on the
               Actions API (run row, jobs endpoint), which can serve stale state (2026-10-22, 2026-11-04), so a
-              first-level wait is corrected by git: see pass_started_after and tests/test_arm_a_watch_replay.py.
+              first-level wait is corrected by git: see pass_started_after and tests/test_arm_a_watch_replay.py, and,
+              when the workflow's run-start marker is there, marker_proves (exact proof a run started).
   no_trigger  no run has been CREATED for N minutes (cron-job.org should create one every 15 minutes).
   stale       status.json has not been committed for N minutes. Normally every 15 (worst gap in 9 trading
               days: 24.5), so a crash loop or a wedged push shows here.
@@ -34,6 +35,7 @@ Usage:
 """
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -205,8 +207,11 @@ def evidence_text(waiting, git=None):
     text = " Evidence (what GitHub returned to this check): %s; list response %s." % ("; ".join(bits), meta or "headers: none")
     if git is not None:
         ran = [r.get("id") for r in waiting if r.get("id") in (git.get("ran_ids") or ())]
-        if git.get("commit") is None or git.get("pass_started") is None:
+        ran_marker = [r.get("id") for r in waiting if r.get("id") in (git.get("marker_ids") or ())]
+        if (git.get("commit") is None or git.get("pass_started") is None) and not ran_marker:
             text += " Git side (not the Actions API): status.json history unreadable here, so nothing could corroborate."
+        elif ran_marker and not ran and (git.get("commit") is None or git.get("pass_started") is None):
+            pass                                               # the marker below is the whole git side here
         elif ran:
             # Only reachable when the wait reached the URGENT level, which git proof may not hide (measure_with_git).
             text += (" Git side (not the Actions API): newest status.json commit %s UTC, its pass started %s UTC, which is after "
@@ -217,6 +222,15 @@ def evidence_text(waiting, git=None):
             text += (" Git side (not the Actions API): newest status.json commit %s UTC, its pass started %s UTC; no pass that "
                      "started after the waiting run was created has committed." % (
                          git["commit"].strftime("%H:%M:%S"), git["pass_started"].strftime("%H:%M")))
+        if ran_marker:
+            # Only reachable at the URGENT level, like the sentence above: a marker proof may not hide a 20 minute wait either.
+            text += (" The run-start marker shows run(s) %s already started while the Actions API still reports them queued. Reported "
+                     "anyway because the wait reached the urgent level." % ", ".join(map(str, ran_marker)))
+        if git.get("marker_checked"):
+            mk = git.get("marker")
+            text += (" Run-start marker (git branch %s): run %s started %s UTC." % (
+                START_BRANCH, mk["run_id"], mk["started"].strftime("%H:%M:%S") if mk.get("started") else "?")
+                if mk else " Run-start marker (git branch %s): none readable." % START_BRANCH)
     return text
 
 
@@ -425,28 +439,95 @@ def pass_started_after(status, commit_utc, created_at, now_utc):
     return ts >= created_at.replace(second=0, microsecond=0)
 
 
-def corroborate(runs, status, commit_utc, now_utc):
-    """(runs, corrected): a run whose row says queued but whose pass status.json shows already committed is not waiting.
+START_BRANCH = "arm-a-start"
+_MARKER_RUN = re.compile(r"\brun=(\d+)")
+_MARKER_AT = re.compile(r"\bstarted=(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)")
 
-    Copies, status "in_progress", row_status keeps what the row said, proof "status.json". Run AFTER reconcile (which asks the
-    jobs endpoint) so the jobs evidence is still recorded for the run.
+
+def parse_start_marker(message):
+    """{"run_id": int, "started": datetime or None} from a marker commit message ("arm-a run-start run=<id> attempt=<n> started=<UTC>"),
+    or None if it is not one. The workflow step "Mark run start" writes it; see tests/test_arm_a_workflow_steps.py."""
+    m = _MARKER_RUN.search(message or "")
+    if not m:
+        return None
+    started = None
+    t = _MARKER_AT.search(message)
+    if t:
+        started = datetime.strptime(t.group(1), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return {"run_id": int(m.group(1)), "started": started}
+
+
+def git_start_marker(fetch=True):
+    """The newest run-start marker on the remote branch arm-a-start, parsed, or None (no branch yet, no network, anything wrong).
+
+    The Arm A workflow force-pushes one parentless commit there the moment a job starts. This reads it through GIT, which shares no failure mode
+    with the Actions API that served stale state on 2026-10-22 and 2026-11-04. Fails soft: no marker means no proof, and the alert is exactly what
+    it was before the marker existed.
+    """
+    try:
+        if fetch:
+            r = _git("fetch", "-q", "origin", "+refs/heads/%s:refs/remotes/origin/%s" % (START_BRANCH, START_BRANCH), timeout=30)
+            if r.returncode != 0:
+                return None
+        r = _git("log", "-1", "--format=%B", "refs/remotes/origin/" + START_BRANCH)
+        return parse_start_marker(r.stdout) if r.returncode == 0 else None
+    except Exception as e:
+        print("  [arm a watch: start marker unreadable: %s]" % e)
+        return None
+
+
+def marker_proves(marker, run, now_utc):
+    """True if the marker proves `run` has STARTED: its run id is at or after this run's. Run ids only grow, and the workflow runs one job at a
+    time in creation order, so a marker for run N means every run up to N started (or was cancelled while still waiting, which a stale row can
+    still call queued). The newest marker alone is enough because the branch is force-pushed. Anything missing or inconsistent says False."""
+    try:
+        rid = run.get("id")
+        if not marker or rid is None or marker.get("run_id") is None:
+            return False
+        started = marker.get("started")
+        if started is not None and started > now_utc + timedelta(minutes=PASS_CLOCK_SLACK_MIN):
+            return False                                     # a start stamp in the future is not evidence
+        return int(marker["run_id"]) >= int(rid)
+    except (TypeError, ValueError):
+        return False
+
+
+def marker_reader(get_marker, get_runs, get_commit_time):
+    """Which function reads the run-start marker. An explicit one is kept. Left at None it is git_start_marker ONLY when the run list and the
+    commit time are the real readers (production: the laptop daemon and the workflow leave them at their defaults). With either stubbed there is
+    no real run list for a real marker to say anything about, and a test must not reach the network or meet today's marker (a real run id is
+    larger than any id a test uses, so it would 'prove' every test row started)."""
+    if get_marker is None and get_runs is fetch_runs and get_commit_time is git_commit_time:
+        return git_start_marker
+    return get_marker
+
+
+def corroborate(runs, status, commit_utc, now_utc, marker=None):
+    """(runs, corrected): a run whose row says queued but which git shows already started is not waiting.
+
+    Two independent proofs, both from git: status.json holds a pass that started at or after the run was created (proof "status.json"), or the
+    workflow's run-start marker is for this run or a later one (proof "start marker"). Copies, status "in_progress", row_status keeps what the
+    row said. Run AFTER reconcile (which asks the jobs endpoint) so the jobs evidence is still recorded for the run.
     """
     if not runs:
         return runs, []
     out, corrected = [], []
     for r in runs:
-        if r.get("status") in QUEUED_STATES and pass_started_after(status, commit_utc, r.get("created_at"), now_utc):
-            r = dict(r, status="in_progress", row_status=r.get("status"), proof="status.json")
-            corrected.append(r)
+        if r.get("status") in QUEUED_STATES:
+            proof = ("status.json" if pass_started_after(status, commit_utc, r.get("created_at"), now_utc)
+                     else "start marker" if marker_proves(marker, r, now_utc) else None)
+            if proof:
+                r = dict(r, status="in_progress", row_status=r.get("status"), proof=proof)
+                corrected.append(r)
         out.append(r)
     return out, corrected
 
 
-def measure_with_git(now_utc, open_utc, commit_utc, status, runs):
+def measure_with_git(now_utc, open_utc, commit_utc, status, runs, marker=None):
     """(signals, runs to show in an alert, corrected runs). measure() on the runs after the git correction, with one exception:
     a wait that reaches the URGENT threshold is judged on the uncorrected runs. Git proof may lower a first-level wait; it never
     hides a run that has waited the urgent time (Devon's brief 2026-11-04: urgent, no_trigger and stale stay untouched)."""
-    view, corrected = corroborate(runs, status, commit_utc, now_utc)
+    view, corrected = corroborate(runs, status, commit_utc, now_utc, marker)
     sig = measure(now_utc, open_utc, commit_utc, status, view)
     shown = view
     if corrected:
@@ -456,12 +537,19 @@ def measure_with_git(now_utc, open_utc, commit_utc, status, runs):
     return sig, shown, corrected
 
 
-def proof_text(corrected, commit_utc, status):
+def proof_text(corrected, commit_utc, status, marker=None):
     """For the summary line: which rows were not counted, and the git facts that decided it."""
-    ts = parse_status_ts(status)
-    return "; ".join("run %s created %s, newest status.json committed %s, its pass started %s" % (
-        r.get("id"), r["created_at"].strftime("%H:%M:%SZ"), commit_utc.strftime("%H:%M:%SZ"), ts.strftime("%H:%MZ"))
-        for r in corrected[:3])
+    bits = []
+    for r in corrected[:3]:
+        if r.get("proof") == "start marker" and marker:
+            bits.append("run %s created %s, start marker for run %s%s" % (
+                r.get("id"), r["created_at"].strftime("%H:%M:%SZ"), marker["run_id"],
+                (" at " + marker["started"].strftime("%H:%M:%SZ")) if marker.get("started") else ""))
+        else:
+            ts = parse_status_ts(status)
+            bits.append("run %s created %s, newest status.json committed %s, its pass started %s" % (
+                r.get("id"), r["created_at"].strftime("%H:%M:%SZ"), commit_utc.strftime("%H:%M:%SZ"), ts.strftime("%H:%MZ")))
+    return "; ".join(bits)
 
 
 def default_deliver(subject, body, urgent):
@@ -475,7 +563,7 @@ def default_deliver(subject, body, urgent):
 
 def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_deliver, window=None,
              get_commit_time=git_commit_time, get_status=read_status, get_runs=fetch_runs,
-             get_job_state=job_started, sender="auto"):
+             get_job_state=job_started, sender="auto", get_marker=None):
     """One check. Returns (exit_code, one_line_summary, [alerts delivered]).
 
     exit 0: fine, or an alert was due and delivered.  exit 1: an alert was due and NOT delivered, or
@@ -486,8 +574,12 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
     started is not waiting for a machine. sender: who is checking, shown in the subject (see sender_label).
 
     After the jobs check, a queued row is checked against GIT (measure_with_git): not waiting if status.json shows a pass that
-    started at or after the run was created had committed. That corrects the first level only; an urgent wait is judged on the
-    uncorrected runs. The summary line names every row that was not counted and the git facts that decided it.
+    started at or after the run was created had committed, or the workflow's run-start marker (branch arm-a-start) is for this run
+    or a later one. That corrects the first level only; an urgent wait is judged on the uncorrected runs. The summary line names every
+    row that was not counted and the git facts that decided it.
+    get_marker: reads the marker. Left at None it is git_start_marker ONLY when the run list and the commit time are the real readers
+    (production: the daemon and the workflow leave them at their defaults); with either stubbed there is no real run list for a real marker
+    to say anything about, and a test must not reach the network or meet today's marker.
 
     A first-level QUEUED alert gets a SECOND LOOK just before it is delivered: runs and jobs are read again
     and the alert is withdrawn if nothing is waiting any more. It is not a pause. The laptop checks every
@@ -507,8 +599,14 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
     commit = get_commit_time(ref or "HEAD")
     status = get_status(ref)
     who = sender_label(sender)
+    get_marker = marker_reader(get_marker, get_runs, get_commit_time)
+    try:
+        marker = get_marker() if get_marker else None
+    except Exception as e:                                  # a marker that cannot be read is no proof, never an error
+        print("  [arm a watch: start marker read failed: %s]" % e)
+        marker = None
     runs, lagged = reconcile(get_runs(), get_job_state)
-    sig, runs, by_git = measure_with_git(now, open_utc, commit, status, runs)
+    sig, runs, by_git = measure_with_git(now, open_utc, commit, status, runs, marker)
     if all(v is None for v in sig.values()):
         return 1, "ARM A WATCH: could not measure anything (no git history, no status.json, no runs list)", []
 
@@ -518,18 +616,25 @@ def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_delive
         f("stale"), f("no_trigger"), f("queued"))
     if lagged:
         line += " (%d run row(s) said queued while their job was already running; not counted)" % lagged
-    if by_git:
+    by_ts = [r for r in by_git if r.get("proof") != "start marker"]
+    by_mark = [r for r in by_git if r.get("proof") == "start marker"]
+    if by_ts:
         line += (" (%d run row(s) said queued although git shows their pass had already committed; not counted at the first "
-                 "level: %s)" % (len(by_git), proof_text(by_git, commit, status)))
+                 "level: %s)" % (len(by_ts), proof_text(by_ts, commit, status)))
+    if by_mark:
+        line += (" (%d run row(s) said queued although git's run-start marker shows they had already started; not counted at the "
+                 "first level: %s)" % (len(by_mark), proof_text(by_mark, commit, status, marker)))
     git = {"commit": commit, "pass_started": parse_status_ts(status) if status else None,
-           "ran_ids": {r.get("id") for r in by_git}}
+           "ran_ids": {r.get("id") for r in by_git if r.get("proof") != "start marker"},
+           "marker_ids": {r.get("id") for r in by_git if r.get("proof") == "start marker"},
+           "marker": marker, "marker_checked": get_marker is not None}
     had_active = _active(fired)
     cs = crossings(sig, fired, window)
     if any(c["signal"] == "queued" for c in cs) and not any(c["signal"] == "queued" and c["urgent"] for c in cs):
         again = get_runs()                                  # the second look; unreadable keeps the alert
         if again is not None:
             again, _ = reconcile(again, get_job_state)
-            q = measure_with_git(now, open_utc, commit, status, again)[0]["queued"]
+            q = measure_with_git(now, open_utc, commit, status, again, marker)[0]["queued"]
             if q is not None and q < THRESHOLDS["queued"][0]:
                 cs = [c for c in cs if c["signal"] != "queued"]
                 if fired is not None:
