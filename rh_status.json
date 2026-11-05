@@ -8,7 +8,9 @@
   "QQQ",
   "SPY"
  ],
+ "hold": 0,
  "holds": [],
+ "index": 318.87,
  "machine": {
   "guards": {
    "fast_startup": 1,
@@ -86,6 +88,10 @@
    }
   }
  },
- "ts": "2026-11-05T11:03",
- "unsettled_excluded_from_buying_power": 0.85
+ "regime": "neutral",
+ "risk": 0.6,
+ "settled": 0.61,
+ "trade": 0.0,
+ "ts": "2026-11-05T11:04",
+ "unsettled_excluded_from_buying_power": 1.21
 }
