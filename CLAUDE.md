@@ -29,9 +29,10 @@ the repeat-trim "deliberate" survived four reviews. A mailbox entry described a 
 A rule cannot make a mistake impossible. Rules 2 and 3 are the ones a test can enforce. For Arm A's QUEUED alert they
 are enforced as of 2026-11-04: tests/test_arm_a_watch_replay.py replays 12 recorded instants through the real
 run_once, each with a control that must say the opposite, and pins that a first-level queued alert stays quiet when
-git shows the run's own pass committed even though both Actions endpoints say queued. It does NOT close the class
-where a stale read lands while the pass is still running (wait 6 to about 10.5 minutes): there git has no evidence
-yet, so that alert still rests on the Actions API alone, and a test says so. Every OTHER alert (the Arm B watchdog,
+git shows the run's own pass committed even though both Actions endpoints say queued. The class where a stale read
+lands while the pass is still running (wait 6 to about 10.5 minutes) has no status.json commit to read yet; from
+2026-11-05 the run-start marker (branch arm-a-start) is the git proof there, and without a marker (the step failed, or
+before it was deployed) that alert still rests on the Actions API alone, and a test says so. Every OTHER alert (the Arm B watchdog,
 the daily digest) is still discipline, and so are rules 1, 4, 5 and 6; a reviewer should check them.
 1. **A fact is something you reproduced in this session.** Anything you tell Devon or write into mail, a
    comment or a test as fact (what happened, why, for how long, whether money or stops were exposed) comes from
@@ -286,8 +287,20 @@ created (`arm_a_watch.pass_started_after`). Not a commit age (a healthy pass and
 mark; a 13-minute guard moved 10-05 from 6.8 to 9.8 minutes) and not "any commit since" (a slow predecessor's commit would hide a run still
 waiting). It corrects the FIRST level only: urgent (20 min), no_trigger and stale are judged on the raw data. A job counts as started on a
 step that ran or a runner assigned as well as its status word; started_at, completed_at and conclusion are NOT proof (the 10-05 job that never
-got a machine carries all three). Missing or inconsistent git data leaves the run counted as waiting. Residual: a stale read before the pass's
-own commit exists (the five 10-22 mails) has no git evidence; and a stale "queued" row that outlives 20 minutes still pages as urgent.
+got a machine carries all three). Missing or inconsistent git data leaves the run counted as waiting.
+RUN-START MARKER (2026-11-05, Devon chose it from clickable options): the workflow step "Mark run start" force-pushes one parentless commit to the branch
+`arm-a-start` right after checkout (message `arm-a run-start run=<id> attempt=<n> started=<UTC>`; never main; continue-on-error, step timeout 2 min,
+`timeout 60` on the push; ci.yml and mailbox-notify.yml trigger only on main, so no workflow starts). arm_a_watch reads it through git (`git_start_marker`;
+only when the run list and the commit time are the real readers, `marker_reader`) and a queued run whose id is at or before the marker's is not waiting
+(`marker_proves`; run ids only grow and runs execute one at a time, so the newest marker proves every earlier run). First level only, like the ts rule.
+This is what closes the stale read DURING a pass (the five 10-22 mails), where status.json has no commit yet. Residuals: no marker means no proof (the
+push failed, GitHub rejecting writes); a stale "queued" row that outlives 20 minutes still pages as urgent; not yet seen firing in production.
+STALE STOP SELLS and BLIND PRICES (2026-11-05, Devon's choices): under CHEAP_PX a stop sells with a DAY limit at 98% of the price and exit_pass skips a
+symbol with a resting order, so a falling price left the sell unfilled forever. A resting sell of OURS (order id in trade_log.jsonl with stop_loss /
+hold_stop / news_exit; NEVER a bracket's take-profit leg, which rests above the market on purpose) that has waited 5 minutes with the price below its
+limit is CANCELLED; the next pass places a fresh stop at 98% of the current price (cancel only, never a re-place in the same pass: Alpaca holds the shares
+for the old order until the cancel lands). A held stock with no live price for 3 consecutive passes emails Devon once (back-off 2 h kept in outage.json
+under `blind_alert_utc`; no other price source, no trading change). The workflow's brief step has a hard timeout (run 42040796649 hung 14 min).
 Arm A's COVERAGE (the DAILY DIGEST's unplanned minutes, `arm_a_downtime.py --by-jobs`) is measured from each run's JOB, not the run span: a run can sit
 4 to 13 minutes before GitHub creates its job (seven times on 2026-10-26, no incident listed) and nothing is executing meanwhile, so the run-span figure said 0 for
 a morning with 34 unwatched minutes. The 6-minute QUEUED alert was right on those; it was wrong on 2026-10-22 when the job existed from second zero.
