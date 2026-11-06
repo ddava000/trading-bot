@@ -15,9 +15,9 @@
   "favor_symbols": [
     "MSFT"
   ],
-  "notes": "VIX easing 26.9->24.8 and the Nasdaq is attempting to claw back from its worst day in 19 months with some AI buying, but the tape is still fragile and holdings remain deep in drawdown (NVDA -17.5%, VST -16%, PLTR -14%). Staying risk-off/0.3 into the weekend; $32 cash caps adds anyway.",
-  "journal_entry": "Fri 11/6 15:35: VIX cooling (26.9->24.8) and AI names bouncing off the lows into the close, first sign of stabilization since the wreck. Nudged scale 0.25->0.3 but staying defensive into the weekend \u2014 watching whether the recovery holds Monday. Deep losers and index ETFs stay off the buy list.",
+  "notes": "End-of-day Friday into the weekend: VIX still elevated at 24.9 and the tape is only tentatively recovering from the worst Nasdaq rout in 19 months, with AI names seeing some dip-buying but still deeply damaged. Holdings remain in heavy drawdown (NVDA -17.7%, VST -15.8%, PLTR -14.1%); staying risk-off/0.3 and $2 cash caps any adds regardless.",
+  "journal_entry": "Fri 11/6 16:59: Closing out the week risk-off/0.3 \u2014 AI names stabilized off the lows but no durable floor yet, VIX ~25. Weekend gap risk present; watching Monday to see if the recovery holds or the AI unwind resumes. Deep losers and index ETFs stay off the buy list; cash nearly exhausted.",
   "date": "2026-11-06",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-06T15:35 ET"
+  "updated_at": "2026-11-06T16:59 ET"
 }
