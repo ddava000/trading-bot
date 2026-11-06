@@ -1,0 +1,2623 @@
+"""
+Alpaca Day Trading Bot - GitHub Actions
+Full buy+sell meme/screener strategy. Same signal engine as the Robinhood bot,
+but account + orders go through Alpaca's OFFICIAL REST API. Fractional market
+buys use `notional` (dollar amount) - exactly what Robinhood's API blocked.
+
+Defaults to the PAPER endpoint. To go live, set the ALPACA_BASE_URL secret to
+https://api.alpaca.markets (and use live API keys).
+"""
+
+import os, math, json, time, requests
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
+
+# ── Config ────────────────────────────────────────────────────────────────────
+# Daily loss halt = max(10% of equity, $20). Loose on purpose: it only stops the
+# day on a genuine crash - and even then it only blocks BUYS; exits keep running
+# so the bot can always de-risk. The real risk controls are the sleeve caps,
+# per-name caps, and per-position brackets below.
+#
+# Capital split (HYBRID, 2026-06-24 - ~95% deployed, ~5% cash):
+#   INDEX CORE (50%):     buy-and-hold SPY/QQQ/IWM equal-weight - the shock absorber.
+#   TRADING sleeve (15%): signal-driven buys managed by brackets + sell signals.
+#   HOLD sleeve (25%):    strong-signal names (4+ buy votes AND uptrend) bought to
+#                         KEEP - exempt from sell signals; exit only on the basis
+#                         stop (-25%), the peak ratchet (gives back 40% from high),
+#                         or the DIVERSIFY trim (max 2 holds per correlated theme).
+#   CRYPTO sleeve (5%):   DOGE-style moonshot exposure via Alpaca crypto (spot,
+#                         long-only, 24/7 assets traded on the bot's schedule).
+#                         Wider brackets (-15%/+30%) for crypto volatility.
+#
+# NOTE: FINRA retired the Pattern Day Trader rule on 2026-06-04 and Alpaca is
+# removing daytrade_count from the API - the old 3-day-trade ration is gone.
+# The bot sizes off CASH (never margin), so the new intraday-margin framework
+# doesn't bind either.
+# ── STRATEGY ARM (A/B experiment, 2026-08-11) ────────────────────────────────
+# CRITICAL: rh_bot.py IMPORTS this module and reads the sleeve percentages below,
+# by design, so the two bots never drift on risk rules. That also means editing
+# these numbers in source would silently reconfigure the REAL-MONEY Robinhood bot.
+# So the arm is chosen by ENVIRONMENT, which only the cloud workflow sets:
+#   STRATEGY_INDEX_ONLY=true  -> index-only (no active sleeves)
+#   unset (the default)       -> full HYBRID, what every importer gets
+#
+# 2026-08-22 STRATEGY SWAP - the arms traded places, so read this before trusting
+# any older comment: ALPACA (cloud) now runs the HYBRID and sets the env var to
+# "false"; ROBINHOOD (laptop) now runs INDEX-ONLY. Robinhood does NOT get there via
+# this env var - rh_bot.py sets its own INDEX_ONLY=True explicitly and asserts it at
+# startup, precisely so a change to the default here cannot silently re-arm the
+# real-money laptop's active sleeves. Shared MECHANICS (stops, ratchet, RSI caps,
+# correlation, news, earnings) are NOT arm-dependent and remain common to both bots.
+_INDEX_ONLY = os.environ.get("STRATEGY_INDEX_ONLY", "").strip().lower() == "true"
+
+LOSS_CAP_PCT     = 0.10
+LOSS_CAP_FLOOR   = 20.00
+MAX_INVESTED_PCT = 0.00 if _INDEX_ONLY else 0.20   # active TRADING sleeve
+                                                   # 0.15 -> 0.20 on 2026-08-26 (Devon):
+                                                   # absorbs the dead crypto 5%. See CRYPTO_PCT.
+HOLD_PCT         = 0.00 if _INDEX_ONLY else 0.25   # active HOLD sleeve
+HOLD_STOP        = 0.75   # hold exits at 75% of basis (-25% - thesis broken)
+HOLD_TRAIL       = 0.60   # ...or at 60% of its peak once well in profit (locks 60% of best gain)
+MAX_POS_PCT      = 0.10   # max 10% of equity in any single name (>=4 names = diversified)
+SMALLCAP_POS_PCT = 0.05   # small/cheap names get HALF size (5%) - higher growth, higher blowup risk
+MICRO_PX         = 2.00   # under this, gaps routinely blow past the -7% stop (audit wk1: realized
+MICRO_POS_PCT    = 0.025  # stop-outs ran -14% to -25%), so QUARTER size - keeps access, caps the bleed
+SPEND_CAP_PCT    = 0.25   # deploy at most 25% of cash per run (gradual, not all at once)
+STOP_LOSS_PCT    = 0.93   # trading sleeve: hard stop at -7% from avg cost (overrides signals)
+TAKE_PROFIT_PCT  = 1.15   # trading sleeve: bank +15% unless the signal still says buy (~2:1 R:R)
+RSI_ENTRY_MAX    = 78.0   # never open a NEW position into a blow-off top
+HOLD_RSI_MAX     = 70.0   # hold-sleeve entries need a calmer entry than trades
+HOLD_MIN_VOTES   = 4      # votes a name needs before the hold sleeve considers it
+NO_PLAN_RISK     = 0.50   # risk_scale used when daily_plan.json is missing entirely.
+                          # NOT a tuning choice: it is the median of the 79 plan days
+                          # the brief has produced (mean 0.46), chosen so an outage
+                          # lands on normal behaviour rather than on full size. A
+                          # STALE plan does not use this; it holds its own value.
+EXPERIMENT_START = "2026-08-24"   # A/B window opened; capital moved after this
+                                  # date contaminates Arm A the way pre-window
+                                  # deposits contaminate Arm B. Keep in step
+                                  # with experiment.json arm_A.
+MEME_RSI_MAX     = 75.0   # meme +2 vote bonus is gated below this (see compute_signals).
+                          # NOTE the gap: 70-75 is a band where a meme name can EARN the
+                          # votes that qualify it and be disqualified from hold at the
+                          # same time. Deliberate as far as anyone knows; instrumented
+                          # via HOLD-GATE lines rather than changed.
+MIN_ORDER_PCT    = 0.001  # skip dust orders under 0.1% of equity...
+MIN_ORDER_ABS    = 5.00   # ...and never under $5 flat. A crumb order can't move the
+                          # needle but still spams a rejection email when a nearly-full
+                          # sleeve leaves $1-2 and it lands on a whole-share-only name
+                          # (6x "not fractionable; $1.03 buys <1 share" on 2026-07-08).
+SMALL_PX         = 15.00  # live price under this sizes at the smallcap (half) cap
+CHEAP_PX         = 5.00   # under this, use marketable LIMIT orders - thin names fill 5-20x worse at market
+STOP_COOLDOWN_D  = 3      # days to sit out a name after its stop fired (no revenge re-entry)
+TIME_STOP_DAYS   = 5      # trading position going nowhere for 5+ days with no signal = exit
+CHEAP_HOLD_MAX   = 0.50   # sub-$5 names may fill at most half the HOLD sleeve (concentration cap)
+CORR_LOOKBACK    = 60     # trading days of returns for the theme-concentration check
+CORR_MAX         = 0.60   # two names above this move as ONE trade (semis pairwise ran 0.71-0.80;
+                          # cross-sector pairs -0.34..0.20 - calibrated 2026-07-02)
+HOLD_CLUSTER_MAX = 2      # max holds per correlated theme (wk1: AMAT+MU+SNDK = 100% semis sank the week)
+
+# Fast protective loop + news tripwire (2026-07-15, Devon: "as adamant as possible
+# without costing me more than it makes me"). Each 15-min trigger now runs ONE job:
+# full strategy cycle once, then a cheap exit-only pass every ~60s until the next
+# window takes over - hard stops and danger headlines react in ~1 minute, while
+# buys/TPs stay on the 15-min clock (signals are daily-bar; faster buying would be
+# churn, not edge). All of it $0: public-repo Actions minutes + Alpaca's news API
+# (Benzinga) included with our keys. Claude stays on its 3x/day brief schedule.
+LOOP_WINDOW_MIN  = 9.5    # fast-pass this long from JOB START, then end. Must leave
+                          # the whole job (setup ~2m + this) comfortably under the
+                          # 15-min trigger interval, or runs overlap, pile up on the
+                          # concurrency queue, and get cancelled (the 2026-08-06 wave).
+EXIT_PASS_SEC    = 60     # seconds between protective passes
+NEWS_BLOCK_MIN   = 720    # a danger headline within this window blocks BUYING the name
+NEWS_ALERT_MIN   = 16     # only articles this fresh alert/exit (dedup across passes)
+EARNINGS_BLOCK_D = 2      # no NEW entries in names reporting earnings within this many days
+DANGER_WORDS = ["bankrupt", "chapter 11", "fraud", "sec investigation", "sec probe",
+                "subpoena", "delist", "going concern", "share offering",
+                "public offering", "dilut", "halted", "trading halt", "fda reject",
+                "complete response letter", "recall", "short report", "short seller",
+                "restatement", "cuts guidance", "withdraws guidance", "resigns",
+                "default", "investigation"]
+
+# Crypto sleeve - spot, long-only, cash-only (no margin/futures). Brackets are
+# wider than stocks because 5-10% daily swings are normal here.
+CRYPTO_PCT       = 0.00   # RETIRED 2026-08-26 (Devon). Alpaca does not offer crypto in
+                          # COLORADO, so this sleeve could never fill and its 5% sat in
+                          # cash, leaving Arm A ~65% deployed against a ~100% deployed
+                          # Arm B and biasing the A/B against the arm being tested.
+                          # Reallocated to MAX_INVESTED_PCT (trade), not HOLD: the hold
+                          # sleeve is already unfilled at its 25% target, so adding room
+                          # there would have parked the cash a second time and changed
+                          # nothing. Zero for BOTH arms now, hence no _INDEX_ONLY branch.
+                          # This is a residency restriction, not an unsigned agreement:
+                          # do not 're-enable' it. See STANDING FACTS.
+CRYPTO_POS_PCT   = 0.04   # max 4% of equity per coin (sleeve holds 2-3 coins max)
+CRYPTO_STOP      = 0.85   # hard stop at -15% from avg cost
+CRYPTO_TP        = 1.30   # bank +30% unless the signal still says buy (2:1 R:R)
+CRYPTO_UNIVERSE  = ["BTC/USD", "ETH/USD", "SOL/USD", "DOGE/USD", "SHIB/USD",
+                    "LINK/USD", "AVAX/USD", "LTC/USD"]
+
+# ── HYBRID strategy (backtested 2026-06-24, Devon's design): a 50% buy-and-hold
+# index core (the shock absorber) + the FULL old active day-trader on the rest
+# (~45%, where the big momentum/meme gains live) + ~5% cash. Beats the old active
+# bot alone on both return and drawdown; trails pure index (the cost of trading).
+INDEX_CORE_PCT = 0.90 if _INDEX_ONLY else 0.50     # held index core
+INDEX_ETFS     = ["SPY", "QQQ", "IWM"]   # broad market + growth/tech + small caps
+
+ET_TZ = ZoneInfo("America/New_York")   # DST-correct ET (the old UTC-4 broke every November)
+
+ALPACA_KEY    = os.environ["ALPACA_API_KEY"]
+ALPACA_SECRET = os.environ["ALPACA_SECRET_KEY"]
+ALPACA_BASE   = os.environ.get("ALPACA_BASE_URL") or "https://paper-api.alpaca.markets"
+ALPACA_HDRS   = {"APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET}
+MODE          = "PAPER" if "paper-api" in ALPACA_BASE else "LIVE"
+
+# Email alerts - sent from GitHub's cloud so they arrive even with the PC asleep.
+# NO ADDRESS LITERALS: this repo is PUBLIC and these are Devon's personal addresses.
+# Recipient comes from the ALERT_EMAIL secret (set 2026-08-27); ALERT_TO is kept as a
+# legacy alias so nothing breaks if an old workflow still passes it.
+#
+# LAST RESORT is the SENDER address, never a literal. Deleting the fallback outright
+# would make a typo in a write-only secret indistinguishable from silence, and the
+# only complaint would be a print in an Actions log nobody reads. Falling back to an
+# inbox Devon owns, with a line saying why, fails loudly instead.
+GMAIL_USER   = (os.environ.get("GMAIL_USER") or "").strip()            # bot sends as
+ALERT_TO     = (os.environ.get("ALERT_EMAIL")
+                or os.environ.get("ALERT_TO") or "").strip()           # you receive
+GMAIL_APP_PW = os.environ.get("GMAIL_APP_PASSWORD", "")
+
+
+def _slack(text):
+    """Mirror an alert into the Slack channel. Best-effort, never raises.
+
+    Imported lazily and inside a try: an alerting side-channel must never be
+    able to stop a trading run, and slack_notify.py is not on the laptop's
+    import path in every context.
+    """
+    try:
+        import slack_notify
+        slack_notify.post(text)
+    except Exception as e:
+        print(f"  [slack mirror failed: {e}]")
+
+
+def send_email(subject, body):
+    """Best-effort Gmail alert, mirrored to Slack. Never raises.
+
+    RETURNS True only if SMTP actually accepted the message; False otherwise.
+    Added at laptop's request (AGENT_MAIL 2026-09-01 17:30): it swallows its own
+    exceptions and used to return None whether delivery succeeded or failed, so
+    rh_daemon's "emailed: ..." log line meant "handed to send_email", not
+    "delivered". A caller could not tell a delivered alert from a silently failed
+    one. The Slack mirror is deliberately NOT part of this verdict: it fires before
+    the Gmail guard on purpose, so a False here means "email failed" and never
+    "nothing was sent anywhere".
+
+    Slack is mirrored FIRST and independently of the Gmail guard, so a missing
+    or wrong GMAIL_APP_PASSWORD (which has silently blanked every channel here
+    before) cannot also take out Slack.
+    """
+    _slack(f"*{subject}*\n{body}")
+    if not GMAIL_APP_PW:
+        print("  [email skipped - GMAIL_APP_PASSWORD not set]")
+        return False
+    if not GMAIL_USER:
+        # Every mail-sending workflow passes GMAIL_USER as of 2026-08-27. If it is
+        # blank the SMTP login would 535-fail anyway; say so plainly instead.
+        print("  [email SKIPPED: GMAIL_USER unset/blank - set the repo secret]")
+        return False
+    to = ALERT_TO or GMAIL_USER
+    if not ALERT_TO:
+        print("  [ALERT_EMAIL unset/blank - sending to the SENDER address instead]")
+        body = ("[ALERT_EMAIL is not set, so this went to the sender address rather "
+                "than Devon's usual inbox. Set the ALERT_EMAIL repo secret.]"
+                + chr(10) + chr(10) + body)
+    # The try covers the SMTP CONVERSATION ONLY. It used to wrap the success
+    # print too, which meant A LOGGING CALL COULD DECIDE WHETHER THE OPERATION
+    # FAILED: on 2026-09-10 sendmail() returned, the connection closed cleanly,
+    # then the success print hit a cp1252 stdout, raised UnicodeEncodeError on a
+    # U+2192 arrow, and a DELIVERED message returned False (laptop, reproduced
+    # twice). The encoding was only the trigger; any exception from that line did
+    # the same, and it always failed in the direction that HIDES delivery, which
+    # would make any retry-on-False caller send duplicates.
+    #
+    # It could never fire on a GitHub runner, whose stdout is UTF-8. Second time
+    # in one day that shared code was verified in Actions and broken on the
+    # laptop, so the log line is ASCII now as well: this module is imported by
+    # rh_bot/rh_daemon on Windows and must not assume a UTF-8 console.
+    ok = False
+    try:
+        import smtplib
+        from email.mime.text import MIMEText
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"]    = GMAIL_USER
+        msg["To"]      = to
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=20) as s:
+            s.starttls()
+            s.login(GMAIL_USER, GMAIL_APP_PW)
+            s.sendmail(GMAIL_USER, [to], msg.as_string())
+        ok = True                 # accepted by the server: nothing below may undo this
+    except Exception as e:
+        try:
+            print(f"  [email failed: {e}]")
+        except Exception:
+            pass
+        return False
+    try:
+        print(f"  [email sent -> {to}: {subject}]")
+    except Exception:
+        pass                      # a broken console must never unsend the mail
+    return ok
+
+
+# ── Outage alerting state ─────────────────────────────────────────────────────
+# "Alpaca unreachable all window" used to email on EVERY failed run. Each Actions
+# run is a fresh process, so the in-process latch used for the crypto entitlement
+# (5b55bb7) cannot work here: a real outage sent ~26 identical emails a day, and it
+# did so exactly when Devon most needs one clear signal instead of wallpaper.
+#
+# State cannot live in status.json: that file is written inside run_bot(), which is
+# the very call that raises when Alpaca is unreachable, so during an outage it is
+# never updated. Hence its own tiny committed file.
+#
+# The rule is alert-then-backoff, never silence: first blind window alerts at once,
+# repeats stay quiet for OUTAGE_REALERT_H, and recovery always sends one note with
+# the duration so an outage has a visible end and not just a beginning.
+OUTAGE_F         = "outage.json"
+OUTAGE_REALERT_H = 2.0
+
+
+def _outage_load():
+    try:
+        with open(OUTAGE_F) as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except Exception:
+        return {}
+
+
+def _outage_save(d):
+    try:
+        with open(OUTAGE_F, "w") as f:
+            json.dump(d, f, indent=1)
+    except Exception as e:
+        print(f"  [outage state not saved: {e}]")
+
+
+def _hours_since(iso):
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return (datetime.now(timezone.utc) - t).total_seconds() / 3600.0
+    except Exception:
+        return None       # unparseable = treat as unknown, and alert rather than skip
+
+
+def market_minutes_between(start_utc, end_utc):
+    """Minutes of the bot's OWN trading window (weekdays 09:45 to 15:55 ET, 12:55 on EARLY_CLOSE days, MARKET_HOLIDAYS
+    excluded; see session_bounds) that fall
+    between two moments. Wall-clock time over a close, a weekend or a holiday is not downtime: nothing runs
+    then, so a failure on the last run before the close followed by a good run at the next open is a few
+    minutes of trading time, not 18 hours. (Found 2026-10-07 when LAPTOP BOT caught the same mistake in its
+    own alert path: 1069 minutes reported for one failed attempt.)"""
+    if end_utc <= start_utc:
+        return 0.0
+    s, e = start_utc.astimezone(ET_TZ), end_utc.astimezone(ET_TZ)
+    total, day = 0.0, s.date()
+    while day <= e.date():
+        b = session_bounds(day)
+        if b:
+            lo, hi = max(b[0], s), min(b[1], e)
+            if hi > lo:
+                total += (hi - lo).total_seconds() / 60.0
+        day += timedelta(days=1)
+    return total
+
+
+def _market_hours_since(iso):
+    """Trading hours (see market_minutes_between) since an ISO stamp, or None if unparseable."""
+    try:
+        t = datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return market_minutes_between(t, datetime.now(timezone.utc)) / 60.0
+    except Exception:
+        return None       # unparseable = unknown, never zero
+
+
+def _fmt_trading_time(hours):
+    if hours is None:
+        return None
+    if hours < 1 / 60:
+        return "under a minute of trading time"
+    if hours < 1:
+        return "%d minutes of trading time" % round(hours * 60)
+    return "%.1fh of trading time" % hours
+
+
+def outage_note_blind():
+    """One blind window recorded. Emails on the first, then backs off. Never silent."""
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    st  = _outage_load()
+    since = st.get("unreachable_since") or now
+    last  = st.get("last_alert_utc")
+    gap   = _hours_since(last) if last else None
+
+    # gap is None when there has been no alert yet OR the stamp is corrupt. Both
+    # mean "we cannot prove Devon was told", so both alert. Fail loud, not quiet.
+    due = (gap is None) or (gap >= OUTAGE_REALERT_H)
+    dur = _market_hours_since(since)      # TRADING time, not wall clock: see market_minutes_between
+    if due:
+        send_email(
+            f"Alpaca bot ({MODE}) - Alpaca unreachable all window",
+            "Every attempt this window failed to reach Alpaca (full cycle and every "
+            "protective pass). No orders were placed; positions are unwatched until a "
+            "run gets through. Nothing is wrong with the bot - check "
+            "https://status.alpaca.markets" + (
+                f"{chr(10)}{chr(10)}Unreachable for about {_fmt_trading_time(dur)} so far."
+                if dur is not None and dur >= OUTAGE_REALERT_H else "") + (
+                f"{chr(10)}Repeats are suppressed for {OUTAGE_REALERT_H:.0f}h at a time; "
+                "you will get one more if it is still down then, and one when it clears."))
+        st["last_alert_utc"] = now
+    else:
+        print(f"  [outage alert suppressed: already alerted {gap:.1f}h ago, "
+              f"re-alerting after {OUTAGE_REALERT_H:.0f}h]")
+    st["unreachable_since"] = since
+    _outage_save(st)
+
+
+def outage_note_contact():
+    """Contact made. If we were mid-outage, close it out with a single note."""
+    st = _outage_load()
+    if not st.get("unreachable_since"):
+        return
+    dur = _market_hours_since(st["unreachable_since"])
+    send_email(f"Alpaca bot ({MODE}) - Alpaca reachable again",
+               "Contact with Alpaca is restored and protective passes are running."
+               + (f" It was unreachable for about {_fmt_trading_time(dur)}." if dur is not None else ""))
+    _outage_save({})
+
+
+# ── Step 1: Market hours ──────────────────────────────────────────────────────
+# NYSE/NASDAQ full-closure holidays (observed dates). Hardcoded for verifiable
+# correctness; refresh every couple of years (the weekly audit can top it up).
+# Half-days (1 pm early closes) are EARLY_CLOSE, just below.
+MARKET_HOLIDAYS = {
+    "2026-01-01","2026-01-19","2026-02-16","2026-04-03","2026-05-25",
+    "2026-06-19","2026-07-03","2026-09-07","2026-11-26","2026-12-25",
+    "2027-01-01","2027-01-18","2027-02-15","2027-03-26","2027-05-31",
+    "2027-06-18","2027-07-05","2027-09-06","2027-11-25","2027-12-24",
+}
+
+# NYSE 1 pm ET early closes: the day after Thanksgiving and Christmas Eve. Devon approved gating them 2026-10-13; until then the
+# bot kept sending orders into a closed market for about three hours on each. The bot's window ends five minutes before the
+# exchange does, exactly as on a normal day (15:55 for the 16:00 close), so on these days it ends at 12:55. Hand-kept like
+# MARKET_HOLIDAYS: add the next year's dates from the NYSE calendar when that set is extended (a test fails 150 days before either
+# table runs out).
+EARLY_CLOSE = {"2026-11-27", "2026-12-24", "2027-11-26"}
+SESSION_OPEN, SESSION_CLOSE, SESSION_CLOSE_EARLY = (9, 45), (15, 55), (12, 55)
+
+
+def session_bounds(day):
+    """THE bot's trading window for one calendar date: (open, close) as tz-aware ET datetimes, or None on a weekend or a
+    MARKET_HOLIDAYS date. `day` may be a date, a datetime or "YYYY-MM-DD". Everything that needs to know when the bot is
+    supposed to be working asks THIS (check_market, market_minutes_between, ARM A WATCH, the laptop's alerts and the downtime
+    tools), so an early close cannot be modelled in one place and missed in another."""
+    if isinstance(day, str):
+        day = datetime.strptime(day, "%Y-%m-%d")
+    y, m, d = day.year, day.month, day.day
+    key = "%04d-%02d-%02d" % (y, m, d)
+    if datetime(y, m, d).weekday() >= 5 or key in MARKET_HOLIDAYS:
+        return None
+    ch, cm = SESSION_CLOSE_EARLY if key in EARLY_CLOSE else SESSION_CLOSE
+    return (datetime(y, m, d, SESSION_OPEN[0], SESSION_OPEN[1], tzinfo=ET_TZ), datetime(y, m, d, ch, cm, tzinfo=ET_TZ))
+
+
+def check_market():
+    et = datetime.now(ET_TZ)
+    b = session_bounds(et)
+    if b is None:                                    # weekend or market holiday
+        return False, et
+    return b[0] <= et <= b[1], et
+
+def next_market_run(et):
+    """UTC time by which the bot should next run. During market hours that is one
+    cadence out; when closed it is the next session's 9:45 ET open. This is what
+    lets a remote monitor tell 'quiet weekend, fine' from 'dead during trading':
+    compare the CURRENT clock to this, not the last-updated timestamp, which on a
+    Saturday is correctly old. Returned as a tz-aware UTC datetime."""
+    open_, _ = check_market()
+    if open_:
+        return datetime.now(timezone.utc) + timedelta(minutes=20)   # 15 cadence + grace
+    cand = et.replace(hour=9, minute=45, second=0, microsecond=0)
+    for _ in range(9):                              # today's open if still ahead, else scan forward
+        if cand > et and cand.weekday() < 5 and cand.strftime("%Y-%m-%d") not in MARKET_HOLIDAYS:
+            return cand.astimezone(timezone.utc)
+        cand = (cand + timedelta(days=1)).replace(hour=9, minute=45, second=0, microsecond=0)
+    return datetime.now(timezone.utc) + timedelta(hours=12)          # fallback, never stick
+
+
+# ── Indicators (identical to the Robinhood bot) ───────────────────────────────
+def calc_rsi(closes, n=14):
+    gains  = [max(closes[i]-closes[i-1], 0) for i in range(-n, 0)]
+    losses = [max(closes[i-1]-closes[i], 0) for i in range(-n, 0)]
+    mg, ml = sum(gains)/n, sum(losses)/n
+    return 100 - 100/(1+mg/ml) if ml > 0 else 100
+
+def calc_ema(prices, n):
+    k, v = 2/(n+1), sum(prices[:n])/n
+    for p in prices[n:]: v = p*k + v*(1-k)
+    return v
+
+def calc_ema_series(prices, n):
+    k, out = 2/(n+1), [None]*(n-1)
+    v = sum(prices[:n])/n; out.append(v)
+    for p in prices[n:]: v = p*k + v*(1-k); out.append(v)
+    return out
+
+def _pair_corr(a, b, n=CORR_LOOKBACK):
+    """Pearson correlation of the last n daily returns of two closes series.
+    Series come from the same Alpaca batch so days align for liquid names; if
+    either is too short to judge, return 0 (fail open - don't block on no data)."""
+    m = min(len(a), len(b), n + 1)
+    if m < 40: return 0.0
+    ra = [a[i]/a[i-1] - 1 for i in range(len(a)-m+1, len(a))]
+    rb = [b[i]/b[i-1] - 1 for i in range(len(b)-m+1, len(b))]
+    k  = len(ra); ma = sum(ra)/k; mb = sum(rb)/k
+    cov = sum((x-ma)*(y-mb) for x, y in zip(ra, rb))
+    va  = sum((x-ma)**2 for x in ra); vb = sum((y-mb)**2 for y in rb)
+    return cov / ((va*vb) ** 0.5) if va > 0 and vb > 0 else 0.0
+
+def compute_signals(sym, closes, vols, live, meme_tickers):
+    if len(closes) < 35: return None  # MACD slow EMA needs >=26 bars + 9 for signal line
+    closes, vols = list(closes), list(vols)
+    closes[-1] = live
+
+    r   = calc_rsi(closes)
+    s20 = sum(closes[-20:])/20
+    s50 = sum(closes[-50:])/50 if len(closes) >= 50 else None
+    e9  = calc_ema(closes, 9)
+    e21 = calc_ema(closes, 21)
+
+    fast = calc_ema_series(closes, 12)
+    slow = calc_ema_series(closes, 26)
+    ml   = [f-s for f, s in zip(fast, slow) if f and s]
+    hist = ml[-1] - calc_ema(ml, 9)
+
+    mid  = s20
+    std  = math.sqrt(sum((p-mid)**2 for p in closes[-20:])/20)
+    pctb = (live-mid+2*std)/(4*std) if std > 0 else 0.5
+
+    trend = "neutral"
+    if s50:
+        if   live > s50*1.002: trend = "up"
+        elif live < s50*0.998: trend = "down"
+
+    v1 = (1 if live > s20*1.005 and r > 52 else -1 if live < s20*0.995 and r < 48 else 0)
+    v2 = 1 if r < 32 else (-1 if r > 68 else 0)
+    v3 = 1 if e9 > e21*1.001 else (-1 if e9 < e21*0.999 else 0)
+    v4 = 1 if hist > 0 else -1
+
+    avg_vol = sum(vols[-20:-1])/len(vols[-20:-1]) if len(vols) >= 20 else 0
+    delta   = (closes[-1]-closes[-2])/closes[-2] if closes[-2] else 0
+    v5 = 0
+    if vols and vols[-1] > avg_vol*1.8:
+        v5 = 1 if delta > 0.003 else (-1 if delta < -0.003 else 0)
+
+    bb     = 1 if pctb < 0.10 else (-1 if pctb > 0.90 else 0)
+    meme_b = 2 if sym in meme_tickers and r < MEME_RSI_MAX and delta > 0 else 0
+
+    buys  = sum(1 for v in [v1,v2,v3,v4,v5] if v==1)  + meme_b + (bb if bb==1  else 0)
+    sells = sum(1 for v in [v1,v2,v3,v4,v5] if v==-1) + (abs(bb) if bb==-1 else 0)
+
+    raw = 1 if buys >= 3 else (-1 if sells >= 3 else 0)
+    con = raw
+    if raw ==  1 and trend == "down": con = 0
+    if raw == -1 and trend == "up":   con = 0
+    if sym in meme_tickers and meme_b == 2 and buys >= 2 and trend != "down": con = 1
+
+    return {"sym": sym, "rsi": r, "trend": trend, "consensus": con, "delta": delta,
+            "buys": buys, "sells": sells, "macd_up": hist > 0, "bb": bb, "meme": meme_b > 0}
+
+
+# ── Yahoo Finance helpers (broker-agnostic, identical) ────────────────────────
+YF_HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+# Yahoo's quoteSummary endpoint (the earnings-calendar source) began requiring a
+# cookie + "crumb" token; without it it returns 401 {"code":"Unauthorized",
+# "description":"Invalid Crumb"}. The chart and screener endpoints are unaffected.
+# Audit 2026-08-23 caught this: earnings_within() fails open, so the guard had gone
+# silently dead - the bot would happily open a NEW position the day before a report.
+# One handshake per run (GET fc.yahoo.com for the A3 cookie, then /v1/test/getcrumb),
+# cached on the session. Still fails OPEN on any error: it is a landmine guard, not
+# a gate, and Yahoo blocking a cloud IP must never stop the bot from trading.
+_YF_SESSION = None
+# "unknown" until something actually needs the guard this run; then "live" or
+# "degraded". Published in status.json so a silently-degraded guard is VISIBLE -
+# it was dead for weeks and nothing reported it. Verified from a residential IP;
+# Yahoo may block this cookie/crumb flow from cloud runner ranges, so the first
+# real runner exercise is the true test.
+EARN_GUARD_STATE = "unknown"
+
+# Set True when the broker rejects a crypto order because the ACCOUNT is not
+# entitled to crypto (live account 2026-08-25: "crypto orders not allowed for
+# account", 4 rejections in one run and an emailed alert every run afterwards).
+# Retrying an entitlement failure is pointless: it cannot succeed until Devon
+# enables crypto on the account, and it turns a config gap into recurring alarm
+# noise, which is how real alerts get ignored.
+CRYPTO_BLOCKED = False
+def yf_session():
+    """requests.Session carrying Yahoo's A3 cookie + crumb. `.crumb` is "" if the
+    handshake failed (callers then behave exactly as they did before)."""
+    global _YF_SESSION, EARN_GUARD_STATE
+    if _YF_SESSION is not None:
+        return _YF_SESSION
+    s = requests.Session()
+    s.headers.update(YF_HEADERS)
+    s.crumb = ""
+    try:
+        s.get("https://fc.yahoo.com", timeout=8)          # 404 is fine - we want the cookie
+        r = s.get("https://query2.finance.yahoo.com/v1/test/getcrumb", timeout=8)
+        if r.status_code == 200 and r.text.strip() and "<" not in r.text:
+            s.crumb = r.text.strip()
+    except Exception as e:
+        print(f"  [yahoo crumb handshake failed ({e}) - earnings guard degraded]")
+    EARN_GUARD_STATE = "live" if s.crumb else "degraded"
+    if not s.crumb:
+        print("  [yahoo crumb unavailable - earnings guard degraded (fails open)]")
+    _YF_SESSION = s
+    return s
+
+def yf_ohlcv(sym):
+    try:
+        d = requests.get(f"https://query2.finance.yahoo.com/v8/finance/chart/{sym}?interval=1d&range=90d",
+                         headers=YF_HEADERS, timeout=10).json()
+        q = d["chart"]["result"][0]["indicators"]["quote"][0]
+        c = [x for x in q["close"]  if x is not None]
+        v = [x for x in q["volume"] if x is not None]
+        return (c, v) if len(c) >= 20 else (None, None)
+    except Exception: return None, None
+
+def yf_live(sym):
+    try:
+        d = requests.get(f"https://query2.finance.yahoo.com/v8/finance/chart/{sym}?interval=1m&range=1d",
+                         headers=YF_HEADERS, timeout=10).json()
+        c = d["chart"]["result"][0]["indicators"]["quote"][0]["close"]
+        return next(x for x in reversed(c) if x)
+    except Exception: return None
+
+# Whether the last yf_vix() read was a REAL quote (True), the 20.0 fallback (False), or not asked yet
+# (None). The fallback is a calm number by construction, so while this is False the VIX>35 halt AND the
+# 25/20 position-size scaling cannot fire, and a real spike during a Yahoo outage (which blocks datacenter
+# addresses) would be invisible. Found by the 2026-10-04 weekly audit. status.json publishes it as
+# "vix_live", the same idea as earnings_guard's live/degraded. VISIBILITY ONLY: the fallback value and every
+# threshold are unchanged (whether to fail closed instead is Devon's call, not a bug fix).
+VIX_STATE = {"live": None}
+
+
+def yf_vix():
+    try:
+        d = requests.get("https://query2.finance.yahoo.com/v8/finance/chart/%5EVIX?interval=1d&range=5d",
+                         headers=YF_HEADERS, timeout=10).json()
+        c = d["chart"]["result"][0]["indicators"]["quote"][0]["close"]
+        v = next(x for x in reversed(c) if x)
+        VIX_STATE["live"] = True
+        return v
+    except Exception as e:
+        VIX_STATE["live"] = False
+        print(f"  [VIX UNAVAILABLE ({type(e).__name__}): using 20.0, so the VIX>35 halt and the size scaling "
+              f"are NOT enforcing this run]")
+        return 20.0
+
+def fetch_wsb():
+    try:
+        d = requests.get("https://apewisdom.io/api/v1.0/filter/wallstreetbets", timeout=10).json()
+        return [x["ticker"] for x in d["results"][:10]]
+    except Exception: return []
+
+def fetch_screener():
+    try:
+        url = ("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved"
+               "?formatted=false&scrIds=most_actives&count=15")
+        qs = requests.get(url, headers=YF_HEADERS, timeout=10).json()["finance"]["result"][0]["quotes"]
+        qs = [q for q in qs if q.get("regularMarketPrice",0) >= 0.01
+              and q.get("averageDailyVolume3Month",0) >= 100000
+              and "." not in q["symbol"] and "-" not in q["symbol"]]
+        qs.sort(key=lambda q: q.get("averageDailyVolume3Month",0), reverse=True)
+        return [q["symbol"] for q in qs[:10]]
+    except Exception: return ["AAPL","MSFT","NVDA","AMD","TSLA","META","GOOGL","AMZN"]
+
+def fetch_smallcaps():
+    """Low-cap growth discovery via Yahoo's small-cap screeners. Quality rails:
+    price >= $0.10 - the practical floor for LISTED stocks (sub-penny names are OTC, untradeable on Alpaca; allows liquid sub-$1 movers - bought as WHOLE shares since
+    Alpaca blocks notional orders on non-fractionable names; true OTC penny stocks
+    aren't tradeable on Alpaca at all), >=500k shares/day AND >=$5M/day traded so
+    spreads don't eat the edge. These are only CANDIDATES - the signal engine
+    still has to vote them in like any name."""
+    out, seen = [], set()
+    for scr in ("small_cap_gainers", "aggressive_small_caps"):
+        try:
+            url = ("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved"
+                   f"?formatted=false&scrIds={scr}&count=15")
+            qs = requests.get(url, headers=YF_HEADERS, timeout=10).json()["finance"]["result"][0]["quotes"]
+            for q in qs:
+                px  = q.get("regularMarketPrice", 0) or 0
+                vol = q.get("averageDailyVolume3Month", 0) or 0
+                sym = q.get("symbol", "")
+                if (px >= 0.10 and vol >= 500_000 and px*vol >= 5_000_000
+                        and sym and "." not in sym and "-" not in sym and sym not in seen):
+                    seen.add(sym); out.append(sym)
+        except Exception:
+            continue
+    return out[:8]
+
+def fetch_day_gainers():
+    """Yahoo's whole-market day-gainers screener - momentum candidates from
+    anywhere in the market, same quality rails as the smallcap screen."""
+    try:
+        url = ("https://query2.finance.yahoo.com/v1/finance/screener/predefined/saved"
+               "?formatted=false&scrIds=day_gainers&count=15")
+        qs = requests.get(url, headers=YF_HEADERS, timeout=10).json()["finance"]["result"][0]["quotes"]
+        qs = [q for q in qs if (q.get("regularMarketPrice",0) or 0) >= 0.25
+              and (q.get("averageDailyVolume3Month",0) or 0) >= 500_000
+              and "." not in q["symbol"] and "-" not in q["symbol"]]
+        return [q["symbol"] for q in qs[:10]]
+    except Exception: return []
+
+
+# ── Alpaca broker layer (official REST API) ───────────────────────────────────
+ALPACA_DATA = "https://data.alpaca.markets"
+
+def alpaca_get(path, _tries=3):
+    """GET + parse JSON, with a short retry on TRANSIENT network errors. A single
+    connect/read timeout on a critical read like /v2/account would otherwise crash
+    the whole run - harmless (it dies before trading) but it fires a GitHub failure
+    email (2026-08-06). Reads are idempotent so retrying is safe; order POSTs are
+    deliberately NOT retried (a timed-out POST may already have filled)."""
+    for i in range(_tries):
+        try:
+            r = requests.get(ALPACA_BASE + path, headers=ALPACA_HDRS, timeout=15)
+            return r.json()
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            if i == _tries - 1:
+                raise
+            time.sleep(2 * (i + 1))                  # 2s, then 4s, then give up
+
+def alpaca_data_get(path):
+    r = requests.get(ALPACA_DATA + path, headers=ALPACA_HDRS, timeout=10)
+    return r.json()
+
+def fetch_market_movers():
+    """ENTIRE-market momentum sweep: Alpaca's screener ranks every listed US
+    equity by % change server-side (SIP data, resets at open). Top gainers join
+    the candidate pool - the signal engine still has to vote each one in."""
+    try:
+        d = alpaca_data_get("/v1beta1/screener/stocks/movers?top=35")
+        out = []
+        for g in d.get("gainers", []):
+            sym, px = g.get("symbol", ""), float(g.get("price") or 0)
+            if px >= 0.10 and sym and all(c not in sym for c in "./-"):
+                out.append(sym)
+        return out[:25]
+    except Exception: return []
+
+def fetch_most_actives():
+    """Highest share-volume names across the entire market (Alpaca screener)."""
+    try:
+        d = alpaca_data_get("/v1beta1/screener/stocks/most-actives?by=volume&top=15")
+        return [a["symbol"] for a in d.get("most_actives", [])
+                if a.get("symbol") and all(c not in a["symbol"] for c in "./-")][:10]
+    except Exception: return []
+
+def alpaca_bars_multi(symbols, days=90):
+    """Daily OHLCV for the WHOLE universe in 1-2 batch calls via Alpaca's official
+    data API (key-authed, real rate limits). This is the PRIMARY data source -
+    Yahoo scraping gets 429-blocked from cloud IPs, and the stops/exits depend on
+    this data, so the primary must be something we're entitled to. Returns
+    {sym: (closes, volumes)}."""
+    out = {}
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(days=days * 2)).strftime("%Y-%m-%d")
+        base = ("/v2/stocks/bars?timeframe=1Day&adjustment=split&feed=iex&limit=10000"
+                f"&start={start}&symbols=" + ",".join(symbols))
+        token = None
+        for _ in range(6):                      # paginate defensively
+            d = alpaca_data_get(base + (f"&page_token={token}" if token else ""))
+            for s, bars in (d.get("bars") or {}).items():
+                c = [b["c"] for b in bars if b.get("c")]
+                v = [b.get("v") or 0 for b in bars if b.get("c")]
+                pc, pv = out.get(s, ([], []))
+                out[s] = (pc + c, pv + v)
+            token = d.get("next_page_token")
+            if not token: break
+    except Exception:
+        pass
+    return out
+
+def alpaca_latest_multi(symbols):
+    """Latest trade price for many symbols in one call. {sym: price}."""
+    try:
+        d = alpaca_data_get("/v2/stocks/trades/latest?feed=iex&symbols=" + ",".join(symbols))
+        return {s: float(t.get("p") or 0) for s, t in (d.get("trades") or {}).items()
+                if t.get("p")}
+    except Exception:
+        return {}
+
+def crypto_data_get(path):
+    """Crypto market data is PUBLIC - send no auth headers (invalid keys would
+    401, and the data needs no entitlement)."""
+    r = requests.get(ALPACA_DATA + path, timeout=10)
+    return r.json()
+
+def crypto_bars_multi(pairs, days=90):
+    """Daily OHLCV for all crypto pairs in one call (v1beta3, free, no scraping).
+    Returns {pair: (closes, volumes)} keyed by slash form, e.g. 'DOGE/USD'."""
+    out = {}
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(days=days * 2)).strftime("%Y-%m-%d")
+        base = ("/v1beta3/crypto/us/bars?timeframe=1Day&limit=10000"
+                f"&start={start}&symbols=" + ",".join(pairs))
+        token = None
+        for _ in range(4):
+            d = crypto_data_get(base + (f"&page_token={token}" if token else ""))
+            for s, bars in (d.get("bars") or {}).items():
+                c = [b["c"] for b in bars if b.get("c")]
+                v = [b.get("v") or 0 for b in bars if b.get("c")]
+                pc, pv = out.get(s, ([], []))
+                out[s] = (pc + c, pv + v)
+            token = d.get("next_page_token")
+            if not token: break
+    except Exception:
+        pass
+    return out
+
+def crypto_latest_multi(pairs):
+    """Latest crypto trade price per pair. {pair: price}."""
+    try:
+        d = crypto_data_get("/v1beta3/crypto/us/latest/trades?symbols=" + ",".join(pairs))
+        return {s: float(t.get("p") or 0) for s, t in (d.get("trades") or {}).items()
+                if t.get("p")}
+    except Exception:
+        return {}
+
+def alpaca_account():
+    """Returns (cash, equity, daily_pnl).
+    We size off CASH - NOT Alpaca's margin buying power - so the bot never trades
+    on leverage. daily_pnl = equity - last_equity (today's change, for the loss cap).
+    daytrade_count is gone: FINRA retired the PDT rule 2026-06-04."""
+    a = alpaca_get("/v2/account")
+    cash = float(a.get("cash") or 0)
+    eq   = float(a["equity"])
+    # last_equity must be validated, not just defaulted. Alpaca returned the STRING
+    # "0" all day on 2026-07-23; "0" is truthy, so `float(x or eq)` produced leq=0
+    # and dayP&L = the entire account value. That reads as a huge GAIN, which can
+    # never trip the daily loss cap - the circuit breaker was silently disabled.
+    # A garbage value now means "unknown", i.e. dayP&L 0, and says so loudly.
+    try:
+        leq = float(a.get("last_equity"))
+    except (TypeError, ValueError):
+        leq = 0.0
+    if leq <= 0:
+        print(f"  [WARN last_equity={a.get('last_equity')!r} unusable - "
+              f"dayP&L reported as 0; daily loss cap is blind this run]")
+        leq = eq
+    return cash, eq, eq - leq
+
+def alpaca_today_sell_proceeds(et):
+    """T+1 settlement guard: stock-sale proceeds from TODAY are not settled cash
+    yet - buying with them and then selling that buy risks a good-faith violation
+    in a live CASH account. Sums today's stock SELL fills (crypto settles ~instantly,
+    excluded) so buys can be capped to settled cash. Paper doesn't enforce settlement,
+    but running the guard there validates it before go-live. Fail-open on API error:
+    treat all cash as settled (paper-safe; the log line makes it loud)."""
+    try:
+        midnight = et.replace(hour=0, minute=0, second=0, microsecond=0)
+        acts = alpaca_get(f"/v2/account/activities/FILL?after={midnight.isoformat()}&page_size=100") or []
+        crypto_flat = {p.replace("/", "") for p in CRYPTO_UNIVERSE}
+        total = 0.0
+        for a in acts:
+            sym = str(a.get("symbol") or "").replace("/", "")
+            if a.get("side") == "sell" and sym not in crypto_flat:
+                total += float(a.get("price") or 0) * float(a.get("qty") or 0)
+        return total
+    except Exception as e:
+        print(f"  [settlement check failed ({e}) - treating all cash as settled]")
+        return 0.0
+
+class _OpenOrders(set):
+    """The set of symbols with an open order, which ALSO remembers the order rows it was built from (.rows) so exit_pass can look at them
+    without a second request. Every caller and test still sees a plain set of symbols."""
+    rows = ()
+
+
+def alpaca_open_orders():
+    """Symbols with a pending (unfilled) order - skipped this run so a lingering
+    limit order can't double-buy or double-sell."""
+    try:
+        rows = alpaca_get("/v2/orders?status=open&limit=100")
+        out = _OpenOrders({o["symbol"] for o in rows if o.get("symbol")})
+        out.rows = [o for o in rows if isinstance(o, dict)]
+        return out
+    except Exception as e:
+        # Fail OPEN on purpose (a cycle that cannot read orders must still run its stops), but say so:
+        # until now an error reply silently switched the double-buy guard off (2026-10-28 cold review).
+        print(f"  [open orders unreadable ({type(e).__name__}) - double-buy guard OFF for this read]")
+        return set()
+
+# ── Contributed-capital detector ──────────────────────────────────────────────
+# Arm A had NO deposit handling at all until 2026-09-01, when laptop asked whether
+# this side carried the bug it had just fixed twice on its own. It was a fair
+# question and the honest answer was "we cannot tell": money moved into Alpaca after
+# the baseline was set would be counted as RETURN, with no detector, no record, and
+# nothing to notice it. On the Robinhood side that bug is at least subtle, because
+# the broker exposes pending_deposits. Here it would have been SILENT, and it biases
+# in favour of the arm this session owns, which is exactly why it needs a detector
+# rather than an assurance.
+#
+# Cash movements only. DIV and INT are deliberately EXCLUDED: dividends and interest
+# are RETURN, not contributed capital, and folding them in here would understate
+# performance instead of overstating it.
+CAPITAL_ACTIVITY_TYPES = "CSD,CSW,JNLC,ACATC,ACATS"
+
+
+def alpaca_capital_flows(after_iso):
+    """Net cash moved IN/OUT since after_iso. Returns (net, [events]) or (None, []).
+
+    None means COULD NOT DETERMINE -- unreachable API, unexpected shape -- and is
+    deliberately distinct from 0.0 meaning "checked, nothing moved". A detector that
+    reports "no deposits" when it actually failed is worse than no detector.
+    """
+    try:
+        d = alpaca_get("/v2/account/activities?activity_types=%s&after=%s"
+                       % (CAPITAL_ACTIVITY_TYPES, after_iso))
+    except Exception as e:
+        print(f"  [capital-flow check failed: {e}]")
+        return None, []
+    if not isinstance(d, list):
+        # A dict here is an API error object; anything else is unexpected.
+        msg = (d or {}).get("message", d) if isinstance(d, dict) else d
+        print(f"  [capital-flow check unavailable: {msg}]")
+        return None, []
+    events, net = [], 0.0
+    for a in d:
+        try:
+            amt = float(a.get("net_amount") or a.get("amount") or 0)
+        except (TypeError, ValueError):
+            continue
+        if not amt:
+            continue
+        net += amt
+        events.append({"date": (a.get("date") or a.get("transaction_time") or "")[:10],
+                       "type": a.get("activity_type"), "amount": round(amt, 2)})
+    return round(net, 2), events
+
+
+# -- Realized gain/loss, for tax tracking (Devon, 2026-09-29) ------------------
+# Devon wants a RUNNING TOTAL of realized gains versus losses in every report. That is
+# NOT the equity change pnl.py prints: equity includes unrealized paper losses, which
+# are not taxable. Only positions actually SOLD count. The pure math lives in
+# realized.py; this is the Alpaca-specific network half.
+#
+# Recomputed from the FULL fill history every cycle instead of updated incrementally,
+# for the reason the mailbox watcher taught us: a runner starts with an empty disk, so
+# incremental state either double counts or silently stops. A recompute cannot drift.
+REALIZED_F     = "realized_a.json"
+REALIZED_SINCE = "2026-01-01"          # before the account was funded (2026-06-08)
+# Events that make FIFO from fills WRONG (a split changes share counts, a transfer or
+# spinoff creates shares with no buy). Any of these => UNVERIFIED, never a clean number.
+BREAKS_FIFO_TYPES = "ACATS,JNLS,MA,NC,REORG,SC,SSO,SSP"
+BREAKS_FIFO_SET = set(BREAKS_FIFO_TYPES.split(","))   # tested here, never sent as a filter
+
+
+def alpaca_activity_history(since=REALIZED_SINCE, page_size=100):
+    """EVERY account activity since `since`, oldest first, as raw dicts.
+
+    One unfiltered pass on purpose. The first version asked for the split/transfer
+    events with an activity_types filter, the API rejected a name in that list, and the
+    check could not run at all (it failed SAFE, reporting UNVERIFIED, which is why it
+    was caught). Reading everything and testing membership here removes the dependency
+    on filter names nobody could verify, and one pass serves fills, event types and
+    income together.
+
+    Returns None unless the WHOLE history was fetched. A partial history would give a
+    confident wrong total, which is worse than no total.
+    """
+    acts, seen, token = [], set(), None
+    for _ in range(100):
+        q = "/v2/account/activities?after=%s&direction=asc&page_size=%d" % (since, page_size)
+        if token:
+            q += "&page_token=%s" % token
+        page = alpaca_get(q)
+        if not isinstance(page, list):
+            print("  [activity history unavailable: %s]" % (str(page)[:160],))
+            return None
+        for a in page:
+            aid = a.get("id")
+            if aid in seen:
+                continue
+            seen.add(aid)
+            acts.append(a)
+        if len(page) < page_size:
+            return acts
+        token = page[-1].get("id")
+    print("  [activity history hit the page cap; treating as incomplete]")
+    return None
+
+
+def fills_from(acts):
+    """realized.py fill dicts from raw activities (FILL rows only)."""
+    return [{"t": a.get("transaction_time"), "symbol": str(a.get("symbol", "")).replace("/", ""),
+             "side": a.get("side"), "qty": a.get("qty"), "price": a.get("price"),
+             "id": a.get("id"), "order": a.get("order_id")}
+            for a in acts if a.get("activity_type") == "FILL"]
+
+
+def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
+    """Fills only, or None if the history is incomplete."""
+    acts = alpaca_activity_history(since, page_size)
+    return None if acts is None else fills_from(acts)
+
+
+def alpaca_positions_total():
+    """Symbol -> TOTAL qty. Not alpaca_positions(): that reports qty_available, which
+    excludes shares tied up in open orders and would fake a mismatch."""
+    d = alpaca_get("/v2/positions")
+    if not isinstance(d, list):
+        return None
+    return {str(p.get("symbol", "")).replace("/", ""): float(p.get("qty") or 0) for p in d}
+
+
+CASH_MOVE_TYPES = {"CSD", "CSW", "CSR", "JNLC", "ACATC", "TRANS"}
+IDENTITY_TOL = 0.50     # dollars. Fractional-share price rounding is cents; more is a bug.
+
+
+def realized_identity(acts, res):
+    """Independent proof that the FIFO math is right, from numbers FIFO did not produce.
+
+    For a long-only cash account:
+        cash + market_value - contributions - other_income  ==  realized + (market_value - open_cost)
+    Everything on the left comes from the broker (account cash, live positions, non-fill
+    activities). Everything on the right comes from the fills and FIFO. If a fill price,
+    a lot match or a closed-lot total were wrong, they would not agree. Positions
+    reconciliation cannot catch that: it only proves the SHARE COUNTS line up.
+
+    Returns (residual_dollars, detail) or (None, reason) when it cannot be computed.
+    """
+    acct, pos = alpaca_get("/v2/account"), alpaca_get("/v2/positions")
+    if not isinstance(pos, list) or not isinstance(acct, dict) or "cash" not in acct:
+        return None, "could not read account cash or positions"
+    try:
+        cash = float(acct["cash"])
+        mv = sum(float(p.get("market_value") or 0) for p in pos)
+        contrib = other = 0.0
+        for a in acts:
+            t = a.get("activity_type")
+            if t == "FILL":
+                continue
+            amt = float(a.get("net_amount") or 0)
+            if t in CASH_MOVE_TYPES:
+                contrib += amt
+            else:
+                other += amt
+        realized_raw = sum(l["gain"] for l in res["closed"])
+        open_cost = sum(res["open_basis"].values())
+        lhs = cash + mv - contrib - other
+        rhs = realized_raw + (mv - open_cost)
+    except Exception as e:
+        return None, "identity calculation failed: %s" % e
+    return round(lhs - rhs, 4), {"cash": round(cash, 2), "market_value": round(mv, 2),
+                                 "contributions": round(contrib, 2), "other_income_fees": round(other, 2),
+                                 "realized_raw": round(realized_raw, 4), "open_cost": round(open_cost, 2)}
+
+
+def alpaca_realized_block():
+    """(summary_block, ledger) for Arm A. NEVER raises. ledger is None on failure.
+
+    summary_block.state is one of:
+      ok          reconciles with the broker's live positions, no FIFO-breaking events
+      unverified  a number exists but something does not reconcile; reason says what
+      unknown     could not compute at all
+    """
+    try:
+        import realized as R
+    except Exception as e:
+        return {"state": "unknown", "reason": "realized.py unavailable: %s" % e}, None
+    acts = alpaca_activity_history()
+    if acts is None:
+        return {"state": "unknown", "reason": "activity history unavailable"}, None
+    fills = fills_from(acts)
+    try:
+        res = R.fifo(fills)
+        summ = R.summarize(res["closed"])
+        watch = R.wash_watch(res["closed"], fills)
+    except Exception as e:
+        return {"state": "unknown", "reason": "calculation failed: %s" % e}, None
+
+    reasons = []
+    if res["unmatched"]:
+        reasons.append("%d sell(s) with no matching buy" % len(res["unmatched"]))
+    live = alpaca_positions_total()
+    if live is None:
+        reasons.append("could not read live positions to reconcile")
+    else:
+        bad = R.verify_positions(res["open"], live)
+        if bad:
+            time.sleep(4)      # a fill can reach positions a moment before activities
+            acts2 = alpaca_activity_history()
+            live2 = alpaca_positions_total()
+            if acts2 is not None and live2 is not None:
+                acts, fills, live = acts2, fills_from(acts2), live2
+                res = R.fifo(fills)
+                summ = R.summarize(res["closed"])
+                watch = R.wash_watch(res["closed"], fills)
+                bad = R.verify_positions(res["open"], live)
+            if bad:
+                reasons.append("positions do not reconcile: " + ", ".join(
+                    "%s fills=%.4f broker=%.4f" % (b["symbol"], b["from_fills"], b["broker"])
+                    for b in bad[:4]))
+    types = {}
+    for a in acts:
+        t = str(a.get("activity_type"))
+        types[t] = types.get(t, 0) + 1
+    # Sanity: an activity list with fills in it must contain FILL rows, otherwise the
+    # reader is returning something other than what this code thinks it is.
+    if fills and types.get("FILL", 0) != len(fills):
+        reasons.append("activity types do not match fills; reader is suspect")
+    resid, idetail = realized_identity(acts, res)
+    if resid is None:
+        reasons.append("identity check unavailable: %s" % idetail)
+    elif abs(resid) > IDENTITY_TOL:
+        reasons.append("does not reconcile to the account: residual %.2f dollars" % resid)
+    hits = {t: n for t, n in types.items() if t in BREAKS_FIFO_SET}
+    if hits:
+        reasons.append("split/transfer/corporate-action event(s) break FIFO: "
+                       + ", ".join("%s x%d" % kv for kv in sorted(hits.items())))
+
+    last_fill = fills[-1]["t"] if fills else None
+    sales = sorted({l["close_date"] for l in res["closed"]})
+    summary = dict(summ)
+    summary.update({
+        "state": "unverified" if reasons else "ok",
+        "since": (R.trade_date(fills[0]["t"]).isoformat() if fills else None),
+        "last_sale": (sales[-1] if sales else None),
+        "last_fill": last_fill, "fills": len(fills),
+        "wash_watch": R.wash_totals(watch),
+        "by_year": R.summarize_by_year(res["closed"]),
+        "reconciliation_residual": resid,
+        "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
+    })
+    if reasons:
+        summary["reason"] = "; ".join(reasons)
+    ledger = {
+        "arm": "A", "source": "alpaca live /v2/account/activities FILL since " + REALIZED_SINCE,
+        "method": summary["method"],
+        "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are "
+                "an UPPER BOUND for a tax preparer to judge, not an adjustment.",
+        "summary": summary,
+        "closed": res["closed"], "wash_watch": watch, "open": res["open"],
+        "buys": [{"t": R.trade_date(f["t"]).isoformat(), "symbol": f["symbol"],
+                  "qty": float(f["qty"])} for f in fills if str(f["side"]).lower() == "buy"],
+    }
+    return summary, ledger
+
+
+def alpaca_activity_count(types, since):
+    """How many activities of these types since `since`. None = COULD NOT CHECK, which
+    is deliberately distinct from 0 = checked and there are none."""
+    d = alpaca_get("/v2/account/activities?activity_types=%s&after=%s" % (types, since))
+    if not isinstance(d, list):
+        print("  [activity query for %s failed: %s]" % (types, str(d)[:160]))
+        return None
+    return len(d)
+
+
+_RUN_REALIZED = {}
+
+
+def realized_for_run():
+    """Arm A's realized block, computed at most ONCE per process and shared by the email
+    body and status.json. On failure it carries the last good ledger forward, marked
+    stale, so one transient API error cannot erase the number (the same lesson as
+    capital_flow: status.json is rewritten every run)."""
+    if "block" in _RUN_REALIZED:
+        return _RUN_REALIZED["block"]
+    try:
+        block, ledger = alpaca_realized_block()
+    except Exception as e:                       # belt and braces: must never break a run
+        block, ledger = {"state": "unknown", "reason": "unexpected: %s" % e}, None
+    if ledger is not None:
+        try:
+            new = json.dumps(ledger, indent=1, sort_keys=True)
+            old = ""
+            if os.path.exists(REALIZED_F):
+                with open(REALIZED_F, encoding="utf-8") as _rf:
+                    old = _rf.read()
+            if new != old:                       # deterministic, so it only changes on new fills
+                with open(REALIZED_F, "w", encoding="utf-8") as f:
+                    f.write(new)
+        except Exception as e:
+            print("  [%s not written: %s]" % (REALIZED_F, e))
+    else:
+        try:
+            with open(REALIZED_F, encoding="utf-8") as _rf:
+                last = json.load(_rf)["summary"]
+            last = dict(last)
+            why = block.get("reason", "refresh failed")
+            if last.get("state") == "unverified":
+                # An UNVERIFIED ledger stays unverified: relabelling it "stale, last good" would drop the warning that
+                # its fills never reconciled with the broker and present it as a number that was once fine.
+                last.update({"reason": "%s [refresh failed, carried forward: %s]" % (last.get("reason") or "does not reconcile", why),
+                             "as_of": last.get("last_fill")})
+            else:
+                last.update({"state": "stale", "reason": why, "as_of": last.get("last_fill")})
+            block = last
+        except Exception:
+            pass                                 # nothing to carry forward: stay unknown
+    block["checked_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    _RUN_REALIZED["block"] = block
+    return block
+
+
+def alpaca_positions():
+    pos = {}
+    for p in alpaca_get("/v2/positions"):
+        q = float(p.get("qty_available") or p.get("qty") or 0)
+        if q > 0:
+            pos[p["symbol"]] = {"qty": q, "avg_cost": float(p.get("avg_entry_price") or 0),
+                                "mkt_val": float(p.get("market_value") or 0)}
+    return pos
+
+def alpaca_position_gone(sym):
+    """Positively confirm a symbol is no longer held (explicit 404 or zero qty)
+    with a direct per-symbol read. On ANY doubt (network error, odd payload),
+    report NOT gone - a hold must never be dropped on a data hiccup.
+    (2026-07-07: one transient empty-positions snapshot purged the whole holds
+    ledger; the names, reclassified as trade-sleeve, stopped out at -7% instead
+    of riding their -25% hold stops.)"""
+    try:
+        p = alpaca_get(f"/v2/positions/{sym}")
+        if not isinstance(p, dict):
+            return False
+        if p.get("code") or p.get("message"):
+            # Alpaca error bodies all look like {"code": N, "message": ...}; ONLY a 404 (40410000,
+            # "position does not exist") means the position is gone. A 429/403/500 body is doubt, not
+            # confirmation (2026-10-28 cold review: it used to count as gone and cleared the ledger).
+            msg = str(p.get("message") or "").lower()
+            return str(p.get("code") or "").startswith("404") or "does not exist" in msg
+        if "qty" not in p:
+            return False
+        return float(p["qty"]) <= 0
+    except Exception:
+        return False
+
+def alpaca_news(symbols, minutes, limit=50):
+    """Headlines for symbols from Alpaca's news API (Benzinga; included with our
+    keys, no extra cost). Returns [(symbols, text, created_at)] newest-first.
+    Fail-open: [] on any error - news can sharpen decisions, never break them. But it SAYS so: the danger-headline
+    tripwire (news_flags, run every fast pass) used to go blind on an error body or an exception without a trace.
+    One page of the newest `limit` articles is enough: they come newest first inside a short window, so a cut-off
+    can only drop headlines older than ones an earlier pass already saw."""
+    if not symbols:
+        return []
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        d = alpaca_data_get(f"/v1beta1/news?symbols={','.join(sorted(symbols))}"
+                            f"&start={start}&limit={limit}&sort=desc")
+        if not isinstance(d, dict) or "news" not in d:
+            why = (d.get("message") if isinstance(d, dict) else None) or ("no news field" if isinstance(d, dict) else type(d).__name__)
+            print(f"  [news unreadable ({why}) - the danger-headline tripwire is blind for this read]")
+            return []
+        out = []
+        for a in (d.get("news") or []):
+            txt = f"{a.get('headline') or ''} {a.get('summary') or ''}".strip()
+            out.append((a.get("symbols") or [], txt, a.get("created_at") or ""))
+        return out
+    except Exception as e:
+        print(f"  [news unreadable ({type(e).__name__}) - the danger-headline tripwire is blind for this read]")
+        return []
+
+def news_flags(symbols, minutes):
+    """The tripwire: {sym: headline_snippet} for names carrying a DANGER_WORDS
+    headline inside the window. Deterministic keywords - no LLM, $0, every pass."""
+    flags = {}
+    for syms, txt, _created in alpaca_news(set(symbols), minutes):
+        low = txt.lower()
+        if any(w in low for w in DANGER_WORDS):
+            for s in syms:
+                if s in symbols and s not in flags:
+                    flags[s] = txt[:140]
+    return flags
+
+_EARN_CACHE = {}
+def earnings_within(sym, days=EARNINGS_BLOCK_D):
+    """True if sym reports earnings within `days`. Yahoo calendarEvents, cached per
+    run, fail-OPEN on any error/429 - it's a landmine guard, not a gate.
+    Cache key includes `days`: keying on the symbol alone made a second call with a
+    different window silently return the first window's answer (only one production
+    caller today, but it is a trap for the next one).
+
+    The published state (EARN_GUARD_STATE, status.json "earnings_guard") used to come from the crumb HANDSHAKE alone, so
+    a run where every per-symbol query was rate limited still said "live". A query that fails, or whose reply carries no
+    `result` (Yahoo's 429 / error body), now marks the guard "degraded" for the rest of the run. The answer is unchanged:
+    still fail-open, still False."""
+    global EARN_GUARD_STATE
+    ck = (sym, days)
+    if ck in _EARN_CACHE:
+        return _EARN_CACHE[ck]
+    hit = False
+    failed = False
+    try:
+        sess = yf_session()
+        if not sess.crumb:
+            _EARN_CACHE[ck] = False       # handshake down: fail open, don't hammer Yahoo
+            return False
+        d = sess.get(f"https://query2.finance.yahoo.com/v10/finance/quoteSummary/{sym}"
+                     f"?modules=calendarEvents&crumb={sess.crumb}", timeout=8).json()
+        results = (d.get("quoteSummary") or {}).get("result")
+        if not results:                   # an error body has result null: the query FAILED, it did not say "no earnings"
+            failed = True
+        res = (results or [{}])[0]
+        eds = ((res.get("calendarEvents") or {}).get("earnings") or {}).get("earningsDate") or []
+        now = datetime.now(timezone.utc).timestamp()
+        for e in eds:
+            ts = e.get("raw") if isinstance(e, dict) else None
+            if ts and 0 <= ts - now <= days * 86400:
+                hit = True
+                break
+    except Exception:
+        hit, failed = False, True
+    if failed:
+        EARN_GUARD_STATE = "degraded"
+        print(f"  [earnings query for {sym} failed - earnings guard degraded, entry NOT blocked (fails open)]")
+    _EARN_CACHE[ck] = hit
+    return hit
+
+
+def load_holds():
+    """The buy-and-hold ledger (holds.json, committed back to the repo like the
+    trade log). Maps symbol -> {ts, basis, notional}. Symbols here are EXEMPT from
+    sell signals - only the HOLD_STOP disaster stop exits them."""
+    if not os.path.exists("holds.json"):
+        return {}
+    try:
+        with open("holds.json") as f:
+            return json.load(f)
+    except Exception as e:
+        # No ledger means every hold is judged as a TRADE position (-7% stop, not -25%), so an unreadable
+        # file must never be silent (2026-10-28 cold review).
+        print(f"! holds.json UNREADABLE ({type(e).__name__}: {e}) - treating the hold ledger as EMPTY this pass")
+        return {}
+
+def save_holds(holds):
+    # Write beside, then replace: a crash mid-write used to leave a truncated file, which load_holds read as "no holds".
+    tmp = "holds.json.tmp"
+    try:
+        with open(tmp, "w") as f:
+            json.dump(holds, f, indent=1, sort_keys=True)
+        os.replace(tmp, "holds.json")
+    except BaseException:
+        try: os.remove(tmp)
+        except OSError: pass
+        raise
+
+def recent_stop_outs(days=STOP_COOLDOWN_D):
+    """Symbols whose stop fired within the cooldown window - no revenge re-entry.
+    Read from the tail of trade_log.jsonl (committed to the repo every run)."""
+    latest = {}
+    try:
+        with open("trade_log.jsonl") as f:
+            for line in f.readlines()[-400:]:
+                try: d = json.loads(line)
+                except Exception: continue
+                if d.get("side") == "sell" and (d.get("stop_loss") or d.get("hold_stop")):
+                    latest[d["symbol"]] = d.get("ts", "")
+    except Exception:
+        return set()
+    cut = (datetime.now(ET_TZ) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
+    return {s for s, ts in latest.items() if ts >= cut}
+
+def last_buy_dates(held_syms):
+    """Most recent buy timestamp per held symbol, from the local trade log.
+    Drives the time stop: an add resets the clock (renewed conviction)."""
+    out = {}
+    try:
+        for line in open("trade_log.jsonl"):
+            try: d = json.loads(line)
+            except Exception: continue
+            if d.get("side") == "buy" and d.get("symbol") in held_syms:
+                out[d["symbol"]] = d.get("ts", "")
+    except Exception:
+        pass
+    return out
+
+
+def load_plan(et):
+    """Read today's research plan (daily_plan.json, written by brief.py).
+    risk is clamped to [0,1] - the plan can only scale buys DOWN, never past the
+    bot's hard rails. A missing or stale (not-today) plan -> neutral defaults, so the
+    bot is unaffected when the brief hasn't run."""
+    # A STALE PLAN MUST NEVER RAISE RISK. The old fallback returned risk 1.0 and an
+    # empty avoid list, and its docstring claimed the bot was then "unaffected". That
+    # was false in the dangerous direction: across all 79 recorded plan days the brief
+    # NEVER once allowed full size (mean 0.46, max 0.65, min 0.30), so falling back to
+    # 1.0 moved the bot to a sizing it had never traded at in its history, silently,
+    # because a stale plan looks exactly like a calm one.
+    #
+    # Found 2026-09-27 when the ANTHROPIC_API_KEY credit balance ran out and stopped
+    # brief.py. A BILLING LAPSE MUST NOT BE ABLE TO DOUBLE POSITION SIZING.
+    #
+    # So a stale plan now HOLDS its own last-known risk and avoid list rather than
+    # discarding them. Both are conservative by construction: risk only ever scales
+    # DOWN, and a stale avoid list can only block names, never admit new ones. The
+    # regime is relabelled so the staleness is visible rather than inferred.
+    no_plan = {"regime": "no-plan", "risk": NO_PLAN_RISK, "avoid": set(), "favor": [],
+               "notes": "daily_plan.json missing", "stale": True, "plan_date": None}
+    try:
+        if not os.path.exists("daily_plan.json"):
+            return no_plan
+        with open("daily_plan.json", encoding="utf-8") as _pf:     # brief.py writes UTF-8; the default
+            p = json.load(_pf)                                   # codec on the Windows laptop is cp1252
+        # A plan with no risk_scale at all (hand-edited, truncated) is not a licence for full size.
+        rs = max(0.0, min(1.0, float(p.get("risk_scale", NO_PLAN_RISK))))
+        pd = p.get("date")
+        stale = pd != et.strftime("%Y-%m-%d")
+        if stale:
+            # Hold the last plan's damper. min() is belt and braces: if some future
+            # plan ever carried 1.0, staleness still could not raise us past the
+            # standing cap.
+            rs = min(rs, NO_PLAN_RISK if rs >= 1.0 else rs)
+        return {"regime": (f"stale:{p.get('regime', 'neutral')}" if stale
+                           else p.get("regime", "neutral")),
+                "risk": rs,
+                "avoid": set(p.get("avoid_symbols", [])),
+                "favor": [] if stale else list(p.get("favor_symbols", [])),
+                "notes": p.get("notes", ""), "stale": stale, "plan_date": pd}
+    except Exception as e:
+        print(f"  [plan unreadable ({e}) - holding conservative default]")
+        return no_plan
+
+def alpaca_order(payload):
+    """POST an order. Returns Alpaca's JSON - has 'id' on success, 'message' on error."""
+    try:
+        r = requests.post(ALPACA_BASE + "/v2/orders", headers=ALPACA_HDRS, json=payload, timeout=15)
+        try:
+            return r.json()
+        except Exception:
+            return {"message": f"non-JSON {r.status_code}: {r.text[:200]}"}
+    except Exception as e:
+        return {"message": f"request failed: {e}"}
+
+def _ok(result):
+    """Alpaca accepted the order iff it echoes an id and carries no error message."""
+    return bool(result) and result.get("id") and not result.get("message")
+
+
+# ── A stop sell that rests unfilled (Devon 2026-11-05, chosen from clickable options) ──────────────────────
+# Under CHEAP_PX a stop sells with a DAY limit at 98% of the price, and exit_pass skips any symbol with a resting order. If the price keeps falling
+# past that limit the sell never fills, is never re-priced, and nothing else can sell the stock that day. A resting sell of OURS that has waited
+# STALE_SELL_MIN minutes with the price below its limit is cancelled; the NEXT pass (a minute later) sees no resting order and places a fresh stop
+# at 98% of the then-current price. Cancel only, never a re-place in the same pass: Alpaca keeps the shares held for the old order until the
+# cancel lands, so an immediate new sell would be rejected.
+# ONLY the bot's own protective sells: a bracket's take-profit leg is a resting sell ABOVE the market on purpose and must be left alone. They are
+# recognised by order id in trade_log.jsonl, where every stop_loss / hold_stop / news_exit sell is logged with its id.
+STALE_SELL_MIN = 5
+
+
+def alpaca_cancel_order(order_id):
+    """Cancel one open order. True if Alpaca accepted it (204), False otherwise, logged. One attempt: a cancel is idempotent (a second one on an
+    order that is already gone answers 404 or 422), and a failure only means the next pass tries again."""
+    try:
+        r = requests.delete(ALPACA_BASE + "/v2/orders/%s" % order_id, headers=ALPACA_HDRS, timeout=15)
+        if r.status_code in (200, 204):
+            return True
+        print("    [cancel of order %s not accepted: %s %s]" % (order_id, r.status_code, (r.text or "")[:120]))
+        return False
+    except Exception as e:
+        print("    [cancel of order %s failed: %s]" % (order_id, type(e).__name__))
+        return False
+
+
+def own_stop_sell_ids(path="trade_log.jsonl", tail=600):
+    """Order ids of the bot's OWN protective sells (stop_loss, hold_stop, news_exit) from the end of the trade log."""
+    ids = set()
+    try:
+        with open(path) as f:
+            lines = f.readlines()[-tail:]
+    except OSError:
+        return ids
+    for ln in lines:
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if isinstance(d, dict) and d.get("side") == "sell" and d.get("order_id") and (d.get("stop_loss") or d.get("hold_stop") or d.get("news_exit")):
+            ids.add(str(d["order_id"]))
+    return ids
+
+
+def _order_time(s):
+    try:
+        return datetime.strptime(str(s)[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def stale_stop_sells(rows, own_ids, lasts, now_utc, min_age=STALE_SELL_MIN):
+    """Resting SELL limit orders that are the bot's own stops, have waited min_age minutes, and sit ABOVE the live price (so they cannot fill).
+    A row missing its id, side, limit, symbol or creation time is never returned: when in doubt, leave the order alone."""
+    out = []
+    for o in rows or ():
+        try:
+            if o.get("side") != "sell" or (o.get("type") or o.get("order_type")) != "limit":
+                continue
+            oid, sym = o.get("id"), o.get("symbol")
+            if not oid or not sym or str(oid) not in own_ids:
+                continue
+            limit, live, created = float(o.get("limit_price") or 0), lasts.get(sym), _order_time(o.get("created_at"))
+            if limit <= 0 or not live or created is None:
+                continue
+            age = (now_utc - created).total_seconds() / 60.0
+            if age >= min_age and live < limit:
+                out.append({"id": str(oid), "symbol": sym, "limit": limit, "live": float(live), "age": age})
+        except (TypeError, ValueError, AttributeError):
+            continue
+    return out
+
+
+# ── A held stock with no live price (Devon 2026-11-05) ─────────────────────────────────────────────────────
+# exit_pass cannot stop-check a name whose price the data API did not return, and used to say so only in the run log. Now Devon is emailed ONCE when
+# a held name has had no price for BLIND_PASSES consecutive passes (about three minutes). No trading change and no other price source: a bad
+# backup price could sell real shares. The back-off lives in outage.json, which the persist step already commits, because every run is a new
+# process (an hour-long feed gap would otherwise mean an email per 15-minute run): at most one email per OUTAGE_REALERT_H, re-armed when
+# every held name has a price again.
+BLIND_PASSES = 3
+_BLIND_STREAK = {}
+
+
+def note_blind(blind, now_utc):
+    """Count consecutive passes with no price per held name; email when one reaches BLIND_PASSES. True if an email was sent."""
+    for sym in [x for x in _BLIND_STREAK if x not in blind]:
+        del _BLIND_STREAK[sym]
+    for sym in blind:
+        _BLIND_STREAK[sym] = _BLIND_STREAK.get(sym, 0) + 1
+    st = _outage_load()
+    if not blind:
+        if st.pop("blind_alert_utc", None) is not None:
+            _outage_save(st)                                   # the episode is over: re-arm
+        return False
+    due = sorted(x for x, n in _BLIND_STREAK.items() if n >= BLIND_PASSES)
+    if not due:
+        return False
+    last = st.get("blind_alert_utc")
+    gap = None
+    if last:
+        try:
+            gap = (now_utc - datetime.fromisoformat(str(last).replace("Z", "+00:00"))).total_seconds() / 3600.0
+        except ValueError:
+            gap = None                                         # unparseable: we cannot prove he was told, so alert
+    if gap is not None and gap < OUTAGE_REALERT_H:
+        return False                                           # already told, inside the back-off
+    send_email(f"Alpaca bot ({MODE}) - no live price for held stock(s): {', '.join(due)}",
+               f"For {BLIND_PASSES} protective passes in a row (about {BLIND_PASSES} minutes) Alpaca's price feed returned nothing for: "
+               f"{', '.join(due)}.{chr(10)}{chr(10)}Their stop-loss and hold-stop checks were NOT evaluated in that time, so those positions are "
+               f"unwatched until the feed returns. Nothing was sold or changed; the bot is otherwise running."
+               f"{chr(10)}{chr(10)}Repeats are suppressed for {OUTAGE_REALERT_H:.0f}h at a time; check https://status.alpaca.markets")
+    st["blind_alert_utc"] = now_utc.isoformat(timespec="seconds")
+    _outage_save(st)
+    return True
+
+_ASSET_CACHE = {}
+def alpaca_asset(sym):
+    """Asset metadata (tradable/fractionable), cached per run."""
+    if sym not in _ASSET_CACHE:
+        try:    _ASSET_CACHE[sym] = alpaca_get(f"/v2/assets/{sym}") or {}
+        except Exception: _ASSET_CACHE[sym] = {}
+    return _ASSET_CACHE[sym]
+
+def _px(p):
+    """Limit-price rounding: sub-$1 names quote in 4 decimals, others in 2."""
+    return round(p, 4 if p < 1 else 2)
+
+def place_buy(sym, dollar_amount, live=None):
+    """Buy with spread protection. Liquid fractionable names: MARKET notional
+    (dollar amount). Cheap names (<$5, incl. all sub-$1): WHOLE-SHARE marketable
+    LIMIT at live*1.02 - thin names fill 5-20x worse at market, so the limit caps
+    slippage at ~2%. Non-fractionable names fall back to whole-share orders too."""
+    a = alpaca_asset(sym)
+    cheap = live is not None and live < CHEAP_PX
+    if a and a.get("tradable") is False:
+        r = {"message": f"{sym} not tradable on Alpaca"}
+    elif a.get("fractionable", True) and not cheap:
+        r = alpaca_order({"symbol": sym, "notional": str(round(dollar_amount, 2)),
+                          "side": "buy", "type": "market", "time_in_force": "day"})
+    elif live and live > 0 and int(dollar_amount // live) >= 1:
+        payload = {"symbol": sym, "qty": str(int(dollar_amount // live)),
+                   "side": "buy", "time_in_force": "day"}
+        if cheap:
+            payload.update({"type": "limit", "limit_price": str(_px(live * 1.02))})
+        else:
+            payload.update({"type": "market"})
+        r = alpaca_order(payload)
+    else:
+        r = {"message": f"{sym} not fractionable; ${dollar_amount:.2f} buys <1 share"}
+    if not _ok(r):
+        print(f"    [buy rejected: {(r or {}).get('message', r)}]")
+    return r
+
+def place_crypto_buy(pair, dollar_amount):
+    """Crypto MARKET buy by dollar amount. Crypto orders require tif=gtc/ioc."""
+    r = alpaca_order({"symbol": pair, "notional": str(round(dollar_amount, 2)),
+                      "side": "buy", "type": "market", "time_in_force": "gtc"})
+    if not _ok(r):
+        msg = str((r or {}).get("message", r))
+        print(f"    [crypto buy rejected: {msg}]")
+        if "not allowed" in msg.lower() or "not permitted" in msg.lower():
+            global CRYPTO_BLOCKED
+            CRYPTO_BLOCKED = True
+            print("    [account is not entitled to crypto - skipping the crypto sleeve "
+                  "for the rest of this run; enable crypto on the Alpaca account to restore it]")
+    return r
+
+def place_crypto_sell(pair, qty):
+    """Crypto MARKET sell of a held quantity (fractional fine)."""
+    r = alpaca_order({"symbol": pair, "qty": str(qty),
+                      "side": "sell", "type": "market", "time_in_force": "gtc"})
+    if not _ok(r):
+        print(f"    [crypto sell rejected: {(r or {}).get('message', r)}]")
+    return r
+
+def place_sell(sym, qty, live=None):
+    """Sell a held quantity. Cheap names with whole-share qty sell via marketable
+    LIMIT at live*0.98 (spread protection); fractional quantities must go MARKET
+    (Alpaca restriction), as do liquid names where market fills are fine."""
+    payload = {"symbol": sym, "qty": str(qty), "side": "sell", "time_in_force": "day"}
+    whole = float(qty) == int(float(qty))
+    if live is not None and live < CHEAP_PX and whole:
+        payload.update({"type": "limit", "limit_price": str(_px(live * 0.98))})
+    else:
+        payload.update({"type": "market"})
+    r = alpaca_order(payload)
+    if not _ok(r):
+        print(f"    [sell rejected: {(r or {}).get('message', r)}]")
+    return r
+
+
+# ── LIVE STRATEGY (HYBRID, 2026-06-24): a 50% buy-and-hold index core (SPY/QQQ/IWM)
+# as a shock absorber, plus the FULL active day-trader on the rest (~45%: trade +
+# hold + crypto sleeves, whole-market momentum, memes, micros, brackets) + ~5% cash.
+# The index core is bought/held below; the active sleeves never touch the index ETFs.
+def run_bot():
+    open_, et = check_market()
+    if not open_:
+        print(f"Market closed ({et.strftime('%H:%M ET')}). Done.")
+        return
+
+    print(f"=== Alpaca bot run {et.strftime('%Y-%m-%d %H:%M ET')} | {MODE} | HYBRID ===")
+    events     = []   # human-readable order outcomes (drives the email)
+    trades_log = []   # structured per-trade context (appended to trade_log.jsonl)
+
+    cash, equity, daily_pnl = alpaca_account()
+    acct_tag    = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]  # tags each trade so an account swap can't silently corrupt the log/review
+    unsettled   = alpaca_today_sell_proceeds(et)        # T+1: today's sale proceeds
+    settled     = max(0.0, cash - unsettled)            # what buys may actually spend
+    if unsettled > 0:
+        print(f"  SETTLEMENT: ${unsettled:.2f} of today's sale proceeds unsettled (T+1) - buys capped to ${settled:.2f}")
+    spend_cap   = settled * SPEND_CAP_PCT               # <=25% of SETTLED cash per run (no margin, no GFVs)
+    low_cash    = cash < 5.00
+    positions   = alpaca_positions()
+    plan        = load_plan(et)
+    pending     = alpaca_open_orders()                  # unfilled orders - skip those names
+    cooldown    = recent_stop_outs()                    # stopped recently - no re-entry yet
+
+    # Sleeve accounting: holds (buy-and-keep ledger) vs trading (everything else).
+    holds       = load_holds()
+    holds_dirty = False
+    # SNAPSHOT SANITY (2026-07-07): if the broker says we hold NOTHING while the
+    # ledger says we should, the snapshot is corrupt (a real Alpaca blip returned
+    # empty positions + equity==cash once) - skip the run rather than trade on it.
+    # A GENUINELY empty account looks identical to that blip, which deadlocked the
+    # first LIVE run (2026-08-11): the fresh live account had 0 positions while
+    # holds.json still carried the old PAPER account's names, so every run skipped
+    # forever. Distinguish the two by asking the broker per-symbol: a real 404 means
+    # the position is truly gone (account switch / clean slate) so the ledger is
+    # merely stale and gets cleared; anything else (error, timeout) still means a
+    # bad snapshot and we skip, preserving the 2026-07-07 protection.
+    if holds and not positions:
+        confirmed_gone = all(alpaca_position_gone(s) for s in holds)
+        if confirmed_gone:
+            print(f"  ledger lists {len(holds)} hold(s) the broker confirms are GONE "
+                  f"(404) - stale ledger from another account, clearing it: {sorted(holds)}")
+            holds = {}; holds_dirty = True
+        else:
+            print("! positions came back EMPTY but the holds ledger is non-empty and the "
+                  "broker did NOT confirm them gone - corrupt snapshot, skipping this run.")
+            return
+    # Prune a hold only on positive confirmation it's gone (per-symbol 404), never
+    # on its mere absence from one batch positions read.
+    # A hold whose ENTRY order is still resting (a sub-$5 marketable limit writes holds.json at order time)
+    # has no position yet and a real 404, but it is not gone: pruning it re-labelled the name a trade
+    # position the moment it filled (-7% stop, signal sells). Wait for the order to fill or expire.
+    stale = [s for s in holds if s in INDEX_ETFS
+             or (s not in positions and s not in pending and alpaca_position_gone(s))]
+    for s in stale: holds.pop(s); holds_dirty = True
+    # A hold can be absent from `positions` while still held: qty_available excludes shares reserved by an
+    # open order, so a hold fully covered by a resting sell has no entry. Count only what is visible; indexing
+    # it raised KeyError at the top of every cycle (2026-10-28 cold review).
+    hold_val    = sum(positions[s]["mkt_val"] for s in holds if s in positions)
+    cheap_hold_val = sum(positions[s]["mkt_val"] for s in holds if s in positions
+                         and float(positions[s].get("avg_cost") or 99) < CHEAP_PX)
+    crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}   # DOGEUSD -> DOGE/USD
+    crypto_pos  = {s: p for s, p in positions.items() if s in crypto_flat}
+    crypto_val  = sum(p["mkt_val"] for p in crypto_pos.values())
+    index_core_val = sum(positions.get(s, {}).get("mkt_val", 0.0) for s in INDEX_ETFS)  # held core, NOT active
+    invested    = max(0.0, equity - cash)               # total $ held in positions
+    trade_val   = max(0.0, invested - hold_val - crypto_val - index_core_val)  # active signal-traded stocks
+    invest_room = max(0.0, equity * MAX_INVESTED_PCT - trade_val)  # trading-sleeve headroom
+    hold_room   = max(0.0, equity * HOLD_PCT - hold_val)           # hold-sleeve headroom
+    crypto_room = max(0.0, equity * CRYPTO_PCT - crypto_val)       # crypto-sleeve headroom
+    spent = trade_spent = hold_spent = cheap_hold_spent = 0.0
+    print(f"  Cash=${cash:.2f}  EQ=${equity:.2f}  dayP&L=${daily_pnl:.2f}  acct=...{acct_tag}")
+    print(f"  INDEX core ${index_core_val:,.0f}/{equity*INDEX_CORE_PCT:,.0f} | "
+          f"trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
+          f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} | "
+          f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f} | holds: {sorted(holds) or '-'}")
+    if pending:  print(f"  PENDING orders (skipped this run): {sorted(pending)}")
+    if cooldown: print(f"  STOP COOLDOWN ({STOP_COOLDOWN_D}d): {sorted(cooldown)}")
+    print(f"  PLAN: {plan['regime']} | risk={plan['risk']} | avoid={sorted(plan['avoid'])} | {plan['notes'][:80]}")
+
+    # Circuit breaker: a >10% down day blocks NEW buying - but exits (stops,
+    # take-profits, signal sells) always run, so the bot can still de-risk.
+    loss_cap = max(LOSS_CAP_FLOOR, equity * LOSS_CAP_PCT)
+    halted   = daily_pnl <= -loss_cap
+    if halted:
+        print(f"HALT Daily loss cap (dayP&L ${daily_pnl:.2f} <= -${loss_cap:.2f}) - buys OFF, exits still live.")
+
+    # Universe - whole-market candidate sweep, then the signal engine votes.
+    # (Crypto positions are excluded here; they have their own sleeve below.)
+    universe     = {s for s in positions if s not in crypto_flat and s not in INDEX_ETFS}
+    meme_tickers = []
+    small_caps   = set()
+    movers_today = set()
+    if low_cash:
+        print("LOW_CASH - positions only.")
+    else:
+        wsb     = fetch_wsb()              # WallStreetBets chatter (meme bonus)
+        smalls  = fetch_smallcaps()        # small-cap gainers/aggressive screens
+        movers  = fetch_market_movers()    # Alpaca: top %-gainers across EVERY listed stock
+        gainers = fetch_day_gainers()      # Yahoo: whole-market day gainers
+        screen  = fetch_screener()         # Yahoo: most-active megacaps
+        actives = fetch_most_actives()     # Alpaca: top volume across the whole market
+        meme_tickers = wsb
+        small_caps   = set(smalls)
+        movers_today = set(movers)         # day-spike names: tradeable, but never HOLD entries
+        # The screeners above each scan the ENTIRE market server-side (movers ranks
+        # every listed US equity by % change, most-actives every stock by volume,
+        # Yahoo screens sweep the whole market) - this cap is only how many top
+        # candidates get the full 90-day indicator analysis per run. It rotates
+        # every 15 minutes, so a full day deep-analyzes hundreds of distinct names.
+        for s in plan["favor"] + wsb + smalls + movers + gainers + screen + actives:
+            if len(universe) < 60: universe.add(s)
+    universe = list(set(universe) - set(INDEX_ETFS))   # index core owns these; active never trades them (screeners surface SPY/QQQ as most-actives)
+    print(f"UNIVERSE ({len(universe)}): {universe}")
+    if small_caps & set(universe):
+        print(f"  smallcap candidates (half-size): {sorted(small_caps & set(universe))}")
+
+    # Market data
+    vix = yf_vix()
+    print(f"VIX={vix:.1f}")
+    if vix > 35:
+        print("VIX>35. Halt."); return
+    vix_scale = 0.50 if vix > 25 else (0.75 if vix > 20 else 1.00)
+
+    # Market data - Alpaca official batch API first (2 calls for the whole
+    # universe, no scraping-block roulette); Yahoo only as per-symbol fallback
+    # for IEX coverage gaps. Exits depend on this data, so reliability is king.
+    bars  = alpaca_bars_multi(universe + ["SPY"])   # +SPY for the regime check ONLY (not tradable -
+    lasts = alpaca_latest_multi(universe)           # the market dict below is built from universe)
+    market, fails = {}, 0
+    for sym in universe:
+        c, v = bars.get(sym, (None, None))
+        if not c or len(c) < 20:
+            c, v = yf_ohlcv(sym)                 # fallback: Yahoo scrape
+        live = lasts.get(sym) or yf_live(sym)
+        if c and len(c) >= 20 and live:
+            market[sym] = {"closes": c, "volumes": v, "live": live}
+        else:
+            fails += 1
+    if fails:
+        print(f"  [market data: {fails}/{len(universe)} symbols unavailable]")
+
+    # Regime filter (practitioner staple): SPY under its 50-day SMA = weak tape -
+    # no NEW hold-sleeve entries (multi-day risk needs a supportive market).
+    # SPY bars come from the bars batch, NOT market: the churn fix removed SPY from
+    # the universe, which silently left this reading an empty list - permanent
+    # risk-off, new holds wrongly disabled 6/26-7/02. Fixed 2026-07-02.
+    spy_c   = bars.get("SPY", (None, None))[0] or yf_ohlcv("SPY")[0] or []
+    risk_on = len(spy_c) >= 50 and spy_c[-1] > sum(spy_c[-50:]) / 50
+    print(f"  REGIME: {'risk-on (SPY>SMA50)' if risk_on else 'risk-off (SPY<SMA50) - new holds disabled'}")
+
+    # Signals
+    sigs = {}
+    for sym, d in market.items():
+        rr = compute_signals(sym, d["closes"], d["volumes"], d["live"], meme_tickers)
+        if rr: sigs[sym] = rr
+
+    # NEWS TRIPWIRE - danger headlines on held names + buy candidates. Blocks buys
+    # (12h window), exits trade-sleeve positions, alerts on holds. $0, no LLM.
+    watch = {s for s in positions if s not in crypto_flat and s not in INDEX_ETFS}
+    watch |= {s for s, g in sigs.items() if g["consensus"] == 1}
+    news_bad = news_flags(watch, NEWS_BLOCK_MIN)
+    if news_bad:
+        print(f"  NEWS TRIPWIRE: {', '.join(f'{s} [{h[:60]}]' for s, h in news_bad.items())}")
+
+    sold_now = set()   # exits this run - never re-buy the same name the same run
+
+    def _exit(sym, qty, live, tag, extra, sig=None):
+        """Shared exit path: place the sell, book cash, log with context."""
+        nonlocal cash, low_cash
+        print(f"{tag} {sym} qty={qty} {extra}")
+        try:
+            r = place_sell(sym, qty, live)
+            if _ok(r):
+                print(f"  -> placed {r['id']}")
+                cash += qty * live; low_cash = False; sold_now.add(sym)
+                events.append(f"{tag} {sym} qty={qty} {extra} -> PLACED ({r['id']})")
+                entry = {"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                         "symbol": sym, "side": "sell", "qty": qty, "order_id": r["id"],
+                         "live": round(live, 2), "vix": round(vix, 1)}
+                if tag == "STOP-LOSS":   entry["stop_loss"]   = True
+                if tag == "TAKE-PROFIT": entry["take_profit"] = True
+                if tag == "HOLD-STOP":   entry["hold_stop"]   = True
+                if tag == "TIME-STOP":   entry["time_stop"]   = True
+                if tag == "DIVERSIFY":   entry["diversify"]   = True
+                if tag == "NEWS-EXIT":   entry["news_exit"]   = True
+                if sig: entry.update({"rsi": round(sig["rsi"], 1), "trend": sig["trend"],
+                                      "consensus": sig["consensus"], "sells": sig.get("sells")})
+                trades_log.append(entry)
+                return True
+            events.append(f"{tag} {sym} -> REJECTED: {(r or {}).get('message', r)}")
+        except Exception as e:
+            events.append(f"{tag} {sym} -> ERROR: {e}")
+        return False
+
+    # 1) BRACKET exits (trading sleeve): hard stop -7% - risk is cut no matter
+    #    what the signals say; take-profit +15% banked unless the signal is still
+    #    an active buy (let confirmed winners run). ~2:1 reward:risk. Plus a TIME
+    #    stop: a position going nowhere for 5+ days with no signal is dead money.
+    buy_dates = last_buy_dates(set(positions) - set(holds))
+    for sym, p in list(positions.items()):
+        if sym in holds or sym in pending or sym in crypto_flat or sym in INDEX_ETFS: continue
+        live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
+        if not live or cost <= 0 or p["qty"] <= 0: continue
+        con = sigs.get(sym, {}).get("consensus", 0)
+        age_d = None
+        if buy_dates.get(sym):
+            try:
+                age_d = (et - datetime.strptime(buy_dates[sym][:10], "%Y-%m-%d")
+                         .replace(tzinfo=ET_TZ)).days
+            except Exception:
+                age_d = None
+        if live <= cost * STOP_LOSS_PCT:
+            _exit(sym, p["qty"], live, "STOP-LOSS",
+                  f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
+        elif live >= cost * TAKE_PROFIT_PCT and con <= 0:
+            _exit(sym, p["qty"], live, "TAKE-PROFIT",
+                  f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})", sigs.get(sym))
+        elif (age_d is not None and age_d >= TIME_STOP_DAYS
+              and con <= 0 and live < cost * 1.02):
+            _exit(sym, p["qty"], live, "TIME-STOP",
+                  f"({(live/cost-1)*100:+.1f}% after {age_d}d, no signal - dead money)",
+                  sigs.get(sym))
+
+    # 2) SIGNAL sells (frees buying power). Hold-sleeve names are exempt.
+    for sym, sig in sigs.items():
+        if sig["consensus"] != -1 or sym not in positions: continue
+        if sym in sold_now or sym in pending: continue
+        if sym in holds:
+            print(f"  KEEP {sym} (hold sleeve - sell signal ignored)"); continue
+        qty = positions[sym]["qty"]
+        if qty <= 0: continue
+        _exit(sym, qty, market[sym]["live"], "SELL", f"RSI={sig['rsi']:.1f}", sig)
+
+    # 2b) NEWS exits: a danger headline on a TRADE position is an immediate exit.
+    #     Holds get an ALERT EMAIL only - wide stops + crude keywords shouldn't
+    #     dump a keeper; Devon decides.
+    for sym, headline in news_bad.items():
+        if sym in holds:
+            continue
+        if sym not in positions or sym in sold_now or sym in pending: continue
+        if positions[sym]["qty"] <= 0 or sym not in market: continue
+        _exit(sym, positions[sym]["qty"], market[sym]["live"], "NEWS-EXIT",
+              f"({headline[:80]})", sigs.get(sym))
+    fresh_bad = news_flags({s for s in news_bad if s in holds}, NEWS_ALERT_MIN)
+    for sym, headline in fresh_bad.items():
+        send_email(f"Alpaca bot ({MODE}) - NEWS ALERT: {sym}",
+                   f"Danger headline on HOLD {sym}:\n{headline}\n\n"
+                   "The bot does not auto-sell holds on keyword matches - review manually.\n"
+                   f"{et.strftime('%Y-%m-%d %H:%M ET')}")
+
+    # 3) HOLD stops: exit a hold at -25% from basis (thesis broken), OR once well
+    #    in profit, if it gives back 40% from its peak (ratchet - a +200% winner
+    #    can't round-trip to a loss). Peaks persist in holds.json.
+    for sym in list(holds):
+        if sym not in positions or sym in pending or sym in sold_now: continue
+        live = market.get(sym, {}).get("live")
+        h = holds[sym]
+        # Broker's avg_entry_price is the true blended basis (our ledger's is an
+        # estimate from order-time prices) - prefer it when available.
+        basis = float(positions[sym].get("avg_cost") or 0) or float(h.get("basis") or 0)
+        if not live or basis <= 0: continue
+        peak = max(float(h.get("peak") or 0), live)
+        if peak > float(h.get("peak") or 0):
+            h["peak"] = round(peak, 4)
+            if peak >= float(h.get("peak_saved") or basis) * 1.05:
+                h["peak_saved"] = round(peak, 4); holds_dirty = True
+        floor_ = max(basis * HOLD_STOP, peak * HOLD_TRAIL)
+        if live > floor_: continue
+        why = ("-25% from basis" if floor_ == basis * HOLD_STOP
+               else f"gave back 40% from peak ${peak:.2f}")
+        if _exit(sym, positions[sym]["qty"], live, "HOLD-STOP",
+                 f"(live ${live:.2f} <= ${floor_:.2f}: {why})"):
+            holds.pop(sym); holds_dirty = True
+
+    # 3b) DIVERSIFY (2026-07-02): the hold book must never become one trade.
+    # Week-1 failure: AMAT+MU+SNDK - 100% semis - sank the week together when the
+    # sector rolled over. Holds whose 60d returns move as one (corr > CORR_MAX)
+    # form a theme cluster; clusters are trimmed to HOLD_CLUSTER_MAX members,
+    # weakest (lowest gain vs basis) sold first. Runs every cycle, so the book
+    # self-heals if a theme concentrates again.
+    hold_syms = [s for s in holds if s in positions and s not in pending
+                 and s not in sold_now and market.get(s, {}).get("closes")]
+    peers = {s: set() for s in hold_syms}
+    for i in range(len(hold_syms)):
+        for j in range(i + 1, len(hold_syms)):
+            a, b = hold_syms[i], hold_syms[j]
+            if _pair_corr(market[a]["closes"], market[b]["closes"]) > CORR_MAX:
+                peers[a].add(b); peers[b].add(a)
+    seen = set()
+    for s in hold_syms:
+        if s in seen or not peers[s]: continue
+        comp, stack = set(), [s]                      # connected component = one theme
+        while stack:
+            x = stack.pop()
+            if x in comp: continue
+            comp.add(x); stack.extend(peers[x] - comp)
+        seen |= comp
+        if len(comp) <= HOLD_CLUSTER_MAX: continue
+        def _gain(sym_):
+            b_ = (float(positions[sym_].get("avg_cost") or 0)
+                  or float(holds[sym_].get("basis") or 0))
+            return market[sym_]["live"] / b_ if b_ > 0 else 0.0
+        ranked = sorted(comp, key=_gain, reverse=True)
+        for sym in ranked[HOLD_CLUSTER_MAX:]:
+            if _exit(sym, positions[sym]["qty"], market[sym]["live"], "DIVERSIFY",
+                     f"({len(comp)} holds move as one theme {sorted(comp)} - max {HOLD_CLUSTER_MAX})",
+                     sigs.get(sym)):
+                holds.pop(sym); holds_dirty = True
+
+    # RETIRE a sleeve whose cap has been set to 0. Zeroing a cap stops NEW buys but
+    # leaves existing positions to dribble out over weeks via stops/time-stops, which
+    # would contaminate an A/B comparison for a month. When a sleeve is switched off,
+    # close its positions deliberately instead. Guarded on the cap being EXACTLY 0, so
+    # a normal (nonzero) config can never trigger a mass exit.
+    if MAX_INVESTED_PCT == 0 and HOLD_PCT == 0:
+        for sym, p in list(positions.items()):
+            if sym in INDEX_ETFS or sym in crypto_flat: continue
+            if sym in pending or sym in sold_now or p["qty"] <= 0: continue
+            live = market.get(sym, {}).get("live")
+            if not live: continue
+            if _exit(sym, p["qty"], live, "SLEEVE-RETIRED",
+                     "(active sleeves switched OFF - index-only mode)", sigs.get(sym)):
+                if sym in holds: holds.pop(sym); holds_dirty = True
+    if CRYPTO_PCT == 0 and crypto_pos:
+        for flat, p in list(crypto_pos.items()):
+            pair = crypto_flat[flat]
+            if flat in pending or p["qty"] <= 0: continue
+            try:
+                live = (crypto_latest_multi([pair]) or {}).get(pair)
+                if not live: continue
+                print(f"SLEEVE-RETIRED {pair} qty={p['qty']} (crypto sleeve OFF)")
+                r = place_crypto_sell(pair, p["qty"])
+                if _ok(r):
+                    cash += p["qty"] * live
+                    events.append(f"SLEEVE-RETIRED {pair} -> PLACED ({r['id']})")
+                    trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                        "acct": acct_tag, "symbol": pair, "side": "sell", "crypto": True,
+                        "qty": p["qty"], "retired": True, "order_id": r["id"],
+                        "live": live, "vix": round(vix, 1)})
+            except Exception as e:
+                print(f"  [crypto retire error: {e}]")
+
+    # INDEX CORE (50%): equal-weight SPY/QQQ/IWM, funded FIRST. Self-rebalancing:
+    # trims any ETF >25% over target (cleans a legacy overweight + keeps the core
+    # balanced long-term), buys toward target when under, DCA'd and paced. The active
+    # sleeves never touch the index ETFs. Left alone on a halt day.
+    if not halted and not low_cash:
+        per_tgt = equity * INDEX_CORE_PCT / len(INDEX_ETFS)
+        for etf in INDEX_ETFS:
+            if etf in pending: continue
+            p_etf = positions.get(etf, {}); hv = p_etf.get("mkt_val", 0.0); q = p_etf.get("qty", 0.0)
+            ilive = yf_live(etf) or alpaca_latest_multi([etf]).get(etf)
+            if not ilive: continue
+            if hv > per_tgt * 1.25 and q > 0:                      # OVERWEIGHT -> trim back to target
+                sq = round((hv - per_tgt) / ilive, 6)
+                if sq <= 0: continue
+                print(f"INDEX-TRIM {etf} qty={sq} (rebalance to ${per_tgt:.0f})")
+                try:
+                    r = place_sell(etf, sq, ilive)
+                    if _ok(r):
+                        cash += sq * ilive
+                        events.append(f"INDEX-TRIM {etf} -> PLACED ({r['id']})")
+                        trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                            "acct": acct_tag, "symbol": etf, "side": "sell", "index": True,
+                            "qty": sq, "live": round(ilive, 2), "order_id": r["id"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"INDEX-TRIM {etf} -> REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"INDEX-TRIM {etf} -> ERROR: {e}")
+            elif spent < spend_cap and hv < per_tgt - equity * 0.01:   # UNDERWEIGHT -> buy toward target
+                amt = min(per_tgt - hv, spend_cap - spent, settled * 0.95)  # settled cash only (T+1 guard)
+                if amt < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue
+                print(f"INDEX-BUY {etf} ${amt:.2f}")
+                try:
+                    r = place_buy(etf, amt, ilive)
+                    if _ok(r):
+                        cash -= amt; spent += amt; settled = max(0.0, settled - amt)
+                        events.append(f"INDEX-BUY {etf} ${amt:.2f} -> PLACED ({r['id']})")
+                        trades_log.append({"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE,
+                            "acct": acct_tag, "symbol": etf, "side": "buy", "index": True,
+                            "notional": round(amt, 2), "live": round(ilive, 2),
+                            "order_id": r["id"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"INDEX-BUY {etf} -> REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"INDEX-BUY {etf} -> ERROR: {e}")
+
+    # BUY - active sleeves on the rest (~45%). New entries AND adds to held winners,
+    # up to the per-name cap. Cheap/small names size at SMALLCAP_POS_PCT (half).
+    # Sleeve routing: STRONG signals (4+ buy votes AND uptrend) buy into the HOLD
+    # sleeve (kept until a stop); everything else is a trading-sleeve buy.
+    if not low_cash and not halted:
+        for sym, sig in sigs.items():
+            if sig["consensus"] != 1: continue
+            if sym in sold_now or sym in pending: continue    # just exited / order in flight
+            if sym in cooldown:
+                print(f"  SKIP {sym} (stop-loss cooldown)"); continue
+            if sym in plan["avoid"]:
+                print(f"  SKIP {sym} (plan avoid-list)"); continue
+            # Diversification guard: never buy (new OR add) into a theme the hold
+            # book already owns HOLD_CLUSTER_MAX times over - this is what let the
+            # 7/1 AMAT add pile a 3rd semi onto an all-semi book.
+            corr_peers = [h for h in holds
+                          if h != sym and h in positions and market.get(h, {}).get("closes")
+                          and _pair_corr(market[sym]["closes"], market[h]["closes"]) > CORR_MAX]
+            if len(corr_peers) >= HOLD_CLUSTER_MAX:
+                print(f"  SKIP {sym} (moves with holds {sorted(corr_peers)} - theme at max {HOLD_CLUSTER_MAX})")
+                continue
+            if sym in news_bad:
+                print(f"  SKIP {sym} (danger news: {news_bad[sym][:60]})"); continue
+            if spent >= spend_cap: break                      # per-run pacing cap reached
+            if (invest_room - trade_spent) < 1.00 and (hold_room - hold_spent) < 1.00:
+                break                                         # both sleeves full
+            # A strong signal can top up a held name, but never past its per-name cap.
+            held_value = 0.0
+            if sym in positions and positions[sym]["qty"] > 0 and sym in market:
+                held_value = positions[sym]["qty"] * market[sym]["live"]
+            if held_value == 0 and sig["rsi"] > RSI_ENTRY_MAX:
+                print(f"  SKIP {sym} (RSI {sig['rsi']:.0f} > {RSI_ENTRY_MAX:.0f} - blow-off chase guard)"); continue
+            live     = market[sym]["live"]
+            is_micro = live < MICRO_PX                          # sub-$2: gappy, stops unreliable -> quarter size
+            is_small = sym in small_caps or live < SMALL_PX     # cheap names = half size
+            # NEVER average down: adds only pyramid into strength (live above the
+            # position's own basis). Adding to a faller turns one bad entry into a
+            # max-size bad position - the classic microcap-pump account killer.
+            if held_value > 0:
+                ref = (float(positions[sym].get("avg_cost") or 0)
+                       or (float(holds[sym].get("basis") or 0) if sym in holds else 0))
+                if ref > 0 and live < ref * 1.02:
+                    print(f"  SKIP {sym} add (live ${live:.4g} <= basis ${ref:.4g}+2% - no averaging down)")
+                    continue
+                if sym in holds and sig["rsi"] > HOLD_RSI_MAX:
+                    print(f"  SKIP {sym} hold-add (RSI {sig['rsi']:.0f} > {HOLD_RSI_MAX:.0f})")
+                    continue
+            # HOLD-GATE OBSERVABILITY (2026-08-25). The hold sleeve has sat at 0
+            # against a 25% target since the strategy swap, and we could not say
+            # whether the bar is SLOW (nothing has qualified yet) or UNREACHABLE
+            # (the rails cannot jointly be satisfied). Both 4-vote names so far died
+            # on RSI, one by a single point, inside the 70-75 band where the meme
+            # bonus (gated r<75) and the hold cap (rsi<=70) are mutually exclusive.
+            # That band is verifiable in code; how OFTEN it binds is not, at n=2.
+            # So log the reason per name. Pure logging, no behaviour change; in two
+            # weeks this answers the question with data instead of argument.
+            if sig["buys"] >= HOLD_MIN_VOTES:
+                _why = []
+                if sig["trend"] != "up":          _why.append("trend")
+                if sig["rsi"] > HOLD_RSI_MAX:     _why.append(f"rsi>{HOLD_RSI_MAX:.0f}")
+                if sym in movers_today:           _why.append("mover")
+                if not risk_on:                   _why.append("risk_off")
+                if sym in positions:              _why.append("already-held")
+                print(f"  HOLD-GATE {sym} buys={sig['buys']} rsi={sig['rsi']:.1f} "
+                      f"meme={bool(sig.get('meme'))} band70_75="
+                      f"{HOLD_RSI_MAX < sig['rsi'] < MEME_RSI_MAX} -> "
+                      + ("QUALIFIES" if not _why else "rejected: " + ",".join(_why)))
+
+            # Hold entries demand QUALITY, not just strength: 4+ votes in an uptrend,
+            # a calm entry (RSI<=70), and never a daily-spike movers name - those are
+            # trade material, not buy-and-hold material (pump risk).
+            strong   = (sig["buys"] >= HOLD_MIN_VOTES and sig["trend"] == "up"
+                        and sig["rsi"] <= HOLD_RSI_MAX and sym not in movers_today
+                        and risk_on)               # no NEW holds into a weak tape
+            use_hold = (sym in holds) or (strong and sym not in positions
+                                          and (hold_room - hold_spent) >= 1.00)
+            # Concentration cap: sub-$5 names may fill at most half the hold sleeve.
+            if use_hold and live < CHEAP_PX:
+                cheap_cap = equity * HOLD_PCT * CHEAP_HOLD_MAX
+                if cheap_hold_val + cheap_hold_spent >= cheap_cap:
+                    print(f"  SKIP {sym} hold (sub-$5 holds at their {CHEAP_HOLD_MAX:.0%} sleeve cap)")
+                    continue
+            sleeve_room  = (hold_room - hold_spent) if use_hold else (invest_room - trade_spent)
+            name_cap     = equity * (MICRO_POS_PCT if is_micro else
+                                     SMALLCAP_POS_PCT if is_small else MAX_POS_PCT)
+            room_in_name = name_cap - held_value
+            if room_in_name < 1.00: continue
+            amount = min(name_cap * vix_scale * plan["risk"], room_in_name, settled * 0.95,
+                         spend_cap - spent, sleeve_room)      # settled cash only (T+1 guard)
+            if amount < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue   # no dust orders
+            if held_value > 0 and amount < name_cap * 0.20:
+                continue   # near its cap - skip dribble top-ups every run
+            # Whole-share-only names the budget can't cover are a predictable skip,
+            # not a broker rejection - don't attempt them (each attempt emailed a
+            # "not fractionable" rejection alert).
+            if alpaca_asset(sym).get("fractionable") is False and amount < live:
+                print(f"  SKIP {sym} (whole-share only; ${amount:.2f} < 1 share @ ${live:.2f})")
+                continue
+            # Earnings landmine guard: momentum entries into an imminent report are
+            # a coin flip on the gap - checked last so only real orders spend a call.
+            if earnings_within(sym):
+                print(f"  SKIP {sym} (reports earnings within {EARNINGS_BLOCK_D}d)")
+                continue
+            verb = (("HOLD-ADD" if held_value > 0 else "HOLD-BUY") if use_hold
+                    else ("ADD" if held_value > 0 else "BUY"))
+            print(f"{verb} {sym} ${amount:.2f} RSI={sig['rsi']:.1f}"
+                  + (" [micro]" if is_micro else " [smallcap]" if is_small else ""))
+            try:
+                r = place_buy(sym, amount, live)
+                if _ok(r):
+                    # Whole-share orders may spend slightly less than requested.
+                    actual = amount
+                    if r.get("qty") and not r.get("notional"):
+                        actual = round(float(r["qty"]) * live, 2)
+                    print(f"  -> placed {r['id']} (${actual:.2f})")
+                    cash -= actual; spent += actual; settled = max(0.0, settled - actual)
+                    if use_hold:
+                        hold_spent += actual
+                        if live < CHEAP_PX: cheap_hold_spent += actual
+                    else:
+                        trade_spent += actual
+                    if sym not in positions:
+                        positions[sym] = {"qty": 0, "avg_cost": 0, "mkt_val": 0.0}
+                    if use_hold:
+                        h = holds.get(sym)
+                        if h:   # weighted-average basis across adds
+                            prev = float(h.get("notional") or 0)
+                            tot  = prev + actual
+                            h["basis"]    = round((float(h["basis"])*prev + live*actual)/tot, 4) if tot else live
+                            h["notional"] = round(tot, 2)
+                        else:
+                            holds[sym] = {"ts": et.strftime("%Y-%m-%dT%H:%M"),
+                                          "basis": round(live, 4), "notional": round(actual, 2)}
+                        holds_dirty = True
+                    events.append(f"{verb} {sym} ${actual:.2f} -> PLACED ({r['id']})")
+                    trades_log.append({
+                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag, "symbol": sym,
+                        "side": "buy", "add": held_value > 0, "smallcap": is_small,
+                        "hold": use_hold, "notional": round(actual, 2), "order_id": r["id"],
+                        "live": round(live, 2), "rsi": round(sig["rsi"], 1),
+                        "trend": sig["trend"], "consensus": sig["consensus"],
+                        "delta": round(sig["delta"], 4), "buys": sig["buys"],
+                        "macd_up": sig["macd_up"], "meme": sig["meme"], "vix": round(vix, 1)})
+                else:
+                    events.append(f"{verb} {sym} ${amount:.2f} -> REJECTED: {(r or {}).get('message', r)}")
+            except Exception as e:
+                events.append(f"{verb} {sym} ${amount:.2f} -> ERROR: {e}")
+
+    # ── CRYPTO sleeve (5%): DOGE-style moonshots, same discipline, wider brackets.
+    # Spot only, cash only, no averaging down. Crypto trades 24/7 but is managed on
+    # the bot's market-hours schedule; the -15% stop covers overnight gaps at exit.
+    try:
+        cbars  = crypto_bars_multi(CRYPTO_UNIVERSE)
+        clasts = crypto_latest_multi(CRYPTO_UNIVERSE)
+        csigs  = {}
+        for pair in CRYPTO_UNIVERSE:
+            c, v = cbars.get(pair, (None, None))
+            live = clasts.get(pair)
+            if c and len(c) >= 20 and live:
+                rr = compute_signals(pair, c, v, live, [])
+                if rr: csigs[pair] = rr
+
+        # Exits first: -15% stop (always) / +30% take-profit (unless still a buy).
+        for flat, p in list(crypto_pos.items()):
+            pair = crypto_flat[flat]
+            live = clasts.get(pair); cost = float(p.get("avg_cost") or 0)
+            if flat in pending or not live or cost <= 0 or p["qty"] <= 0: continue
+            con = csigs.get(pair, {}).get("consensus", 0)
+            tag = None
+            if live <= cost * CRYPTO_STOP:                 tag = "CRYPTO-STOP"
+            elif live >= cost * CRYPTO_TP and con <= 0:    tag = "CRYPTO-TP"
+            if not tag: continue
+            print(f"{tag} {pair} qty={p['qty']} ({(live/cost-1)*100:+.1f}% from ${cost:.6g})")
+            try:
+                r = place_crypto_sell(pair, p["qty"])
+                if _ok(r):
+                    print(f"  -> placed {r['id']}")
+                    cash += p["qty"] * live
+                    events.append(f"{tag} {pair} ({(live/cost-1)*100:+.1f}%) -> PLACED ({r['id']})")
+                    trades_log.append({
+                        "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                        "symbol": pair, "side": "sell", "crypto": True, "qty": p["qty"],
+                        "stop_loss": tag == "CRYPTO-STOP", "take_profit": tag == "CRYPTO-TP",
+                        "order_id": r["id"], "live": live, "vix": round(vix, 1)})
+                else:
+                    events.append(f"{tag} {pair} -> REJECTED: {(r or {}).get('message', r)}")
+            except Exception as e:
+                events.append(f"{tag} {pair} -> ERROR: {e}")
+
+        # Entries: +1 consensus, not already held, no blow-off chasing, sleeve+coin caps.
+        if not low_cash and not halted:
+            crypto_spent = 0.0
+            for pair, sig in csigs.items():
+                if CRYPTO_BLOCKED: break          # account not entitled; stop asking
+                flat = pair.replace("/", "")
+                if sig["consensus"] != 1 or flat in crypto_pos or flat in pending: continue
+                if sig["rsi"] > RSI_ENTRY_MAX:
+                    print(f"  SKIP {pair} (RSI {sig['rsi']:.0f} - blow-off chase guard)"); continue
+                room = crypto_room - crypto_spent
+                amount = min(equity * CRYPTO_POS_PCT, room, settled * 0.95, spend_cap - spent)  # settled cash only
+                if amount < max(MIN_ORDER_ABS, equity * MIN_ORDER_PCT): continue
+                print(f"CRYPTO-BUY {pair} ${amount:.2f} RSI={sig['rsi']:.1f}")
+                try:
+                    r = place_crypto_buy(pair, amount)
+                    if _ok(r):
+                        print(f"  -> placed {r['id']}")
+                        cash -= amount; spent += amount; crypto_spent += amount; settled = max(0.0, settled - amount)
+                        events.append(f"CRYPTO-BUY {pair} ${amount:.2f} -> PLACED ({r['id']})")
+                        trades_log.append({
+                            "ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct_tag,
+                            "symbol": pair, "side": "buy", "crypto": True,
+                            "notional": round(amount, 2), "order_id": r["id"], "live": sig and clasts.get(pair),
+                            "rsi": round(sig["rsi"], 1), "trend": sig["trend"],
+                            "consensus": sig["consensus"], "buys": sig["buys"],
+                            "macd_up": sig["macd_up"], "vix": round(vix, 1)})
+                    else:
+                        events.append(f"CRYPTO-BUY {pair} ${amount:.2f} -> REJECTED: {(r or {}).get('message', r)}")
+                except Exception as e:
+                    events.append(f"CRYPTO-BUY {pair} ${amount:.2f} -> ERROR: {e}")
+        if csigs:
+            cline = [f"{p} {s['consensus']:+d} RSI={s['rsi']:.0f}" for p, s in csigs.items() if s["consensus"] != 0]
+            print(f"  CRYPTO signals: {', '.join(cline) if cline else '(all neutral)'}")
+    except Exception as e:
+        print(f"  [crypto sleeve error (stocks unaffected): {e}]")
+
+    # Summary
+    print(f"\n--- {MODE} | {et.strftime('%H:%M ET')} | VIX={vix:.1f} | "
+          f"dayP&L=${daily_pnl:.2f} | Cash=${cash:.2f} ---")
+    if holds:
+        hl = []
+        for s, h in sorted(holds.items()):
+            lv = market.get(s, {}).get("live")
+            hl.append(f"{s} {((lv/float(h['basis'])-1)*100):+.1f}%" if lv and float(h.get("basis") or 0) > 0 else s)
+        print(f"  HOLDS vs basis: {', '.join(hl)}")
+    for sym, sig in sigs.items():
+        if sig["consensus"] != 0:
+            print(f"  {sym}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}")
+    print(f"  Zero-consensus: {sum(1 for s in sigs.values() if s['consensus']==0)}")
+
+    # Email: on any order activity, plus once at the 9:45 ET morning run
+    morning = (et.hour == 9 and et.minute >= 45)
+
+    # An account not entitled to trade crypto is a PERMANENT, already-published
+    # condition (status.json carries crypto_enabled), not an event. Alerting on it
+    # every 15 minutes is ~26 mails a day that all say the same thing, which is how
+    # a person learns to ignore the alert that finally matters. Suppress the alert
+    # only when entitlement rejections are the ONLY thing that happened; a run with
+    # a real order still reports them in the body.
+    entitlement_only = bool(events) and all(
+        "not allowed" in e.lower() or "not permitted" in e.lower() for e in events)
+    if entitlement_only:
+        print("  [alert suppressed: crypto entitlement rejection only, see "
+              "status.json crypto_enabled]")
+
+    if (events and not entitlement_only) or morning:
+        nonzero = [f"  {s}: {sig['consensus']:+d}  RSI={sig['rsi']:.1f}  {sig['trend']}"
+                   for s, sig in sigs.items() if sig["consensus"] != 0]
+        body = [f"Alpaca bot ({MODE})  {et.strftime('%Y-%m-%d %H:%M ET')}",
+                f"Plan: {plan['regime']} | risk {plan['risk']} | avoid {sorted(plan['avoid'])}",
+                f"Equity ${equity:.2f} | Cash ${cash:.2f} | "
+                f"dayP&L ${daily_pnl:.2f}",
+                f"Index core ${index_core_val:,.0f}/{equity*INDEX_CORE_PCT:,.0f} | "
+                f"trade ${trade_val:,.0f}/{equity*MAX_INVESTED_PCT:,.0f} | "
+                f"hold ${hold_val:,.0f}/{equity*HOLD_PCT:,.0f} ({len(holds)} holds) | "
+                f"crypto ${crypto_val:,.0f}/{equity*CRYPTO_PCT:,.0f}", ""]
+        body.append("ORDERS THIS RUN:" if events else "No orders this run.")
+        body += [f"  * {e}" for e in events]
+        # Running realized gain/loss for tax tracking (Devon, 2026-09-29). Wrapped on its
+        # own: a reporting line must never be able to stop the alert it rides on.
+        try:
+            import realized as _R
+            body += [""] + _R.repo_report_lines(a_block=realized_for_run())
+        except Exception as _e:
+            body += ["", f"Realized gain/loss totals UNAVAILABLE ({_e})"]
+        body += ["", "Signals (non-neutral):"] + (nonzero or ["  (all neutral)"])
+        if any("PLACED" in e for e in events):
+            subject = f"Alpaca bot ({MODE}) - ORDER PLACED"
+        elif any(("REJECTED" in e or "ERROR" in e) for e in events):
+            subject = f"Alpaca bot ({MODE}) - order rejected"
+        else:
+            subject = f"Alpaca bot ({MODE}) - morning status"
+        send_email(subject, "\n".join(body))
+
+    # Persist structured trade context for the weekly review / pattern analysis.
+    # The workflow commits trade_log.jsonl (and holds.json) back to the repo.
+    if trades_log:
+        with open("trade_log.jsonl", "a") as f:
+            for t in trades_log:
+                f.write(json.dumps(t) + "\n")
+        print(f"  [logged {len(trades_log)} trade(s) to trade_log.jsonl]")
+    if holds_dirty:
+        save_holds(holds)
+        print(f"  [holds.json updated - {len(holds)} hold(s)]")
+
+    # ── Status snapshot for remote monitoring ────────────────────────────────
+    # Everything this run printed lives inside a GitHub Actions log, which a
+    # phone cannot fetch. Publishing the numbers as a committed file makes the
+    # bot readable from anywhere the repo is (it is public), and mirrors what
+    # the Robinhood laptop already writes to rh_status.json.
+    try:
+        hold_pct = {}
+        for s, h in holds.items():
+            lv = market.get(s, {}).get("live")
+            b  = float(positions.get(s, {}).get("avg_cost") or h.get("basis") or 0)
+            if lv and b > 0:
+                hold_pct[s] = round((lv / b - 1) * 100, 1)
+        # Market-aware liveness, all in UTC so no reader has to juggle timezones.
+        # as_of_utc = when this was written; next_expected_utc = when the next run
+        # is due. A monitor flags "down" only when NOW is well past next_expected,
+        # NOT when ts merely looks old (which is correct and fine on a weekend).
+        nowu = datetime.now(timezone.utc)
+        nxt  = next_market_run(et)
+        status = {
+            "bot": "alpaca-cloud", "mode": MODE, "acct": acct_tag,
+            "ts": et.strftime("%Y-%m-%dT%H:%M ET"),
+            "as_of_utc": nowu.strftime("%Y-%m-%dT%H:%MZ"),
+            "market_open": open_,
+            "next_expected_utc": nxt.strftime("%Y-%m-%dT%H:%MZ"),
+            "monitor_note": ("Down ONLY if current UTC is >45 min past "
+                             "next_expected_utc. An old ts outside market hours "
+                             "(nights/weekends/holidays) is normal, not a failure."),
+            "equity": round(equity, 2), "cash": round(cash, 2),
+            "day_pnl": round(daily_pnl, 2),
+            "sleeves": {"index": round(index_core_val, 2), "trade": round(trade_val, 2),
+                        "hold": round(hold_val, 2), "crypto": round(crypto_val, 2)},
+            "holds_pct_vs_basis": hold_pct,
+            "regime": "risk-on" if risk_on else "risk-off",
+            "plan": {"date": plan.get("plan_date"), "stale": bool(plan.get("stale")),
+                     "risk": plan["risk"]},
+            "vix": round(vix, 1), "vix_live": VIX_STATE["live"], "halted": halted,
+            "orders_this_run": len(trades_log),
+            # "live" = the Yahoo crumb handshake worked and the earnings guard is
+            # really enforcing. "degraded" = it fails open and blocks NOTHING, which
+            # is indistinguishable from "no earnings soon" unless it is reported.
+            # "unknown" = nothing needed the guard this run.
+            "earnings_guard": EARN_GUARD_STATE,
+            # False once the broker refuses crypto for lack of account entitlement.
+            # The hybrid allocates CRYPTO_PCT to it, so while this is False that
+            # slice sits in cash and Arm A is running hybrid-minus-crypto.
+            "crypto_enabled": not CRYPTO_BLOCKED,
+        }
+        try:
+            base = json.load(open("baseline.json"))
+            if float(base.get("equity") or 0) > 0:
+                status["baseline"] = {"equity": base["equity"], "set": base.get("set")}
+                status["vs_baseline_pct"] = round((equity / float(base["equity"]) - 1) * 100, 2)
+        except Exception:
+            pass
+        # CONTRIBUTED CAPITAL, persisted (laptop's cross-audit, 2026-09-01 16:20).
+        # The detector shipped in faadfce had exactly one call site, inside the
+        # manual ACCOUNT_TEST branch, which exits before trading. So nothing on any
+        # schedule could ever produce the answer, and the answer it did produce went
+        # to an Actions console log that EXPIRES. laptop's framing is right and it is
+        # the same defect it fixed on itself six hours earlier: A CORRECT NUMBER THAT
+        # DOES NOT PROPAGATE IS INDISTINGUISHABLE FROM NO NUMBER, and it fails
+        # silently precisely because the computation works.
+        #
+        # Now runs on every scheduled cycle and lands in the committed snapshot.
+        # `state` is explicit rather than inferred from `net`, because an ABSENT block
+        # and a ZEROED block must not look alike -- the same None-vs-0.0 conflation
+        # avoided in memory would otherwise come straight back on disk.
+        try:
+            _cnet, _cev = alpaca_capital_flows(EXPERIMENT_START)
+            status["capital_flow"] = {
+                "window_opened": EXPERIMENT_START,
+                "state": "unknown" if _cnet is None else
+                         ("clean" if _cnet == 0 else "contaminated"),
+                "net": _cnet,
+                "events": _cev,
+                "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "how_to_use": ("state=clean means start_equity is a complete basis. "
+                               "contaminated means subtract net before computing Arm A "
+                               "return. unknown means the check FAILED and Arm A's "
+                               "basis is UNVERIFIED -- do not read it as clean."),
+            }
+        except Exception as e:
+            status["capital_flow"] = {"state": "unknown", "net": None, "events": [],
+                                      "error": str(e)[:200]}
+        # REALIZED GAIN/LOSS for tax tracking (Devon, 2026-09-29). Not the equity change:
+        # only positions actually SOLD count. `state` is ok / unverified / stale /
+        # unknown, and a failed refresh carries the last good ledger forward as stale so
+        # one transient API error cannot erase the number. Kept in its own try so a
+        # failure here cannot cost the snapshot its other fields.
+        try:
+            status["realized"] = realized_for_run()
+        except Exception as e:
+            status["realized"] = {"state": "unknown", "reason": "unexpected: %s" % str(e)[:160]}
+        with open("status.json", "w") as f:
+            json.dump(status, f, indent=1, sort_keys=True)
+    except Exception as e:
+        print(f"  [status snapshot skipped: {e}]")
+
+
+def exit_pass(et, alerted):
+    """Fast protective pass between full cycles (~every EXIT_PASS_SEC): HARD exits
+    only - trade-sleeve stop-loss, hold basis-stop/ratchet floor, crypto stop -
+    plus the news tripwire on held names. No buys, no take-profits, no signal
+    computation (those stay on the 15-min full cycle; signals are daily-bar and
+    barely move minute to minute). ~4-5 API calls per pass. Returns True if it
+    placed any order - the job then ends early so the workflow persists the log."""
+    holds     = load_holds()
+    positions = alpaca_positions()
+    if not positions:
+        # Nothing held means nothing to protect, so there is no exit to place either
+        # way. Stay quiet instead of crying "corrupt snapshot" every 60s, which is
+        # what a clean-slate account did on go-live day. run_bot() owns deciding
+        # whether an empty snapshot is real or a blip; this pass just no-ops.
+        return False
+    pending     = alpaca_open_orders()
+    acct        = str((alpaca_get("/v2/account") or {}).get("account_number", "????"))[-4:]
+    crypto_flat = {p.replace("/", ""): p for p in CRYPTO_UNIVERSE}
+    stocks      = [s for s in positions if s not in crypto_flat and s not in INDEX_ETFS]
+    lasts       = alpaca_latest_multi(stocks) if stocks else {}
+    clasts      = crypto_latest_multi([crypto_flat[s] for s in positions if s in crypto_flat]) or {}
+    # A name with no price cannot be stop-checked, and nothing used to say so: when the data API failed the
+    # whole pass was a silent no-op that the caller recorded as "reached". Still cannot sell on a price it
+    # does not have, but the log now names what went unwatched (2026-10-28 cold review).
+    blind = sorted(s for s in stocks if s not in pending and not lasts.get(s))
+    if blind:
+        print(f"  [fast pass {et.strftime('%H:%M')}: no live price for {len(blind)} of {len(stocks)} "
+              f"held name(s) {blind} - their stops were NOT evaluated this pass]")
+    try:
+        note_blind(blind, et.astimezone(timezone.utc))
+    except Exception as e:                                       # an alert that fails must never cost a protective pass
+        print(f"  [blind-price alert failed ({type(e).__name__}: {e})]")
+    resting = getattr(pending, "rows", ())
+    for o in (stale_stop_sells(resting, own_stop_sell_ids(), lasts, et.astimezone(timezone.utc)) if resting else ()):
+        print(f"  STALE-STOP {o['symbol']}: our stop sell {o['id']} has rested {o['age']:.0f} min at limit ${o['limit']:.2f} while the "
+              f"price is ${o['live']:.2f}; cancelling it so the next pass re-prices at the current price [fast pass {et.strftime('%H:%M')}]")
+        alpaca_cancel_order(o["id"])
+    placed = False
+    holds_dirty = False
+
+    def _sell(sym, qty, live, tag, extra):
+        nonlocal placed
+        print(f"{tag} {sym} qty={qty} {extra} [fast pass {et.strftime('%H:%M')}]")
+        is_crypto = sym in crypto_flat
+        r = place_crypto_sell(crypto_flat[sym], qty) if is_crypto else place_sell(sym, qty, live)
+        if _ok(r):
+            placed = True
+            entry = {"ts": et.strftime("%Y-%m-%dT%H:%M"), "mode": MODE, "acct": acct,
+                     "symbol": crypto_flat[sym] if is_crypto else sym, "side": "sell",
+                     "qty": qty, "order_id": r["id"], "live": live, "fast_pass": True}
+            key = {"STOP-LOSS": "stop_loss", "HOLD-STOP": "hold_stop",
+                   "CRYPTO-STOP": "stop_loss", "NEWS-EXIT": "news_exit"}[tag]
+            entry[key] = True
+            if is_crypto: entry["crypto"] = True
+            with open("trade_log.jsonl", "a") as f:
+                f.write(json.dumps(entry) + "\n")
+            send_email(f"Alpaca bot ({MODE}) - ORDER PLACED (fast pass)",
+                       f"{tag} {sym} qty={qty} {extra}\n{et.strftime('%Y-%m-%d %H:%M ET')}")
+        else:
+            print(f"    [fast-pass sell rejected: {(r or {}).get('message', r)}]")
+        return _ok(r)
+
+    for sym, p in list(positions.items()):
+        if sym in pending or sym in INDEX_ETFS: continue
+        qty = p.get("qty") or 0
+        cost = float(p.get("avg_cost") or 0)
+        if qty <= 0 or cost <= 0: continue
+        if sym in crypto_flat:
+            live = clasts.get(crypto_flat[sym])
+            if live and live <= cost * CRYPTO_STOP:
+                _sell(sym, qty, live, "CRYPTO-STOP", f"({(live/cost-1)*100:+.1f}% from ${cost:.6g})")
+            continue
+        live = lasts.get(sym)
+        if not live: continue
+        if sym in holds:
+            h = holds[sym]
+            basis  = cost or float(h.get("basis") or 0)
+            peak   = max(float(h.get("peak") or 0), live)
+            floor_ = max(basis * HOLD_STOP, peak * HOLD_TRAIL)
+            if live <= floor_:
+                if _sell(sym, qty, live, "HOLD-STOP", f"(live ${live:.2f} <= ${floor_:.2f})"):
+                    holds.pop(sym); holds_dirty = True
+        elif live <= cost * STOP_LOSS_PCT:
+            _sell(sym, qty, live, "STOP-LOSS", f"({(live/cost-1)*100:+.1f}% from ${cost:.2f})")
+
+    # Tripwire: fresh danger headlines - exit trade positions, alert on holds.
+    bad = news_flags(set(stocks), NEWS_ALERT_MIN)
+    for sym, headline in bad.items():
+        key = sym + headline[:40]
+        if key in alerted: continue
+        alerted.add(key)
+        if sym in holds:
+            send_email(f"Alpaca bot ({MODE}) - NEWS ALERT: {sym}",
+                       f"Danger headline on HOLD {sym}:\n{headline}\n\n"
+                       "The bot does not auto-sell holds on keyword matches - review manually.")
+        elif sym in positions and sym not in pending and positions[sym]["qty"] > 0 and lasts.get(sym):
+            _sell(sym, positions[sym]["qty"], lasts[sym], "NEWS-EXIT", f"({headline[:80]})")
+
+    if holds_dirty:
+        save_holds(holds)
+    return placed
+
+
+if __name__ == "__main__":
+    # Manual test: `gh workflow run alpaca-bot.yml -f email_test=true`
+    if os.environ.get("EMAIL_TEST", "").lower() == "true":
+        send_email(f"Alpaca bot ({MODE}) - email test OK",
+                   "Cloud email alerts are working for the Alpaca bot.")
+        raise SystemExit(0)
+
+    # Connection check: READ-ONLY, places nothing, so it is safe against a LIVE
+    # account - unlike ORDER_TEST, which refuses on live before it ever reads the
+    # account and so can't confirm a go-live worked. Answers the only questions
+    # that matter after swapping keys: which endpoint, which account, how much
+    # money, and which strategy arm is actually loaded.
+    if os.environ.get("ACCOUNT_TEST", "").lower() == "true":
+        print(f"=== ACCOUNT_TEST ({MODE}) ===")
+        a = alpaca_get("/v2/account") or {}
+        if a.get("message"):
+            print(f"  x API rejected the credentials: {a['message']}")
+            raise SystemExit(1)
+        cash_, eq, _d = alpaca_account()
+        pos = alpaca_positions()
+        print(f"  endpoint : {ALPACA_BASE}")
+        print(f"  mode     : {MODE}")
+        print(f"  account  : ...{str(a.get('account_number', '????'))[-4:]}  status={a.get('status')}")
+        print(f"  equity   : ${eq:,.2f}   cash ${cash_:,.2f}")
+        print(f"  positions: {len(pos)} {sorted(pos) if pos else '(none - clean slate)'}")
+        print(f"  ARM      : {'INDEX-ONLY' if _INDEX_ONLY else 'HYBRID'}  "
+              f"(index {INDEX_CORE_PCT:.0%} / hold {HOLD_PCT:.0%} / "
+              f"trade {MAX_INVESTED_PCT:.0%} / crypto {CRYPTO_PCT:.0%})")
+        print(f"  rails    : cash-only, no leverage/shorting/options; "
+              f"stop {1-STOP_LOSS_PCT:.0%}, loss-halt {LOSS_CAP_PCT:.0%}, VIX halt >35")
+        # CAPITAL_SINCE overrides the window so the detector can be FALSIFIED.
+        # A detector that has only ever printed "$0.00 clean" has not been shown
+        # to be capable of printing anything else, and "absent" is not evidence
+        # until you have seen it say "present". Run with an early date to make it
+        # report the account's original funding.
+        _since = os.environ.get("CAPITAL_SINCE", "").strip() or EXPERIMENT_START
+        _net, _ev = alpaca_capital_flows(_since)
+        if _net is None:
+            print(f"  capital  : COULD NOT DETERMINE flows since {_since} "
+                  f"- treat Arm A's return as UNVERIFIED, not as clean")
+        elif _net == 0:
+            print(f"  capital  : $0.00 moved in/out since {_since} - "
+                  f"start_equity is a complete basis, nothing to adjust")
+        else:
+            print(f"  capital  : ${_net:+,.2f} moved since {_since} - "
+                  f"Arm A's raw return is CONTAMINATED by this much")
+            for e in _ev:
+                print(f"             {e['date']}  {e['type']}  ${e['amount']:+,.2f}")
+        raise SystemExit(0)
+
+    # Order-path test: `gh workflow run alpaca-bot.yml -f order_test=true`
+    # Validates auth + the order endpoint by placing a tiny $1 PAPER buy, any time
+    # of day. Refuses to run against a LIVE account so it can't spend real money.
+    if os.environ.get("ORDER_TEST", "").lower() == "true":
+        print(f"=== ORDER_TEST ({MODE}) ===")
+        if MODE == "LIVE":
+            print("Refusing ORDER_TEST on a LIVE account."); raise SystemExit(1)
+        cash_, eq, dpnl = alpaca_account()
+        print(f"Account OK: Cash=${cash_:.2f}  EQ=${eq:.2f}")
+        print("Placing $1 notional AAPL market buy (paper)...")
+        r = place_buy("AAPL", 1.00)
+        print("Order result:", json.dumps(r)[:400])
+        print("OK ORDER PLACED - Alpaca order path works." if _ok(r)
+              else "! Not accepted (see message). Auth/account confirmed above.")
+        raise SystemExit(0)
+
+    try:
+        # NETWORK SHIELD (2026-08-06): the 14:30Z outage outlasted alpaca_get's
+        # ~50s of read retries, run_bot() raised, the job died, and the WHOLE
+        # 15-min window of protective passes was lost. When Alpaca is unreachable,
+        # retry INSIDE this job instead of waiting for the next trigger: three
+        # attempts at the full cycle, and even if all fail, still run the fast
+        # loop below - stops resume within ~EXIT_PASS_SEC of Alpaca coming back.
+        # Only network errors are shielded; real code crashes still raise (red X).
+        # Retrying the cycle is safe: a fresh run re-reads positions AND pending
+        # orders, so anything placed before a mid-run drop is seen and skipped.
+        _NET_ERRS = (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+        t0 = time.time()
+        # Run the full cycle ONCE. If Alpaca is unreachable, do NOT sit here retrying
+        # with sleeps - that unbounded retry loop is what blew jobs past their window
+        # on 2026-08-06 (runs ran ~16 min, overlapping the 15-min trigger, and got
+        # cancelled/timed out). Skip straight to the fast protective loop, which keeps
+        # retrying Alpaca every ~EXIT_PASS_SEC for the rest of the window and places
+        # stops the moment it comes back. Losing one BUY/rebalance cycle to an outage
+        # is fine (the next 15-min trigger redoes it); the protective passes are what
+        # matter and they are preserved. A network error is absorbed (exit 0). Any OTHER
+        # failure of the full cycle (a gateway HTML page or a JSON error body from Alpaca
+        # surfaces as JSONDecodeError / KeyError, not as a ConnectionError) ALSO runs the
+        # protective loop first, then fails the job: a crash is still a red X, but it must
+        # not cost the window its stops, since no stop orders exist at the broker
+        # (2026-10-28 cold review: it used to skip the loop entirely).
+        cycle_ok = False
+        crashed = None
+        try:
+            run_bot()
+            cycle_ok = True
+        except _NET_ERRS as e:
+            print(f"! Alpaca unreachable for the full cycle ({e}) - skipping to "
+                  "protective passes, which retry Alpaca every pass.")
+        except Exception as e:
+            import traceback
+            crashed = e
+            print(traceback.format_exc())
+            print(f"! the full cycle CRASHED ({type(e).__name__}: {e}) - running the protective "
+                  "passes anyway, then failing the job.")
+
+        # Fast protective loop: check hard stops + danger news every ~EXIT_PASS_SEC
+        # until the deadline, then end so the log persists and the job finishes well
+        # before the next 15-min trigger. Deadline anchors to JOB START so a slow full
+        # cycle can't push total run time past the interval (which caused the pileup).
+        if check_market()[0]:
+            deadline = t0 + LOOP_WINDOW_MIN * 60
+            alerted  = set()
+            passes = acted = 0
+            reached = cycle_ok   # did we get through to Alpaca at all this window?
+            while time.time() < deadline:
+                time.sleep(EXIT_PASS_SEC)
+                open_, _et = check_market()
+                if not open_:
+                    print("  [fast loop: market closed - done]"); break
+                passes += 1
+                try:
+                    if exit_pass(_et, alerted):
+                        acted = 1
+                        reached = True
+                        print("  [fast pass placed orders - ending job so the log persists now]")
+                        break
+                    reached = True
+                except _NET_ERRS:
+                    print("  [fast pass: Alpaca unreachable - trying again next pass]")
+                except Exception as _e:
+                    print(f"  [fast pass error (loop continues): {_e}]")
+            print(f"  [fast loop done: {passes} pass(es), orders={'yes' if acted else 'no'}]")
+            if not (reached or cycle_ok):
+                # An entire window with ZERO contact means stops are not being
+                # watched. The job exits 0 (nothing to fix in the code), but that
+                # blind spot deserves a real alert, not silence. Alert-then-backoff
+                # rather than one email per run: see OUTAGE_F above.
+                outage_note_blind()
+            else:
+                outage_note_contact()
+        if crashed is not None:
+            raise crashed                    # the outer handler mails the open-of-day crash and keeps the job red
+    except Exception:
+        import traceback
+        tb = traceback.format_exc()
+        print(tb)
+        try:
+            _, _et = check_market()
+            if _et.hour == 9 and _et.minute >= 45:
+                send_email(f"Alpaca bot ({MODE}) - CRASHED at open", tb[-3000:])
+        except Exception:
+            pass
+        raise

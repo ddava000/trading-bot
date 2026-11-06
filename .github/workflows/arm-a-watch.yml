@@ -1,0 +1,62 @@
+name: ARM A WATCH
+
+# Dead-man's switch for Arm A (the Alpaca bot). Devon 2026-10-06, after the 2026-10-05 Actions incident:
+# Arm A's 15:30 and 15:45 ET runs never got a machine, the bot's stop checks did not run for about 28
+# minutes before the close, and nothing alerted. See arm_a_watch.py for the three signals and thresholds.
+#
+# HONEST LIMIT: this workflow runs on GitHub Actions, so it shares fate with what it watches. During an
+# incident it can be delayed too, and the workflow_run trigger below only fires when an Arm A run COMPLETES,
+# which a run stuck waiting for a machine does not (it is cancelled about 15 minutes later). The schedule is
+# best effort (GitHub throttles frequent crons). The real coverage is the SAME check running on the Arm B
+# laptop, which does not depend on GitHub Actions: rh_daemon calls arm_a_watch.run_once() from its loop.
+# That integration is the laptop's file and is proposed in AGENT_MAIL, not made here.
+#
+# No concurrency group, on purpose: GitHub cancels the older PENDING run when a newer one arrives, which
+# silently dropped a MAILBOX NOTIFY run during the same incident. Runs are stateless and independent.
+on:
+  workflow_run:
+    workflows: ["Alpaca Trading Bot"]
+    types: [completed]
+  schedule:
+    - cron: "*/10 13-20 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "no = a normal check. yes = a TEST alert by email and Slack. urgent = the same plus SMS and push."
+        type: choice
+        options: ["no", "yes", "urgent"]
+        default: "no"
+
+permissions:
+  contents: read
+  actions: read          # list Arm A's runs to see one waiting for a machine
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 100     # to find the last commit of status.json (about 7 hours of history)
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --quiet requests
+      - name: Check that Arm A is running and alert if not
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+          NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
+          SMS_TO:             ${{ secrets.SMS_TO }}
+          GH_TOKEN:           ${{ github.token }}
+          FORCE_ALERT:        ${{ inputs.force }}
+          # Stateless windows: a threshold fires if it was crossed in the last N minutes. workflow_run
+          # arrives about every 15 minutes, the schedule every 10 when GitHub keeps it.
+          WATCH_WINDOW_MIN:   ${{ github.event_name == 'schedule' && '12' || '20' }}
+        run: python arm_a_watch.py

@@ -1,0 +1,2588 @@
+
+### 2026-06-09T09:06 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.7
+- avoid: [] | favor: ['NVDA', 'AMD', 'SMH']
+- notes: VIX moderate at 18.1 with constructive tape on chip rebound and Iran-Israel ceasefire, but BofA's 'take profits' warning and an upcoming May CPI print plus rate-hike repricing argue for measured sizing.
+- journal: Starting flat with full cash. Calm-ish open but CPI later this week and a strong jobs report pushing rate expectations up — watching CPI release for a volatility spike, keeping risk dialed to 0.7 until macro data clears.
+
+### 2026-06-09T17:25 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.5
+- avoid: ['MU', 'MRVL', 'QQQ'] | favor: ['DTE', 'AAL']
+- notes: VIX climbed to ~19.9 with a tech-led rotation selloff (chip rebound failed, MU continuing to fall) and a critical May CPI print looming alongside hawkish rate repricing and renewed US-Iran tensions. Dialing risk down to 0.5 and avoiding the semis and beta-heavy QQQ until macro clears.
+- journal: Tape deteriorated since the open — Nasdaq/S&P closed red on tech selloff, MU down -3.3% and bleeding, VIX up from 18.1 to 19.9. Cut risk to 0.5 ahead of CPI; rotating posture toward defensives (DTE utility, AAL on oil/Google tailwind) and steering clear of chips. Watching CPI release for a volatility spike.
+
+### 2026-06-09T19:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.5
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Tech rotation selloff persists with chips bleeding (MU -3.7%, MRVL -2.5%), VIX elevated at 19.9, US-Iran military strikes adding geopolitical risk, and a critical May CPI print looming with hawkish rate repricing. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs until macro and geopolitics clear.
+- journal: Conditions still risk-off into the close — chip names continuing to fall, US launched strikes against Iran (new geopolitical overhang), CPI still ahead. Kept risk at 0.5, added SPY to avoids as it tracks MU weakness; staying with defensives DTE and AAL (oil tailwind/Google deal). Watching CPI release and Iran headlines for a vol spike.
+
+### 2026-06-10T10:26 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.5
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Hot May CPI (+4.2% YoY, 3-year high) confirmed hawkish rate repricing, with VIX at 20.2 and chip-led tape still soft; one bright spot is easing Iran tensions and falling oil lifting airlines. Holding risk at 0.5, avoiding semis and beta-heavy index ETFs into the rate-fear digestion.
+- journal: CPI printed hot (+4.2%) as feared — inflation/rate overhang now the dominant risk, while Iran de-escalation removes some geopolitical premium and falling oil helps AAL. Keeping risk-off at 0.5, still avoiding MU/MRVL/QQQ/SPY; watching whether VIX cools below 19 or chips stabilize before adding risk back.
+
+### 2026-06-10T17:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL'] | favor: ['DTE', 'CLOV', 'CHOW']
+- notes: Conditions deteriorated: Dow off 900+ on a worsening chip selloff, VIX up to 22.2, hot May CPI (3-year high) plus re-escalating US-Iran tensions lifting oil. AAL flipped negative on a fuel shock + downgrade so it's off the favor list and now an avoid; cutting risk to 0.4 and steering clear of semis, beta ETFs, and AAPL (post-WWDC disappointment).
+- journal: Tape got materially worse since this morning — VIX 20.2->22.2, Dow worst day of 2026, chips still bleeding (MU -7.4%, MRVL -8.5%), and oil now rising again hurting AAL (fuel shock + downgrade). Dropped AAL from favor to avoid, added AAPL to avoids, cut risk to 0.4. Rotating to defensives DTE/CLOV/CHOW; watching for VIX to cool and Iran headlines.
+
+### 2026-06-10T18:30 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'CHOW']
+- notes: Conditions remain dangerous: Dow down ~950 to close below 50K, Nasdaq -2% on a worsening chip rout, VIX 22.2, hot May CPI (3-yr high) and renewed US-Iran strikes lifting oil. Day P&L -$15k with chips (MU -8%, MRVL -9%) and MTEN -12.6% bleeding; holding risk at 0.4 and steering clear of semis, beta ETFs, AAPL, and AAL (fuel shock).
+- journal: Still risk-off into the close — Dow plunged below 50K, tech rout deepening, Iran re-escalation and hot CPI both pressuring tape. CLOV got a Medicare rating upgrade (bright spot), CHOW still strong (+20.7%). Added deep losers MTEN/HXHX/GLE to avoids; keeping risk 0.4, leaning defensive DTE/CLOV/CHOW. Watching for VIX cooling under 20 and chip stabilization before adding back.
+
+### 2026-06-10T19:16 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAL', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'CHOW']
+- notes: Dangerous tape persists: Dow -950 below 50K, Nasdaq -2% on a deepening chip rout, VIX 22.2, hot May CPI (3-yr high) and renewed US-Iran strikes lifting oil. Day P&L -$13k with semis (MU -9%, MRVL -10.7%) and MTEN -13.5% bleeding; keeping risk at 0.4, avoiding semis, beta ETFs, AAPL and AAL (fuel shock).
+- journal: Still risk-off near the close — conditions essentially unchanged from prior check (VIX 22.2, chips weak, Iran/CPI overhang). CLOV strength holding on Medicare upgrade, CHOW +36%. Maintaining 0.4 and defensive tilt; watching for VIX under 20 and chip stabilization before adding risk back.
+
+### 2026-06-11T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'QQQ', 'SPY', 'AAPL', 'MTEN', 'HXHX', 'GLE'] | favor: ['DTE', 'CLOV', 'AAL']
+- notes: Tape attempting a bounce — futures higher as US says Iran strikes are 'completed' and oil slips, with VIX easing to 21.5 from 22.2. Still elevated risk with a hot 3-yr-high May CPI and a deep -$34.9k overnight drawdown, so staying defensive at 0.45; chips (MU/MRVL) still soft and AAPL post-WWDC disappointment remain avoids.
+- journal: Slight thaw vs yesterday's rout: Iran strikes done, oil falling, VIX 22.2->21.5, futures green. AAL flipped to a positive catalyst (Google deal + lower fuel) so moved from avoid to favor. Nudged risk 0.4->0.45 but staying risk-off given hot CPI and big P&L hole. Watching VIX under 20 and chip stabilization to add back.
+
+### 2026-06-11T17:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.65
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
+- notes: Sharp relief rally — Dow +900, tech rebounding and oil falling on news US is calling off Iran strikes, VIX cooled to 19.4 from 21.5. Chips stabilizing (MU +3.2%, MRVL +1.9%) so easing off risk-off to neutral at 0.65, but a hot CPI and Fed rate-hike risk keep me from going full risk-on; deep losers GLE/HXHX and refiner PBF (oil down) stay avoids.
+- journal: Big regime shift vs morning: Iran de-escalation sparked a 900pt Dow surge, VIX fell under 20, chips bounced — flipping from risk-off 0.45 to neutral 0.65 and moving MU/MRVL/AAL back to favor. Still cautious on hot CPI and a Fed that may be forced to hike; PBF added to avoids as falling oil pressures refiners. Watching whether the bounce holds and VIX stays sub-20.
+
+### 2026-06-11T18:24 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.65
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC'] | favor: ['MU', 'MRVL', 'AAL', 'CLOV', 'DTE']
+- notes: Relief rally holding into the close — Dow up ~930, tech rebounding, VIX steady at 19.4 and chips firm (MU +4.1%, MRVL +3.2%). Staying neutral at 0.65 rather than going risk-on given hot CPI and a Fed that may be forced to hike; deep losers GLE/HXHX, oil-pressured refiner PBF, dilutive AMC offering, and post-WWDC AAPL stay avoids.
+- journal: Conditions stable vs the 17:10 check — bounce held, VIX flat at 19.4, chips still green. Keeping risk 0.65 and same tilt; added AMC to avoids after its $150M ATM dilution. Watching CPI/Fed rate-hike overhang and whether VIX stays sub-20 before adding risk back.
+
+### 2026-06-11T19:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX back up to 22.2 from 19.4 even as the Dow surged 900pts on Iran de-escalation/falling oil — the rebound is real but volatility is re-elevating and a hot CPI plus a Fed possibly forced to hike are live overhangs. Trimming risk to 0.55; deep losers GLE/HXHX, dilutive AMC, refiner PBF, post-WWDC AAPL, and now CLOV (insider selling) stay avoids.
+- journal: VIX jumped 19.4->22.2 despite the index rally, so I'm pulling risk 0.65->0.55 — the surface looks calm but the vol bid says otherwise. Added CLOV to avoids on insider 10b5-1 sales. Watching whether VIX retreats under 20 and how the market digests the hot inflation/Fed-hike narrative before adding back.
+
+### 2026-06-12T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC'] | favor: ['MU', 'MRVL', 'AAL', 'DTE', 'CLOV']
+- notes: VIX back down to 19.4 and the Iran de-escalation/oil-down relief rally is holding with tech rebounding, so nudging risk 0.55->0.60. Hot CPI and a Fed possibly forced to hike keep me from going full risk-on; deep losers GLE/HXHX, oil-pressured PBF, dilutive AMC, and extended MTEN/post-WWDC AAPL stay avoids.
+- journal: VIX retreated from 22.2 back to 19.4 overnight and futures are up on a potential Iran peace deal, so I'm easing risk 0.55->0.60. Moved CLOV off avoids to favor after its Medicare rating upgrade. Watching the hot inflation/Fed-hike overhang and whether VIX stays sub-20 before adding more.
+
+### 2026-06-12T15:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX eased to 18.2 and the Iran de-escalation/oil-down relief rally is holding with chips firm (MU +3.4%, MRVL +4.8%), but it's late Friday with a hot-inflation/Fed-hike-overhang and Iran headline risk over the weekend, so I'm holding at 0.6 rather than reaching. Refiner PBF (-4% on falling oil), dilutive AMC, extended MTEN (+10.8%), post-WWDC AAPL, and now whipsawing CLOV (-5.9%) stay avoids.
+- journal: VIX slipped further 19.4->18.2 and the bounce is intact, but with it being 15:33 Friday I won't add risk into the weekend given lingering Iran/Fed-hike headlines — holding 0.6. Moved CLOV back to avoid after a -5.9% reversal off its court-order spike. Watching whether VIX holds sub-19 and how the Fed-hike narrative develops Monday.
+
+### 2026-06-12T17:20 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX is calm at 17.7 and the Iran de-escalation/oil-down relief rally held into the close (chips firm, AAL +5.1%), but this is the post-close Friday read with hot-inflation/Fed-hike overhang and live Iran headline risk over the weekend, so I'm easing to 0.55 rather than reaching. Refiner PBF (-3.9%), dilutive AMC (just printed a $150M ATM), extended MTEN (+12.2%), post-WWDC AAPL, and whipsawing CLOV stay avoids.
+- journal: VIX slipped further to 17.7 and the bounce closed intact, but I'm trimming 0.6->0.55 into the weekend given unresolved Iran and a Fed-possibly-forced-to-hike narrative — surface calm but event-heavy. MTEN now +12.2% and overextended, AMC confirmed dilution. Watching Monday's gap and whether the Fed-hike story hardens before adding back.
+
+### 2026-06-12T19:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GLE', 'HXHX', 'PBF', 'AAPL', 'MTEN', 'AMC', 'CLOV'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: VIX still calm at 17.7 and the relief rally held into the Friday close (AAL +5.1%, chips firm), but headlines now show a fresh round of US strikes on Iran, reviving weekend geopolitical/oil risk on top of the hot-inflation/Fed-hike overhang — so I'm trimming to 0.5 into the long weekend. Dilutive AMC ($150M ATM), oil-pressured refiner PBF (-3.9%), extended MTEN (+14.5%), post-WWDC AAPL, and whipsaw CLOV stay avoids.
+- journal: Post-close Friday: surface tape calm (VIX 17.7) but a fresh US-Iran strike headline reintroduces escalation risk that conflicts with the prior de-escalation narrative, so easing 0.55->0.5 ahead of the weekend gap. MTEN now overextended at +14.5%. Watching Monday's open for an Iran/oil gap and whether the Fed-hike story hardens before adding risk back.
+
+### 2026-06-15T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['PBF', 'AMC', 'MTEN', 'AAPL', 'CLOV', 'BFLY'] | favor: ['MU', 'MRVL', 'AAL', 'DTE']
+- notes: Weekend Iran headline risk resolved constructively — a US-Iran pact reopening Hormuz sent futures soaring and oil diving, with VIX easing to 16.6, so the tape is genuinely improved. But a hot jobs/inflation print has markets pricing higher rates and a busy data week (Jun 15-19), so I'm nudging up to 0.6 rather than chasing the gap. Oil-pressured refiner PBF (-7.9%), dilutive AMC, extended MTEN (+24.8%) and pre-market-spiking BFLY (+23%), post-WWDC AAPL, and whipsaw CLOV stay avoids.
+- journal: Big shift since Friday: the Iran escalation fear flipped to a peace-deal relief gap, oil down, VIX 16.6 — so I'm adding risk back 0.5->0.6. Fed-hike/inflation narrative is now the main overhang into a data-heavy week. MTEN ballooned to +24.8% (very extended) and BFLY popped 23% pre-market — both too hot to buy. Watching whether the rally holds past the open and how the rate-hike story develops.
+
+### 2026-06-15T18:01 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'AAL', 'QQQ']
+- notes: Constructive tape: Dow record close, oil tumbling on the US-Iran Hormuz pact, VIX easing to 16.2, and broad tech/chip strength (MRVL +13%, MU +13.9%). I'm leaning risk-on but capping at 0.65 because a hot jobs/inflation print keeps a Fed-hike narrative alive into a data-heavy week (Jun 15-19). MTEN is parabolic (+62.7%) and must not be added; AMC just printed a $150M ATM, CLOV has RSU-vesting share sales, AAPL stays post-WWDC, BFLY has a Jun 18 conference event.
+- journal: Rally held and extended into a record close with VIX 16.2 and oil down on the Iran deal, so nudging 0.6->0.65 risk-on. MTEN now blown out to +62.7% (no chase), AMC dilution and CLOV insider sales confirmed. Watching this week's inflation/rate data for whether the Fed-hike story hardens enough to flip posture defensive again.
+
+### 2026-06-15T19:07 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
+- notes: Tape stays constructive into the close: Dow record, oil lower on the US-Iran Hormuz pact, VIX calm at 16.2, and chips/memory leading (MRVL +12%, MU +13.3%, AMD buying MEXT for memory). Holding 0.65 risk-on but not higher because a hot jobs/inflation print keeps the Fed-hike narrative alive in a data-heavy week (Jun 15-19).
+- journal: Steady from last check at 0.65 — rally intact, VIX 16.2, oil soft. MTEN parabolic at +63.1% (no chase), AMC ATM dilution and CLOV RSU sales confirmed, AAPL post-WWDC, BFLY has a Jun 18 conference event. Watching this week's inflation/rate data for any hardening of the hike story that would force a defensive flip.
+
+### 2026-06-15T20:14 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
+- notes: End-of-day posture unchanged: Dow record close, VIX calm at 16.2, oil soft on the US-Iran framework, and chips/memory still leading (MU +13.2%, MRVL +12.2%, AMD buying MEXT). Capping at 0.65 because a hot jobs/inflation print keeps the Fed-hike narrative alive into a data-heavy week (Jun 15-19).
+- journal: Steady at 0.65 into the close — rally intact, big day P&L (+$41.7k), VIX 16.2. MTEN now blown out to +61.2% (no chase), AMC ATM dilution and CLOV RSU sales confirmed, AAPL post-WWDC, BFLY Jun 18 event. Watching this week's inflation/rate data for any hardening of the hike story that would flip me defensive.
+
+### 2026-06-16T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.65
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY'] | favor: ['MU', 'MRVL', 'SNDK', 'QQQ']
+- notes: Constructive but flat open: S&P futures slightly lower while Dow holds near record, VIX calm at 16.1, oil soft on the US-Iran Hormuz framework, and chips/memory still leading (MU +15.4%, MRVL +10.4%, AMD buying MEXT). Holding 0.65 — not higher — because a data-heavy week (Jun 15-19) and Warsh/inflation chatter keep a Fed-hike risk alive.
+- journal: Overnight rally held into Tuesday with VIX easing to 16.1; posture unchanged at 0.65 risk-on. New wrinkle: Fox buying ROKU (we hold ROKU -3.0%) — deal news already priced, no chase. MTEN still parabolic (+59.4%, no add), AMC ATM dilution and CLOV insider sales confirmed, AAPL extended post-50% run, BFLY has a Jun 18 conference. Watching this week's inflation data for any hike-story hardening that flips me defensive.
+
+### 2026-06-16T18:01 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Dialing down: a Fed rate decision is looming with inflation at a 3-year high and Warsh's debut, while the tape split (Dow record but S&P tech sell-off) and a -$27k day signal fading breadth. VIX still calm at 16.4 but event risk plus the rollover in chips (AMD -7.6%, ROKU -5.0%) warrant a defensive posture into the decision.
+- journal: Cut from 0.65 to 0.45 and flipped to neutral — Fed decision with hot inflation is the dominant risk this week, and today's tape soured (tech sell-off, day P&L -$27k). Avoiding AMD/ROKU on adverse momentum; still no chase on parabolic MTEN (+37.9%), AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event. Watching the rate decision outcome before re-risking.
+
+### 2026-06-16T18:35 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Holding defensive into the Fed rate decision with inflation at a 3-year high and Warsh's debut as the dominant event risk; VIX calm at 16.4 but day P&L -$29k and a split tape (chip rollover) confirm fading breadth. No reason to re-risk before the decision prints.
+- journal: Nudged 0.45 to 0.40 — still neutral and defensive ahead of the Fed. Tape stayed soft (AMD -7.1%, ROKU -5.0%, CRVO -13.7%), oil down on US-Iran framework helps AAL/airlines but I'm not chasing. Same avoids: parabolic MTEN, AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event. Waiting on the rate outcome before re-risking.
+
+### 2026-06-16T19:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Staying defensive into the Fed decision with inflation at a 3-year high and Warsh's debut as the dominant event risk; VIX calm at 16.4 but day P&L -$29k and a split tape (Dow record vs. S&P tech sell-off) confirm fading breadth. No reason to re-risk before the decision prints.
+- journal: Holding 0.40 neutral into the Fed — tape unchanged (tech soft, chips rolling), oil sub-$80 on US-Iran framework lifts AAL but I'm not chasing extended winners. Same avoids: parabolic MTEN, AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event, AMD/ROKU/CRVO adverse momentum. Waiting on the rate outcome before re-risking.
+
+### 2026-06-17T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Fed rate decision lands today with inflation at a 3-year high and Warsh's debut as chair — the dominant event risk and a binary catalyst, so I'm trimming to risk-off ahead of the print. VIX is calm at 16 and day P&L flipped green (+$6.8k), but no reason to add risk into the decision.
+- journal: Cut to 0.35 risk-off — decision day. Tape recovered overnight (day P&L +$6.8k vs. -$29k yesterday) but I won't re-risk before the rate print and presser. Same avoids: parabolic MTEN (+43.5%), AMC dilution, CLOV insider sales, AAPL extended, BFLY Jun 18 event, AMD/ROKU/CRVO adverse momentum. Watching the decision outcome and Warsh's tone before re-risking; will reassess this afternoon.
+
+### 2026-06-17T16:34 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'GPUS', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Fed held steady but Warsh's hawkish debut spiked bond yields and knocked the Dow ~500 pts with a tech-led S&P selloff; VIX up to 18.4 and day P&L -$15k confirm the risk-off tilt. Inflation at a 3-year high keeps a rate hike on the table, so I'm staying defensive.
+- journal: Decision came in hawkish — rates held but Warsh's tone surged yields and pressured tech (day P&L -$15k, VIX 18.4 from 16). Held risk-off at 0.35. Avoids unchanged plus added parabolic GPUS (+29.7%); BFLY TD Cowen event is tomorrow. Watching whether the yield/tech selloff stabilizes before re-risking.
+
+### 2026-06-17T18:22 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'GPUS', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Post-Fed digestion continues: Warsh's hawkish debut spiked yields and pressured tech, VIX at 18.4 and day P&L -$8.8k. With a 2026 rate-hike risk now live and inflation at a 3-year high, I'm holding defensive until the yield/tech selloff stabilizes.
+- journal: Holding 0.35 risk-off after end-of-day reassessment — tape still soft (day P&L -$8.8k, improved from -$15k but red), VIX 18.4. Avoids unchanged: parabolic MTEN/GPUS, AMC dilution, CLOV insider sales, AAPL extended, BFLY TD Cowen event tomorrow (Jun 18), AMD/ROKU/CRVO weak momentum. Watching whether yields ease and tech finds a floor before re-risking.
+
+### 2026-06-17T19:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MTEN', 'AMC', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'GPUS', 'CRVO'] | favor: ['MU', 'MRVL', 'DTE']
+- notes: Post-Fed digestion ongoing after Warsh's hawkish debut spiked yields and pressured tech; VIX 18.4, day P&L -$8.6k. With a 2026 rate-hike risk live and inflation at a 3-year high, I'm holding defensive until the yield/tech selloff stabilizes.
+- journal: Holding 0.35 risk-off into the close — tape still soft (day P&L -$8.6k, VIX 18.4) but slowly improving from -$15k earlier. Avoids unchanged: parabolic MTEN/GPUS (+40.9%), AMC dilution, CLOV insider sales, AAPL extended, BFLY TD Cowen event tomorrow (Jun 18), AMD/ROKU/CRVO weak momentum. Watching whether yields ease and tech finds a floor before re-risking; MU/MRVL holding green on the AMD-MEXT memory-shortage theme.
+
+### 2026-06-18T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'GPUS', 'CLOV', 'AAPL', 'BFLY', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'NBIS']
+- notes: VIX eased to 17.1 from 18.4 and futures are rebounding from the Fed-led selloff, with chips (Intel/AI names) leading; day P&L is +$24.7k. Stepping up from 0.35 to 0.5 but staying cautious given Warsh's live 2026 rate-hike risk and 3-year-high inflation.
+- journal: Bumped to 0.5 neutral as tape stabilizes — VIX 17.1, futures green, big P&L recovery (+$24.7k) versus yesterday's red. Avoids: parabolic AMC/GPUS (+56%), CLOV insider sales, AAPL extended, AMD/ROKU/SABR weak momentum, BFLY event window. Memory theme MU/MRVL still favored; watching whether yields ease further before re-risking past 0.5.
+
+### 2026-06-18T17:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Tape healed nicely — VIX down to 16.4, Nasdaq +~2% led by chips, oil retreating on Iran peace deal, day P&L +$30.9k. Nudging up to 0.55 but capping risk into the Juneteenth holiday (market closed Friday) since long-weekend gap risk argues against fully re-risking.
+- journal: Stepped 0.5→0.55 as conditions improved: VIX 16.4, broad chip-led rally, big P&L (+$30.9k). Staying measured because tomorrow is Juneteenth (closed) — limiting fresh exposure over the long weekend. Avoids: parabolic AMC(+25%)/BFLY(+65%)/GPUS, CLOV insider sales, AAPL extended, AMD/ROKU/SABR weak. Memory theme MU/MRVL/SNDK still leading; watching yields and whether momentum holds Monday.
+
+### 2026-06-18T18:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Strong constructive close — VIX 16.4, Nasdaq +~2% led by chips, oil back to pre-war levels, day P&L +$30.5k. Trimming slightly to 0.5 into the Juneteenth holiday (market closed Friday) since fresh exposure over a 3-day weekend carries gap risk despite the healed tape.
+- journal: Held neutral and nudged 0.55→0.5 ahead of Juneteenth long weekend — tape is good (VIX 16.4, chip-led rally, +$30.5k) but I don't want big fresh positions sitting over the closure. Avoids unchanged: parabolic AMC(+24.5%)/BFLY(+63.8%)/GPUS(-22%), CLOV insider/Star-rating pop, AAPL extended, AMD/ROKU/SABR soft. Memory theme MU/MRVL/SNDK/NBIS still leading; watching whether momentum and yields hold into Monday.
+
+### 2026-06-18T20:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Constructive close holds — VIX 16.4, chip-led Nasdaq rally, oil back near pre-war levels, day P&L +$33.4k. Keeping risk at 0.5 into the Juneteenth holiday (market closed Friday) to limit fresh exposure over the 3-day weekend despite the healed tape.
+- journal: Holding 0.5 neutral into Juneteenth closure — tape stays good (VIX 16.4, chips leading, +$33.4k) but I don't want big new positions gapping over the long weekend. Avoids unchanged: parabolic AMC(+24.6%)/BFLY(+67%)/GPUS, CLOV pop, AAPL extended, AMD/ROKU/SABR soft. Memory theme MU/MRVL/SNDK/NBIS still leading; reassess re-risking Monday on yields and momentum follow-through.
+
+### 2026-06-19T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Market is closed today for Juneteenth — no trading. VIX ticked up to 17.2 and futures slipped into the long weekend on Fed-hike worries despite Iran-deal optimism; nudging risk slightly down to 0.45 since strong jobs/inflation data is pushing rate expectations higher.
+- journal: Juneteenth holiday — exchanges closed, holding flat. Shaved 0.5→0.45 as the macro tone shifted: VIX 16.4→17.2, futures softer, markets pricing higher rates after the strong jobs report. Avoids unchanged (parabolic AMC/BFLY/GPUS, CLOV, AAPL extended, AMD/ROKU/SABR soft). Chip theme MU/MRVL/SNDK/NBIS still the leaders; reassess re-risking Monday on yields and whether the rally follows through.
+
+### 2026-06-19T14:25 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Cash equities closed today for Juneteenth — no live trading; VIX 16.8 and a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after strong jobs). Holding risk at 0.45 ahead of next week's economic data slate and reassess Monday.
+- journal: Juneteenth holiday again — exchanges closed, holding flat at 0.45 neutral. Tape stays healthy (VIX 16.8, chip leadership intact) but markets are pricing higher rates and a busy data week (June 22-26) looms. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip theme MU/MRVL/SNDK/NBIS still the leaders; reassess re-risking Monday on yields and rally follow-through.
+
+### 2026-06-19T16:50 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Market closed today for Juneteenth — no live trading. VIX 16.8 with a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after strong jobs); holding 0.45 into the long weekend and a heavy data slate June 22-26.
+- journal: End-of-week check on Juneteenth closure — staying flat at 0.45 neutral. Tape healthy (VIX 16.8, chips leading) but rate expectations rising and busy data week ahead. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip theme MU/MRVL/SNDK/NBIS still leaders; reassess re-risking Monday on yields and rally follow-through.
+
+### 2026-06-19T17:52 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AMC', 'GPUS', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Market closed today for Juneteenth — no live trading. VIX 16.8 with a constructive but rate-sensitive tape (Iran-deal optimism vs. Fed-hike worries after a strong jobs report); holding 0.45 into the long weekend ahead of a heavy data slate June 22-26.
+- journal: Final Juneteenth-closure check — staying flat at 0.45 neutral, no action possible. Tape healthy (VIX 16.8, chips leading) but rate expectations are creeping higher and a busy data week looms. Avoids unchanged: parabolic AMC/BFLY/GPUS, CLOV spec, AAPL extended, AMD/ROKU/SABR soft. Chip names MU/MRVL/SNDK/NBIS still leaders; reassess re-risking Monday on yields and rally follow-through.
+
+### 2026-06-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'GPUS', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: First live session back after Juneteenth; VIX 17.1 with futures muted on U.S.-Iran talks progress and easing oil, but the tape stays rate-sensitive after strong jobs data and a busy data week (June 22-26). Holding modestly defensive at 0.50 neutral, nudged up slightly as conditions remain orderly.
+- journal: Reopened Monday after the holiday — bumped from 0.45 to 0.50 as VIX ticks to 17.1 and the tape is orderly with Iran-deal optimism and easing oil. Watching rising rate expectations and the heavy data slate this week. Chip leaders MU/MRVL/SNDK/NBIS still favored; avoids unchanged on parabolic AMC/BFLY/GPUS, spec CLOV, extended AAPL, and soft AMD/ROKU/SABR. AAL up big (+12%) on falling oil — let it run but no adds.
+
+### 2026-06-22T17:35 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Closing brief: Nasdaq slid sharply on big-tech weakness while Dow held up; VIX 17.3 with rate expectations climbing after strong jobs data and a heavy data week ongoing. Tech/chip rotation is choppy, so staying defensive at 0.50 neutral.
+- journal: Day finished +$3.3k with AAL (+13%), MU (+29%), AMC (+22%), BFLY (+34%) and SNDK leading. Tape split — Dow up, Nasdaq down hard on tech — so keeping 0.50 rather than re-risking into a softening Nasdaq. Avoids unchanged on parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR; added TTWO and SLDB as laggards. Chip leaders still favored but watching rate fears and the rest of the June 22-26 data slate. Let oversized winners ride, no chasing.
+
+### 2026-06-22T18:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB', 'ASML'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: After-hours brief: S&P/Nasdaq closed lower on big-tech weakness, Dow held with back-to-back gains; VIX 17.3, oil under $74. ASML added to avoids on the China tech-restriction headline. Holding defensive at 0.50 into a heavy June 22-26 data week.
+- journal: End-of-day Monday check, +$2.9k day. Tape stays split — Dow firm, Nasdaq soft on tech rotation. Added ASML to avoids on U.S./China tech-concern report; kept parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR/TTWO/SLDB. Chip leaders MU/MRVL/SNDK/NBIS still favored. Watching rate expectations and the rest of the data slate before re-risking; oversized winners ride, no chasing.
+
+### 2026-06-22T19:05 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMC', 'BFLY', 'CLOV', 'AAPL', 'AMD', 'ROKU', 'SABR', 'TTWO', 'SLDB', 'ASML'] | favor: ['MU', 'MRVL', 'SNDK', 'NBIS']
+- notes: Final after-hours read on Monday: S&P and Nasdaq closed lower on big-tech weakness, Dow held back-to-back gains; VIX 17.3, oil below $74. Rate expectations climbing on strong jobs data; staying defensive at 0.50 into the heavy June 22-26 data slate.
+- journal: Late Monday check, day roughly flat (-$288). No regime change — tape still split with Dow firm and Nasdaq soft on tech rotation. Avoids unchanged: parabolic AMC/BFLY, spec CLOV, extended AAPL, soft AMD/ROKU/SABR/TTWO/SLDB, ASML on China headline. Chip leaders MU/MRVL/SNDK/NBIS favored; watching rate fears and rest of data week before re-risking. Oversized winners ride, no chasing.
+
+### 2026-06-23T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB'] | favor: ['DTE', 'AAL']
+- notes: Global tech rout: Nasdaq futures -3%, chips routed worldwide, Micron -9%; VIX up to 20.1 with PCE inflation data looming. Open day P&L already -$54.9k, so flipping to risk-off at 0.30 and pulling chip names from favor — the prior leaders (MU/MRVL/SNDK/NBIS) are now the epicenter of the selloff.
+- journal: Big change from yesterday's neutral/0.50: overnight chip selloff routed semis globally (Micron -9%), VIX 17.3->20.1, and account opened down ~$55k. Dropped risk to 0.30 risk-off and moved former chip favorites to avoid; only defensive DTE and resilient AAL look constructive. Watching PCE data and whether chips stabilize before re-risking — let winners ride, no buying into falling knives.
+
+### 2026-06-23T15:30 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Tech/chip rout persists into the afternoon, VIX 19.5 and PCE inflation data looming; day P&L -$45.5k off the open lows but tape still ugly with global AI doubts and rate jitters. Holding risk-off at 0.30 — no chasing falling chip names, AMC diluting via $200M offering.
+- journal: Mid-afternoon Tuesday, day -$45.5k (improved from -$55k open). Regime unchanged risk-off/0.30. Chips still the epicenter; added AMC dilution risk and weak SPY/WBI to avoids. Only defensive DTE and resilient AAL (+13%) look constructive. Watching for chip stabilization and PCE print before re-risking — let winners ride, no buying knives.
+
+### 2026-06-23T17:20 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Second straight day of tech/chip rout into the close; Nasdaq and S&P ended sharply lower, Micron results loom after the bell and PCE inflation data is later this week. VIX 19.5, day P&L -$45.5k — staying risk-off at 0.30, no chasing falling chip/AI names.
+- journal: End-of-day Tuesday, day -$45.5k. Regime unchanged risk-off/0.30 into the close. Micron earnings after the bell is the key event risk that could set chip tone tomorrow; semis remain the epicenter. Defensive DTE and resilient AAL (+13%) the only constructive names. Watching Micron reaction and PCE print before any re-risking — let winners ride, no buying knives.
+
+### 2026-06-23T18:22 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'AAPL', 'SABR', 'TTWO', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL']
+- notes: Global tech/chip rout persists with AI doubts and rate jitters; VIX 19.5 and PCE inflation data looming this week, Micron just reported. Day P&L -$40.7k — holding risk-off at 0.30, no chasing falling chip/AI names, AMC still diluting via $200M offering.
+- journal: Late Tuesday, day -$40.7k (improved from open lows). Regime unchanged risk-off/0.30; semis remain the epicenter and PCE print is the next key event. Defensive DTE and resilient AAL (+13.5%, fuel-price breakout) the only constructive names. Watching chip stabilization post-Micron and PCE before re-risking — let winners ride, no buying knives.
+
+### 2026-06-24T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL', 'AAPL']
+- notes: Tech attempting a rebound with VIX easing to 19.0 and day P&L +$9.4k, but hawkish jobs data and rate-hike worries cap conviction. Nudging risk to 0.40 from 0.30; still avoiding falling chip/AI names and AMC's $200M dilution.
+- journal: Wednesday open, day +$9.4k — tape stabilizing as Nasdaq futures firm and VIX slips to 19.0. Lifted risk modestly to 0.40 but staying defensive given hawkish rate noise; AAPL near buy zone added to favors. Watching whether the tech rebound holds and the PCE print before further re-risking.
+
+### 2026-06-24T14:24 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'SPY'] | favor: ['DTE', 'AAL', 'AAPL']
+- notes: Chip sell-off and AI jitters returning with S&P/Nasdaq slipping into red; VIX back up to 19.7 and Micron earnings keep semis fragile. Holding defensive at 0.40 — no chasing chip/AI knives.
+- journal: Wednesday midday, day flat. Early tech rebound faded as chip sell-off resumed ahead of Micron reaction; VIX ticked up to 19.7. Keeping risk-off/0.40, avoiding semis and SPY; watching PCE print and whether tech can stabilize before re-risking.
+
+### 2026-06-24T17:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'AAL']
+- notes: VIX eased to 18.6 and the day is marginally green, but chip sell-off is in its 3rd straight day with AI jitters and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Holding defensive at 0.45 — no chasing semis; GT flagged as an avoid after 'reasons to avoid' coverage and weak action.
+- journal: Wednesday close, day ~flat (+$2). VIX cooled to 18.6 but Nasdaq logged a 3rd down day on chips and oil keeps tumbling. Nudged risk to 0.45; ABSI ripping on hair-loss data + Lilly-backed raise, CUPR/OPTU squeezing — let holdings ride, no buying knives. Watching whether tech stabilizes and the rate-hike narrative ahead of next macro print.
+
+### 2026-06-24T18:45 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['MU', 'MRVL', 'SNDK', 'NBIS', 'AMD', 'ASML', 'INTC', 'ROKU', 'HOOD', 'AMC', 'BFLY', 'CLOV', 'SABR', 'SLDB', 'WBI', 'GT', 'SPY'] | favor: ['ABSI', 'CUPR', 'OPTU']
+- notes: Post-close: VIX steady at 18.6 but Nasdaq logged a 3rd straight down day on resuming chip sell-off and AI jitters, with Micron results on tap and hawkish rate noise (strong jobs, Warsh at Fed) capping conviction. Staying defensive at 0.45 — no chasing semis, GT still flagged after weak action and 'reasons to avoid' coverage.
+- journal: Wednesday close, day +$2. Tape soft for a 3rd day on chips/AI while oil tumbled to prewar lows and yields retreated; Micron earnings due after the bell keep semis fragile. Holding risk-off/0.45 — ABSI (hair-loss data + Lilly raise), CUPR and OPTU squeezing, let winners ride. Watching Micron reaction and the rate-hike narrative into next macro print before re-risking.
+
+### 2026-06-25T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CUPR', 'BRBR', 'AMC', 'CLOV', 'BFLY', 'SLDB', 'SABR', 'WBI'] | favor: ['ABSI', 'OPTU', 'SPY']
+- notes: Sentiment flipped constructive: Micron's strong earnings sparked a tech turnaround, Nasdaq futures +2%, in-line inflation eased rate fears and VIX cooled to 17.9. Lifting from risk-off 0.45 to neutral 0.6 — conditions improving but still measured given a 3-day prior selloff and lingering rate noise; CUPR flagged on weak -7% action.
+- journal: Thursday open, day +$3. Big regime shift vs yesterday: Micron beat reversed the chip selloff (Nasdaq fut +2%), in-line CPI calmed rate worries, VIX down to 17.9 — moving off pure risk-off to neutral/0.6 and dropping GT/SPY from avoid. ABSI and OPTU still leading; CUPR fading so flagged. Watching whether the tech rebound holds and oil/yields into the session.
+
+### 2026-06-25T15:28 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['FCUV', 'PACB', 'MIMI', 'ULCC', 'MULL', 'CUPR', 'BRBR'] | favor: ['MU', 'SNDK', 'AMAT']
+- notes: Market split: memory rally lifting MU/SNDK/AMAT but Apple-led Nasdaq weakness and a hot core PCE (3.4%, highest since Oct '23) keep rate fears alive; VIX edging up to 19 with Mideast oil tension. Trimming to 0.5 with under an hour to close — selective, no chasing the late-day knives.
+- journal: Thursday 15:28, day flat. Micron-driven memory names (MU, SNDK, AMAT) green and leading, but core inflation came in hot (3.4%) and Apple is dragging Nasdaq — tape divided. Nudged from 0.6 to 0.5 into the close given event risk priced and several holdings (FCUV -8%, PACB -6%, MIMI -4%) bleeding. Watching close and whether the rate narrative re-tightens tomorrow.
+
+### 2026-06-25T17:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MIMI', 'PACB', 'BRBR', 'GETY', 'CUPR', 'MULL', 'ULCC'] | favor: ['MU', 'SNDK', 'AMAT']
+- notes: Post-close: tape ended split — memory complex (MU/SNDK/AMAT) strong on Micron's blowout, but Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears alive. VIX 18.9. Holding neutral/0.5; no chasing, flagging the bleeders.
+- journal: Thursday close, day flat. Micron-led semis carried the only real strength while Apple weakness and hot core inflation capped the broader tape; several small holdings still bleeding (MIMI -8%, PACB -6%, BRBR -5%, GETY -4%). Staying neutral/0.5 — watching whether the rate-tightening narrative hardens and if the memory rally broadens or fades next session.
+
+### 2026-06-25T19:01 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MIMI', 'PACB', 'BRBR', 'GETY', 'CUPR', 'MULL', 'ULCC', 'SNXX'] | favor: ['MU', 'SNDK', 'AMAT']
+- notes: Post-close 19:01: tape stayed split — Micron-led memory (MU/SNDK/AMAT) the lone strength while Apple/Big Tech dragged Nasdaq to a 4th down day and core PCE at 3.4% (highest since Oct '23) keeps rate fears live. VIX 18.9 with Mideast oil noise. Holding neutral/0.5, no chasing late knives; cash thin at $114.
+- journal: Thursday post-close, day flat (-$1). No regime change from 17:18 check — memory complex still leading, broad tape soft on hot core inflation and Apple weakness. Several micro holdings bleeding (MIMI -4.6%, MULL -6.4%, PACB -6%, BRBR -4.5%); SNXX +13.5% added to avoid as overextended. Watching whether rate narrative hardens overnight and if the semi strength broadens next session.
+
+### 2026-06-26T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['MIMI', 'MULL', 'PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC'] | favor: ['MU', 'SNDK']
+- notes: Tech sell-off set to continue Friday — Nasdaq futures down, OpenAI IPO-delay rattling techs, first equity outflow since March feeding a 'risk-off summer' narrative, and VIX up to 20.2. Memory rally is fading (Micron failed to broaden), so trimming to 0.4 and holding only modest favor for MU/SNDK.
+- journal: Friday open: regime cut to risk-off (0.4) from neutral/0.5 — VIX 20.2, Nasdaq futures sliding, OpenAI IPO delay and outflow data point to broad de-risking. Micron-led semi strength stalling; MU -2.6%, SNDK flat. Cash thin ($114), day -$21 already. Watching whether the tech knife keeps falling or stabilizes midday before adding any new risk.
+
+### 2026-06-26T14:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS'] | favor: ['AMAT', 'MU', 'SNDK']
+- notes: Midday tape stabilizing — VIX back down to 18.8 from 20.2, tech sell-off easing per Investopedia and AMAT soaring, though S&P still heads for a losing week with defensive rotation and hot 3.4% core PCE keeping rate fears alive. Nudging from 0.4 to 0.45 (neutral) but cash is razor-thin ($47) so new risk is naturally capped.
+- journal: Friday 14:16: lifted from risk-off/0.4 to neutral/0.45 as VIX cooled to 18.8 and the AI/tech knife stopped falling (AMAT soaring, Nasdaq off lows). Still a down week on rate worries; bleeders GETY -9%, ULCC -5.8%, PACB/BRBR/CUPR soft and CNVS +16% overextended added to avoid. Cash near zero — watching into the close for any late fade.
+
+### 2026-06-26T17:08 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'BWIN']
+- notes: Late-Friday close into a losing week — tech/AI sell-off resumed (Nasdaq slid on OpenAI IPO-delay report, chip names adding to losses) and memory leadership reversed with MU -3.5%/SNDK -5%, so I pulled them off favor. VIX calm at 18.4 but hot 3.4% core PCE keeps rate fears live; trimming to 0.4 with cash thin ($76) and weekend gap risk ahead.
+- journal: Friday 17:08 close: cut back to 0.4 from 0.45 — the midday stabilization faded, chips/memory rolled back over (MU/SNDK now bleeders, moved to avoid), and tech selling persisted into the bell on a down week. Watching weekend headlines and whether semis find a floor Monday before re-adding risk.
+
+### 2026-06-26T17:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'GT']
+- notes: After-hours Friday into the weekend: VIX calm at 18.4 but a losing week with memory/chips (MU -3.1%, SNDK -4.3%) still rolling over and hot 3.4% core PCE keeping rate fears alive. Cash razor-thin ($76) and day -$22, so holding 0.4 with no reach into weekend gap risk.
+- journal: Friday 17:55 post-close: holding neutral/0.4 — semis/memory remained soft into the bell (MU, SNDK, SNDK family still bleeders, kept on avoid), small caps and broad bleeders weak. Watching weekend headlines and whether chips find a floor Monday before re-adding any risk.
+
+### 2026-06-29T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['PACB', 'CUPR', 'GETY', 'BRBR', 'ULCC', 'SNXX', 'INTC', 'CNVS', 'MU', 'SNDK'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive Monday open: futures higher on a U.S.-Iran truce and VIX calm at 18.4, though oil stays edgy and a big jobs week (June payrolls Friday) looms. Memory/chips (MU -3%, SNDK -3.3%) still leaking so kept on avoid; nudged to 0.5 as tape improves but cash is razor-thin ($76) which naturally caps new risk.
+- journal: Mon 6/29 open: lifted from 0.4 to 0.5 as weekend resolved bullishly (Iran ceasefire, futures green, VIX 18.4) — no immediate landmine today. Chips/memory still soft so MU/SNDK stay on avoid; watching whether semis floor and bracing for payrolls Friday before pushing risk higher.
+
+### 2026-06-29T15:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive late-Monday tape: Dow eyeing a record close on the U.S.-Iran truce, VIX easing to 17.6, AMAT printing record highs. But cash is near zero ($51), payrolls loom Friday, and memory/chips (MU, SNDK) still leak — holding 0.5 with no reach. Added ABCL/FCEL (+22%/+21%) to avoid as overextended chase risk.
+- journal: Mon 6/29 15:23: held neutral/0.5 into a green close (Dow record, VIX 17.6). AMAT strong at record highs stays on favor; MU/SNDK still soft and now ABCL/FCEL overextended so flagged for no-chase. Cash $51 caps new risk; watching semis for a floor and bracing for Friday payrolls before adding.
+
+### 2026-06-29T17:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive close to Monday: Dow record on the U.S.-Iran de-escalation, VIX calm at 17.6, AMAT at record highs. But cash is near zero ($51), June payrolls land Friday, and memory/chips (MU, SNDK) keep leaking — holding 0.5 with no reach.
+- journal: Mon 6/29 17:12: held neutral/0.5 into a green record close (VIX 17.6, Iran truce holding). AMAT strong stays favored; MU/SNDK soft and ABCL/FCEL overextended remain no-chase. Cash $51 caps risk; bracing for Friday payrolls and watching whether semis find a floor before adding.
+
+### 2026-06-29T18:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive Monday close: Dow above 52,000 on U.S.-Iran de-escalation, VIX calm at 17.6, AMAT at record highs. Cash near zero ($51) and June payrolls Friday keep me at 0.5 with no reach; memory/chips (MU, SNDK) still leaking and ABCL/FCEL overextended stay no-chase.
+- journal: Mon 6/29 18:17: posture unchanged — neutral/0.5 into a green record close (VIX 17.6, Iran truce holding). AMAT strong stays favored; MU/SNDK soft, ABCL/FCEL overextended remain avoid. Cash $51 caps new risk; bracing for Fed's Warsh and Friday payrolls, watching whether semis floor before adding.
+
+### 2026-06-30T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'QDEL', 'INTC'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Constructive quarter-end tape: Dow above 52,000, Nasdaq closing out a ~20% quarter, VIX calm at 17.6. But cash is thin ($51), payrolls land Friday, and chips/memory (MU, SNDK) still leak — holding 0.5 with no reach into a holiday-shortened week.
+- journal: Tue 6/30 09:00: held neutral/0.5 on a green quarter-end open (VIX 17.6, no landmine today). AMAT at record highs stays favored; MU/SNDK soft and ABCL/FCEL overextended remain no-chase. Cash $51 caps risk; watching Fed's Warsh and bracing for Friday jobs report before adding.
+
+### 2026-06-30T14:25 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Quarter-end tape constructive (Nasdaq +20% qtr, VIX calm at 16.6, day P&L green) but bubble-fear headlines and a Grantham crash warning add caution; cash thin at $53 and payrolls Friday keep me at 0.5 with no reach.
+- journal: Tue 6/30 14:25: VIX eased to 16.6, holding neutral/0.5 into a green quarter-end afternoon. AMAT record-high stays favored; MU/SNDK soft, ABCL/FCEL overextended remain no-chase. Watching bubble-fear chatter and bracing for Friday jobs; cash $53 still caps any add.
+
+### 2026-06-30T17:20 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Quarter-end close on a strong note (Nasdaq ~+20% qtr, VIX calm at 16.5, day P&L green), but bubble-fear chatter and a holiday-shortened week with payrolls Friday warrant caution; cash thin at $53 keeps me at 0.5 with no reach.
+- journal: Tue 6/30 17:20: held neutral/0.5 into the quarter-end close, VIX 16.5. AMAT record-high stays favored; MU/SNDK soft, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for Thursday jobs report (early on holiday week) and watching bubble-fear narrative.
+
+### 2026-06-30T18:52 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: Post-close on a record quarter (Nasdaq best since 2020, VIX calm 16.5, day P&L green), but bubble-fear chatter and a holiday-shortened week with payrolls Thursday keep me defensive; cash thin at $53 leaves no room to reach.
+- journal: Tue 6/30 18:52: held neutral/0.5 into the quarter-end close, VIX 16.5. AMAT record-high stays favored; MU/SNDK soft, GETY hit by Shutterstock merger termination, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for the early jobs report this holiday week and watching the tech-bubble narrative.
+
+### 2026-07-01T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'QDEL'] | favor: ['AMAT', 'GT', 'BWIN']
+- notes: New quarter opens after record-setting first half (VIX calm at 16.9) but bubble-fear chatter is building and the June jobs report lands Thursday in this holiday-shortened week; cash thin at $53 keeps me at 0.5 with no room to reach.
+- journal: Wed 7/1 09:00: rolled into Q3 holding neutral/0.5, VIX 16.9. AMAT record-high stays favored; MU/SNDK soft, GETY hit by terminated Shutterstock merger and note redemption, ABCL/FCEL overextended remain no-chase. Cash $53 caps adds; bracing for Thursday's early payrolls and watching whether the tech-bubble narrative cracks the tape.
+
+### 2026-07-01T15:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'AMAT', 'INTC'] | favor: ['GT', 'BWIN', 'SPY']
+- notes: VIX calm at 16.4 and Dow at fresh record, but chipmakers are dragging Nasdaq and jobs report lands tomorrow in a holiday-shortened week; cash at $32 leaves essentially no room to add, so I hold 0.5.
+- journal: Wed 7/1 15:18: neutral/0.5, VIX 16.4. Dow record but chips (MU -9.5%, SNDK, AMAT) soft so pulling AMAT off favor into avoid; GT/BWIN steady. GETY still cratering (-23%) on terminated Shutterstock merger. Cash $32 caps any add; bracing for Thursday's early payrolls print.
+
+### 2026-07-01T17:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'AMAT', 'INTC'] | favor: ['GT', 'BWIN', 'SPY']
+- notes: VIX calm at 16.6 and Dow at a fresh record, but chips keep dragging the Nasdaq and the June jobs report lands tomorrow in this holiday-shortened week; cash at $32 leaves essentially no room to add, so I hold 0.5.
+- journal: Wed 7/1 17:11: neutral/0.5, VIX 16.6, day P&L -$17. Chips (MU -11%, SNDK, AMAT) remain the weak spot so AMAT stays parked in avoid; GETY still cratering on terminated Shutterstock merger and note redemption. Cash $32 caps any add; bracing for Thursday's early payrolls print before the July 4 weekend.
+
+### 2026-07-01T18:46 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'AMAT', 'INTC'] | favor: ['GT', 'BWIN', 'SPY']
+- notes: VIX calm at 16.6 with the Dow near a record, but chips keep dragging Nasdaq lower and the June jobs report drops early tomorrow in this holiday-shortened week; cash at $32 leaves no room to add, so I hold 0.5.
+- journal: Wed 7/1 18:46: neutral/0.5, VIX 16.6, day P&L -$16. No material change into the close — chips (MU -11%, SNDK, AMAT) still soft and parked in avoid, GETY still cratering on the terminated Shutterstock merger. Cash $32 caps adds; braced for Thursday's early payrolls print before the July 4 weekend.
+
+### 2026-07-02T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'AMAT', 'GETY', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: June payrolls came in weaker than expected and semis keep sinking to open Q3, but VIX is calm at 16.0; with only $32 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.
+- journal: Thu 7/2 09:00: neutral/0.5, VIX 16.0, day P&L +$3. Jobs report landed soft (growth slowed more than expected) and chips (MU, SNDK, AMAT) lead the tape lower again; AMAT explicitly falling on news so stays parked in avoid, GETY still imploding on terminated merger/note redemption. Cash $32 caps any adds; watching whether the weak-payrolls read stokes rate-cut hopes or a growth scare into the July 4 close.
+
+### 2026-07-02T14:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'SNDK', 'AMAT', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: Soft June payrolls (+57k) drove a rotation trade: Dow at a record but Nasdaq/chips (SNDK, MU) keep slumping, and VIX ticked up to 17.1; with only $37 cash there's no room to add, so I hold a defensive 0.5 into the holiday-shortened session.
+- journal: Thu 7/2 14:19: neutral/0.5, VIX 17.1, day P&L -$18. Rotation trade in force — Dow record while chips lag (SNDK, MU deep red); AMAT actually hit a record high on PT hikes but I keep it in avoid given my losing position and sector weakness. Cash $37 caps adds; watching the July 4 early close and whether weak-jobs stokes rate-cut hopes vs growth scare.
+
+### 2026-07-02T16:37 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: End-of-session read: VIX calm at 16.1 and the Dow closed at a record, but the rotation persists as chips/memory (MU -16.5%, AMAT -8.5%) keep dragging Nasdaq; with only $68 cash there's minimal room to add, so I stay defensive at 0.5 into the July 4 weekend.
+- journal: Thu 7/2 16:37: neutral/0.5, VIX 16.1, day P&L -$15. Little changed into the close \\u2014 rotation trade intact (Dow record, chips red); MU still the worst position and stays parked in avoid alongside AMAT despite its PT-hike record high. Cash $68 caps adds; watching for any post-holiday shift when markets reopen and whether soft payrolls tilts toward rate-cut hopes or growth scare.
+
+### 2026-07-02T17:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: After-hours read into the July 4 close: VIX calm at 16.1 and broad tape constructive (Dow record), but chip/memory rotation persists (MU -15.9%, AMAT -8.6%) and cash is only $68, so I hold defensive 0.5 with no room to add.
+- journal: Thu 7/2 17:49: neutral/0.5, VIX 16.1, day P&L -$15. Nothing materially changed since the close — rotation intact, MU/AMAT still the drags and parked in avoid. Markets closed early for July 4; watching for post-holiday reopen and whether soft payrolls tilts to rate-cut hopes vs growth scare.
+
+### 2026-07-03T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'GETY', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 15.9 and Dow closed at a record, but the chip/memory rotation persists (MU -16.3%, AMAT -9.1%) and cash is only $67, so I hold defensive 0.5 with minimal room to add into the July 4 holiday closure/thin session.
+- journal: Fri 7/3 09:00: neutral/0.5, VIX 15.9, day P&L flat. Nothing materially changed over the holiday oth AAT still the worst positions and parked in avoid; watching the post-holiday reopen and next week's econ data (Jul 6-10) plus whether soft payrolls tilts toward rate-cut hopes vs a growth scare.
+
+### 2026-07-03T13:06 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 15.8 with Dow at a record, but the chip/memory rotation still drags (MU -16.3%, AMAT -9.1%) and it's a thin, possibly-closed holiday session with only $67 cash, so I hold defensive 0.5 with minimal room to add.
+- journal: Fri 7/3 13:06: neutral/0.5, VIX 15.8, day P&L flat. Nothing new over the holiday — chip rotation intact, MU/AMAT parked in avoid; watching post-holiday reopen and next week's econ data (Jul 6-10) for rate-cut hopes vs growth scare.
+
+### 2026-07-03T16:06 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 15.8 and Dow at a record, but chip/memory rotation keeps dragging (MU -16.3%, AMAT -9.1%, plus Burry-short chatter on AMAT/SOXX) and cash is only $67 in a thin pre-holiday close, so hold defensive 0.5 with minimal room to add.
+- journal: Fri 7/3 16:06: neutral/0.5, VIX 15.8, day P&L flat. Nothing new into the holiday close \u chip rotation intact, MU/AMAT parked in avoid; watching Mon reopen and next week's econ data (Jul 6-10) for rate-cut hopes vs growth scare.
+
+### 2026-07-03T17:43 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 15.8 with Dow at a record, but chip/memory rotation keeps dragging (MU -16.3%, AMAT -9.1%, Burry-short chatter on AMAT/SOXX) and cash is only $67 into the July 4 holiday close, so hold defensive 0.5 with minimal room to add.
+- journal: Fri 7/3 17:43: neutral/0.5, VIX 15.8, day P&L flat. Nothing new after the holiday close /AM/AMAT still the worst drags and parked in avoid; watching Mon reopen and next week's econ data (Jul 6-10) for rate-cut hopes vs growth scare.
+
+### 2026-07-06T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'BWIN', 'WEN']
+- notes: VIX calm at 16.4 with futures extending gains after a record week and soft June payrolls (57k) chilling hike odds, but chip/memory rotation still drags (MU -13.3%, AMAT falling again) and cash is just $67, so hold defensive 0.5 with little room to add.
+- journal: Mon 7/6 09:00: neutral/0.5, VIX 16.4, day P&L +5. Post-holiday reopen firm on soft-jobs/rate-cut hopes; MU/AMAT still worst drags and parked in avoid. Watching busy tech-earnings week and Jul 6-10 econ data, plus MarketWatch 'momentum unwind' warning.
+
+### 2026-07-06T15:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'AMD', 'QQQ']
+- notes: VIX easing to 15.7 with Nasdaq/Dow at records and chips rebounding (AMD firm on Goldman upgrade), tech jitters fading, but AMAT still -10% and cash is only $66, so I nudge risk to 0.6 while keeping the chip/memory laggards and low-conviction names parked in avoid.
+- journal: Mon 7/6 15:12: neutral/0.6 (up from 0.5), VIX 15.7, day P&L +5. Tape constructive into the close, chips bouncing (AMD/Goldman), QQQ/SPY green; still avoiding AMAT/MU rotation drags and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data.
+
+### 2026-07-06T17:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC'] | favor: ['GT', 'AMD', 'QQQ']
+- notes: VIX calm at 15.6 with Dow closing above 53k and Nasdaq/S&P higher on the revived chip trade, but AMAT still -10% and cash is thin at $66, so I hold risk at 0.6 and keep the chip/memory laggards and low-conviction names parked in avoid.
+- journal: Mon 7/6 17:14: neutral/0.6, VIX 15.6, day P&L +3. Records held into the close on AI/chip optimism; AMAT/MU rotation drags still parked in avoid and thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.
+
+### 2026-07-06T18:43 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['MU', 'AMAT', 'SNDK', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'INTC', 'BWIN'] | favor: ['GT', 'AMD', 'QQQ']
+- notes: VIX calm at 15.6 with Dow closing above 53k on revived AI/chip optimism and soft June jobs (57k) chilling hike odds, but AMAT still -10% and cash is thin at $66, so I hold posture at 0.6 and keep chip/memory laggards plus BWIN (go-private rumor, event risk) parked in avoid.
+- journal: Mon 7/6 18:43: neutral/0.6, VIX 15.6, day P&L +3. Records held on AI/chip trade; added BWIN to avoid on go-private rumor event risk. Thin cash caps adds. Watching busy tech-earnings week and Jul 6-10 econ data for any momentum-unwind reversal.
+
+### 2026-07-07T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['GT', 'SPY', 'WEN']
+- notes: VIX still calm at 15.8 but a Samsung-driven global chip sell-off is hitting semis (AMAT down again, AMD in focus) and oil is climbing, so I trim risk to 0.5 and park all chip/memory names plus low-conviction laggards in avoid; thin $66 cash leaves little room to add anyway.
+- journal: Tue 7/7 09:00: neutral/0.5 (down from 0.6), VIX 15.8, day P&L -1. Chip trade reversed overnight on Samsung results — added AMD to avoid alongside AMAT/MU semis; oil rising, jobs soft (57k). Watching whether the chip weakness bleeds into QQQ/SPY and the Jul 6-10 econ data.
+
+### 2026-07-07T11:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'GT', 'WEN']
+- notes: VIX ticked up to 16.4 amid a Samsung/DeepSeek-driven chip sell-off, though tech jitters are easing intraday; with day P&L deeply red (-403) and only $66 cash, I cut risk to 0.4 and keep all semis/memory laggards plus event-risk BWIN parked in avoid.
+- journal: Tue 7/7 11:22: neutral/0.4 (down from 0.5), VIX 16.4, day P&L -403 — real drawdown so I'm dialing back further. Chip weakness persisting but not bleeding hard into SPY/QQQ yet; watching whether the tape stabilizes and the Jul 6-10 econ data (Fed's Warsh) for any shift.
+
+### 2026-07-07T13:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'QQQ', 'GT']
+- notes: VIX eased back to 15.7 and day P&L recovered to -12 from the -403 midday low, with SPY +2% and QQQ green showing the chip rout is staying contained; I nudge risk up to 0.5 while keeping semis, laggards, and event-risk BWIN parked in avoid. Cash a bit healthier at $115 but still tight for adds.
+- journal: Tue 7/7 13:32: neutral/0.5 (up from 0.4), VIX 15.7, day P&L -12 — big intraday recovery, tape stabilizing and chip weakness not bleeding into SPY/QQQ. Nudged risk back up; still avoiding all semis and event-risk BWIN. Watching Jul 6-10 econ data and Fed's Warsh.
+
+### 2026-07-07T15:28 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AMAT', 'AMD', 'MU', 'SNDK', 'INTC', 'PACB', 'BRBR', 'ABCL', 'FCEL', 'BWIN'] | favor: ['SPY', 'QQQ', 'GT']
+- notes: VIX steady at 16.3 with the chip sell-off staying contained and SPY holding +1.7% into the close; day P&L back to -15 from the -403 midday low, so I hold risk at 0.5 while keeping semis, laggards, and event-risk names parked. Late-session with only $102 cash leaves little room for new adds.
+- journal: Tue 7/7 15:28: neutral/0.5, VIX 16.3, day P&L -15 — tape stable into the close, chip weakness not bleeding into indexes. Steady posture; still avoiding semis, PACB/BRBR/ABCL laggards and event-risk BWIN. Watching Jul 6-10 econ data and Fed's Warsh into tomorrow.
+
+### 2026-07-08T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['FCEL', 'BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'QQQ', 'IWM'] | favor: ['SPY', 'GT', 'WEN']
+- notes: Geopolitics turned ugly overnight — Trump says Iran ceasefire 'over', Dow futures -700, oil surging and semis selling off, with Fed minutes due today; VIX up to 17.4. This is a clear risk-off open so I cut sizing to 0.3, park FCEL (after-hours plunge), event/news names and high-beta tech, and keep only defensive favors.
+- journal: Wed 7/8 09:00: shifted neutral/0.5 -> risk-off/0.3, VIX 16.3->17.4. Ceasefire collapse + 700pt futures drop + oil spike + Fed minutes = defensive posture. FCEL plunged after-hours, added to avoid. Watching whether the gap-down stabilizes intraday and the Fed minutes reaction.
+
+### 2026-07-08T10:45 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD'] | favor: ['SPY', 'GT', 'DTE']
+- notes: Iran ceasefire collapse, oil surging and Dow off 400-650pts with semis (Micron/Sandisk) still bleeding, plus FOMC minutes landing this afternoon; VIX 17.6. Clear event-heavy risk-off day so I hold sizing at 0.3, park high-beta tech, semis, crypto and news/laggard names, and keep only defensive favors like DTE (near 52w high) and SPY.
+- journal: Wed 7/8 10:45: hold risk-off/0.3, VIX 17.4->17.6, day P&L only -8 (better than yesterday's -400 scare). SPY oddly green +1% but tape still heavy on Iran/oil; Fed minutes this afternoon is the key event. Dropped FCEL/QQQ from avoid, added MU/crypto. Watching minutes reaction and whether oil spike bleeds into indexes.
+
+### 2026-07-08T12:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM'] | favor: ['SPY', 'GT', 'DTE']
+- notes: Iran ceasefire collapse with oil topping $75, Dow -700 and semis/AI names bleeding, and FOMC minutes still due this afternoon; VIX 17.3. Event-heavy risk-off day so I hold sizing at 0.3, park high-beta tech, semis, crypto and news/laggard names, and lean on defensive favors DTE and SPY.
+- journal: Wed 7/8 12:57: hold risk-off/0.3, VIX 17.6->17.3, day P&L -8 (well-contained). Fed minutes this afternoon remains the key event; SPY still oddly green +1.3% but broad tape heavy on Iran/oil. Added IRDM (down 5%) to avoid. Watching minutes reaction and whether oil spike bleeds into indexes into the close.
+
+### 2026-07-08T15:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'MU', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM', 'WEN'] | favor: ['SPY', 'GT', 'DTE']
+- notes: Iran tensions and oil above $75 keep the tape heavy with semis/AI names bleeding, though VIX has eased to 16.8 and day P&L is well-contained at -7; final hour with FOMC minutes largely digested. Hold defensive at 0.35, park high-beta tech, semis, crypto and laggards, lean on SPY/GT/DTE.
+- journal: Wed 7/8 15:00: hold risk-off, nudged 0.3->0.35 as VIX eased 17.3->16.8 and losses stayed tiny (-7). Fed minutes now mostly priced; SPY still green +1.5% despite oil/Iran drag. Watching into the close for any late oil-driven fade; added WEN to avoid on weakness.
+
+### 2026-07-09T09:05 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'NET', 'IWM', 'ETHUSD', 'SOLUSD', 'IRDM', 'WEN'] | favor: ['SPY', 'QQQ', 'DTE', 'MU']
+- notes: US-Iran tensions and rising oil keep the tape two-sided with Nasdaq up on semis (Micron rallying) but Dow/S&P retreating; VIX calm at 16.8 and day P&L flat. Still event-heavy with jobs report, CPI and bank earnings ahead, so hold defensive at 0.4, park high-beta laggards/crypto, lean on SPY/QQQ and defensive DTE.
+- journal: Thu 7/9 09:05: hold risk-off, nudged 0.35->0.4 as VIX steady 16.8 and futures inch higher; Micron/semis now rallying so pulled MU off avoid into favors. Iran headline risk persists and jobs/CPI loom this week. Watching whether oil spike bleeds into indexes and META's -6.8% slide.
+
+### 2026-07-09T11:39 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
+- notes: VIX easing to 16.2 with SPY +2.1%/QQQ +1.7% and day P&L green; tape is constructive but Iran ceasefire headlines remain two-sided and CPI/bank earnings loom, so I lift to neutral 0.5 while parking crypto, high-beta laggards (TSLA, META) and news-driven biotechs (ABCL +9% on clinical anticipation is too whippy to chase).
+- journal: Thu 7/9 11:39: upgraded risk-off->neutral, 0.4->0.5 as VIX slid 16.8->16.2 and indexes turned solidly green (SPY +2.1%). MU still leading semis higher, kept in favors. Watching CPI/bank earnings this week and any Iran headline reversal; ABCL added to avoid on parabolic clinical-data run.
+
+### 2026-07-09T13:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
+- notes: VIX steady at 16.0 with SPY +2.3%/QQQ +2.1% and day P&L green, tape is constructive; but Iran ceasefire headlines are two-sided and CPI/bank earnings loom, so I hold neutral 0.5 while parking crypto, high-beta laggards and parabolic biotechs (ABCL still whippy).
+- journal: Thu 7/9 13:29: hold neutral 0.5, VIX flat 16.2->16.0 and indexes holding solid gains (SPY +2.3%). MU/semis still leading, kept in favors. Watching CPI/bank earnings this week and any Iran ceasefire reversal into the close.
+
+### 2026-07-09T15:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET'] | favor: ['SPY', 'QQQ', 'MU', 'DTE']
+- notes: VIX steady at 16.1 with SPY +2.2%/QQQ +1.9% and day P&L green; tape constructive but Iran ceasefire headlines flip-flopping and CPI/bank earnings loom, so I hold neutral 0.5 into the close while parking crypto, high-beta laggards and whippy biotechs (ABCL +9.6% too parabolic).
+- journal: Thu 7/9 15:16: hold neutral 0.5, VIX flat ~16.0-16.1 and indexes still solidly green (SPY +2.2%). Under an hour to close so no reason to add risk; MU/semis leading, kept in favors. Watching CPI/bank earnings and any late Iran-driven oil fade into the bell.
+
+### 2026-07-10T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['BRBR', 'BWIN', 'ABCL', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE'] | favor: ['SPY', 'QQQ', 'MU']
+- notes: VIX still calm at 15.8 but event risk stacked today — CPI/inflation report, FOMC minutes and bank earnings kicking off, plus a second day of US strikes on Iran lifting oil and leaving futures mixed. I trim to 0.45 and stay defensive, parking crypto, high-beta laggards and whippy biotechs; DTE added to avoid after index removal/valuation questions.
+- journal: Fri 7/10 09:00: nudged 0.5->0.45. VIX flat ~15.8 but a heavy macro day (CPI, FOMC minutes, bank earnings) collides with a second day of US-Iran strikes and rising oil; futures mixed, chips retreating from rally. Added DTE to avoid on index-removal news. Watching CPI print reaction and whether oil spike bleeds into indexes.
+
+### 2026-07-10T11:08 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'META', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE'] | favor: ['SPY', 'QQQ', 'MU']
+- notes: VIX easing to 15.6 with indexes green (SPY +2.3%/QQQ +1.6%) and day P&L flat; the stacked macro morning (CPI/FOMC minutes/bank earnings) seems to have passed without a shock, so I nudge back to 0.5. Still parking crypto, high-beta laggards (IRDM, ANAB, TSLA), whippy names and DTE.
+- journal: Fri 7/10 11:08: bumped 0.45->0.5 as VIX ticked down to 15.6 and tape held constructive post-CPI with no visible shock. Semis/MU steady; watching for any late oil/Iran headline or bank-earnings follow-through into the afternoon.
+
+### 2026-07-10T13:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE', 'VOD'] | favor: ['SPY', 'QQQ', 'MU', 'META']
+- notes: VIX easing further to 15.3 with indexes solidly green (SPY +2.6%/QQQ +2.2%) heading into a winning week; the stacked macro morning passed without shock. Holding 0.5 rather than reaching, since Iran-strike/oil headlines and next week's CPI/earnings still lurk and it's a Friday afternoon.
+- journal: Fri 7/10 13:18: hold neutral 0.5, VIX drifting down 15.6->15.3 and tape constructive (META +6.6%, semis firm). No fresh shock from Iran/CPI; keeping crypto, high-beta laggards and DTE parked. Watching for a late oil/Iran headline into the close and any bank-earnings follow-through.
+
+### 2026-07-10T15:11 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BRBR', 'BWIN', 'ANAB', 'TSLA', 'ETHUSD', 'SOLUSD', 'IRDM', 'NET', 'DTE', 'VOD'] | favor: ['SPY', 'QQQ', 'MU', 'META']
+- notes: VIX steady at 15.3 with indexes holding solidly green into a winning week (SPY +2.8%, QQQ +2.3%, META +3.2%); the stacked macro day passed without shock. Holding 0.5 with less than an hour to the close on a Friday — no reason to reach with Iran/oil and next week's CPI/earnings still ahead.
+- journal: Fri 7/10 15:11: hold neutral 0.5 into the final hour. Tape constructive and calm, VIX 15.3, day P&L flat/green; keeping crypto, high-beta laggards (IRDM, TSLA, ANAB), whippy names and DTE parked. Watching for any late Iran/oil headline into the bell; carry these avoids into Monday's CPI/earnings gauntlet.
+
+### 2026-07-13T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['MU', 'SNDK', 'NET', 'META', 'TSLA', 'IRDM', 'ANAB', 'ETHUSD', 'SOLUSD', 'BRBR', 'BWIN', 'DTE', 'VOD', 'JXN'] | favor: ['SPY', 'QQQ']
+- notes: Weekend brought a chip-led selloff (SK Hynix -10%, AI jitters), Iran saying Hormuz is closed with oil rising, and futures pointing lower into a CPI + Warsh testimony + bank-earnings week; VIX up to 16.5. Cutting to 0.35 and parking all semis/high-beta/crypto until the tape stabilizes.
+- journal: Mon 7/13 09:00: dropped 0.5->0.35 and flipped risk-off. Weekend chip rout (SK Hynix -10%) plus Iran/Hormuz oil spike and CPI/Warsh this week broke Friday's calm; added MU/SNDK/META to avoids. Watching CPI print and whether semis stabilize before dialing back up.
+
+### 2026-07-13T11:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Despite morning chip/Iran jitters, the tape has recovered nicely — SPY +2.4%, QQQ +1.2%, META +1.7% and VIX easing to 16.2 with day P&L roughly flat. Nudging up 0.35->0.45 but staying below normal with CPI, Warsh testimony and bank earnings still ahead this week; keeping crypto, whippy high-beta and the CNMD takeover-rumor pop parked.
+- journal: Mon 7/13 11:18: lifted 0.35->0.45, back to neutral. Feared weekend chip rout/Iran didn't stick — indexes green, VIX 16.5->16.2, semis stabilizing so dropped MU/SNDK from avoids. Added CNMD (PE takeover rumor spike). Still watching CPI print and bank earnings before reaching further.
+
+### 2026-07-13T13:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Tape steady midday — SPY +2.1%, QQQ +0.5%, META +1.9% with VIX little-changed at 16.6, but small-caps lag (IWM -2.0%) and TSLA is bleeding -5.8%. Holding 0.45 neutral, keeping crypto, high-beta laggards, the CNMD rumor pop and IWM parked ahead of CPI, Warsh testimony and bank earnings still to come this week.
+- journal: Mon 7/13 13:30: holding neutral 0.45, no material change since 11:18. Large-caps green but IWM weak and TSLA -5.8% — keeping those and crypto/high-beta parked. Watching CPI print and bank-earnings kickoff before adjusting posture.
+
+### 2026-07-13T15:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: Late-day tape holding with SPY +2.1% and QQQ +0.4%, but Iran/Hormuz tensions re-escalated (ceasefire collapsed, oil jumping) and VIX ticked up 16.6->17.0. Trimming to 0.40 into the close ahead of this week's CPI, Warsh testimony and bank-earnings gauntlet; keeping crypto, TSLA (-6%), whippy high-beta, the CNMD rumor pop and lagging IWM parked.
+- journal: Mon 7/13 15:07: nudged 0.45->0.40, still neutral. Iran blockade headlines returned and VIX crept 16.6->17.0 while indexes stayed green; TSLA now -6%. Carrying same avoids into tomorrow's CPI print and bank earnings before adjusting.
+
+### 2026-07-14T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'BRBR', 'VOD', 'NET', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: CPI print plus Warsh testimony land today with rate-hike bets rising and AI/chip angst back on the Nasdaq; VIX still calm at 16.7 but event risk is front-and-center. Trimming to 0.35 into the data and adding AAPL to avoids on its downgrade (iPhone weakness).
+- journal: Tue 7/14 09:00: cut 0.40->0.35 ahead of the June CPI print and Warsh House testimony — both today. Added AAPL to avoids (Barron's downgrade, iPhone weakness). Watching CPI reaction and whether chips stabilize before dialing risk back up.
+
+### 2026-07-14T10:21 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'BWIN', 'IWM'] | favor: ['SPY', 'QQQ', 'META']
+- notes: June CPI landed soft and futures/indexes are green (SPY +2.1%, QQQ +1.0%) with VIX calm at 16.6 — the main event risk cleared benign, so nudging back to 0.45. Keeping AAPL (downgrade), TSLA (-4.5%), CNMD rumor pop, crypto and lagging IWM parked while Warsh testimony finishes.
+- journal: Tue 7/14 10:21: CPI came in light and tape green, so lifted 0.35->0.45 as event risk resolved constructively. Trimmed BRBR/VOD/NET off avoids as they firm; still watching Warsh testimony and whether IWM/TSLA weakness spreads.
+
+### 2026-07-14T12:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['SPY', 'QQQ', 'META', 'NET']
+- notes: Soft CPI held and the tape is broadly green (SPY +2.3%, QQQ +1.6%, META/NET leading) with VIX calm at 16.7, so nudging to 0.50; only offset is Iran/Hormuz fire exchange lifting oil, keeping a defensive cap. Parking AAPL (downgrade), TSLA (-4.7%), CNMD/ANAB, crypto and lagging IWM (-1.5%).
+- journal: Tue 7/14 12:45: lifted 0.45->0.50 as CPI-driven rally holds and VIX stays calm; large-caps and NET strong. Watching Iran/oil headlines and IWM/TSLA weakness before pushing risk higher.
+
+### 2026-07-14T14:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['SPY', 'QQQ', 'META', 'NET']
+- notes: CPI-driven rally is holding into the afternoon with SPY +2.4%/QQQ +1.6% and VIX easing to 16.4; keeping 0.50 rather than reaching since it's late-day and Iran/Hormuz oil headlines remain a background risk. Parking AAPL (downgrade), TSLA (-4.9%), CNMD/ANAB, crypto and lagging IWM (-1.6%).
+- journal: Tue 7/14 14:56: holding 0.50 neutral into the close; tape stayed green all session and VIX drifted 16.7->16.4. No new landmines — same avoids. Watching for any late fade or fresh Hormuz/oil escalation before tomorrow's open.
+
+### 2026-07-15T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM'] | favor: ['QQQ', 'SPY', 'META', 'NET', 'MU']
+- notes: VIX calm at 16.2 and semis leading futures higher after yesterday's soft-CPI rally held; keeping 0.50 rather than reaching because oil is spiking on Iran/Hormuz headlines and a packed earnings/data week (jobs, Warsh) keeps event risk elevated. Parking AAPL (downgrade), TSLA/ANAB weakness, CNMD, crypto and lagging IWM.
+- journal: Wed 7/15 09:00: holding 0.50 neutral into the open; Tuesday's rally carried through and VIX eased 16.4->16.2 with chips bid, but oil spike and busy data/earnings week cap risk. Same avoids; watching Iran/oil escalation and whether IWM/small-caps stop lagging.
+
+### 2026-07-15T10:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'MU'] | favor: ['QQQ', 'SPY', 'META', 'NET', 'REZI']
+- notes: Tape constructive with SPY +2.8%/QQQ +1.5% and VIX calm at 16.0; keeping 0.50 rather than reaching given oil spike on Iran/Hormuz, Warsh testimony today, and a packed earnings/data week. MU turned negative (-3.1%) so parking it alongside AAPL downgrade, TSLA weakness, CNMD/ANAB, crypto and lagging IWM.
+- journal: Wed 7/15 10:17: holding 0.50 neutral; large-caps green (SPY/QQQ/META/NET/REZI firm) but MU faded -3.1% so added to avoids. VIX steady 16.0. Watching Warsh testimony, Iran/oil headlines, and whether IWM/small-caps keep lagging.
+
+### 2026-07-15T12:51 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'QQQ'] | favor: ['SPY', 'META', 'REZI', 'JXN']
+- notes: Tape has softened intraday — Nasdaq turned lower on chip/tech weakness while S&P holds up (SPY +2.3%), and VIX ticked to 16.5; trimming to 0.45 given tech rollover, Warsh testimony and a packed CPI/jobs/earnings week. Parking tech-heavy QQQ/NET alongside AAPL, TSLA, ANAB (-17%), CNMD, crypto and lagging IWM.
+- journal: Wed 7/15 12:51: nudged 0.50->0.45 as chips faded and Nasdaq turned lower midday while broad SPY stayed green; VIX up slightly 16.0->16.5. Added QQQ/NET to avoids on tech weakness; ANAB deep red -17%. Watching whether tech stabilizes and any Warsh/oil headlines.
+
+### 2026-07-15T14:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET'] | favor: ['SPY', 'META', 'QQQ', 'REZI']
+- notes: VIX eased back to 15.7 and the tape firmed into the afternoon — SPY +2.6%, QQQ back green +1.0%, META +3.9% as chips stabilized; nudging back to 0.50 but staying cautious with Warsh testimony and a packed data/earnings week. Still parking AAPL (extended/downgrade), TSLA/ANAB (-15%) weakness, CNMD, crypto and lagging IWM.
+- journal: Wed 7/15 14:49: bumped 0.45->0.50 as VIX slipped 16.5->15.7 and tech recovered (QQQ back green, chips bounced); moved QQQ back to favor, kept NET parked. No new landmines. Watching for a late-day fade and any Warsh/oil headline into the close.
+
+### 2026-07-16T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: S&P futures edge lower with semis leading down and Warsh testimony plus retail-sales data on tap; VIX steady at 16.4. Trimming to 0.45 into an uncertain open — parking AAPL (extended at record high), TSLA (-6%), ANAB (-17.5%), CNMD, crypto, lagging IWM, and CVI ahead of its 7/30 call.
+- journal: Thu 7/16 09:00: new session, held 0.45 neutral. Semis soft and futures lower after softer CPI helped megacaps yesterday; retail sales + Warsh in focus. Added CVI (earnings 7/30) to avoids; watching whether chips stabilize and if IWM stops lagging.
+
+### 2026-07-16T10:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: Mixed tape — semis sliding and Treasury yields rising pressure Nasdaq while SPY/Dow hold up; VIX steady at 16.0 with Warsh testimony live and retail-sales/jobless data in play. Holding 0.45 neutral into a choppy open; most positions green but chip weakness keeps me cautious.
+- journal: Thu 7/16 10:29: held 0.45 neutral, VIX flat 16.0. Semis leading futures lower again and yields up, but book is mostly green (REZI +10.5%, META +4.3%, SPY +2.7%). Still parking extended AAPL, weak TSLA (-5.5%)/ANAB (-17%), CNMD, crypto, lagging IWM and CVI. Watching Warsh testimony and whether chips stabilize.
+
+### 2026-07-16T12:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: Broad tape firm — SPY +2.4%, AAPL at record high, book mostly green with only semis dragging Nasdaq; VIX steady 16.3 with Warsh testimony live. Nudging to 0.5 neutral but keeping laggards and event names parked.
+- journal: Thu 7/16 12:49: bumped 0.45->0.50 as tape held up (SPY +2.4%, REZI +8.4%, META +3.5%) despite chip weakness; VIX flat 16.3. Still parking extended AAPL, weak TSLA(-6.9%)/ANAB(-19%), CNMD, crypto, lagging IWM, CVI. Watching semis and any late Warsh headline.
+
+### 2026-07-16T14:51 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'ETHUSD', 'SOLUSD', 'IWM', 'NET', 'CVI'] | favor: ['SPY', 'QQQ', 'META', 'REZI', 'JXN']
+- notes: Tape steady into the last hour — SPY +2.2%, book mostly green, only semis (TSMC/SK Hynix) dragging Nasdaq; VIX slightly up to 16.6 with Warsh testimony live. Holding 0.5 neutral and keeping extended/weak/event names parked.
+- journal: Thu 7/16 14:51: held 0.50 neutral, VIX ticked 16.3->16.6. Chip weakness persists but breadth firm (SPY/ABT/REZI/META green); TSLA still weak (-6.4%), ANAB -19.9%. No new landmines. Watching for a late-day fade into the close.
+
+### 2026-07-17T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'CVI', 'META'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip rout deepening (Nasdaq futures -1.5%) after Netflix whiff, plus hot PCE at a 3-year high and tariff/Iran jitters; VIX jumped to 18.5. Cutting to 0.35 risk-off — tech/semis and crypto under pressure, only defensives (ABT, VOD, REZI) holding up.
+- journal: Fri 7/17 09:00: dropped to 0.35 risk-off (from 0.5 neutral) as VIX spiked 16.6->18.5. Chip sell-off + Netflix miss hammering Nasdaq, hot PCE inflation and tariff headlines add macro risk. Added META/QQQ to avoids given tech weakness; leaning into defensives ABT/VOD/REZI/JXN/SPY. Watching whether semis stabilize and if breadth breaks down further.
+
+### 2026-07-17T10:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip sell-off intensifying (Nasdaq futures down, Netflix -11%) on new Chinese AI model, plus hot PCE at a 3-year high and Fed/CPI/Iran event risk; VIX at 18.5. Staying risk-off at 0.35 — tech/semis and crypto weak (TSLA -8.5%, ANAB -17.4%), only defensives (ABT, REZI, VOD, JXN) holding.
+- journal: Fri 7/17 10:09: holding 0.35 risk-off, VIX steady 18.5. Chip rout ongoing, META/QQQ/IWM red but book overall stabilizing (REZI +10.8%, CVI +5.5%, VOD +5.5%). Parking AAPL (Q3 report this month), weak TSLA/ANAB/CNMD, crypto, tech. Watching if semis find a floor or breadth cracks further.
+
+### 2026-07-17T12:40 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip rout persists into midday (semis in bear market, Netflix plunge dragging Nasdaq) but VIX has eased to 18.2 and broad tape stabilizing — SPY +1.5%, ABT/JXN/REZI/VOD/CVI green. Holding risk-off at 0.4; tech/semis and crypto still weak (TSLA -8.1%, ANAB -15.2%) with CPI/Fed/Iran event risk ahead.
+- journal: Fri 7/17 12:40: nudged 0.35->0.4 as VIX slipped 18.5->18.2 and book steadied (REZI +12%, CVI +4.6%, SPY/ABT/JXN/VOD green). Semis still in bear market, TSLA/ANAB the laggards; parking tech/crypto/AAPL. Watching for a late-Friday fade and weekend Iran/CPI headlines.
+
+### 2026-07-17T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AAPL', 'CNMD', 'TSLA', 'ANAB', 'NET', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'META', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Chip sell-off persists into the afternoon (Nasdaq -1%+ on China AI news, Netflix whiff) with VIX back at 18.5 and tech/semis/crypto weak (TSLA -8.7%, ANAB -13.9%). Holding risk-off at 0.4 — defensives (REZI +8.6%, CVI +6.8%, VOD/ABT/JXN green) leading, but weekend Iran/CPI/Fed event risk argues against reaching.
+- journal: Fri 7/17 14:47: staying 0.4 risk-off, VIX ticked back to 18.5 from 18.2. Book steady (REZI +8.6%, CVI +6.8%, SPY/ABT/JXN/VOD green) but semis/tech still soft and it's late Friday. Parking tech/crypto/AAPL/TSLA/ANAB; watching for close-out fade and weekend headline risk (Iran, CPI, Fed next week).
+
+### 2026-07-20T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD', 'CVI']
+- notes: Futures up on Iran de-escalation and lower oil, VIX eased to 18.2 and last week's chip rout stabilizing — nudging from risk-off to neutral at 0.5. But Big Tech earnings dominate this week (AAPL/META within days) plus jobs/Fed-speak data, so keeping sizing modest and parking event-risk names.
+- journal: Mon 7/20 09:00: upgraded risk-off->neutral, 0.4->0.5 as Iran talks calm the tape, oil falls, VIX steady 18.2 and book firm (REZI +6.3%, CVI +6.6%, JXN/VOD/ABT/SPY green). Still parking AAPL/META (Big Tech earnings imminent), weak TSLA/ANAB, tech/crypto. Watching earnings landmines and this week's econ data.
+
+### 2026-07-20T10:36 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: Tape holding steady midmorning — VIX ticked up slightly to 18.4, oil reversing lower, chip rout stabilizing. Big Tech earnings week (AAPL/META imminent) plus jobs/Fed-speak data keep me at neutral 0.5; parking event-risk names and CVI (Q2 call July 30, reports coming). ANAB -17.8% and TSLA -10.1% remain the book's landmines.
+- journal: Mon 7/20 10:36: holding neutral 0.5, VIX nudged 18.2->18.4. Book firm (IWM/QQQ soft but SPY green, REZI/CVI/JXN/VOD/ABT positive). Added CVI to avoid ahead of its 7/30 earnings; still parking AAPL/META (Big Tech earnings), TSLA/ANAB weak, tech/crypto. Watching earnings landmines and week's econ data.
+
+### 2026-07-20T12:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX eased to 17.6 and the tape is constructive midday (S&P/Nasdaq green, chips rebounding, oil lower), but Big Tech earnings week (AAPL/META imminent) plus this week's jobs/Fed-speak data keep me at neutral 0.5. Parking event-risk names and CVI (7/30 call); ANAB -20.2% and TSLA -10.7% remain the book's landmines.
+- journal: Mon 7/20 12:56: holding neutral 0.5, VIX ticked down 18.4->17.6 and market broadly green (SPY +1.4%, defensives REZI/CVI/ABT/JXN/VOD firm), but QQQ/IWM still slightly red. No change to posture ahead of Big Tech earnings and econ data; watching AAPL/META earnings landmines and ANAB/TSLA weakness.
+
+### 2026-07-20T15:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX nudged back to 18.4 into the last hour; tape still broadly green (SPY +1.0%) but QQQ/IWM soft and Big Tech earnings week (AAPL/META imminent) plus jobs/Fed-speak data keep me at neutral 0.5. Parking event-risk names and CVI (7/30 call); ANAB -23.9% and TSLA -11.3% remain the book's landmines.
+- journal: Mon 7/20 15:19: holding neutral 0.5 into the close, VIX back up 17.6->18.4 as Iran headlines swing. Defensives (REZI/CVI/ABT/JXN/VOD) firm, growth/crypto mixed, ANAB slid further to -23.9%. No posture change; watching AAPL/META earnings and this week's econ data.
+
+### 2026-07-21T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'ANAB', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX eased to 17.9 and futures firm on a chip-led bounce, but Big Tech earnings (AAPL/META imminent) plus this week's jobs data and Fed's Warsh keep me at neutral 0.5; Dimon's caution reinforces defensiveness. Parking event-risk/earnings names and CVI (7/30 call); ANAB -25.2% and TSLA -11.1% remain the book's landmines.
+- journal: Tue 7/21 09:00: opening neutral 0.5, VIX 18.4->17.9, futures higher on chip revival but Big Tech earnings week live. AAPL dropped on news; ANAB deepened to -25.2%. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-21T10:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.6 and the tape is constructive (SPY +1.7%, chips leading), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil spike above $90 keep me neutral at 0.5; Dimon's caution reinforces defensiveness. Parking earnings/event-risk names and CVI (7/30 call).
+- journal: Tue 7/21 10:30: holding neutral 0.5, VIX flat 17.6, chip-led rally lifting SPY/QQQ. TSLA slid to -8.3% today (fresh landmine), oil >$90 on Iran strikes. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-21T12:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX eased to 17.1 and the tape is broadly green (SPY +2.0%, chips leading, Dow +500), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil above $91 keep me at neutral 0.5. Parking earnings/event-risk names plus CVI (7/30 call) and TSLA (-8.7% today).
+- journal: Tue 7/21 12:55: holding neutral 0.5, VIX ticked down 17.6->17.1, chip-led rally intact with SPY/REZI/CVI firm. TSLA still weak at -8.7%, oil >$91 on Iran strikes. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-21T14:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ', 'CVI'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%, Dow +400), but Big Tech earnings (AAPL/META imminent), this week's jobs data/Fed's Warsh, and Iran-strike oil above $91 keep me at neutral 0.5. Parking earnings/event-risk names plus CVI (7/30 call) and TSLA (-9.4% today, deepening landmine).
+- journal: Tue 7/21 14:59: holding neutral 0.5 into the close, VIX flat 17.0, chip rally intact and defensives firm. TSLA sank further to -9.4% today. Watching AAPL/META earnings, jobs report and Fed-speak this week.
+
+### 2026-07-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'NET', 'ETHUSD', 'SOLUSD', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX 17.5 with futures slipping and Iran war still in focus; CVI reports earnings TODAY (moved to top of avoid) and Big Tech (AAPL/META) earnings plus this week's jobs data keep me at neutral 0.5. TSLA has deepened to -10.1%, a persistent landmine.
+- journal: Wed 7/22 09:00: holding neutral 0.5, VIX ticked up 17.0->17.5, futures lower on Iran war and earnings jitters. CVI reports today so firmly parked; TSLA landmine deepened to -10.1%. Watching AAPL/META earnings and jobs data this week.
+
+### 2026-07-22T10:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'PLTK', 'ETHUSD', 'SOLUSD', 'NET', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.0 but oil jumping and CVI reports TODAY (parked despite its +8.9% pop) keep me defensive at neutral 0.5; AAPL/META earnings and this week's jobs data are looming event risks. TSLA remains a deep landmine at -9.5%, META soft -3.0%.
+- journal: Wed 7/22 10:30: holding neutral 0.5, VIX flat 17.0. CVI ran +8.9% into its earnings today—still parked. TSLA landmine -9.5%, META/PLTK weak. Watching oil spike, AAPL/META earnings and jobs data.
+
+### 2026-07-22T12:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'PLTK', 'LCID', 'ETHUSD', 'SOLUSD', 'NET', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX eased to 16.8 with a constructive chip-led tape (SPY +2.1%), but Big Tech (AAPL/META) earnings, this week's jobs data and rising oil keep me at neutral 0.5. TSLA remains a deep landmine (-9.6%), LCID/PLTK/META soft, and CVI/CNMD carry event risk.
+- journal: Wed 7/22 12:55: holding neutral 0.5, VIX ticked down 17.0->16.8, tape firm with SPY +2.1% and CVI now reporting next week (still parked). TSLA -9.6% and LCID -5.3% remain landmines. Watching AAPL/META earnings, jobs data and oil.
+
+### 2026-07-22T14:52 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CVI', 'AAPL', 'META', 'TSLA', 'CNMD', 'PLTK', 'LCID', 'ETHUSD', 'SOLUSD', 'NET', 'RKLZ'] | favor: ['SPY', 'ABT', 'JXN', 'REZI', 'VOD']
+- notes: VIX steady at 17.0 with a constructive chip-led tape (SPY +1.9%), but Big Tech (AAPL/META) earnings, this week's jobs data and rising oil keep me at neutral 0.5. TSLA is a deep landmine (-10.1%), PLTK -7.9% and LCID -5.8% soft, and CVI/CNMD carry event risk.
+- journal: Wed 7/22 14:52: holding neutral 0.5 into the close, VIX flat 17.0, tape firm SPY +1.9% but breadth 'weird' per WSJ. TSLA landmine deepened to -10.1%, PLTK/LCID weak. Watching AAPL/META earnings and this week's jobs data.
+
+### 2026-07-23T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['TSLA', 'META', 'PLTK', 'CNMD', 'AAPL', 'CVI', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'JXN', 'REZI', 'VOD', 'SPY']
+- notes: VIX up to 18.9 with futures slipping on Alphabet/Tesla earnings fallout, surging oil and Iran headlines; nudging risk down to 0.4. TSLA is a severe landmine (-17.2%), META -5.7% and PLTK -8.2% remain weak, and CNMD carries takeover event risk. CPI and jobs data still loom this week.
+- journal: Thu 7/23 09:00: cut to neutral 0.4 as VIX ticked 17->18.9 and futures slip on Alphabet/Tesla earnings, AI capex fears and oil/Iran. TSLA blew out to -17.2% (deep landmine), META/PLTK still soft. ABT strong on Q2 report. Watching CPI, jobs data and Mideast headlines.
+
+### 2026-07-23T10:38 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'AMBP', 'CNMD', 'CVI', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Dow futures down 600 with Brent topping $100 and widening Mideast attacks; TSLA cratered to -22%, META -6.6%, PLTK -12.5% and IWM/QQQ soft. VIX 18.9 plus CPI/jobs still ahead—cutting to risk-off 0.3 and parking landmines and event-risk names.
+- journal: Thu 7/23 10:38: dropped to risk-off 0.3 as oil spike >$100 and Iran headlines slam the tape (Dow futs -600). TSLA blew out to -22%, PLTK -12.5%, META -6.6%. ABT still firm on Q2. Watching CPI, jobs data and Mideast escalation.
+
+### 2026-07-23T12:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'AMBP', 'CNMD', 'CVI', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Tape still ugly midday: Dow -400+, Brent over $100 on Mideast worries, Big Tech slumping on disappointing earnings and yields climbing. TSLA a deep landmine (-22.9%), META -6.8%, PLTK -14.2%, IWM/QQQ soft; VIX 19.1 with CPI/jobs still ahead—staying risk-off 0.3.
+- journal: Thu 7/23 12:57: holding risk-off 0.3, VIX up 18.9->19.1, tape weak (Dow -400, oil >$100). TSLA -22.9%, PLTK -14.2%, META -6.8% remain landmines; ABT firm on Q2. Watching CPI, jobs data and Mideast escalation.
+
+### 2026-07-23T14:54 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'AMBP', 'CNMD', 'CVI', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Tape stays ugly into late afternoon: Dow -600, Brent over $100 on Iran war fears, Big Tech slumping post-earnings and yields climbing; VIX 19.6 and rising. TSLA a severe landmine (-23.1%), META -6.4%, PLTK -14.5%, IWM/QQQ soft, ABT hit 52-week low—holding risk-off 0.3 with Fed decision looming.
+- journal: Thu 7/23 14:54: staying risk-off 0.3, VIX ticked 19.1->19.6, tape still weak (Dow -600, oil >$100 on Iran). TSLA -23.1%, PLTK -14.5%, META -6.4% remain landmines; ABT slipped to 52wk low despite prior Q2 strength. Watching Fed decision, CPI/jobs and Mideast escalation into the close.
+
+### 2026-07-24T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['TSLA', 'META', 'PLTK', 'EHGO', 'JXN', 'CNMD', 'QQQ', 'IWM', 'AAPL', 'ETHUSD', 'SOLUSD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Futures inch higher and oil halts its surge after Thursday's oil-driven Mag-7 rout (-$797B); VIX eased 19.6->18.8. Still fragile with Big Tech weak, so nudging to neutral 0.4 while keeping deep landmines (TSLA -22.9%, PLTK -15.4%, META -7%, EHGO -14.5%) off the buy list.
+- journal: Fri 7/24 09:00: lifted from risk-off 0.3 to neutral 0.4 as oil surge stalls and futures firm, VIX 19.6->18.8. TSLA/PLTK/META/EHGO still bleeding landmines; CVI reports next week. Watching inflation data, Warsh testimony and whether the oil/Iran relief holds.
+
+### 2026-07-24T10:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady at 18.8 with no fresh macro/news shocks, but the tape is split: SPY green while QQQ/IWM soft (-3.3%/-2.6%) and Big Tech still bleeding (META -7.2%, TSLA -24.8%). Holding neutral 0.4 and keeping deep losers plus the parabolic WLDS (+19.7%) off the buy list.
+- journal: Fri 7/24 10:18: staying neutral 0.4, VIX flat 18.8, no new headlines. Growth/small-caps lag (QQQ -3.3%, IWM -2.6%) while defensives (ABT, SPY, REZI, VOD, WAB) hold up; TSLA/META/PLTK remain landmines. Added WLDS to avoid after a +19.7% parabolic pop. Watching whether oil relief holds and if Big Tech stabilizes.
+
+### 2026-07-24T13:05 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['TSLA', 'META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'CVI', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Conditions improving into the close: Dow +300 as oil retreats on Iran/Pakistan peace-talk reports, VIX easing 18.8->17.9. Tape still split (QQQ/IWM red, Big Tech soft with META -7.2%), so nudging up to neutral 0.5 while keeping deep losers, the parabolic WLDS (+20.5%) and next-week reporter CVI off the buy list.
+- journal: Fri 7/24 13:05: lifted 0.4->0.5 as oil relief holds and VIX slips to 17.9 with Dow +300. Defensives (ABT/SPY/REZI/VOD/WAB) firm; META/PLTK/TSLA still landmines, added CVI (reports next week). Watching next week's Fed decision, tech earnings deluge and whether Big Tech stabilizes.
+
+### 2026-07-24T15:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['META', 'PLTK', 'JXN', 'IWM', 'QQQ', 'CNMD', 'AAPL', 'CVI', 'ETHUSD', 'SOLUSD', 'WLDS'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX ticked back up to 18.7 and growth/small-caps stay red (QQQ -3.6%, IWM -2.6%, META -7.4%) into a Friday close ahead of next week's Fed decision and tech earnings deluge; trimming to 0.45 to limit weekend/event exposure while defensives hold firm.
+- journal: Fri 7/24 15:07: nudged 0.5->0.45 into the close as VIX crept 17.9->18.7 and Big Tech stayed weak, heading into a Fed-and-earnings-heavy week. Kept META/PLTK/JXN losers, parabolic WLDS and next-week reporter CVI off the buy list. Watching weekend Iran headlines and whether tech stabilizes Monday.
+
+### 2026-07-27T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'QQQ', 'IWM', 'CNMD', 'JXN'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: Constructive open — Dow futures +500 as oil dives on U.S.-Iran de-escalation and VIX eased to 17.7, but a Fed decision and a heavy tech-earnings deluge (AAPL reports this week) loom, so I'm holding neutral 0.5 rather than pressing risk. Keeping AAPL/CVI (reporters), deep losers META/PLTK, parabolic WLDS and volatile crypto off the buy list.
+- journal: Mon 7/27 09:00: nudged 0.45->0.5 as VIX slipped to 17.7 and the Iran/oil relief held into a green futures open. Added AAPL to avoid (earnings this week, leads the wave); still dodging Fed/earnings event risk. Watching Fed decision and whether Big Tech stabilizes post-report.
+
+### 2026-07-27T11:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM', 'CNMD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX crept back to 18.9 and growth/small-caps stay heavy (QQQ -4.2%, IWM -2.3%, META -6.7%) even as oil relief buoys the Dow; with a Fed decision and a tech-earnings deluge (AAPL reports this week) dead ahead I'm trimming to 0.45 to limit event exposure. Keeping earnings reporters AAPL/CVI, deep losers META/PLTK, parabolic WLDS/BMNR and volatile crypto off the buy list.
+- journal: Mon 7/27 11:19: nudged 0.5->0.45 as VIX ticked 17.7->18.9 and Nasdaq/small-caps stayed red despite the Iran/oil relief rally in the Dow. Added BMNR (ETH-linked, extended) to avoids; still dodging Fed decision and AAPL-led tech earnings this week. Watching whether Big Tech stabilizes and the Fed outcome.
+
+### 2026-07-27T13:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'WLDS', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM', 'CNMD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady at 19.7 with chips dragging Nasdaq red (QQQ -4.5%, IWM -2.6%, META -8%) even as oil relief supports the Dow; holding 0.45 into a Fed decision and AAPL-led tech-earnings deluge this week. Keeping reporters AAPL/CVI, deep losers META/PLTK, parabolic WLDS/BMNR and volatile crypto off the buy list.
+- journal: Mon 7/27 13:17: holding 0.45 as VIX firmed 18.9->19.7 and Big Tech/small-caps stayed heavy despite Dow strength. No new avoids; META now -8%, WLDS +72% still parabolic. Watching the Fed outcome and whether chips/tech stabilize.
+
+### 2026-07-27T15:05 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM', 'CNMD'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX eased slightly to 19.3 but chips keep dragging Nasdaq red (QQQ -3.9%, IWM -2.2%, META -8.1%) while oil relief supports the Dow; holding 0.45 into the Fed decision and AAPL-led big-tech earnings this week. Keeping reporters AAPL/CVI, deep losers META/PLTK, extended BMNR and volatile crypto off the buy list.
+- journal: Mon 7/27 15:05: holding 0.45 as VIX ticked 19.7->19.3 into the close; tech/small-caps still heavy, META -8.1%. No new avoids. Watching the Fed outcome and whether Big Tech stabilizes post-earnings this week.
+
+### 2026-07-28T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX eased to 18.6 but Asia chip sell-off has Nasdaq futures red and a Fed decision plus a Big Tech/earnings blitz loom this week; holding 0.45. CNMD reports tomorrow (added to avoids), AAPL/CVI report this week, and META/PLTK remain heavy losers while crypto/BMNR stay volatile.
+- journal: Tue 7/28 09:00: VIX ticked 19.3->18.6 but futures soft on Asia chip weakness ahead of Fed decision and earnings deluge. Added CNMD (reports tomorrow) to avoids, dropped it from favor. Watching Fed outcome and whether tech stabilizes post-report.
+
+### 2026-07-28T10:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady at 18.8 with the chip sell-off deepening (Micron/SK Hynix dragging Nasdaq) even as strong earnings lift the Dow; holding 0.45 into the Fed decision and Big Tech earnings blitz this week. Keeping reporters AAPL/CVI/CNMD (CNMD tomorrow), deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Tue 7/28 10:55: VIX flat ~18.8; chip selloff persists but Dow supported by KO/SHW earnings. No changes to avoids/favors. Watching Fed outcome and whether tech/small-caps stabilize.
+
+### 2026-07-28T12:58 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX eased to 18.0 and the Dow rallied ~600pts on strong earnings and tumbling oil, though a chip selloff caps Nasdaq and a Fed decision looms this week; holding 0.45. Keeping reporters AAPL/CVI/CNMD (CNMD tomorrow), deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Tue 7/28 12:58: VIX ticked 18.8->18.0 as Dow rallied 600pts on KO/SHW earnings and oil decline, but chips still soft and Fed decision pending. No changes to avoids/favors. Watching Fed outcome and tech stabilization.
+
+### 2026-07-28T15:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'PLTK', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR', 'QQQ', 'IWM'] | favor: ['ABT', 'SPY', 'REZI', 'VOD', 'WAB']
+- notes: VIX steady ~18.3 with Dow rallying on strong earnings and falling oil, but the chip selloff keeps Nasdaq heavy and a Fed decision plus earnings deluge loom this week; holding 0.45 into the close. Keeping reporters AAPL/CVI/CNMD (CNMD tomorrow), deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Tue 7/28 15:00: VIX flat ~18.3, Dow up ~600pts on earnings/oil while chips still soft into the close. No changes to avoids/favors. Watching Fed decision and whether tech/small-caps stabilize this week.
+
+### 2026-07-29T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'CNMD', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Fed rate decision lands today with oil jumping on Iran news and chips selling off — classic event-risk day, so cutting to 0.35 and staying risk-off into the announcement. AAPL reports Thursday (avoid), keeping deep losers META/PLTK/QQQ/IWM, extended BMNR and volatile crypto off the buy list.
+- journal: Wed 7/29 09:00: Fed decision day, VIX 18.7, oil spiking on Iran, chips soft. Dropped scale 0.45->0.35 and moved to risk-off ahead of the announcement; AAPL earnings Thursday keeps it on avoids. Watching Fed outcome/presser and post-decision tape before re-adding risk.
+
+### 2026-07-29T10:37 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Fed decision lands this afternoon with VIX up to 19.5, oil jumping on Iran strike threats and chips sliding — full event-risk day, staying risk-off at 0.35 into the announcement. AAPL reports Thursday and CNMD reports tomorrow (both avoid), plus deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR stay off the buy list.
+- journal: Wed 7/29 10:37: VIX ticked 18.7->19.5 pre-Fed, tape slipping and oil spiking on Iran headlines. Holding risk-off 0.35; added CNMD back to avoids (reports tomorrow). Watching the Fed decision/presser this afternoon before re-adding any risk.
+
+### 2026-07-29T12:49 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['AAPL', 'CNMD', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Dow down 800+ with VIX up to 20 as the tape sells off hard into this afternoon's Fed decision, oil spiking on Iran threats and chips sliding — a full event-risk day, so trimming to 0.3 and staying firmly risk-off. AAPL reports Thursday and CNMD reports tomorrow (both avoid), deep losers META/PLTK/QQQ/IWM and volatile crypto/BMNR remain off the buy list.
+- journal: Wed 7/29 12:49: Tape deteriorated hard (Dow -800/-900), VIX 19.5->20 into the Fed decision. Cut scale 0.35->0.3, keeping risk-off; AAPL (Thu) and CNMD (tomorrow) stay on avoids. Watching the Fed announcement/presser and whether the selloff stabilizes before re-adding risk.
+
+### 2026-07-29T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['AAPL', 'CNMD', 'META', 'PLTK', 'QQQ', 'IWM', 'CVI', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'SPY', 'REZI', 'VOD']
+- notes: Fed held rates steady as expected but the tape stayed heavy (Dow down 800+) with AI earnings still looming; VIX eased slightly to 18.8. Staying risk-off at 0.35 until the selloff stabilizes — AAPL reports Thursday and CNMD tomorrow (both avoid), and deep losers META/PLTK/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Wed 7/29 14:47: Fed held rates steady (as expected), VIX ticked 20->18.8 but tape still weak into AI earnings. Nudged scale 0.3->0.35 as event risk clears, staying risk-off; AAPL (Thu) and CNMD (Fri) remain on avoids. Watching whether the post-Fed tape stabilizes and how AI names react.
+
+### 2026-07-30T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Fed Day is behind us and futures are firming as Microsoft results eased AI worries; VIX slipped to 19.1 after peaking near 20. Nudging up to neutral 0.45 as the post-Fed tape stabilizes, but AAPL reports today (avoid) and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Thu 7/30 09:00: Fed held (as expected), Wednesday's Dow -1100 selloff appears to be finding footing with futures up on MSFT AI relief; VIX 18.8->19.1. Removed CNMD (Q2 beat, stock soars) and CVI (revenue beat) from avoids and moved to favor. AAPL reports today so kept on avoid. Watching AAPL's after-hours print and whether the recovery holds.
+
+### 2026-07-30T10:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Post-Fed tape is stabilizing with VIX easing to 18.3 and futures firm on chip/MSFT strength; nudging to neutral 0.5. AAPL reports after the close today (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Thu 7/30 10:38: Selloff finding footing, VIX 19.1->18.3, day P&L only -$8. Raised scale 0.45->0.5 as tape calms. AAPL still on avoid ahead of tonight's print; earnings winners ABT/CNMD/CVI stay favored. Watching AAPL/AMZN after-hours reaction.
+
+### 2026-07-30T13:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Tape holding steady midday with VIX at 18.3 and day P&L only -$8; keeping neutral 0.5. AAPL reports after the close (avoid), and deep losers META/QQQ/IWM plus volatile crypto/BMNR stay off the buy list.
+- journal: Thu 7/30 13:00: Tape stable into the close, VIX flat at 18.3, no new landmines. Holding scale 0.5 and posture unchanged. AAPL prints tonight — staying off it; watching after-hours reaction and Friday's data/jobs setup before re-adding risk.
+
+### 2026-07-30T15:04 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'REZI', 'VOD']
+- notes: Tape recovered with Nasdaq up ~2% on chip/MSFT strength and VIX easing to 17.8; day P&L only -$7 so holding neutral 0.5. AAPL reports after the close (avoid) and treasury yields at multiyear highs keep me from reaching further.
+- journal: Thu 7/30 15:04: Late-day rebound holding, VIX 18.3->17.8, Nasdaq +2% on AI relief. Keeping scale 0.5 and posture unchanged into the close. AAPL prints tonight (avoid); watching after-hours reaction and Friday's jobs/inflation data before adding risk.
+
+### 2026-07-31T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
+- notes: Tape is constructive with Nasdaq up ~3% on MSFT/AMZN earnings, cooling inflation and solid GDP, and VIX easing to 17.2, so nudging risk to 0.55. AAPL's weak forecast overshadowed its beat (stay off), META still deep in the red, and volatile crypto/BMNR remain off the buy list.
+- journal: Fri 7/31 09:00: AAPL printed a sales beat but weak guidance/supply concerns — keeping it on avoid. Broad rebound holding, VIX 17.8->17.2, so raised scale 0.5->0.55. Earnings winners CNMD/CVI/CORT stay favored; watching next week's jobs report and inflation data before reaching further.
+
+### 2026-07-31T10:44 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
+- notes: Tape stays constructive on the tech rebound with VIX steady at 17.9 and day P&L only -$6, so holding neutral 0.55. AAPL's weak guidance keeps it on avoid, META remains deep in the red, and volatile crypto/BMNR stay off the buy list.
+- journal: Fri 7/31 10:44: Rebound holding, VIX 17.2->17.9 (slightly up but calm), P&L -$6. Kept scale 0.55 and posture unchanged. Earnings winners CNMD/CVI/CORT still favored; watching next week's Fed decision and jobs report before reaching for more risk.
+
+### 2026-07-31T13:04 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
+- notes: Tape is whipsawing as bond yields jump and AAPL tumbles ~9% post-earnings, but VIX is calm at 17.0 and day P&L is only -$5, so holding neutral 0.55. AAPL/META stay on avoid, and volatile QQQ/IWM/crypto/BMNR remain off the buy list into a heavy macro week.
+- journal: Fri 7/31 13:04: VIX eased 17.9->17.0 but yields are spiking and AAPL is down ~9% — keeping AAPL/META on avoid. Held scale 0.55, posture unchanged. Earnings winners CNMD/CVI/CORT/ABT still favored; watching next week's Fed decision and jobs report before adding risk into the weekend.
+
+### 2026-07-31T15:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['ABT', 'CNMD', 'CVI', 'CORT', 'REZI']
+- notes: VIX eased to 16.5 and the tape is steadier, but it's late Friday heading into a heavy macro week (Fed, jobs, inflation), so trimming to 0.5 into the weekend. AAPL (-6%, weak guidance) and META (-15%) stay on avoid; volatile QQQ/IWM/crypto/BMNR remain off the buy list.
+- journal: Fri 7/31 15:02: VIX 17.0->16.5, day P&L only -$4, tape calmed. Nudged scale 0.55->0.5 into the close ahead of next week's Fed/jobs/inflation. AAPL/META still on avoid; earnings winners CNMD/CVI/CORT/ABT favored. Watching weekend gaps and Monday's setup.
+
+### 2026-08-03T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AAPL', 'META', 'ABT', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'CORT', 'REZI', 'VOD']
+- notes: VIX slipped to 15.9 with futures higher on easing oil and a called-off Iran attack — a calm, constructive open. Still a heavy macro/earnings week (jobs Friday) so holding neutral 0.55; AAPL (weak guidance) and META stay on avoid, and ABT just tagged a 52-week low so it moves off favor.
+- journal: Mon 8/3 09:00: Fed held last week (inflation 3-yr high); weekend calm, VIX 16.5->15.9, futures up on oil slide/Iran de-escalation. Bumped ABT to avoid after 52-wk low despite prior gain. Kept CNMD/CVI/CORT winners favored; watching Friday jobs report before adding risk.
+
+### 2026-08-03T11:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'REZI', 'VOD', 'ABT']
+- notes: VIX eased to 15.7 with a strong tape (Dow +600) on oil slide and de-escalation — calm and constructive, so nudging up to 0.6. AAPL (weak guidance) and META (-8.6%) stay on avoid, and volatile QQQ/IWM/crypto/BMNR remain off the buy list into Friday's jobs report.
+- journal: Mon 8/3 11:22: VIX 15.9->15.7, Dow up big, day P&L +$5. Bumped scale 0.55->0.6 on the calm/constructive tape; restored ABT to favor after 'bargain' framing and +8% today. Still watching Friday jobs report before reaching for more risk; AAPL/META stay avoided.
+
+### 2026-08-03T13:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'CVI', 'REZI', 'VOD', 'ABT']
+- notes: VIX 15.5 with a broad rally (Dow +500-600) on oil slide and Iran de-escalation — calm and constructive, holding 0.6. AAPL (weak guidance) and META (-8.5%) stay avoided; volatile QQQ/IWM/crypto/BMNR off the buy list into Friday's jobs report.
+- journal: Mon 8/3 13:26: VIX 15.7->15.5, tape still strong, day P&L +$5. Held scale at 0.6. Palantir reports tonight (PLTR not held; PLTK is separate). Watching Friday jobs report before adding risk; AAPL/META remain avoided.
+
+### 2026-08-03T15:13 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'REZI', 'VOD', 'ABT', 'SPSC']
+- notes: VIX 15.8 with a strong broad rally (Dow +500-600) on oil slide and Iran de-escalation — calm and constructive, holding 0.6. AAPL (weak guidance) and META (-8.6%) stay avoided; volatile QQQ/IWM/crypto/BMNR remain off the buy list into Friday's jobs report.
+- journal: Mon 8/3 15:13: VIX 15.5->15.8 into the close, tape still firm, day P&L +$6. Held scale at 0.6. Watching Friday jobs report and this week's chip/memory earnings before adding risk; AAPL/META remain avoided.
+
+### 2026-08-04T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX 15.6 with a record-high tape (Dow +700) on Iran de-escalation and oil slide — calm and constructive, holding 0.6. Added GTM to avoid (ZoomInfo reports Q2 tomorrow); AAPL/META stay off the buy list and volatile QQQ/IWM/crypto/BMNR remain excluded into Friday's jobs report.
+- journal: Tue 8/4 09:00: Overnight rally to record highs, VIX 15.8->15.6, day P&L -$8 early. Added GTM to avoid ahead of tomorrow's earnings; REZI (-21.9%) and META (-10.8%) sagging so dropped REZI from favor. Watching Friday jobs report before adding risk.
+
+### 2026-08-04T10:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX 15.8 with a record-high tape (Dow +600) on Iran de-escalation and falling oil; Fed already held steady so that event is behind us — calm and constructive, holding 0.6. AAPL/META (-10%) stay avoided, GTM off the list into tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR remain excluded ahead of Friday's jobs report.
+- journal: Tue 8/4 10:56: Fed held rates steady (inflation 3-yr high) but market shrugged and rallied to records, VIX 15.6->15.8, day P&L -$7. PLTR ripping on 'otherworldly' quarter (held, small), BLZE at 55-mo high. Held scale 0.6; still watching Friday jobs before adding risk, AAPL/META stay avoided.
+
+### 2026-08-04T13:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX 16.3 with record-high tape (Dow +900) on Iran/Hormuz optimism and oil drop; Fed hold is behind us but inflation hit a 3-yr high, so staying at 0.6. AAPL/META (-10%) stay avoided, GTM off ahead of tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR remain excluded into Friday's jobs report.
+- journal: Tue 8/4 13:12: VIX 15.8->16.3 even as tape hit fresh records, day P&L -$5. PLTR still ripping on strong quarter (held small). Held scale 0.6; watching Friday jobs report and creeping VIX before adding risk, AAPL/META/GTM stay avoided.
+
+### 2026-08-04T15:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: VIX steady at 16.3 with record-high tape (Dow +900) on Iran/Hormuz optimism and falling oil; Fed hold behind us but inflation at a 3-yr high, so holding 0.6. AAPL/META (down) stay avoided, GTM off into tomorrow's earnings, and volatile QQQ/IWM/crypto/BMNR excluded ahead of Friday's jobs report.
+- journal: Tue 8/4 15:14: Late-day, VIX flat at 16.3, day P&L -$3 (improved). No new landmines; PLTR/CNMD leaders held small. Kept scale 0.6 into the close, watching Friday jobs and chip/memory earnings before adding risk; AAPL/META/GTM stay avoided.
+
+### 2026-08-05T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'DXST', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'VOD', 'SPY', 'SPSC', 'WAB']
+- notes: Tape at fresh records (S&P above 7,700) on Iran/Hormuz optimism and falling oil, but VIX ticked up to 16.8 and Friday's jobs report plus CPI loom, so holding 0.6. AAPL/META (down) stay avoided, GTM likely reporting today, DXST added after a volatile -16.6% swing, and QQQ/IWM/crypto/BMNR remain excluded.
+- journal: Wed 8/5 09:00: Overnight ADP jobs came in soft; VIX 16.3->16.8, day P&L +$1. Record rally continues on Iran deal hopes. Added DXST to avoid after sharp adverse move; GTM earnings due today. Watching Friday jobs/CPI before adding risk; AAPL/META/GTM stay avoided.
+
+### 2026-08-05T10:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'DXST', 'QQQ', 'IWM', 'PLTK', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
+- notes: Tape at fresh records (S&P above 7,700) on Iran/Hormuz optimism and easing oil, but VIX 16.9 and Friday jobs plus CPI loom, so staying 0.6. GTM avoided on securities-fraud/AI-integration crash (-33%), AAPL/META remain weak, and volatile QQQ/IWM/crypto/BMNR excluded into the catalysts.
+- journal: Wed 8/5 10:42: VIX 16.8->16.9, day P&L -$1. GTM news confirms the -33% drop (fraud class action) - keep firmly avoided. Record rally intact; CNMD/PLTR/ABT leaders holding. Holding 0.6 into Friday jobs/CPI; AAPL/META/GTM/DXST stay avoided.
+
+### 2026-08-05T13:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
+- notes: VIX eased to 16.0 and tape at records but rally is losing momentum (S&P gave up gains, Nasdaq red), and Friday jobs plus upcoming CPI/Fed minutes loom, so holding 0.6. GTM stays avoided on fraud/AI crash, AAPL/META/PLTK/ZETA weak, and volatile crypto/BMNR/QQQ/IWM excluded into catalysts.
+- journal: Wed 8/5 13:02: VIX 16.9->16.0, day P&L -$2. Rally stalling midday (4-day run losing steam, Nasdaq gave back gains). Dropped DXST from avoid, added ZETA (down -3.8%). Holding 0.6 into Friday jobs/CPI; AAPL/META/GTM stay avoided.
+
+### 2026-08-05T15:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'SPSC', 'WAB', 'ABT']
+- notes: VIX calm at 15.6 and tape near records but the 4-day rally is losing momentum (S&P gave up gains, Nasdaq red) with Friday jobs plus CPI/Fed minutes ahead, so holding 0.6. GTM stays firmly avoided on the fraud/AI crash, AAPL/META/PLTK/ZETA weak, and crypto/BMNR/QQQ/IWM excluded into catalysts.
+- journal: Wed 8/5 15:07: VIX 16.0->15.6, day P&L -$2. Rally still stalling into the close, no new landmines; CNMD/ABT leaders holding. Keeping 0.6 into Friday jobs/CPI/Fed minutes; AAPL/META/GTM stay avoided.
+
+### 2026-08-06T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'SHOP', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB', 'GTM']
+- notes: VIX calm at 16.0 and Dow at record highs on a fifth winning day, but chips are slipping (Sandisk earnings dive) and Friday's jobs report plus lingering CPI/Fed risk keep me at 0.6. GTM stays firmly avoided on the fraud/AI crash, AAPL/META/PLTK/ZETA/SHOP weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
+- journal: Thu 8/6 09:00: VIX 15.6->16.0, day P&L -$1. Dow record close but Nasdaq/chips soft on Sandisk; jobs report tomorrow. Added SHOP to avoid (weak, -2.3%). Holding 0.6 into Friday jobs; AAPL/META/GTM stay avoided.
+
+### 2026-08-06T10:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'ZETA', 'SHOP', 'SPSC', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB']
+- notes: VIX calm at 15.9 and Dow near record highs, but Nasdaq futures soft on Iran headlines/chip weakness and Friday's jobs report looms, so holding 0.6. GTM stays firmly avoided on the fraud crash; AAPL/META/PLTK/ZETA/SHOP weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
+- journal: Thu 8/6 10:42: VIX 16.0->15.9, day P&L +$2. Fixed prior plan's error (GTM was mistakenly in favor - now avoid only). Iran geopolitics and soft Nasdaq futures noted; jobs report tomorrow. Holding 0.6; CNMD/ABT/WAB leaders steady.
+
+### 2026-08-06T19:46 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR', 'AZI'] | favor: ['CNMD', 'SPY', 'ABT', 'WAB']
+- notes: VIX still calm at 15.1 but the tape rolled over — Dow snapped its 5-day streak as oil/Strait of Hormuz headlines pressure stocks, and Friday's jobs report looms, so holding 0.6. GTM avoided on the fraud crash, META (-9.1%)/PLTK (-20.9%) in free-fall, AAPL/SHOP/AZI weak, and crypto/BMNR/QQQ/IWM excluded into the catalyst.
+- journal: Thu 8/6 19:46: VIX 15.9->15.1, day P&L -$1. Dow broke its winning streak on oil/Iran pressure; META bleeding -9%, PLTK -20%, AZI slipping on weak balance sheet (added to avoid). Holding 0.6 into Friday jobs; CNMD/ABT/WAB leaders steady, GTM/AAPL/META stay avoided.
+
+### 2026-08-07T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'AZI', 'QQQ', 'IWM', 'ETHUSD', 'SOLUSD', 'BMNR'] | favor: ['CNMD', 'ABT', 'SPY', 'WAB']
+- notes: VIX calm at 15.3 but today is jobs-report day with oil pressuring the tape (Dow -460 Thu snapped its streak), so trimming to 0.5 into the catalyst. AAPL slid 6% on forecast miss (avoid), META/PLTK still bleeding, GTM/AZI weak; CNMD firm on PE-takeover interest and ABT/WAB steady leaders.
+- journal: Fri 8/7 09:00: VIX 15.1->15.3, day P&L +$3. Jobs report hits today — cut risk 0.6->0.5 into the event. AAPL down 6% on forecast miss added-focus avoid; META/PLTK/GTM/AZI stay avoided; CNMD/ABT/WAB holding as leaders. Watching jobs reaction and oil.
+
+### 2026-08-07T09:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GTM', 'AAPL', 'META', 'PLTK', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'ABT', 'WAB', 'QQQ']
+- notes: Jobs report landed weak (-23k, unexpected loss) but the tape is rallying as rate-hike odds fade and yields drop; VIX calm at 15.3 so the immediate event risk has cleared. Nudging up slightly to 0.55 but staying cautious — economic softness plus next week's CPI keeps me from leaning in.
+- journal: Fri 8/7 09:45: jobs report out — surprise -23k loss, but stocks rallied on lower rate-hike odds and falling yields. Event cleared, so bumped 0.5->0.55. CPI next week is the next catalyst. AAPL/META/PLTK/GTM/AZI stay avoided; CNMD moved to avoid on PE-takeover event risk; SPY/ABT/WAB steady, added QQQ to favor as Nasdaq firms.
+
+### 2026-08-07T12:24 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'ABT', 'WAB', 'QQQ']
+- notes: VIX calm at 15.0 and jobs-report event risk has fully cleared with the tape stabilizing, so holding 0.55. Oil pressure lingers and CPI hits next week, keeping me cautious; META still bleeding -8.4%, AAPL weak on its forecast miss, CNMD held on PE-takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Fri 8/7 12:24: VIX 15.3->15.0, day P&L +$4 and steady. Jobs event behind us, tape holding as rate-hike odds fade; keeping risk 0.55. Watching CPI next week as the next catalyst. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/ABT/WAB/QQQ remain leaders.
+
+### 2026-08-07T14:35 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'ABT', 'WAB', 'QQQ']
+- notes: VIX calm at 14.9 and the tape held its banner week after the weak jobs report cleared; holding 0.55 into the Friday afternoon with weekend gap risk and CPI next week keeping me from leaning in. META still bleeding -8.8%, AAPL weak, CNMD on PE-takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Fri 8/7 14:35: VIX 15.0->14.9, day P&L +$3 steady. Nothing changed intraday — jobs event long behind us, tape constructive; holding 0.55 into the weekend. Watching CPI next week as the next catalyst. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/ABT/WAB/QQQ remain leaders.
+
+### 2026-08-10T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT', 'WAB']
+- notes: VIX calm at 15.4 and futures steady after the weak jobs report, but CPI lands this week as the dominant catalyst and geopolitics (Hormuz/Iran, oil) add noise, so I'm holding a cautious 0.5. META still bleeding -6.9%, AAPL weak post-earnings, CNMD on PE/takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Mon 8/10 09:00: weekend cleared uneventfully, VIX 14.9->15.4, still calm. Trimmed to 0.5 ahead of this week's CPI which is the key risk event. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT/WAB remain leaders. Watching CPI and oil/Iran headlines.
+
+### 2026-08-10T09:50 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.3 and futures little changed, but this week's CPI is the dominant catalyst and Hormuz/Iran-oil headlines add noise, so holding a cautious 0.5. META still bleeding -8.3%, AAPL weak post-earnings, CNMD on PE/takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Mon 8/10 09:50: VIX steady 15.3, tape flat as traders await CPI and watch Hormuz deal/oil. No change to posture, holding 0.5. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT remain leaders. Watching CPI print this week as the key risk event.
+
+### 2026-08-10T12:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.1 and tape little changed, but CPI is the dominant catalyst this week and Hormuz/Iran headlines add noise, so holding a cautious 0.5. META still bleeding -7.8%, AAPL weak post-earnings, CNMD on takeover/PE event risk, crypto/BMNR excluded for volatility.
+- journal: Mon 8/10 12:23: VIX 15.3->15.1, midday tape seesawing on Hormuz/Iran and awaiting CPI. No change to posture, holding 0.5. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT leaders. Watching CPI print as the key event.
+
+### 2026-08-10T14:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'AZI', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX still calm at 15.4 but the tape is turning softer with rising Treasury yields and oil, and CPI remains this week's dominant catalyst, so I'm holding a cautious 0.5. META still bleeding -8.5%, AAPL weak post-earnings, CNMD on PE/takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Mon 8/10 14:38: VIX 15.1->15.4, tape drifting lower on rising yields/oil and Intel weakness while awaiting CPI. No change to posture, holding 0.5. AAPL/META/GTM/AZI/CNMD stay avoided; SPY/QQQ/ABT leaders. Watching CPI print as the key event.
+
+### 2026-08-11T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX still calm at 15.5 but tomorrow's CPI is the dominant catalyst and oil/Hormuz headlines add noise, so I'm trimming to 0.4 on CPI eve. AZI is cratering -30% pre-market (hard avoid), META still bleeding -8.1%, AAPL weak post-earnings, CNMD on takeover event risk, crypto/BMNR excluded for volatility.
+- journal: Tue 8/11 09:00: VIX steady 15.4->15.5, futures little changed with oil up ~5% on Iran/Hormuz. Cut to 0.4 ahead of Wednesday's CPI (the week's key event). AZI blew up -30% pre-market so it stays hard-avoided; AAPL/META/GTM/CNMD/crypto also excluded. SPY/QQQ/ABT remain leaders. Watching the CPI print tomorrow.
+
+### 2026-08-11T09:49 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.5 but Wednesday's CPI is tomorrow's dominant catalyst and Iran/Hormuz oil headlines add noise, so I'm holding a defensive 0.4 on CPI eve. META still bleeding -8.2%, AAPL weak post-earnings, CNMD on PE/takeover event risk, GTM overextended +26%, crypto/BMNR excluded for volatility.
+- journal: Tue 8/11 09:49: VIX steady 15.5, tape little changed with oil elevated on Hormuz. Holding 0.4 into tomorrow's CPI print (the week's key event). AAPL/META/GTM/CNMD/AZI/crypto stay avoided; SPY/QQQ/ABT remain leaders. Watching CPI Wednesday for the next posture shift.
+
+### 2026-08-11T12:24 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.4 but tomorrow's CPI is the dominant catalyst and Iran/Hormuz oil headlines add noise, so I'm holding a defensive 0.4 on CPI eve. META still bleeding -6.8%, AAPL weak post-earnings, CNMD on PE/takeover event risk, GTM overextended +30%, crypto excluded for volatility.
+- journal: Tue 8/11 12:24: VIX steady 15.4, tape mixed with oil swinging on Hormuz/Iran headlines while Nasdaq lags. Holding 0.4 into Wednesday's CPI print (the week's key event). AAPL/META/GTM/CNMD/AZI/crypto stay avoided; SPY/QQQ/ABT remain leaders. Watching CPI tomorrow for the next posture shift.
+
+### 2026-08-11T14:41 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.3 but tomorrow's CPI is the dominant catalyst and Iran/Hormuz oil headlines keep the tape noisy, so I'm holding a defensive 0.4 on CPI eve. META still down -7.1%, AAPL weak post-earnings, CNMD on PE/takeover event risk, GTM overextended +26%, crypto excluded for volatility.
+- journal: Tue 8/11 14:41: VIX ticked to 15.3, tape drifting lower on US/Iran impasse while Nasdaq lags despite NVDA. Holding 0.4 into Wednesday's CPI print (the week's key event). AAPL/META/GTM/CNMD/AZI/crypto stay avoided; SPY/QQQ/ABT remain leaders. Reassess posture after the CPI print tomorrow.
+
+### 2026-08-12T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: VIX calm at 15.1 and July CPI eased to 3.4% roughly as expected, removing the week's dominant overhang, so I'm lifting risk modestly to 0.55 while staying alert to any hawkish Fed re-pricing. Kept the earnings/event/free-fall names avoided (META, AAPL, GTM, CNMD, crypto/BMNR).
+- journal: Wed 8/12 09:00: CPI cleared at 3.4% (eased, in-line) and futures firmed with VIX 15.1, so I nudged risk from 0.4 to 0.55 now that the key catalyst is behind us. Watching the tape's reaction through the open and any Fed-path repricing; SPY/QQQ/ABT still leaders, same avoid list.
+
+### 2026-08-12T09:53 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: CPI cleared at 3.4% (eased, in-line) with September rate-hike odds falling; VIX low at 14.9 and S&P opening at record territory, so I'm shifting to a constructive risk-on posture at 0.6. Kept earnings/event/free-fall names avoided (META, AAPL post-earnings weakness, GTM overextended, CNMD PE/takeover, crypto/BMNR).
+- journal: Wed 8/12 09:53: Post-CPI tape firm, S&P at record highs, VIX 14.9 and yields ticking up but benign; lifted risk 0.55->0.6 with the key catalyst behind us. Watching for any late-morning fade or hawkish Fed repricing; same avoid list, SPY/QQQ/ABT still leaders.
+
+### 2026-08-12T12:25 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'ABT']
+- notes: Midday tape holding constructive post-CPI: VIX low at 14.8, S&P flirting with record highs and AI/tech names leading QQQ +0.7%. Maintaining risk-on at 0.6 with the week's key catalyst cleared; same earnings/event/free-fall avoid list intact.
+- journal: Wed 8/12 12:25: No change since the open plan — CPI behind us, VIX 14.8, indexes firm and QQQ leading on AI strength. Holding 0.6; watching for any afternoon fade or Fed-path repricing. SPY/QQQ/ABT still leaders, avoid list unchanged.
+
+### 2026-08-12T14:42 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Afternoon tape stays constructive with VIX low at 14.5 and S&P near record highs, AI names leading; CPI catalyst cleared with no hawkish repricing. Holding risk-on at 0.6 with a watchful eye on the US-Iran headline noise, which is minor for now.
+- journal: Wed 8/12 14:42: No material change since midday \5, indexes firm, QQQ leading on AI. Holding 0.6; only new wrinkle is US-Iran impasse headlines but market shrugging. Same avoid list; SPY/QQQ leaders, IWM firm.
+
+### 2026-08-13T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: New session opens calm with VIX 14.5, S&P near record highs and AI optimism (CoreWeave) supporting tech; CPI catalyst cleared with no hawkish repricing. Holding risk-on at 0.6, only mild overhang from US-Iran impasse headlines.
+- journal: Thu 8/13 09:00: Fresh day, tape constructive post-CPI (3.4% eased), VIX 14.5, indexes firm and AI leading. Holding 0.6; watching US-Iran headlines and any Fed-path repricing. ETF holdings carry no earnings risk; avoid list unchanged.
+
+### 2026-08-13T09:54 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Tape stays constructive: VIX 14.4, S&P near record highs, holdings all green (IWM/QQQ/SPY) with CPI catalyst cleared and no hawkish repricing. Cisco weighs slightly on Nasdaq but broad AI optimism intact; holding risk-on at 0.6.
+- journal: Thu 8/13 09:54: No material change since the open - VIX 14.4, indexes firm, all three ETF holdings modestly green. Holding 0.6; watching Cisco drag on Nasdaq and any late-morning fade. Avoid list unchanged.
+
+### 2026-08-13T12:24 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Midday tape remains constructive: VIX 14.7, S&P at record highs on tame PPI/CPI data, all three ETF holdings green with AI optimism intact. Holding risk-on at 0.6 - no fresh event risk, just watching for a late-day fade.
+- journal: Thu 8/13 12:24: No material change since morning - VIX ticked to 14.7, indexes at records post-PPI, IWM/QQQ/SPY all modestly green. Holding 0.6; avoid list unchanged, watching for afternoon fade or Fed-path repricing.
+
+### 2026-08-13T14:43 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Afternoon tape steady and constructive: VIX 14.7, S&P at record highs post-tame PPI/CPI, all three ETF holdings green with AI optimism intact. Holding risk-on at 0.6 into the final stretch, no fresh event risk.
+- journal: Thu 8/13 14:43: No material change since midday - VIX 14.7, indexes firm at records, IWM/QQQ/SPY all modestly green, day P&L +2. Holding 0.6; avoid list unchanged, watching for a late-day fade into the close.
+
+### 2026-08-14T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Calm open with VIX 14.5, S&P at record above 7,800 and heading for a winning week; futures choppy with inflation data in focus and chip-sector rotation. Holding risk-on at 0.6 given constructive breadth (IWM breakout) but mindful of stretched-market warning chatter.
+- journal: Fri 8/14 09:00: New session, tape near records with VIX 14.5 and breadth broadening (IWM joins breakout). All three ETF holdings green, no earnings risk on holdings. Watching inflation-data reaction and 'warning flashed' overbought narratives for any late-week fade; holding 0.6, avoid list unchanged.
+
+### 2026-08-14T09:49 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Constructive tape: VIX 14.5, S&P at record above 7,800 heading for a winning week, all three ETF holdings green with breadth broadening (IWM breakout). Holding risk-on at 0.6 into a Friday with no fresh event risk, mindful of stretched/overbought chatter and thin capital.
+- journal: Fri 8/14 09:49: No material change since the open - VIX 14.5, indexes at records, IWM/QQQ/SPY all modestly green. Holding 0.6; avoid list unchanged, watching for a Friday afternoon fade or profit-taking into the weekend.
+
+### 2026-08-14T12:23 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Midday tape drifting slightly off record highs (indexes little changed to modestly lower) but VIX still calm at 14.5 and all three ETF holdings green; consumer sentiment dip and stretched-market chatter warrant staying at 0.6, not reaching higher into the weekend.
+- journal: Fri 8/14 12:23: Indexes fading a touch from record after soft consumer sentiment print; VIX 14.5, holdings still green, day P&L flat. Holding 0.6, avoid list unchanged; watching for a Friday afternoon profit-taking fade into the weekend and any chip-sector (AVGO/AMAT) drag on QQQ/SPY.
+
+### 2026-08-14T14:36 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.6
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Calm afternoon tape: VIX 14.3, indexes drifting modestly lower but poised for a third straight winning week, all three ETF holdings green. Holding risk-on at 0.6 into the weekend given constructive breadth but only $25 cash and stretched-market chatter.
+- journal: Fri 8/14 14:36: No material change since midday - VIX ticked down to 14.3, indexes little changed near records, IWM/QQQ/SPY all green, day P&L flat. Holding 0.6; watching for late-Friday profit-taking fade and any AVGO-driven chip drag on QQQ into the close.
+
+### 2026-08-17T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Futures wavering into an event-heavy week: Walmart/Home Depot earnings, Fed minutes, and inflation focus after a weak jobs report keeps September rate-hike odds alive. VIX still calm at 15.1 and all three ETF holdings green, but trimming to 0.5 to respect midweek macro/earnings risk with only $25 cash.
+- journal: Mon 8/17 09:00: Dialed back from 0.6 to 0.5 (regime risk-on -> neutral) as new week brings Fed minutes, big-box retail earnings (WMT/HD), and inflation data; VIX 15.1, holdings modestly green. Added WMT/HD to avoid; watching Fed minutes and CPI/inflation reaction midweek.
+
+### 2026-08-17T09:12 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Futures slipping after a three-week win streak into an event-heavy week (WMT/HD earnings, Fed minutes, inflation focus with September rate-hike odds alive). VIX calm at 15.1 and holdings green, but staying at 0.5 to respect midweek macro/earnings risk on only $25 cash.
+- journal: Mon 8/17 09:12: Holding 0.5 neutral, no change since 09:00 brief. Futures wavering, WMT/HD on avoid ahead of their reports; watching Fed minutes and inflation data reaction midweek.
+
+### 2026-08-17T11:50 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Midday tape mixed: tech/AI optimism offset by Iran/Middle East tensions, VIX steady at 15.0, all three ETF holdings green. Holding 0.5 neutral ahead of event-heavy week (WMT/HD earnings, Fed minutes, inflation focus) with only $25 cash to deploy.
+- journal: Mon 8/17 11:50: No change from 0.5 neutral since morning briefs; VIX flat at 15.0, holdings green (QQQ +1.2%, IWM +0.8%, SPY +0.3%), day P&L flat. Watching Middle East headline risk and midweek Fed minutes/inflation and WMT/HD reports.
+
+### 2026-08-17T14:18 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Early afternoon tape drifting slightly lower as Treasury yields rise and Iran tensions linger, offsetting AI optimism; VIX calm at 15.1 and all three ETF holdings modestly green. Holding 0.5 neutral into an event-heavy week (WMT/HD earnings, Fed minutes, inflation data) with only $25 cash.
+- journal: Mon 8/17 14:18: No change from 0.5 neutral; indexes now slightly red on rising yields, VIX 15.1, day P&L roughly flat (-$1). Still avoiding WMT/HD pre-earnings; watching midweek Fed minutes/inflation and Iran headline risk into the close.
+
+### 2026-08-18T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Futures extending losses on US-Iran tensions and a deepening bond selloff (30Y yield 19-year high), with VIX ticking up to 15.8; HD reports today and WMT tomorrow into Fed minutes midweek. Dialing to 0.4 risk-off to respect rising-yield/geopolitical pressure on only $25 cash.
+- journal: Tue 8/18 09:00: Cut from 0.5 neutral to 0.4 risk-off as yields spike (30Y 19yr high) and Iran tensions drive oil/futures lower, VIX 15.8. HD reports today, WMT tomorrow, Fed minutes midweek — all on avoid; watching yield/oil reaction and index tape.
+
+### 2026-08-18T09:15 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Confirming risk-off at 0.4: futures lower on US-Iran tensions and a deepening bond selloff (30Y at a 19-year high), VIX 15.8; HD reports today, WMT tomorrow, and Fed minutes midweek all pose event risk. With only $25 cash and holdings slightly red, respecting rising-yield/geopolitical pressure and keeping earnings names on avoid.
+- journal: Tue 8/18 09:15: Holding 0.4 risk-off, unchanged from 09:00. Yields still elevated and Iran ceasefire rejected weighing on the tape; watching oil, 30Y yield, HD reaction and Fed minutes midweek.
+
+### 2026-08-18T11:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Holding 0.4 risk-off midday: chip stocks selling off, bond yields still elevated and Iran tensions lingering, though VIX remains calm at 15.8. Holdings modestly red (day P&L -$2) with only $25 cash; keeping WMT/HD and other earnings names on avoid ahead of Fed minutes midweek.
+- journal: Tue 8/18 11:57: No change from 0.4 risk-off; tape drifting lower on chip selloff and high yields, VIX 15.8, holdings slightly red. Watching Fed minutes, WMT earnings tomorrow, and yield/oil reaction into the afternoon.
+
+### 2026-08-18T14:17 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'WMT', 'HD'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: Holding 0.4 risk-off into the afternoon: tape drifting lower with QQQ -1.0% on chip weakness, yields still elevated and Iran tensions lingering, though VIX stays calm at 15.8. Only $25 cash and holdings modestly red (day P&L -$3); keeping WMT and other earnings names on avoid ahead of Fed minutes midweek.
+- journal: Tue 8/18 14:17: No change from 0.4 risk-off; indexes still red (QQQ -1.0%), day P&L -$3, VIX 15.8. Watching Fed minutes and WMT earnings tomorrow plus yield/oil into the close.
+
+### 2026-08-19T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: Fed minutes hit this afternoon and Target reports today, bond yields still elevated (selloff only waning) and chip names (Micron, Sandisk) getting hit dragging QQQ. VIX calm at 15.4 but with only $25 cash and holdings flat-to-red, I'd rather wait through the Fed-minutes event risk.
+- journal: Wed 8/19 09:00: Staying 0.4 risk-off. Bond selloff easing and VIX ticked to 15.4, but Fed minutes + Target earnings today keep me defensive; added TGT and chip names (MU/SNDK) to avoid on the semi selloff. Watching yields and the minutes reaction into the close.
+
+### 2026-08-19T09:22 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: futures firmer as bond pressure eases but 30Y yields remain near fresh highs and Fed minutes plus Target earnings hit today, keeping event risk elevated. VIX calm at 15.5 but with only $25 cash and holdings flat-to-red, staying defensive into the minutes.
+- journal: Wed 8/19 09:22: No change from 0.4 risk-off. Futures jumped on bond relief but yields still elevated; Fed minutes and TGT earnings today are the key events. Watching the minutes reaction and 30Y yield into the close.
+
+### 2026-08-19T11:57 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: Treasury buyback plan is calming the bond market and VIX is quiet at 15.3, but Fed minutes hit this afternoon and chip names remain weak, keeping event risk elevated. With only $25 cash and holdings flat-to-red, I'd rather ride through the minutes before adding.
+- journal: Wed 8/19 11:57: No change from 0.4 risk-off. Bond pressure eased on Treasury buybacks and tariff pause lifted the tape (Dow +300), VIX down to 15.3, day P&L flat. Fed minutes this afternoon is the key event; watching yields and the minutes reaction into the close before considering easing back to neutral.
+
+### 2026-08-19T14:14 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['TGT', 'WMT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off with Fed minutes hitting at 2pm ET — event risk is immediate and elevated. VIX is calm at 15.2 and tape is mixed (Dow up on bond relief, S&P down a third day on yields/oil), but with only $25 cash and holdings flat-to-red there's no reason to add ahead of the minutes.
+- journal: Wed 8/19 14:14: Still 0.4 risk-off, day P&L flat. Fed minutes drop momentarily — waiting for the reaction before any move toward neutral. Watching yields/oil and the minutes response into the close; WMT earnings tomorrow keeps WMT on avoid.
+
+### 2026-08-20T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY', 'IWM']
+- notes: Easing to neutral 0.55: Fed minutes are behind us, indexes snapped a three-day slide, and the Treasury buyback plan has calmed the bond market with VIX steady at 16.0. Still cautious with inflation data in focus and a soft jobs backdrop, plus only $25 cash limits any real adds anyway.
+- journal: Thu 8/20 09:00: Moved from 0.4 risk-off to 0.55 neutral now that Fed minutes passed without incident and the tape stabilized (3-day slide snapped, bonds calmer). Watching inflation data and 30Y yields; keeping WMT on avoid for earnings and chip names weak.
+
+### 2026-08-20T09:24 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
+- notes: Pulling back to 0.4 risk-off: Dow futures dropped ~400pts as Treasury yields reversed the Bessent-driven decline and Walmart is tumbling, a clear deterioration since the 9:00 brief despite VIX at 15.8. Holdings are flat-to-red and cash is just $25, so no reason to add into a weakening open.
+- journal: Thu 8/20 09:24: Reverted from 0.55 neutral to 0.4 risk-off — futures rolled over (Dow -400) as bond intervention relief faded and yields reversed higher, WMT tumbling post-earnings. Watching whether the 30Y yield stabilizes and if the tape finds footing before easing back.
+
+### 2026-08-20T11:59 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off midday: Dow down ~400 as Treasury yields climb, a tech selloff drags QQQ, and Walmart tumbles post-earnings. VIX still calm at 15.9 but the tape is clearly deteriorating and holdings are red, so no reason to add with only $25 cash.
+- journal: Thu 8/20 11:59: Staying 0.4 risk-off — yields reversed higher and tech is selling off, keeping the tape weak; all three ETF holds red, day P&L -2. Watching whether 30Y yields stabilize and if indexes find footing into the afternoon before easing back to neutral.
+
+### 2026-08-20T14:18 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off into the afternoon: Dow off ~500 as climbing Treasury yields and a tech selloff drag QQQ (-2.2%), with all three ETF holds red. VIX still calm at 15.9 but the tape hasn't found footing, and $25 cash leaves no room to add anyway.
+- journal: Thu 8/20 14:18: Unchanged at 0.4 risk-off — selloff deepened (Dow -500, QQQ -2.2%) on rising yields and WMT drag; no stabilization yet. Watching 30Y yields and whether indexes base into the close before considering neutral.
+
+### 2026-08-21T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
+- notes: Staying 0.4 risk-off: Dow tumbled 700 as the Treasury yield rebound wiped out the Bessent-driven relief and sparked a broad selloff; VIX still calm at 15.4 but the tape remains weak and all three ETF holds are red. Only $25 cash leaves no room to add regardless.
+- journal: Fri 8/21 09:00: Held 0.4 risk-off — yields rebounded and Dow fell 700, extending the multi-day slide; adding NVDA to avoid ahead of its earnings next week. Watching PCE data and 30Y yields for any stabilization before easing back toward neutral.
+
+### 2026-08-21T09:23 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off: yield-driven selloff continues with breadth breaking down (ETFs losing EMA support) and all three holds red, though futures are trying to bounce and VIX remains calm at 15.4. With only $25 cash there's no room to add regardless, so posture stays defensive.
+- journal: Fri 8/21 09:23: Unchanged at 0.4 risk-off — futures drift higher attempting a recovery but yields rebounded again and breadth is deteriorating; multi-day slide intact. Watching PCE data, 30Y yields, and whether indexes stabilize before easing toward neutral; NVDA earnings next week keeps it on avoid.
+
+### 2026-08-21T11:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
+- notes: Easing from 0.4 risk-off to 0.5 neutral: indexes are rebounding, losses in all three holds have narrowed sharply (-0.7% to -1.4% vs -2%+ yesterday), and VIX is calm at 15.3, though the week is still on track for a decline and yields remain the swing factor. Only $25 cash leaves no room to add regardless, so posture stays cautious.
+- journal: Fri 8/21 11:59: Nudged to 0.5 neutral as the tape found footing — Dow/Nasdaq rebounded and ETF holds pared losses, VIX steady 15.3. Watching PCE next week, 30Y yields, and NVDA earnings (kept on avoid); will revert to risk-off if the afternoon rolls back over.
+
+### 2026-08-21T14:17 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['WMT', 'TGT', 'AZI', 'GTM', 'AAPL', 'META', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD', 'MU', 'SNDK', 'NVDA'] | favor: ['SPY']
+- notes: Holding 0.5 neutral into the Friday close: VIX calm at 15.3 and the tape stabilized off the yield-driven selloff, but all three ETF holds are still modestly red (-0.6% to -1.6%) and the week remains on pace for a decline. With only $25 cash there is no room to add regardless, so posture stays cautious.
+- journal: Fri 8/21 14:17: Kept 0.5 neutral — indexes are bouncing but holds drifted slightly redder than midday and the weekly slide is intact; watching whether the tape holds into the close. NVDA earnings and PCE next week keep me defensive; will revert toward risk-off if the afternoon rolls over.
+
+### 2026-08-24T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Dialing back to 0.4 risk-off: tech-led futures slip with NVDA earnings and Jackson Hole as major event risk this week, US-Canada talks broke down, and inflation data looms after a weak jobs report — QQQ already -2.2% on my holds. VIX is calm at 15.9 but the event calendar is loaded, and with only $25 cash there's no room to add anyway.
+- journal: Mon 8/24 09:00: Cut from 0.5 neutral to 0.4 risk-off into a heavy event week — NVDA earnings and Jackson Hole plus fresh inflation focus, tech futures lower and QQQ hold slipping -2.2%. Added QQQ to avoid given tech vulnerability; watching NVDA print, Powell at Jackson Hole, and whether indexes stabilize before easing back toward neutral.
+
+### 2026-08-24T09:27 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off: tech-led futures slip ahead of NVDA earnings and Jackson Hole, US-Canada talks broke down, and inflation data looms after a weak jobs report — QQQ hold already -2.2%. VIX calm at 15.8 but event calendar is loaded, and with only $25 cash there's no room to add anyway.
+- journal: Mon 8/24 09:27: Staying 0.4 risk-off into a heavy event week — chip slide and NVDA earnings plus Jackson Hole and inflation focus keep tech vulnerable, QQQ kept on avoid. Watching NVDA print, Powell, and whether indexes stabilize before easing back toward neutral.
+
+### 2026-08-24T12:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off midday: chip-led tech slide continues (QQQ -2.3% on holds), NVDA earnings and Jackson Hole loom this week, and inflation focus persists after weak jobs. VIX still calm at 15.8 but event calendar is loaded and cash is only $117 with day P&L flat.
+- journal: Mon 8/24 12:04: Kept 0.4 risk-off — tape softened through morning with tech sagging and US-Canada trade spat escalating; QQQ hold now -2.3%. Watching NVDA print, Powell at Jackson Hole, and whether indexes stabilize before easing back toward neutral.
+
+### 2026-08-24T14:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off into the afternoon: chip-led tech slide persists (QQQ -2.3% on holds), NVDA earnings and Jackson Hole loom this week, and geopolitical noise from the Iran sanctions campaign adds uncertainty. VIX still calm at 15.8 but the event calendar is loaded and cash is only $117.
+- journal: Mon 8/24 14:19: Staying 0.4 risk-off — tape still soft on chip weakness, Iran sanctions headlines added, day P&L flat. Added MSTR to avoid (Trump exit headline, crypto-linked volatility). Watching NVDA print and Powell at Jackson Hole before easing toward neutral.
+
+### 2026-08-25T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off: NVDA earnings land this week plus a key inflation print and Powell/Jackson Hole aftermath, keeping chip-heavy tech vulnerable (QQQ hold -1.7%). VIX calm at 15.8 and futures firmer, but the loaded event calendar and thin $117 cash argue for defense.
+- journal: Tue 8/25 09:00: Kept 0.4 risk-off into the NVDA-earnings/inflation week; futures edged higher overnight but tech and MSTR (crypto-linked) still on avoid. Watching NVDA print, the inflation report, and whether indexes stabilize before easing toward neutral.
+
+### 2026-08-25T09:25 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY']
+- notes: Holding 0.4 risk-off: NVDA earnings and a key inflation print land later this week with Jackson Hole aftermath, keeping chip-heavy tech vulnerable (QQQ hold -1.7%). VIX calm at 15.8 and futures edge higher, but the loaded event calendar and thin $117 cash argue for defense.
+- journal: Tue 8/25 09:25: Staying 0.4 risk-off — futures firmer but NVDA print/inflation report still ahead; tech and crypto-linked MSTR remain on avoid. Watching for post-event clarity before easing toward neutral.
+
+### 2026-08-25T12:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off with NVDA reporting tomorrow and a key inflation print this week keeping chip-heavy tech (QQQ hold -1.9%, MRVL/SMCI) vulnerable; VIX calm at 15.6 and yields easing help, but the loaded event calendar and thin $88 cash demand defense. Added MRVL (earnings ~7 days) to avoid.
+- journal: Tue 8/25 12:08: Stayed 0.4 risk-off — tape mixed, chips bid ahead of NVDA but binary event tomorrow plus inflation data keep me cautious; added MRVL to avoid for pending earnings, kept SMCI on avoid (down on news). Watching NVDA print and CPI before easing toward neutral.
+
+### 2026-08-25T14:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off into the NVDA earnings print (tomorrow) and this week's inflation data; chip names bid but QQQ hold -2.1% and the binary event calendar keep tech vulnerable, and thin $88 cash demands defense despite calm VIX 15.6.
+- journal: Tue 8/25 14:19: Kept 0.4 risk-off — tape steady with yields easing and chips leading, but NVDA report tomorrow plus CPI are the pivotal events; MRVL (earnings ~7d) and SMCI stay on avoid. Watching NVDA print and inflation data before easing toward neutral.
+
+### 2026-08-26T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
+- notes: Staying 0.4 risk-off: NVDA reports after the close today and a key inflation print looms, keeping chip-heavy tech (QQQ hold -2.3%, MRVL -3.2%) vulnerable. VIX calm at 15.7 but the binary event calendar and thin $88 cash demand defense.
+- journal: Wed 8/26 09:00: Held 0.4 risk-off — NVDA prints tonight and inflation data still pending, so tech and crypto-linked MSTR remain on avoid; MRVL (earnings ~7d) and SMCI (weak on news) stay flagged. Watching NVDA reaction and CPI before easing toward neutral.
+
+### 2026-08-26T09:30 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM']
+- notes: Holding 0.4 risk-off: NVDA reports after the close today and sticky inflation data has futures softer, keeping chip-heavy tech (QQQ -2.1%, MRVL -2.2%) vulnerable ahead of the binary event. VIX calm at 15.7 but thin $88 cash and the loaded calendar demand defense; MRVL earnings ~7 days keeps it on avoid.
+- journal: Wed 8/26 09:30: Stayed 0.4 risk-off into the open — sticky inflation report has S&P futures slipping and NVDA prints tonight, so tech stays flagged; MRVL (earnings ~7d) and SMCI (weak on news) remain on avoid. Watching NVDA reaction and inflation follow-through before easing toward neutral.
+
+### 2026-08-26T12:36 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM', 'MRNA']
+- notes: Holding 0.4 risk-off into the NVDA print after today's close — sticky PCE data has chips weighing on the Nasdaq (QQQ -2.1%, MRVL -1.9%) and the binary event keeps tech vulnerable. VIX calm at 15.6 but only $74 cash and the loaded event calendar demand defense; MRVL earnings ~7d and SMCI weakness keep them flagged.
+- journal: Wed 8/26 12:36: Kept 0.4 risk-off midday — flat P&L (-$1), PCE came in sticky and NVDA still reports tonight, the day's pivotal event. MRNA jumping +14% on cancer-vaccine news but we already hold it. Watching NVDA reaction after close before easing toward neutral tomorrow.
+
+### 2026-08-26T15:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['NVDA', 'MRVL', 'MU', 'SNDK', 'AAPL', 'META', 'QQQ', 'MSTR', 'SMCI', 'WMT', 'TGT', 'AZI', 'GTM', 'SHOP', 'SPSC', 'BMNR', 'ETHUSD', 'SOLUSD', 'CNMD'] | favor: ['SPY', 'IWM', 'MRNA']
+- notes: Holding 0.4 risk-off into the final hour ahead of NVDA's after-close print — the binary chip event keeps tech-heavy QQQ (-1.7%) vulnerable and sticky PCE limits upside. VIX calm at 15.4 but thin $64 cash and the loaded event demand defense; MRVL earnings ~7d stays flagged.
+- journal: Wed 8/26 15:27: Kept 0.4 risk-off into the close — flat day (+$1), NVDA prints tonight and is the pivotal event; BHVN (+11%) and MRNA (+14% earlier) our winners but we already hold. Watching NVDA reaction after close to reassess toward neutral tomorrow.
+
+### 2026-08-27T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['MRVL', 'BZ', 'SMCI', 'MRNA'] | favor: ['SPY', 'QQQ', 'IWM']
+- notes: NVDA cleared with a positive reaction — Nasdaq futures up and chips lifting, VIX calm at 15.1, so the binary event that kept us defensive has passed and we can ease toward neutral. Still trimming size ($64 cash, CPI next week looms); MRVL (earnings ~7d), BZ (earnings-quality doubts) and SMCI weakness stay flagged.
+- journal: Thu 8/27 09:00: NVDA print landed well, futures higher and tech recovering, so lifted from 0.4 risk-off to 0.6 neutral. Trimmed the avoid list now that the event is behind us; watching next week's CPI and MRVL's upcoming report before pushing risk higher.
+
+### 2026-08-27T18:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 and NVDA's guidance rally is lifting chips, so the tape is constructive but jobs report next week and only $31 cash keep me at moderate risk. CXM (earnings ~7d), MRVL (post-print weakness -7.4%) and BZ (-5.2%, earnings-quality doubts) stay flagged; NBIS added on -3.2% drift.
+- journal: Thu 8/27 18:26: Held 0.6 neutral into the close — NVDA cleared well and indexes finished mixed-to-higher with VIX easing to 14.5. Cash is down to $31 so new buys are minimal regardless; added CXM (earnings within a week) and NBIS to the avoid list, watching next week's jobs/inflation before pushing higher.
+
+### 2026-08-27T20:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 with NVDA-led tech strength keeps the tape constructive, but Jackson Hole underway and next week's jobs report plus only $31 cash cap risk at moderate. CXM (earnings ~7d), MRVL (post-print weakness -8.8%), BZ (-4.4%, quality doubts) and NBIS (-3.4% drift) stay flagged.
+- journal: Thu 8/27 20:30: Steady at 0.6 neutral — indexes closed higher on NVDA/Salesforce, VIX 14.5, BHVN still our winner (+3.9% on licensing deal). Cash tight at $31 so new buys minimal; watching Jackson Hole tone and next week's jobs report before any risk increase.
+
+### 2026-08-27T21:48 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 with NVDA-led tech strength keeps the tape constructive, but Jackson Hole underway and next week's jobs/inflation data plus only $31 cash cap risk at moderate. CXM (earnings ~7d), MRVL (post-print weakness -9.5%), BZ (-5.2% quality doubts) and NBIS (-3.5% drift) stay flagged.
+- journal: Thu 8/27 21:48: Held 0.6 neutral into post-close — indexes finished higher on NVDA/Salesforce, VIX 14.5, BHVN still our best holder (+3.9% on licensing deal). Cash tight at $31 so new buys minimal regardless; watching Jackson Hole tone and next week's jobs report before any risk increase.
+
+### 2026-08-28T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['CXM', 'MRVL', 'BZ', 'SMCI', 'NBIS'] | favor: ['SPY', 'QQQ', 'BHVN']
+- notes: VIX calm at 14.5 and tech held its NVDA-led gains, but Fed Chief Warsh speaks today and next week brings JOLTS/jobs plus Broadcom, with soft hiring data as a warning sign; only $31 cash keeps new buys minimal so I stay moderate. CXM (earnings ~7d), MRVL (post-print -8.5%), BZ (-5.1% quality doubts), NBIS (-3.9% drift) and SMCI stay flagged.
+- journal: Fri 8/28 09:00: Held 0.6 neutral — tape constructive after NVDA but Warsh speech today and soft hiring headline add event/macro caution. BHVN still our best holder (+18% on licensing); MRVL leaking (-8.5%). Watching Warsh tone and next week's jobs/Broadcom before adjusting.
+
+### 2026-08-28T18:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
+- notes: Warsh's hawkish Jackson Hole tone pushed the S&P/Nasdaq lower and reversed NVDA's gains, though VIX stays calm at 14.4 and the week closed positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom looming, I trim to 0.5. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.9%), NVDA (-4% reversal), SMCI and overvalued IWM (-1.9%) stay flagged.
+- journal: Fri 8/28 18:29: Cut to 0.5 neutral — Warsh's higher-rate outlook faded the NVDA rally, tech names leaking (NBIS -6.9%, BZ -6.2%, NVDA -4%) but VIX still 14.4 and indexes held weekly gains. Cash near-zero at $26 so buys minimal into weekend; watching next week's jobs report and Broadcom earnings before any risk increase.
+
+### 2026-08-28T20:03 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
+- notes: Warsh's hawkish tone pressured indexes into the close and reversed NVDA, but VIX stays calm at 14.4 and the week finished positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom looming, I hold 0.5 into the weekend. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.6%), NVDA (-4% reversal), SMCI and overvalued IWM (-1.9%) stay flagged.
+- journal: Fri 8/28 20:03: Held 0.5 neutral into the close/weekend — tech leaked on Warsh's higher-rate outlook (NBIS -6.6%, BZ -6.2%, NVDA -4%), VIX still 14.4, indexes kept weekly gains. Cash near-zero at $26 so buys minimal; watching next week's jobs report and Broadcom earnings before adjusting risk.
+
+### 2026-08-28T21:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM'] | favor: ['MSFT', 'SPY', 'BHVN']
+- notes: Market closed for the weekend after Warsh's hawkish tone faded tech into Friday's close, though VIX stays calm at 14.4 and the week finished positive; with only $26 cash and next week's JOLTS/jobs plus Broadcom earnings looming, I hold 0.5 neutral. CXM (earnings ~7d), BZ (-6.2%), NBIS (-6.6%), NVDA (-4% reversal), SMCI and overvalued IWM stay flagged.
+- journal: Fri 8/28 21:12: Held 0.5 neutral into the weekend — no change since 20:03 as tech leaked on Warsh's higher-rate outlook, VIX still 14.4, weekly gains intact. Cash near-zero at $26 keeps buys minimal; watching next week's JOLTS/jobs report and Broadcom earnings before adjusting risk.
+
+### 2026-08-31T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'SMCI', 'IWM', 'SPCX'] | favor: ['MSFT', 'SPY']
+- notes: US strikes on Iran have futures falling and Brent topping $90, with rate-hike bets jumping ahead of a jobs-report week — a genuine geopolitical event, so I cut to 0.35 risk-off despite a still-moderate VIX (15.4). CXM reports within ~7d and tech names (NBIS -8.3%, BZ -5.8%, NVDA -3.8%, SMCI) keep leaking.
+- journal: Mon 8/31 09:00: Shifted neutral->risk-off, 0.5->0.35 on the Iran strike/oil spike and jump in rate-hike odds; VIX only 15.4 but event risk plus a jobs-report week warrants defense. Cash $26 keeps buys tiny anyway; watching oil, VIX, and Friday's jobs data before easing back.
+
+### 2026-08-31T15:10 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: Iran-strike geopolitical risk persists with Brent topping $90 and 30-yr yields at 5.25%, indexes down modestly into the close (SPY -0.9%, QQQ -1.4%, IWM -2.7%); VIX still moderate at 15.1 but event risk plus a jobs-report week keeps me defensive at 0.35. BZ (-8.4%) and NBIS (-8.4%) keep bleeding, CXM reports within ~7d.
+- journal: Mon 8/31 15:10: Holding risk-off 0.35 into the close — no material change since morning, Iran/oil tension intact and VIX easing slightly to 15.1. BZ and NBIS both -8.4% still leaking; watching oil, VIX, and Friday's jobs data before easing risk.
+
+### 2026-08-31T16:58 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: Market closing on Iran-strike geopolitical tension and rising oil, with indexes red but capping a winning August; VIX still moderate at 14.9. Jobs report Friday plus Hormuz risk keeps me defensive at 0.35 into the close. BZ (-8.8%) and NBIS (-7.5%) keep bleeding; CXM reports within ~7d.
+- journal: Mon 8/31 16:58: Holding risk-off 0.35 at the close — no material change, VIX eased to 14.9 but Iran/oil event risk and Friday's jobs report keep me cautious. BZ (-8.8%) and NBIS (-7.5%) still weakest; watching oil, VIX, and jobs data before easing risk.
+
+### 2026-08-31T18:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX', 'SMCI'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: After-hours brief: Iran-strike geopolitical tension and rising oil persist, tech leaking on Warsh's higher-rate outlook, indexes red into the close but capping a winning August; VIX moderate at 14.9. Jobs-report week plus Hormuz risk keeps me defensive at 0.35. BZ (-8.8%) and NBIS (-7.5%) still bleeding; CXM reports within ~7d.
+- journal: Mon 8/31 18:04: No material change post-close — holding risk-off 0.35, VIX 14.9 but Iran/oil event risk and Friday's jobs report keep me cautious. Cash $25 keeps buys tiny anyway. Watching oil, VIX, and jobs/JOLTS data plus Broadcom earnings before easing risk.
+
+### 2026-09-01T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'SPCX'] | favor: ['MSFT', 'SPY', 'CRWD']
+- notes: Futures down on Iran-Hormuz oil spike and rising bond yields; jobs-report week with ISM and Palo Alto earnings on tap. VIX still moderate at 15.9 but broad holdings red (NBIS -10.2%, BZ -9.5%, NVDA -4.4%, BHVN -4.1%); event risk keeps me defensive at 0.35. CXM reports within ~7d — avoid.
+- journal: Tue 9/1 09:00: Holding risk-off 0.35 into new month. Iran/oil tension and yields persist, futures lower, VIX ticked to 15.9. NBIS and BZ still worst bleeders. Watching oil, ISM data, and Friday's jobs report before easing; cash $25 keeps buys tiny anyway.
+
+### 2026-09-01T12:46 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'CRWD'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: September opens red across the board on Iran/Hormuz oil spike and rising yields; VIX moderate at 15.9 but holdings broadly leaking (NBIS -10.5%, BZ -7.5%, CRWD -6.9%, IWM -3.5%). Jobs report Friday plus event risk keeps me defensive at 0.35; CXM reports within ~7d.
+- journal: Tue 9/1 12:46: No material change midday — held risk-off 0.35. NBIS worst at -10.5%, BZ and CRWD still bleeding; added CRWD to avoid on weakness. Watching oil, yields, and Friday jobs before easing; cash $25 keeps buys tiny anyway.
+
+### 2026-09-01T14:43 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'PLTR'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: September stays under pressure — indexes red on Iran/Hormuz oil spike, surging Treasury yields and rising crude; holdings broadly leaking (NBIS -11%, BZ -7.7%, NVDA -4.6%, IWM -3.7%). VIX moderate at 16.2 but jobs report Friday plus geopolitical event risk keeps me defensive at 0.35; CXM reports within ~7d.
+- journal: Tue 9/1 14:43: No material change into the afternoon — held risk-off 0.35. NBIS worst at -11%, BZ and IWM still bleeding; VIX ticked up to 16.2. Watching oil, yields, and Friday jobs before easing; cash $30 keeps buys tiny anyway.
+
+### 2026-09-01T16:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'IWM', 'PLTR'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: End of day stays defensive — bond selloff intensifying with 10yr at 20-month high on Iran/Hormuz oil-driven inflation fears; holdings broadly red (NBIS -11%, BZ -7.5%, NVDA -4.1%, IWM -3.7%). VIX moderate at 16.5 but Friday jobs report and geopolitical event risk keep me at 0.35; CXM reports within ~7d.
+- journal: Tue 9/1 16:12: Holding risk-off 0.35 into the close. Bond selloff intensified (yields 20-mo high) on Middle East oil spike; NBIS worst at -11%, BZ still bleeding. VIX 16.5. Watching yields, oil, and Friday's jobs report before easing; cash $30 keeps buys tiny anyway.
+
+### 2026-09-02T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['CXM', 'BZ', 'NBIS', 'NVDA', 'PLTR', 'IWM'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: Escalation to actual US strikes on Iran with oil above $95 and yields at fresh highs is a genuine event-risk landmine; Dow -370 with ADP today and jobs Friday. VIX still only 16.2 but headline/geopolitical risk plus broadly red holdings (NBIS -11.8%, BZ -7.7%, PLTR -5.2%) keeps me pinned defensive at 0.30.
+- journal: Wed 9/2 09:00: Trimmed to 0.30 as Iran conflict went kinetic (US strikes, oil >$95, yields up); tape gapping down. NBIS still worst bleeder, CXM already reported Q2 (keep avoiding weak name). Watching oil, yields, ADP today and Friday jobs before easing; cash $30 keeps buys tiny regardless.
+
+### 2026-09-02T12:42 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: Iran-strike geopolitical overhang persists with oil elevated and bond selloff deepening; holdings broadly red (NBIS -10.5%, PLTR -10%, BZ -8.5%, IWM -2.8%) even as VIX eased to 15.4. ADP/Beige Book today and jobs Friday keep me pinned defensive at 0.30.
+- journal: Wed 9/2 12:42: Held risk-off 0.30 midday — VIX cooled to 15.4 but tape still leaking and event risk (jobs Fri, geopolitics) intact. Biggest bleeders PLTR -10%, NBIS -10.5%, BZ -8.5%; cash $43 keeps buys tiny anyway. Watching yields, oil, Friday jobs before easing.
+
+### 2026-09-02T14:51 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: VIX calm at 15.2 and a modest bounce attempt after four down sessions, but the Iran/oil geopolitical overhang and bond selloff persist with holdings still deeply red (PLTR -9.8%, BZ -8.6%, NBIS -8.5%, IWM -2.5%). Friday jobs report ahead keeps me pinned defensive at 0.30.
+- journal: Wed 9/2 14:51: Held risk-off 0.30 into the afternoon — tape trying to stabilize (VIX 15.2, stocks up for first time in four sessions) but geopolitics and Friday jobs keep me cautious. Worst bleeders unchanged (PLTR -9.8%, BZ -8.6%, NBIS -8.5%); cash $43 keeps buys tiny. Watching oil, yields, and Friday's report before easing.
+
+### 2026-09-02T16:10 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: End-of-day print with VIX low at 15.3 but geopolitical (Iran/oil) overhang and a deepening bond selloff (10yr at 2023 highs) keep the tape leaky; holdings still deeply red (PLTR -9.1%, NBIS -8.7%, BZ -8.5%, IWM -2.6%). Friday jobs report is a major event landmine ahead, so I stay pinned defensive at 0.30.
+- journal: Wed 9/2 16:10: Closed the day risk-off 0.30 — VIX calm at 15.3 but yields at 20-month highs and Iran/oil still overhanging; worst bleeders unchanged (PLTR -9.1%, NBIS -8.7%, BZ -8.5%). Cash $43 keeps buys tiny anyway. Watching Friday's jobs report, yields and oil before easing.
+
+### 2026-09-03T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'PLTR', 'NVDA', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ']
+- notes: Tape stabilized — Dow +300, yields cooling, VIX calm at 15.1 after snapping a 3-day skid, but Friday's jobs report is a major event landmine one day out and holdings remain deeply red (BZ -10.1%, NBIS -8.5%, PLTR -8.5%). Nudging risk up slightly to 0.35 while staying pinned defensive into the print.
+- journal: Thu 9/3 09:00: Eased marginally to 0.35 from 0.30 — conditions improved (yields slipped, oil selloff paused, VIX 15.1, stocks bounced) but I stay defensive with Friday jobs report dead ahead. BZ now worst bleeder (-10.1%) with an officer selling 300k ADS — keep avoiding. Watching jobs report tomorrow and yields before easing further.
+
+### 2026-09-03T12:33 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL']
+- notes: Strong constructive tape — Dow +600, yields falling, Big Tech rallying, VIX low at 14.6 — but Friday's jobs report is a major event landmine one day out and several holdings remain deeply red (BZ -11.1% with insider selling, NBIS -7.2%). Nudging risk to 0.40 while staying pinned defensive into the print.
+- journal: Thu 9/3 12:33: Eased to 0.40 from 0.35 as tape firmed sharply (Dow +600, yields retreating on Waller, VIX 14.6) but held risk-off with jobs report tomorrow. BZ still worst bleeder (-11.1%) — keep avoiding; NBIS -7.2%. Watching Friday's jobs print before easing further.
+
+### 2026-09-03T14:49 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'SNDK'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL']
+- notes: Constructive tape persists — Dow surging, yields easing on Waller, VIX low at 14.5, Big Tech rallying — but Friday's jobs report is a major event landmine one day out and BZ (-11.1%, insider selling), NBIS (-5.9%) remain deep in the red. Holding risk-off at 0.40 into the print.
+- journal: Thu 9/3 14:49: Held 0.40 risk-off into the close — tape stayed firm (VIX 14.5, yields cooling), but staying pinned defensive with jobs report tomorrow morning. BZ still worst bleeder (-11.1%), NBIS -5.9%. Watching Friday's jobs print — that's the key event before I ease further.
+
+### 2026-09-03T16:11 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'SNDK', 'CRK'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL']
+- notes: Tape held constructive into the close (VIX 14.3, yields easing on Waller, Big Tech firm), but Friday's jobs report is a major event landmine one session out and BZ (-11.2%, insider selling), NBIS (-5.7%) stay deep in the red. Holding risk-off at 0.40 into the print.
+- journal: Thu 9/3 16:11: Held 0.40 risk-off into the close, day P&L +$3, VIX ticked to 14.3. Everything hinges on tomorrow's jobs report — that's the key event before I ease. BZ still worst bleeder (-11.2%), NBIS -5.7%; added CRK to avoid as it drifts. Cash $20 keeps buys tiny regardless.
+
+### 2026-09-04T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'SNDK', 'HOOG'] | favor: ['MSFT', 'SPY', 'QQQ', 'AAPL', 'NVDA']
+- notes: Jobs report is today's big event — futures mixed at 09:00 ahead of the open, so I stay pinned defensive until the market digests the print and yields settle. VIX low at 14.2 and tape firm into the week, but BZ (-10.6%, insider selling), NBIS (-6.9%), PLTR and IWM remain deep red landmines.
+- journal: Fri 9/4 09:00: Jobs report day — held risk-off 0.40 into the open with futures mixed. VIX 14.2, tape constructive but I won't ease until the print's reaction settles. BZ still worst bleeder (-10.6%), NBIS -6.9%; kept CRK/SNDK/HOOG on avoid. Cash $20 keeps buys tiny regardless. Watching yields and the market's read on the jobs number.
+
+### 2026-09-04T12:29 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Hot August jobs (162k vs est) revived rate-hike fears — yields ticking up, indices choppy/red intraday even as VIX stays calm at 14.0. The event is now digested but the rate-hike overhang keeps me defensive; BZ (-10.6%, insider selling), NBIS (-3.4%), PLTR (-6.4%) remain landmines and ASND sits red near LULU-style retail weakness.
+- journal: Fri 9/4 12:29: Jobs print landed hot — rate-hike fears back, yields up, tape mixed to lower despite VIX 14.0. Nudged risk_scale to 0.45; still risk-off until yields settle. BZ worst bleeder, PLTR -6.4%, NBIS -3.4%; SMMT/SNDK/HOOG green. Watching whether afternoon holds or fades on rate worry.
+
+### 2026-09-04T14:31 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Hot jobs print keeps rate-hike overhang alive — yields up, indices red intraday (QQQ -1.0%, IWM -2.0%) despite calm VIX 14.1. Staying defensive into the weekend; BZ (-10.7%), PLTR (-6.4%), NBIS (-2.0%) remain landmines and ASND/CRK stay soft on rate sensitivity.
+- journal: Fri 9/4 14:31: Afternoon holding mixed-to-lower, VIX 14.1, day P&L +$1. Kept risk-off 0.45 into the close ahead of the weekend — no reason to reach with tape red and rate worry lingering. SMMT/SNDK/HOOG green; BZ still worst bleeder. Watching whether yields settle before easing next week.
+
+### 2026-09-04T15:56 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Final hour on jobs-day Friday: hot 162k print keeps rate-hike overhang alive, yields up and indices red (IWM -1.8%, QQQ -0.8%) despite calm VIX 14.3. No reason to reach into the weekend close; BZ (-11%), PLTR (-6.7%) remain landmines while SMMT/SNDK/HOOG hold green.
+- journal: Fri 9/4 15:56: Into the close, tape mixed-to-lower, VIX 14.3, day P&L +$1. Held risk-off 0.45 — kept defensive posture over the weekend with rate-hike worry lingering. BZ still worst bleeder, PLTR -6.7%; watching whether yields settle before easing next week.
+
+### 2026-09-07T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'NBIS', 'PLTR', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: New week opens with rate-hike overhang from Friday's hot 162k jobs print still live, plus renewed Middle East headlines; VIX ticked up to 15.2 from 14.3. Staying defensive — BZ (-10.8%), PLTR (-6.7%) remain landmines, while SMMT/SNDK/HOOG hold firmly green.
+- journal: Mon 9/7 09:00: Weekend passed, tape still digesting rate-hike fears and fresh Middle East hostilities; VIX nudged up to 15.2. Held risk-off 0.45 — cash $20 keeps buys tiny anyway. Watching yields and whether the jobs-driven rate worry fades this week.
+
+### 2026-09-07T13:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Rate-hike overhang from Friday's hot jobs print persists, Middle East hostilities linger, and VIX ticked up to 15.3. Adding AAPL to avoid ahead of its product-launch event (event risk); ASND has trial data due this week, another landmine. BZ (-10.8%) and PLTR (-6.7%) remain the worst bleeders.
+- journal: Mon 9/7 13:47: Tape still soft on rate worry, VIX 15.3, day P&L flat. Held risk-off 0.45 and added AAPL to avoid list (product event) plus flagged ASND trial-data risk. Cash $20 keeps buys tiny anyway; watching yields and AAPL event outcome.
+
+### 2026-09-07T15:20 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Final hour: rate-hike overhang from Friday's hot jobs print still dominates with Middle East headlines lingering; VIX steady at 15.3 but tape soft (IWM -1.8%, QQQ -0.8%). Holding defensive 0.45 into the close — BZ (-10.8%) and PLTR (-6.7%) remain landmines, AAPL flagged for product event, ASND for trial data this week.
+- journal: Mon 9/7 15:20: Into the close, tape mixed-to-lower, VIX 15.3, day P&L flat. Kept risk-off 0.45 — no reason to reach with rate worry live and cash at $20. SMMT/SNDK green; watching AAPL event outcome and whether yields settle this week.
+
+### 2026-09-07T16:50 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Post-close on 9/7: rate-hike overhang from Friday's hot jobs print still dominates with Middle East headlines lingering; VIX steady at 15.3, tape soft (IWM -1.8%, QQQ -0.8%). Holding defensive 0.45 — BZ (-10.8%) and PLTR (-6.7%) remain the worst bleeders, AAPL flagged for its product-launch event, ASND for trial data due this week.
+- journal: Mon 9/7 16:50: Day closed flat, VIX 15.3, rate-hike worry still live into a Fed-focused week. Kept risk-off 0.45 with cash at $20 keeping buys tiny. Watching AAPL product event and whether yields settle as Fed decision approaches.
+
+### 2026-09-08T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Tuesday open into a shortened week: futures lower as oil climbs on renewed Middle East hostilities, and Friday's hot jobs print keeps rate-hike/Fed worry live; VIX 15.5. Holding defensive 0.45 — BZ (-12.1%) and PLTR (-7.1%) still bleeding, AAPL flagged for its product event, ASND has trial data due this week.
+- journal: Tue 9/8 09:00: Oil spiking on Middle East escalation pressures futures; VIX nudged to 15.5, rate worry unchanged. Kept risk-off 0.45, avoid list intact (AAPL event, ASND trial data, BZ/PLTR bleeders). Cash $20 keeps buys tiny; watching oil, yields, and AAPL event outcome.
+
+### 2026-09-08T12:45 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Midday: oil spiking on Saudi attack/Middle East escalation pressures indexes, US-Canada trade friction adds noise, and Friday's hot jobs print keeps Fed rate-hike worry live; VIX calm at 15.3 but tape soft. Holding defensive 0.45 — BZ (-11.9%) and PLTR (-8.2%) still bleeding, AAPL near product event, ASND trial data due.
+- journal: Tue 9/8 12:45: VIX eased to 15.3 but oil surge and trade-war headlines keep tape heavy; day P&L flat +$1. NBIS/SNDK/SMMT green, BZ/PLTR still landmines. Kept risk-off 0.45, avoid list intact; watching oil, yields, AAPL event.
+
+### 2026-09-08T14:52 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Afternoon: Dow down ~600 as oil climbs toward $100 (Brent) and US-Canada trade war escalates; hot jobs print keeps Fed rate-hike risk live into a shortened week. VIX still calm at 15.3 but breadth soft — holding defensive 0.45.
+- journal: Tue 9/8 14:52: Tape deteriorated, Dow -600 on rising oil and trade-war escalation; day P&L +$1. BZ (-11.9%) and PLTR (-8.7%) still bleeding, NBIS/SNDK/SMMT green. Kept risk-off 0.45, avoid list intact; watching oil toward $100, yields, and AAPL product event.
+
+### 2026-09-08T16:22 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Near close: Dow -400/-600 on oil spike (Iran/Saudi strikes) and US-Canada trade war; hot jobs print keeps Fed rate-hike risk live into a shortened week. VIX 15.8 and climbing, breadth soft — staying defensive 0.45.
+- journal: Tue 9/8 16:22: Day closed roughly flat, VIX ticked up to 15.8 as oil surge and geopolitical/trade headlines kept tape heavy. BZ (-12.4%) and PLTR (-8.8%) still bleeding; NBIS/SNDK/SMMT green. Kept risk-off 0.45, avoid list intact; watching oil toward $100, yields, Fed decision, AAPL event fallout.
+
+### 2026-09-09T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND', 'AAPL'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Brent over $100 on US-Iran/Middle East tensions, AI-software worries hitting the tape, and a hot jobs print plus a hotter-headline CPI preview keeping Fed rate-hike risk live; VIX up to 16.3. Staying defensive 0.40.
+- journal: Wed 9/9 09:00: Oil crossed $100 on US-Iran escalation, AI/software selling and hot jobs+CPI-hike worry pressuring futures; VIX 16.3. BZ (-12.4%) and PLTR (-8.2%) still bleeders, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching CPI print, oil, yields, AAPL event fallout.
+
+### 2026-09-09T12:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Dow off 400+ as oil tops $101 and Treasury yields jump on a hot jobs print reviving Fed rate-hike risk; VIX 16.5 and breadth soft. Holding defensive 0.40 — broad indices and rate-sensitive names under pressure.
+- journal: Wed 9/9 12:47: Tape still heavy, Dow -400 on oil >$101 and jumping yields; day P&L -$2. BZ (-14.3%) and PLTR (-8.7%) remain landmines, NBIS/SMMT/SNDK green. Kept risk-off 0.40, avoid list intact (dropped AAPL post-event); watching oil, yields, and Fed hike chatter.
+
+### 2026-09-09T14:47 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Tape stays heavy: Dow down ~400, oil above $101 and Treasury yields jumping on a hot jobs print keeping Fed rate-hike risk live; VIX 16.2. Holding defensive 0.40 as rate-sensitive names and broad indices remain under pressure.
+- journal: Wed 9/9 14:47: No relief into the afternoon, Dow still -400 on oil >$101 and elevated yields; day P&L -$2. BZ (-15.6%) and PLTR (-8.8%) still deepest landmines, NBIS/SMMT/SNDK green. Kept risk-off 0.40, avoid list intact; watching oil, yields, and Fed-hike chatter into close.
+
+### 2026-09-09T16:05 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NBIS', 'IWM', 'CRK', 'ASND'] | favor: ['MSFT', 'QQQ', 'SPY', 'NVDA', 'SNDK']
+- notes: Into the close the tape stayed heavy: Dow -300 to -600, oil topping $100 and Treasury yields jumping on inflation worry with Fed rate-hike risk live ahead of tomorrow's CPI; VIX 16.4. Holding defensive 0.40 with CPI event risk overnight.
+- journal: Wed 9/9 16:05: Day closes soft, day P&L -$2; oil >$100 and rising yields kept indices red into the bell. BZ (-15.4%) and PLTR (-9.3%) still deepest landmines, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching tomorrow's CPI print, oil, and yields.
+
+### 2026-09-10T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'ASND', 'NVDA', 'QQQ'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Inflation data (PPI/CPI) is the day's event risk with Nasdaq futures sinking, Brent near/over $100 and yields rising; VIX 17.7 and breadth negative. Holding defensive 0.40 into the print — trimmed favor on rate-sensitive tech and added NVDA/QQQ to avoid given AI-software selling.
+- journal: Thu 9/10 09:00: Overnight tape softened — Nasdaq futures sink on rising oil and yields ahead of inflation data; VIX up to 17.7. BZ (-15.2%) and PLTR (-11.3%) remain deepest landmines; NBIS/SMMT/SNDK green with NBIS lifted by Palantir team-up. Held risk-off 0.40, avoid list intact; watching CPI/PPI print, oil, yields.
+
+### 2026-09-10T12:33 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Oil above $100 and Treasury yields jumping keep Fed rate-hike risk live with CPI in focus; broad indices red (SPY/QQQ/IWM), VIX 17.7 and breadth negative. Holding defensive 0.40 — BZ and PLTR remain deep landmines while NBIS/SMMT/SNDK stay green.
+- journal: Thu 9/10 12:33: Midday tape still heavy — oil >$100, yields up, indices red; day P&L -$2. BZ (-13%) and PLTR (-11%) remain worst; NBIS/SMMT/SNDK green (NBIS lifted by Palantir team-up). Held risk-off 0.40, avoid list intact; watching CPI reaction, oil, yields and Fed-hike odds.
+
+### 2026-09-10T14:37 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Hot PPI lifted Fed rate-hike odds with oil above $100 and Treasury yields surging; indices extending losses, breadth negative, VIX 17.7. Staying defensive at 0.40 with Fed meeting next week as looming event risk.
+- journal: Thu 9/10 14:37: Tape still heavy into afternoon \u2014 oil >$100, yields jump, indices red; day P&L -$3. BZ (-13%) and PLTR (-11%) remain deepest landmines; NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching oil, yields, and rising Fed-hike odds ahead of next week's meeting.
+
+### 2026-09-10T16:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Into the close the tape stayed heavy — oil ~$100, Treasury yields at 52wk highs and rising Fed rate-hike odds ahead of next week's meeting; VIX 18.0, breadth negative. Holding defensive 0.40 with BZ and PLTR the deepest landmines.
+- journal: Thu 9/10 16:08: Day closes red, day P&L -$3; oil >$100 and jumping yields kept indices lower with Fed-hike odds climbing. BZ (-13.5%) and PLTR (-11.1%) remain worst; NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching oil, yields, and next week's Fed decision as key event risk.
+
+### 2026-09-11T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'IWM', 'CRK', 'NVDA', 'QQQ', 'SPY'] | favor: ['MSFT', 'SNDK', 'SMMT', 'NBIS']
+- notes: Hot August CPI (3.4% vs est) landed above expectations with oil >$100 and yields at 52wk highs, keeping Fed rate-hike risk live into next week's meeting; indices down four straight days, VIX 16.6 but breadth weak. Staying defensive at 0.40 with BZ and PLTR the deepest landmines.
+- journal: Fri 9/11 09:00: CPI printed hot at 3.4% (above est), futures wobbling; four-day losing streak, oil >$100, yields high, Fed decision looms next week. VIX eased to 16.6 but tape stays heavy — BZ (-13.5%) and PLTR (-9.8%) worst, NBIS/SMMT/SNDK green. Held risk-off 0.40, avoid list intact; watching CPI reaction, oil, yields.
+
+### 2026-09-11T12:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
+- notes: Tape improved sharply — Dow +500, oil retreating and VIX easing to 15.7 as traders shake off sticky CPI; the four-day slide is pausing. Nudging up to 0.55 (neutral) but keeping Fed-hike risk into next week's meeting in mind, with BZ (-12.6%) and PLTR (-10.9%) still the deepest landmines to avoid.
+- journal: Fri 9/11 12:38: Sentiment flipped constructive — Dow +500, oil pulling back, VIX 15.7, day P&L +$1 after four red days. Softened from risk-off 0.40 to neutral 0.55; trimmed avoid list to worst laggards (BZ, PLTR, IWM, NVDA). Watching whether the bounce holds and Fed-hike odds ahead of next week's decision.
+
+### 2026-09-11T14:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.55
+- avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
+- notes: Constructive tape holding into the afternoon — Dow up 500+, oil retreating and VIX steady at 15.7 as traders shake off the hot 3.4% CPI; day P&L flat-positive after four red days. Staying neutral at 0.55 while respecting live Fed-hike risk into next week's meeting; BZ (-13%) and PLTR (-10.5%) remain the deepest landmines.
+- journal: Fri 9/11 14:42: Bounce is holding into the afternoon — VIX 15.7, oil easing, indices green. Maintaining neutral 0.55 with same avoid list (BZ, PLTR, IWM, NVDA). Watching whether gains stick into the close and Fed-hike odds ahead of next week's decision; weekend gap risk noted.
+
+### 2026-09-11T16:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'PLTR', 'IWM', 'NVDA'] | favor: ['MSFT', 'NBIS', 'SNDK', 'SMMT']
+- notes: Bounce held into the Friday close — Dow up 500+, oil retreating and VIX calm at 15.9 after traders shook off the hot 3.4% CPI. Trimming slightly to 0.50 into the close given weekend gap risk and a live Fed-hike case ahead of next week's meeting; BZ (-13.4%) and PLTR (-10.6%) remain the deepest landmines.
+- journal: Fri 9/11 16:07: Constructive tape stuck into the close — VIX 15.9, oil easing, day P&L +$1. Nudged risk to 0.50 ahead of the weekend/Fed-decision gap risk, same avoid list (BZ, PLTR, IWM, NVDA). Watching Fed-hike odds and oil/yields into next week's meeting.
+
+### 2026-09-14T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM', 'MSFT', 'QQQ'] | favor: ['SMMT', 'NBIS', 'ELV']
+- notes: Ugly Monday open — futures fall on AI-slowdown fears (Anthropic warning hitting MSFT/tech), oil spikes on Saudi pipeline closure, and the Fed-hike case builds after hot 3.4% CPI with VIX up to 17.7. Cutting to risk-off 0.40; adding MSFT/QQQ to the avoid list given the AI-tape damage while BZ (-14.9%) and PLTR (-9.4%) stay the deepest landmines.
+- journal: Mon 9/14 09:00: Friday's bounce reversed over the weekend — AI-slowdown fears plus oil spike and rising Fed-hike odds push futures down, VIX 17.7. Dropped from neutral 0.50 to risk-off 0.40, expanded avoid to include MSFT/QQQ (tech under pressure). NBIS/CRWV surging premarket but I'm not chasing; watching oil, yields, and whether AI selloff deepens into the Fed meeting.
+
+### 2026-09-14T14:06 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
+- notes: Dangerous tape — 10-year yield hit the 5% threshold, oil surging, and AI names sliding on Anthropic's slowdown warning while the Fed-hike case builds after hot 3.4% CPI; VIX easing to 16.7 but yields/oil are the real risk. Holding risk-off at 0.35, avoiding tech/AI (NVDA -6.4%, PLTR -7.4%, NBIS -2.5%) and index ETFs, keeping BZ (-18.1%) as the deepest landmine.
+- journal: Mon 9/14 14:06: Selloff persisting — 10Y yield tagged 5%, oil jumping, AI complex still under pressure. Cut risk further to 0.35 and expanded avoid to NBIS/SPY given yield shock. Watching whether 5% yield holds and if the AI slide deepens into the Fed meeting; SMMT (+9%) and defensive ELV the only green spots.
+
+### 2026-09-14T15:54 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
+- notes: Six minutes to close on a rough Monday — 10Y yield tagged 5%, oil elevated, and AI names still soft despite the tape paring losses off session lows; VIX contained at 16.9 but the yield/inflation backdrop and building Fed-hike case keep this defensive. Holding risk-off 0.35 into the bell, avoiding AI/tech and index ETFs with BZ (-18.8%) the deepest landmine.
+- journal: Mon 9/14 15:54: Selloff moderated into the close (stocks off worst levels, oil pressure easing) but 10Y still near 5% and AI-slowdown worry lingers. Keeping risk-off 0.35, same avoid list; day P&L -$2. Watching whether the 5% yield holds overnight and AI names stabilize ahead of the Fed meeting.
+
+### 2026-09-14T17:05 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY'] | favor: ['SMMT', 'ELV', 'SNDK']
+- notes: Post-close on a rough Monday — 10Y yield touched the 5% threshold, oil elevated, and the AI complex stayed soft on Anthropic's slowdown warning while a Fed-hike case builds after hot 3.4% CPI; VIX contained at 17.1 but the yield/inflation backdrop keeps this defensive. Holding risk-off 0.35, avoiding AI/tech and index ETFs with BZ (-18.3%) the deepest landmine.
+- journal: Mon 9/14 17:05: Market closed near lows-off levels, day P&L -$2. Kept risk-off 0.35, same avoid list. Watching whether 5% yield holds overnight, oil, and AI-name stabilization heading into the Fed meeting; SMMT (+9%) and defensive ELV the lone bright spots.
+
+### 2026-09-15T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM', 'MSFT', 'QQQ', 'SPY', 'NBIS'] | favor: ['SMMT', 'ELV', 'SNDK', 'INSP']
+- notes: Tuesday open still dangerous — 10Y yield breached 5%, oil surging, and a Fed-hike case builds after hot 3.4% CPI while chip stocks slide on AI warnings; VIX contained at 17.0 but yields/inflation are the real risk. Holding risk-off 0.35, avoiding AI/tech and index ETFs; BZ (-18.3%) remains the deepest landmine. NBIS spiked on Nvidia's 9% stake but stays on avoid as a volatile AI name.
+- journal: Tue 9/15 09:00: Overnight yield held at/above 5% and futures slipped again; AI complex still soft though NBIS popped on Nvidia stake news. Kept risk-off 0.35 and same avoid list, added INSP to favor (undervalued defensive med-tech). Watching whether 5% yield holds, oil, and any Fed-hike escalation.
+
+### 2026-09-15T13:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Midday Tuesday tape still hostile — 10Y yield touched 5% (19-yr high), oil surging, and a Fed-hike case builds after hot 3.4% CPI; VIX ticked up to 17.5 as chip/AI names slide on the AI-slowdown warning. Holding risk-off 0.35, avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-20.6%) is the deepest landmine, and SNDK moved to avoid on continued weakness.
+- journal: Tue 9/15 13:09: No relief — yields pinned near 5%, oil elevated, VIX crept to 17.5; NVDA/NBIS/PLTR still bleeding and IWM (-5.4%) hardest hit on rate fear. Day P&L -$3. Kept risk-off 0.35, moved SNDK to avoid; defensives SMMT/ELV/INSP the only steady names. Watching the 5% yield, oil, and Fed-hike escalation.
+
+### 2026-09-15T15:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Late Tuesday tape remains hostile — Dow down 450 as 10Y yield hit a 19-year high near 5%, oil surging, and a Fed-hike case builds after hot 3.4% CPI; VIX 17.5 with AI/chip names still sliding on slowdown fears. Holding risk-off 0.35, avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-20.8%) is the deepest landmine.
+- journal: Tue 9/15 15:08: Losses accelerated into the close, Dow -450, yields pinned near 5%; NVDA/NBIS/PLTR/IWM still bleeding, day P&L -$3. Kept risk-off 0.35 and same avoid list; defensives SMMT/ELV/INSP the only steady names. Watching the 5% yield, oil, and Fed-hike escalation into tomorrow.
+
+### 2026-09-15T16:30 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Closing bell Tuesday — tape stayed hostile all session with 10Y yield pinned near a 19-year-high 5%, oil above $106, and a Fed-hike case building after hot 3.4% CPI; VIX 17.2 as AI/chip names bled on slowdown warnings. Staying risk-off 0.35, avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-20.8%) remains the deepest landmine.
+- journal: Tue 9/15 16:30: End of a rough day — yields near 5%, oil high, day P&L -$3; NVDA/NBIS/PLTR/IWM finished weak while defensives SMMT/ELV/INSP held. Kept risk-off 0.35 and same avoid list. Watching whether the 5% yield holds, oil, and any Fed-hike escalation into tomorrow's open.
+
+### 2026-09-16T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Fed decision day with a live hike risk after hot 3.4% CPI, 10Y yield near a 19-year high ~5%, and oil surging; VIX 16.9 but event risk is binary this afternoon. Staying risk-off 0.3 into the announcement — avoiding AI/tech and rate-sensitive index/small-cap ETFs; BZ (-19.7%) remains the deepest landmine.
+- journal: Wed 9/16 09:00: Fed decision day — futures edging higher but yields pinned near 5% and a hike is on the table; VIX eased to 16.9. Trimmed risk to 0.3 ahead of the 2pm event, same avoid list, defensives SMMT/ELV/INSP still the steady names. Watching the Fed statement/presser and whether the 5% yield breaks either way.
+
+### 2026-09-16T13:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Fed decision lands at 2pm ET with a live hike case after hot 3.4% CPI and the 10Y yield near a 19-year high ~5%; VIX 16.8 is deceptively calm ahead of a binary event less than an hour out. Holding risk-off 0.3 into the announcement, avoiding AI/tech and rate-sensitive ETFs; ADPT added on insider selling, BZ (-21.2%) still the deepest landmine.
+- journal: Wed 9/16 13:09: ~1hr before Fed decision, tape flattish (day P&L +$1), yields still pinned near 5%; NVDA/PLTR/QQQ soft, defensives SMMT/SPCX green. Kept 0.3 and added ADPT to avoid on insider sale. Watching the 2pm statement/presser and whether 5% yield breaks either direction.
+
+### 2026-09-16T15:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP']
+- notes: Post-Fed tape is sharply negative — SPY -2.4%, QQQ -2.7%, IWM -6%, NVDA -5.7%, PLTR -7.5% — consistent with a hawkish outcome amid the live-hike case and 10Y near 5%; VIX 16.7 understates the selling. Holding risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs into the close; BZ (-21.6%) remains the deepest landmine.
+- journal: Wed 9/16 15:00: Fed is out and the reaction is ugly — broad index/AI selloff (IWM -6%, NVDA/PLTR/QQQ deep red) while defensives SMMT/SPCX/INSP hold green. Kept risk-off 0.3, same avoid list. Watching the last hour for stabilization or capitulation and whether 5% yield breaks.
+
+### 2026-09-16T16:29 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'PLTR', 'NVDA', 'NBIS', 'IWM', 'MSFT', 'QQQ', 'SPY', 'SNDK', 'ADPT'] | favor: ['SMMT', 'ELV', 'INSP', 'SPCX']
+- notes: Into the close on a hawkish-Fed selloff day — broad indices deep red (IWM -5.9%, NVDA -5.6%, QQQ/SPY -2.5%) while defensives SMMT/SPCX hold green; VIX 17.7. Staying risk-off 0.3, avoiding AI/tech and rate-sensitive ETFs; BZ (-21.2%) still the deepest landmine.
+- journal: Wed 9/16 16:29: Closing an ugly post-Fed session — broad selloff held into the bell, defensives SMMT/SPCX the only green. Kept risk-off 0.3 and same avoid list. Watching tomorrow's open for stabilization vs. follow-through and whether the 5% 10Y yield resolves.
+
+### 2026-09-17T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'PLTR', 'NVDA', 'IWM'] | favor: ['SMMT', 'SPCX', 'ELV', 'INSP']
+- notes: Post-Fed dust settling — futures up, VIX back down to 15.5 from 17.7, suggesting yesterday's hawkish selloff is stabilizing. Nudging to neutral 0.5 but staying cautious given one more hike signaled and 10Y near 5%; still avoiding the deepest landmine BZ (-21%) and the weakest AI/small-cap names.
+- journal: Thu 9/17 09:00: Fed event is behind us and tape is trying to bounce (futures green, VIX 15.5). Upgraded risk-off 0.3 -> neutral 0.5, trimmed avoid list to worst offenders. Watching whether the open holds the bounce or fades back into rate-driven selling.
+
+### 2026-09-17T13:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
+- notes: Tape is recovering from the post-Fed selloff — VIX easing to 15.6, oil and yields backing off, tech attempting a bounce; but breadth stays negative (IWM -4.9%) and inflation/hike risk lingers. Holding neutral 0.5, still avoiding the deepest landmine BZ (-21%, insider ADS sale) and the weakest rate-sensitive/AI names.
+- journal: Thu 9/17 13:10: Bounce is holding intraday — yields/oil easing, VIX 15.6, defensives (SMMT/SPCX) green while small-caps/AI (IWM, PLTR, NVDA) still lag. Kept neutral 0.5 and trimmed avoid list. Watching whether the recovery sustains into the afternoon or fades back to rate-driven selling.
+
+### 2026-09-17T15:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
+- notes: Late-day tape holding the post-Fed recovery — VIX steady at 15.6, oil and yields easing, tech bouncing; but breadth stays weak (IWM -5.1%) and one more hike/3.4% inflation keeps risk elevated. Holding neutral 0.5, still avoiding BZ (-21% landmine) and the laggard AI/small-cap names into the last hour.
+- journal: Thu 9/17 15:10: Recovery held through the afternoon — VIX 15.6, defensives green, but small-caps/AI still soft. Kept neutral 0.5 and same avoid list. Watching the close for whether the bounce sticks or fades, and how 10Y yield settles.
+
+### 2026-09-17T16:37 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
+- notes: Session closing with the post-Fed recovery holding — VIX calm at 15.4, oil/yields easing, tech-led rally into the bell. But breadth stayed negative (IWM -5.4%) and one more hike with 3.4% inflation keeps a lid on risk; holding neutral 0.5 and still avoiding the BZ landmine (-21%) plus laggard small-cap/AI names.
+- journal: Thu 9/17 16:37: Recovery held into the close — VIX 15.4, defensives (SMMT/SPCX) green, but small-caps/AI still weak. Kept neutral 0.5 and same avoid list. Watching overnight for whether the bounce carries into Friday or fades on rate/inflation follow-through.
+
+### 2026-09-18T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SPCX', 'INSP', 'ELV']
+- notes: Post-Fed bounce carried overnight — VIX calm at 15.5, oil easing, tech extending its rally, but 3.4% inflation and hawkish hint keep a lid on risk. Holding neutral 0.5, still avoiding the BZ landmine (-22%) and the weakest rate-sensitive/AI names into a Friday session.
+- journal: Fri 9/18 09:00: Recovery carried into Friday — VIX steady 15.5, oil slipping, tech leading. Kept neutral 0.5 and same avoid list. Watching for Friday fade/profit-taking after the multi-day bounce and whether small-caps/AI stabilize.
+
+### 2026-09-18T12:34 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SMMT', 'SNDK', 'INSP', 'SPCX']
+- notes: Midday tape is fading again as Treasury yields tick up and the S&P heads for a losing week; VIX still calm at 15.4 but breadth is negative (IWM -6.2%, SPY -1.8%). Holding neutral 0.5, avoiding the BZ landmine (-21%) and rate-sensitive small-cap/AI laggards into a Friday afternoon.
+- journal: Fri 9/18 12:34: Post-Fed bounce is rolling over intraday — yields rising, indices red into the weekly close, but VIX still tame. Kept neutral 0.5 and same avoid list; SNDK (+9.4%) and SMMT/INSP holding green. Watching for a Friday-afternoon fade/profit-taking and how 10Y settles into the weekend.
+
+### 2026-09-18T14:36 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SNDK', 'SMMT', 'INSP', 'SPCX']
+- notes: Last hour of a losing week — 10Y yields backing up toward 5% and indices red, but VIX still tame at 15.2 and no fresh landmine in holdings. Holding neutral 0.5, avoiding the BZ blowup (-21.5%) and rate-sensitive small-cap/AI laggards into the weekend.
+- journal: Fri 9/18 14:36: Tape still soft into the close — yields rising, SPY/QQQ red, breadth weak (IWM -6%), but VIX calm. SNDK (+9.6%) and SMMT/INSP green. Kept neutral 0.5 and same avoid list; watching the final hour for a Friday fade and weekend gap risk.
+
+### 2026-09-18T16:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SNDK', 'SMMT', 'INSP', 'SPCX']
+- notes: Market close on a losing week — 10Y yield near 5% and hot 3.4% inflation raising Fed-hike odds, but VIX still tame at 14.9 and no fresh holding landmine. Holding neutral 0.5 into the weekend, avoiding the BZ blowup (-22%) and rate-sensitive small-cap/AI laggards.
+- journal: Fri 9/18 16:02: Week closes soft — yields backing to 5%, indices mixed-to-red, but VIX calm. SNDK (+13%) and SMMT/INSP green; BZ still the landmine (-22%). Kept neutral 0.5 and same avoid list. Watching weekend gap risk and whether the 5% 10Y and hawkish inflation print pressure the tape Monday.
+
+### 2026-09-21T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'IWM', 'PLTR', 'NVDA'] | favor: ['SNDK', 'SMMT', 'INSP', 'SPCX']
+- notes: Fresh week opens with VIX calm at 14.8 and no headline landmine in holdings, but last week's 5% 10Y and hot 3.4% inflation keep the tape rate-sensitive. Holding neutral 0.5, still avoiding the BZ blowup (-23.6%) and rate-sensitive small-cap/AI laggards.
+- journal: Mon 9/21 09:00: New week, VIX steady 14.8, no gap disaster over weekend. Kept neutral 0.5 and same avoid list; SNDK (+14%) and SMMT (+10%) leading, BZ still the deep loser. Watching whether the 5% 10Y/hawkish inflation pressures tech/small-caps Monday.
+
+### 2026-09-21T14:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'INSP', 'NVDA']
+- notes: Constructive tape today — S&P +1%, AI/chip rally, oil and yields sliding, VIX calm at 15.1. But hot 3.4% inflation and rising Fed-hike odds cap enthusiasm, so nudging to 0.6 rather than full risk-on. Added NBIS to avoid on fresh Rothschild 'Sell' call; still avoiding the BZ blowup (-24%) and rate-sensitive small-caps.
+- journal: Mon 9/21 14:14: Yields/oil reversed lower and AI stocks are ripping (QQQ +2.1%, NBIS +5.7%, SNDK +10.6%), a shift from last week's soft rate-pressured tape. Nudged risk 0.5->0.6. New landmine: NBIS got a Sell rating so added to avoid despite green. Watching whether the Fed-hike narrative resurfaces to fade this rally.
+
+### 2026-09-21T16:05 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'INSP']
+- notes: Strong close — Nasdaq record, AI/chip rally, oil and yields lower, VIX calm at 14.8. But hot 3.4% inflation and building Fed-hike odds cap conviction, so holding neutral 0.6 rather than full risk-on; still avoiding the BZ blowup, Sell-rated NBIS and rate-sensitive small-caps.
+- journal: Mon 9/21 16:05: Day finished constructive — indices at/near records on AI strength, SNDK +11.7% and NBIS +4.1% but NBIS stays on avoid due to Rothschild Sell. Kept neutral 0.6, same avoid list. Watching whether the Fed-hike/hot-inflation narrative resurfaces to fade this AI rally tomorrow.
+
+### 2026-09-21T17:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'INSP']
+- notes: Post-close on a record day — Nasdaq +2%, AI/chip strength, oil and yields lower, VIX calm at 14.9. But hot 3.4% inflation and building Fed-hike odds keep me from going full risk-on, so holding neutral 0.6; still avoiding the BZ blowup, Sell-rated NBIS and rate-sensitive small-caps.
+- journal: Mon 9/21 17:16: Session closed strong with indices at records on AI momentum; posture unchanged at neutral 0.6 with same avoid list. Watching whether the hot-inflation/Fed-hike narrative resurfaces to fade this rally into Tuesday, plus any BZ/NBIS follow-through.
+
+### 2026-09-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: Calm tape and low VIX (14.7), but CPI drops tomorrow and could decide a Fed hike next week — that binary event risk caps conviction, so trimming to 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, and rate-sensitive small-caps ahead of the print.
+- journal: Tue 9/22 09:00: Trimmed 0.6->0.5 ahead of tomorrow's CPI, which is a real Fed-hike catalyst; VIX still calm at 14.7 and AI trade steady. Same avoid list — BZ hit by CEO-linked block sale, NBIS still Sell-rated. Watching CPI-driven repositioning today and any pre-print volatility.
+
+### 2026-09-22T13:06 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: VIX calm at 14.2 and Nasdaq/QQQ drifting higher on AI strength with oil paring losses, but persistent hot 3.4% inflation and a building Fed-hike case cap conviction, plus a 1999-style breadth-divergence warning — holding neutral 0.5. Still avoiding the BZ block-sale blowup (-22.6%), Sell-rated NBIS, and rate-sensitive small-caps.
+- journal: Tue 9/22 13:06: Tape mixed (Dow -230, Nasdaq up), VIX ticked down to 14.2; SNDK ripping +19% and NBIS +5% but NBIS stays on avoid due to Sell rating. Held 0.5 — Fed-hike narrative still live and breadth divergence flagged. Watching for late-day fade and any BZ/NBIS follow-through.
+
+### 2026-09-22T15:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: VIX calm at 14.2 and Nasdaq at record highs on AI/chip strength with oil sub-$100, but hot 3.4% inflation keeps a live Fed-hike case that caps conviction — holding neutral 0.5. Continue avoiding the BZ block-sale blowup (-22%), Sell-rated NBIS, and rate-sensitive small-caps into a late-day session with thin cash.
+- journal: Tue 9/22 15:02: Late-day tape constructive (Nasdaq record, oil falling), VIX steady 14.2; SNDK still leading +19%. Held 0.5 — Fed-hike narrative unresolved and only $33 cash limits new buys anyway. Watching the close and whether inflation/Fed fear resurfaces Wednesday.
+
+### 2026-09-22T16:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: Session closing with VIX calm at 14.2 and Nasdaq at record highs on AI/chip strength, but a live Fed-hike case (hot 3.4% inflation) caps conviction — holding neutral 0.5. Continue avoiding the BZ block-sale blowup, Sell-rated NBIS, and rate-sensitive small-caps; only $33 cash limits new buys regardless.
+- journal: Tue 9/22 16:32: Held 0.5 into the close; day P&L roughly flat (+$1), SNDK still the leader (+19%). Fed-hike/inflation narrative unresolved and thin cash constrains action. Watching whether hot-inflation fear resurfaces Wednesday and any BZ/NBIS follow-through.
+
+### 2026-09-23T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'INSP'] | favor: ['SNDK', 'QQQ', 'NVDA', 'SPY']
+- notes: VIX calm at 14.3 and Nasdaq at fresh records, but a hot-inflation Fed-hike case with CPI landing tomorrow and a Fed decision next week caps conviction — holding neutral 0.5. Still avoiding the BZ block-sale blowup (-24%), Sell-rated NBIS, rate-sensitive IWM, and adding INSP which is weak (-6%); only $33 cash limits new buys anyway.
+- journal: Wed 9/23 09:00: Flat overnight (P&L -$1), VIX 14.3, futures mixed with oil/yields ticking up. CPI prints tomorrow and could lock in a rate hike — staying defensive at 0.5. Watching for pre-CPI de-risking and any BZ/NBIS follow-through.
+
+### 2026-09-23T13:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ'] | favor: ['SNDK', 'NVDA']
+- notes: 10-year yield surging to a 2007 high with the Dow off 300 and Nasdaq retreating from record — plus CPI tomorrow that could lock in a Fed hike next week. Rate/event risk is stacked, so dialing down to 0.35 and adding index ETFs to avoid ahead of the print; only $29 cash constrains buys anyway.
+- journal: Wed 9/23 13:19: Tape turned defensive — yields spiked to 2007 highs, indices red, VIX up to 15.3. Cut risk to 0.35 into CPI (tomorrow) and Fed next week; SNDK still leading (+15%), BZ still bleeding (-24%). Watching CPI print and yield follow-through.
+
+### 2026-09-23T15:09 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE'] | favor: ['SNDK', 'NVDA']
+- notes: Yields at 2007 highs pressuring the tape with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close. Holding risk-off 0.35; only $29 cash caps new buys regardless.
+- journal: Wed 9/23 15:09: Late-day, VIX steady 15.0, yields still elevated ahead of CPI print tomorrow. SNDK leading (+14.6%), BZ still deep red (-23.8%), IWM soft (-6.3%). Staying defensive at 0.35 into the print — watching CPI and yield follow-through into Fed next week.
+
+### 2026-09-23T16:44 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE', 'MSFT'] | favor: ['SNDK', 'NVDA']
+- notes: Yields at 2007 highs with CPI tomorrow that could lock in a Fed hike next week — event risk stacked into the close; MSFT added to avoid ahead of its 9/24 catalyst. Holding risk-off 0.35 with only $29 cash capping buys anyway.
+- journal: Wed 9/23 16:44: Into the close, VIX 15.2, yields still elevated pre-CPI. SNDK still leading (+14.9%), BZ deep red (-24%), IWM soft (-6.5%). Added MSFT to avoid on its 9/24 event; staying defensive at 0.35 — watching CPI print and yield follow-through into Fed next week.
+
+### 2026-09-24T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['BZ', 'NBIS', 'IWM', 'PLTR', 'SPY', 'QQQ', 'NICE', 'MSFT', 'BAND'] | favor: ['SNDK', 'ADPT']
+- notes: CPI prints today into a 10-year yield above 5.1% (19-year high) and a Fed decision next week — event risk peaks now with markets already selling off. Holding risk-off at 0.3; MSFT kept on avoid for its 9/24 catalyst and only $29 cash caps any buys anyway.
+- journal: Thu 9/24 09:00: CPI day is here — yields spiked to a 19-year high (5.1%+), Dow -300, Nasdaq -1%; VIX 15.9. Cut to 0.3 into the print. SNDK still leading (+12%), ADPT on a 5-day green streak, BZ still deep red (-24%). Watching the CPI reaction and yield follow-through into next week's Fed.
+
+### 2026-09-24T13:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
+- notes: CPI landed and yields remain above 5.1% (multi-year highs) with a Fed decision next week — event risk still elevated even as tape pares losses on Hormuz hopes. Holding risk-off 0.3; IWM deep red (-6.8%), and SNDK/NBIS extended (+11%) so avoiding chase into stretched names.
+- journal: Thu 9/24 13:23: Post-CPI, VIX eased to 15.4 and indices paring losses (QQQ +2.2%) on Hormuz hopes, but 10yr still >5.1% and Fed looms next week. NBIS +10.5% and SNDK +11.5% extended — added to avoid to prevent chasing; ADPT still green. Staying defensive at 0.3, watching yield follow-through into the Fed.
+
+### 2026-09-24T15:24 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
+- notes: Late-day with 10yr yield >5.1% (19-year high) and a Fed decision next week keeping event risk elevated despite VIX easing to 15.6. IWM crushed (-6.7%) on record small-cap outflows; NBIS/SNDK extended (+10%) so avoiding chase into stretched names.
+- journal: Thu 9/24 15:24: Into the close, VIX 15.6, yields still surging (10yr >5.1%), Dow -300/Nasdaq -1%. NBIS +10.4% and SNDK +9.8% still stretched; IWM deep red on $3.3B outflow. Holding risk-off 0.3 with only $39 cash capping buys — watching yield follow-through into next week's Fed.
+
+### 2026-09-24T16:50 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'SPY', 'QQQ', 'BAND'] | favor: ['ADPT', 'NVDA']
+- notes: Final hour with 10yr yield above 5.1% (19-year high) and a Fed decision next week keeping event risk elevated even as VIX eases to 15.7. IWM crushed (-6.7%) on record small-cap outflows; NBIS/SNDK extended (+8-11%) so avoiding chase into stretched names, and only $39 cash caps any new buys anyway.
+- journal: Thu 9/24 16:50: Into the close, VIX 15.7, yields still elevated (10yr >5.1%), tape mixed with Big Tech supporting. NBIS +8.6% and SNDK +10.5% still stretched; IWM deep red. Holding risk-off 0.3 — watching yield follow-through and CPI/Fed setup into next week.
+
+### 2026-09-25T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'NBIS', 'SNDK', 'MSFT', 'PLTR', 'BAND'] | favor: ['ADPT', 'NVDA', 'QQQ']
+- notes: Futures flat and VIX eased to 15.2, but the 10yr near 5.1% (multi-year highs) and a heavy week ahead (jobs, PCE, Micron, Fed) keep event risk live; nudging to 0.4 as the tape stabilizes. Avoiding extended names (NBIS +10.5%, SNDK +13.5%) and small-caps (IWM -6.3%) to prevent chasing.
+- journal: Fri 9/25 09:00: VIX down to 15.2 and futures little changed after four losing weeks; yields still elevated but tape steadier, so lifting risk 0.3->0.4. NBIS/SNDK remain stretched, IWM weak. Watching next week's jobs/PCE/Fed and yield follow-through; only $39 cash caps new buys anyway.
+
+### 2026-09-25T13:22 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'SRZN', 'BAND'] | favor: ['QQQ', 'MSFT', 'ADPT']
+- notes: Constructive Friday tape with VIX back to 15.0, QQQ +2.8% and yields easing off highs as indices head for a winning week; nudging to 0.45 but keeping powder dry with only $17 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.3%, NBIS +6.9%), weak small-caps (IWM -6.4%), and adverse movers (AKAM -4.9%, SRZN -4.7%).
+- journal: Fri 9/25 13:22: Tape turned constructive — VIX 15.0, QQQ +2.8%, MSFT +2.5% on Copilot news, yields slipping and indices on pace for a winning week. Lifted risk 0.4->0.45; SNDK/NBIS still extended so keep on avoid. Watching next week's jobs/PCE/Fed; cash near-zero caps new buys.
+
+### 2026-09-25T15:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'BAND'] | favor: ['QQQ', 'MSFT', 'PLTR']
+- notes: Constructive late-Friday tape with VIX 14.9, QQQ +2.7% and MSFT firm on Copilot news as indices lock in a winning week despite elevated yields; holding 0.45 into the close with only $23 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.1%, NBIS +6.5%), weak IWM (-6.4%), and AKAM (-5.4%).
+- journal: Fri 9/25 15:26: Tape steady into the close — VIX 14.9, QQQ +2.7%, MSFT +2.2%, day P&L roughly flat. Keeping risk 0.45; SNDK/NBIS still extended, IWM/AKAM weak so stay on avoid. Watching next week's jobs/PCE/Fed and yield follow-through; cash near-zero caps buys anyway.
+
+### 2026-09-25T16:47 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'BAND'] | favor: ['QQQ', 'MSFT', 'PLTR']
+- notes: Constructive close to a winning week with VIX 14.9 and QQQ +2.8% despite surging Treasury yields near multi-year highs; holding 0.45 into the weekend with only $23 cash and a heavy macro week ahead (jobs/PCE/Fed). Avoiding stretched names (SNDK +12.1%, NBIS +6.3%), weak IWM (-6.4%) and AKAM (-6.1%).
+- journal: Fri 9/25 16:47: End-of-day snapshot — indices locked in weekly gains, VIX 14.9, day P&L flat. Keeping risk 0.45; SNDK/NBIS extended, IWM/AKAM weak so stay on avoid. Watching next week's jobs/PCE/Fed and yield follow-through into Monday; near-zero cash caps new buys.
+
+### 2026-09-28T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['IWM', 'SNDK', 'NBIS', 'AKAM', 'BAND', 'TSLA'] | favor: ['QQQ', 'MSFT']
+- notes: Nasdaq futures -1% to open the week on U.S.-Iran tensions and rising oil after a winning Friday; VIX ticking up to 16 with a landmine-heavy macro week (jobs/PCE) ahead. Dialing risk to 0.35 — defensive into the gap-down, and only $23 cash caps new buys anyway.
+- journal: Mon 9/28 09:00: Weekend gap-down — futures -1%, geopolitical/oil risk and yields still elevated, so cut risk 0.45->0.35. SNDK/NBIS extended, IWM/AKAM weak stay on avoid; watching how the open holds and jobs/PCE prints later this week.
+
+### 2026-09-28T15:44 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT'] | favor: ['QQQ', 'MSFT']
+- notes: Mixed intraday tape into the close — QQQ recovered to +1.6% and VIX holding 16, but SPY -1.0% and IWM cratering -7.1% on rising Treasury yields and Iran headlines. Nudging risk to 0.4 as tech steadied, but staying defensive with a landmine-heavy macro week (jobs/PCE) ahead and only $33 cash.
+- journal: Mon 9/28 15:44: Gap-down morning stabilized — QQQ climbed back to +1.6%, VIX flat at 16, so eased risk 0.35->0.40. IWM ugly (-7.1%), SNDK (+8%)/NBIS (+4.1%) extended, ADPT flagged above fair value — all on avoid. Watching yields and this week's jobs/PCE prints; near-zero cash caps buys anyway.
+
+### 2026-09-28T17:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: Late-day tape mixed with QQQ +1.7% and MSFT firm on the Copilot upgrade, but SPY -0.9% and IWM cratering -7.1% as 10-year yields hit 19-year highs on rising oil. Holding risk at 0.4 — tech steadies things, but yield/macro landmine week (jobs/PCE) and only $33 cash keep me defensive.
+- journal: Mon 9/28 17:19: Close snapshot — QQQ/MSFT green, IWM/SPY weak on 19-yr-high yields and oil. Keeping risk 0.40. Added META to avoid (AI-spend selloff, Zuck down $11B); SNDK/NBIS extended, ADPT above fair value, TSLA/BAND weak. Watching yields and this week's jobs/PCE.
+
+### 2026-09-28T18:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: After-hours snapshot confirms a weak session: Dow -300+, 10-year yields at 19-year highs on rising oil, IWM -7.1%, but QQQ +1.8% and MSFT firm on the Copilot upgrade. Holding risk at 0.4 into a landmine-heavy macro week (jobs/PCE) with only $33 cash capping new buys anyway.
+- journal: Mon 9/28 18:40: End-of-day recap unchanged from close — tech (QQQ/MSFT) green, IWM/SPY/small-caps hit by 19-yr-high yields and oil. Keeping risk 0.40, same avoid list (META AI-spend selloff, SNDK/NBIS extended, ADPT rich, TSLA/BAND weak, IWM ugly). Watching yields and jobs/PCE this week.
+
+### 2026-09-29T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META'] | favor: ['QQQ', 'MSFT']
+- notes: VIX calm at 15.9 and futures edging higher as oil retreats, but yields still pressuring the tape (Dow -300 Monday) and a landmine-heavy macro week (jobs/PCE) looms. Holding risk at 0.4 with only $33 cash capping new buys anyway.
+- journal: Tue 9/29 09:00: Overnight steadier — oil retreating, futures green, VIX 15.9. Keeping risk 0.40 into jobs/PCE week. Avoid unchanged: META (AI-spend selloff), SNDK/NBIS extended, ADPT rich, TSLA/BAND weak, IWM ugly (-7%). Watching yields and this week's inflation/jobs prints.
+
+### 2026-09-29T14:09 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
+- notes: VIX benign at 16.4 but the tape is soft — Dow down on rising yields and AI jitters (Anthropic/OpenAI, META down on spend concerns), with jobs/PCE data ahead. Holding risk at 0.4; only $19 cash caps new buys regardless.
+- journal: Tue 9/29 14:09: Midday tape slipping on rising yields and AI jitters; VIX 16.4. Kept risk 0.40. NBIS (+7%)/SNDK (+8%) extended, AXTI added to avoid (parabolic on S&P600 inclusion), BE ripping but volatile. Watching yields and Fri jobs/PCE prints. Cash down to $19.
+
+### 2026-09-29T16:08 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
+- notes: Near the close: VIX benign at 16.1 but tape stayed soft with 30-year yields at a 24-year high pressuring stocks; jobs/PCE landmine week ahead. Holding risk 0.4, and only $19 cash caps new buys anyway.
+- journal: Tue 9/29 16:08: EOD snapshot — yields still the story (30-yr at 24-yr high), Dow down two days running; VIX 16.1. Kept risk 0.40, avoid list unchanged. SNDK (+9%)/NBIS (+7%) extended, AXTI parabolic, IWM ugly (-7%), META/TSLA/BAND weak. Watching Fri jobs and PCE; cash tight at $19.
+
+### 2026-09-29T17:33 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
+- notes: After-hours snapshot: VIX benign at 16.0 but yields near multi-decade highs kept the tape soft, and a landmine-heavy macro week (jobs/PCE, Fed rate-hike chatter) looms. Holding risk 0.4; only $19 cash caps new buys regardless.
+- journal: Tue 9/29 17:33: Post-close, little changed — yields still the story, VIX 16.0, day flat (+$1). Kept risk 0.40, avoid list unchanged (SNDK/NBIS extended, AXTI parabolic, IWM -7%, META/TSLA/BAND weak). Watching Fri jobs and PCE prints; cash tight at $19.
+
+### 2026-09-30T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'TSLA', 'BAND', 'ADPT', 'META', 'AXTI'] | favor: ['QQQ', 'MSFT']
+- notes: VIX benign at 15.8 but yields near 24-year highs keep the tape soft, consumer confidence at a 12-year low, and PCE inflation data plus a landmine-heavy jobs week with Fed rate-hike chatter loom. Holding risk 0.4; only $19 cash caps new buys anyway.
+- journal: Wed 9/30 09:00: Futures little changed ahead of PCE; yields still the story, VIX 15.8, consumer confidence at 12-yr low. Kept risk 0.40, avoid list unchanged (SNDK/NBIS extended, AXTI parabolic, IWM -7%, META/TSLA/BAND weak, ADPT rich). Watching PCE print and month-end flows; cash tight at $19.
+
+### 2026-09-30T14:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Soft PCE plus strong GDP lifted Nasdaq/S&P and VIX sits benign at 15.9, a constructive tape, but 30-year yields near 24-year highs and a Friday jobs print keep me from leaning fully risk-on. Nudged risk to 0.45; only $29 cash caps new buys regardless.
+- journal: Wed 9/30 14:02: PCE came in soft, market advancing, VIX 15.9 — tape firmer than yesterday. Bumped risk 0.40->0.45, kept avoid list (SNDK +9.5%/NBIS +6.5% extended, IWM -7% ugly, ADPT rich, META/BAND weak). Watching long-end yields and Fri jobs; cash tight at $29.
+
+### 2026-09-30T16:12 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: EOD close: soft PCE and upward GDP revision kept Nasdaq/S&P green and VIX benign at 16.4, a constructive tape, but 30-year yields at a 24-year high and Friday's jobs print cap enthusiasm. Holding risk 0.45; only $29 cash limits new buys regardless.
+- journal: Wed 9/30 16:12: Month-end close, indices firm on soft PCE, VIX 16.4. Kept risk 0.45. Added BE to avoid (slumped on Fremont news); SNDK +9.7%/NBIS +5.6% extended, IWM -7.9% ugly, ADPT rich, META weak on OpenAI-Muse worry. Watching long-end yields and Fri jobs; cash tight at $29.
+
+### 2026-09-30T17:34 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: After-hours on month-end: VIX benign at 16.3 and indices firm on soft PCE/strong GDP, a constructive tape, but 30-year yields near 24-year highs and Friday's jobs print with Fed rate-hike chatter cap enthusiasm. Holding risk 0.45; only $29 cash limits new buys regardless.
+- journal: Wed 9/30 17:34: Post-close snapshot little changed, VIX 16.3, day flat (-$1). Kept risk 0.45 and avoid list intact (SNDK +9.2%/NBIS +5.4% extended, IWM -7.7% ugly, BE weak on Fremont, META soft on OpenAI-Muse, ADPT rich). Watching Fri jobs print and long-end yields; cash tight at $29.
+
+### 2026-10-01T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: October opens with futures up on AI strength and VIX benign at 16.3, a constructive tape, but 30-year Treasury yields at a 24-year high and Friday's jobs print with Fed rate-hike chatter keep me from leaning risk-on. Holding risk 0.45; only $29 cash caps new buys regardless.
+- journal: Thu 10/1 09:00: New month, AI names lift futures, VIX 16.3, day +$1. Kept risk 0.45 and avoid list intact (SNDK +9.9%/NBIS +6.5% extended, IWM -7.8% ugly, BE weak on Fremont, META soft on OpenAI-Muse threat, ADPT rich). Watching Friday jobs report and the relentless long-end yields; cash tight at $29.
+
+### 2026-10-01T14:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Choppy October open: indices pared early losses as 10-year yields hit a 24-year high then eased, VIX still benign at 16.6, Micron's drop pressuring chips. Constructive but Friday's jobs print and Fed rate-hike chatter keep me neutral at 0.45; $28 cash caps new buys anyway.
+- journal: Thu 10/1 14:29: Day flat, VIX 16.6, tape choppy with yields spiking then easing and Micron weighing on AI chips. Kept risk 0.45 and avoid list intact (SNDK +12.1% very extended, NBIS +4.6% extended, IWM -7.4% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching Fri jobs report and long-end yields; cash tight at $28.
+
+### 2026-10-01T16:25 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Session closing constructive: indices rallied as Treasury yields eased from 24-year highs and chips gained, VIX benign at 16.5. But Friday's jobs report and persistent Fed rate-hike chatter keep me neutral at 0.45; $28 cash caps new buys regardless.
+- journal: Thu 10/1 16:25: Day flat into close, VIX 16.5, tape finished green on easing yields and chip rally. Kept risk 0.45 and avoid list intact (SNDK +12.6% very extended, NBIS +4.2% extended, IWM -7.3% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching tomorrow's jobs print and long-end yields; cash tight at $28.
+
+### 2026-10-01T18:02 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['IWM', 'SNDK', 'NBIS', 'ADPT', 'BAND', 'BE', 'META', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: After-hours wrap: indices closed slightly higher on easing yields from 24-year highs and a chip rally, VIX benign at 16.4. Friday's jobs report plus Fed rate-hike chatter are the key overnight risks, so I hold neutral at 0.45; $28 cash caps new buys anyway.
+- journal: Thu 10/1 18:02: Day finished flat, VIX 16.4, tape green on easing long-end yields and chip strength. Kept risk 0.45 and avoid list intact (SNDK +12.4% very extended, NBIS +4.4% extended, IWM -7.3% ugly, BE/BAND weak, META soft on OpenAI-Muse). Watching Friday's jobs print and long-end yields; cash tight at $28.
+
+### 2026-10-02T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'ACN', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: September jobs report lands this morning — the key event risk — with VIX benign at 15.5 and the tape constructive on easing yields and a chip rally. Holding neutral at 0.40 until the print is digested; $28 cash caps new buys regardless.
+- journal: Fri 10/2 09:00: Overnight futures firm, oil falling, VIX down to 15.5, but jobs report is the morning landmine so I trimmed risk to 0.40. ACN beat on record bookings yet still -5.7%, keeping it off the buy list; SNDK +12.5% very extended, NBIS +6.2% extended, IWM -6.0% ugly. Watching the 08:30 jobs reaction and long-end yields.
+
+### 2026-10-02T13:56 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Jobs print came in soft (29k, UR 4.2%), cementing a Fed October skip and sending Nasdaq to a record led by Nvidia; VIX benign at 15.8 and the tape is constructive. Nudging risk to 0.50 with the event cleared, though $22 cash caps new buys regardless.
+- journal: Fri 10/2 13:56: Jobs landmine passed cleanly — soft data = Fed skip, Nasdaq record, VIX 15.8. Lifted risk 0.40→0.50. Keeping avoids: SNDK +8.5% & NBIS +8.6% extended, IWM -6.6% ugly, EFXT -5.9% weak. Watching 24-year-high long-end yields for any flip; cash tight at $22.
+
+### 2026-10-02T16:05 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Close of a constructive week: soft jobs cemented a Fed October skip, Nasdaq at record led by chips, VIX benign at 15.4. Holding risk-on at 0.50 into the weekend; $28 cash caps new buys regardless and extended/weak names stay off the list.
+- journal: Fri 10/2 16:05: Day closed +$2, VIX 15.4, jobs landmine cleared cleanly and tape green. Keeping risk 0.50 and avoids intact — SNDK +8.6% & NBIS +8.6% very extended, IWM -6.6% ugly, BE/BAND weak. Watching 24-year-high long-end yields over the weekend; cash tight at $28.
+
+### 2026-10-02T17:28 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: After-hours on a constructive week: soft jobs cemented a Fed October skip, Nasdaq at a record led by chips, VIX benign at 15.3. Holding risk-on at 0.50 into the weekend with $28 cash capping new buys regardless; extended and weak names stay off the list.
+- journal: Fri 10/2 17:28: Day closed +$2, VIX 15.3, jobs landmine cleared cleanly and tape green all week. Keeping risk 0.50 and avoids intact — SNDK +8.5% & NBIS +8.5% very extended, IWM -6.7% ugly, BE +3.9%/BAND weak. Watching long-end yields over the weekend; cash tight at $28.
+
+### 2026-10-05T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Weekend shifted tone slightly defensive: futures lower on higher long-end yields with Fed minutes due this week, VIX ticking up to 16.2 and breadth still narrow. Trimming to 0.40 and adding GOOGL (Q3 earnings approaching) to avoids; BE weak on ORCL-linked selling, SNDK +9%/NBIS +9% extended, IWM -6.6% ugly.
+- journal: Mon 10/5 09:00: VIX 15.3→16.2, futures soft on rising yields, Fed minutes the week's watch item. Cut risk 0.50→0.40 and added GOOGL to avoids ahead of Q3 earnings. Watching long-end yields and whether narrow breadth broadens; cash tight at $28.
+
+### 2026-10-05T18:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Tape firmed through the day — Nasdaq at a record led by chips/tech (NVDA +5.6%, MSFT +4.1%, QQQ +4.4%), VIX eased back to 15.5 from the 16.2 morning print. Nudging risk 0.40→0.50 but staying neutral with Fed minutes still ahead; GOOGL stays off ahead of Q3, IWM -6% ugly, SNDK/NBIS extended.
+- journal: Mon 10/5 18:07: VIX 16.2→15.5, tech broke to records and holdings green across the board; lifted risk 0.40→0.50. Kept GOOGL avoid (earnings) and META (bearish note). Watching Fed minutes and long-end yields; cash very tight at $24 caps new buys regardless.
+
+### 2026-10-05T19:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Session closing constructive — Nasdaq at a record led by chips/tech, VIX benign at 15.5, holdings green across the board. Staying neutral at 0.50 given 24-year-high long-end yields and Fed minutes ahead; GOOGL off for Q3, META on bearish note, IWM -6% ugly, SNDK/NBIS extended, and $24 cash caps new buys regardless.
+- journal: Mon 10/5 19:23: Tape held records into the close, VIX steady 15.5, day P&L +$1. Risk unchanged at 0.50, avoids intact. Watching surging long-end yields (highest since 2002) and Fed minutes; cash critically tight at $24.
+
+### 2026-10-06T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI'] | favor: ['QQQ', 'MSFT', 'NVDA']
+- notes: Constructive backdrop — Nasdaq at record highs, VIX benign at 15.3, soft jobs report cooling rate-hike bets (Fed likely skips October). Holding neutral at 0.50 given 24-year-high long-end yields and GOOGL under a fresh AI-disclosure/class-action headline; cash critically tight at $24 caps new buys regardless.
+- journal: Tue 10/6 09:00: VIX eased 15.5→15.3, soft jobs report boosts Fed-skip odds, futures mixed. Kept risk 0.50 and avoids intact — GOOGL now also hit by AI-issue class-action news (-4% prior), IWM -5.6% ugly, SNDK/NBIS extended. Watching long-end yields and GOOGL headline fallout; cash $24.
+
+### 2026-10-06T14:30 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI', 'VST'] | favor: ['QQQ', 'MSFT', 'NVDA', 'SPY']
+- notes: S&P 500 and Nasdaq at fresh record highs, VIX benign at 15.1, yields retreating and oil lower — constructive tape with holdings broadly green (MSFT +5.3%, NVDA +5.9%, NBIS +13.3%, VST +10.8%). Staying at 0.50 sizing because cash is critically tight at $24 and several names are extended; GOOGL off ahead of Q3 earnings, IWM -6.7% remains the ugly laggard.
+- journal: Tue 10/6 14:30: VIX 15.3→15.1, S&P hit record as yields fell; tagged regime risk-on but kept risk 0.50 — cash $24 caps buys and NBIS/VST/SNDK look extended (added VST to avoids after +10.8% run). GOOGL stays off for Q3 earnings. Watching whether the IWM small-cap weakness spreads.
+
+### 2026-10-06T16:28 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI', 'VST'] | favor: ['QQQ', 'MSFT', 'NVDA', 'SPY']
+- notes: Session closing at record highs with VIX benign at 15.0, yields lower and oil soft — constructive tape, holdings broadly green (NBIS +12%, VST +11%, MSFT +5%, NVDA +5.5%). Holding 0.50 sizing: cash is critically tight at $24 and several names look extended, so new buys are limited regardless.
+- journal: Tue 10/6 16:28: VIX steady 15.0 into the close, S&P/Nasdaq at records, day P&L +$1. Risk-on held at 0.50 — extended runs (NBIS/VST/SNDK) and $24 cash keep me defensive on new buys. GOOGL stays off for Q3 earnings; IWM -6.7% still the ugly small-cap laggard to watch for contagion.
+
+### 2026-10-06T17:55 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BE', 'GOOGL', 'META', 'EFXT', 'TSLA', 'AXTI', 'VST'] | favor: ['QQQ', 'MSFT', 'NVDA', 'SPY']
+- notes: Post-close brief: S&P/Nasdaq closed at record highs, VIX benign at 15.0, yields eased and oil soft — constructive tape with holdings broadly green (NBIS +12%, VST +11%, NVDA +5.5%, MSFT +5%). Keeping 0.50 sizing: cash critically tight at $24 and multiple names extended, so new buys are limited regardless.
+- journal: Tue 10/6 17:55: Session closed at records, VIX steady 15.0, day P&L +$2. Held risk-on 0.50 — $24 cash and extended runs (NBIS/VST/SNDK) keep me defensive. GOOGL stays off into Q3 earnings; IWM -6.7% remains the ugly small-cap laggard to watch for contagion into tomorrow.
+
+### 2026-10-07T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'SNDK', 'NBIS', 'BAND', 'BRZU', 'GOOGL', 'CEG', 'VST', 'SYNA'] | favor: ['QQQ', 'MSFT', 'SPY', 'NVDA']
+- notes: Futures slipping as oil and Treasury yields push higher (yields near multi-decade highs) after records — a pullback risk off an extended rally; VIX firmer at 15.8. Downshifting to neutral/0.40: cash is critically tight at $24 and several holdings (NBIS +8.6%, VST +8.4%) look extended, so I'm defensive on new buys.
+- journal: Wed 10/7 09:00: Regime cut risk-on→neutral, 0.50→0.40. Futures down on rising oil/yields despite yesterday's records; VIX 15.0→15.8. GOOGL stays off into Q3 earnings; IWM -7.5% is the worsening small-cap laggard. Watching whether yield pressure drags tech from its highs.
+
+### 2026-10-07T14:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BAND', 'BRZU', 'CEG', 'SYNA', 'GOOGL'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: Split tape: Dow down ~400-500 as 10-year yields hit a 24-year high, yet tech holds records (NVDA/AMD lead) and VIX is benign at 15.1. Holding neutral/0.40 — rising yields are a real headwind and several holdings are extended (VST +15.8%, SNDK +8.5%, NBIS/NVDA +4-5%), plus cash is critically tight at $25, so new buys stay limited.
+- journal: Wed 10/7 14:59: Held neutral 0.40. VIX eased 15.8→15.1 but 10-yr yields at 24-year high pressuring the Dow even as tech makes records — divergent tape. Added VST (+15.8%) to avoid as overextended; IWM -7.7% still the worst laggard. Watching whether yield spike finally drags tech off highs into the close.
+
+### 2026-10-07T16:42 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BRZU', 'CEG', 'SYNA', 'PLTR', 'GOOGL'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: End-of-day split tape: Dow down ~300 on 24-year-high yields and Fed-minutes digestion, but tech/S&P near records (NVDA/AMD leading) and VIX benign at 15.1. Holding neutral/0.40 — rising yields are a persistent headwind, cash is critically tight at $30, and multiple holdings are extended (VST +15.8%, SNDK +7%, NBIS +6.4%).
+- journal: Wed 10/7 16:42: Held neutral 0.40 into the close. VIX steady 15.1; yields at multi-decade high pressuring Dow while tech holds records — divergence persists. Added PLTR (+3.8%) to avoid as extended; IWM -7.9% still worst laggard. Watching whether yield pressure finally drags tech off highs tomorrow.
+
+### 2026-10-07T18:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BRZU', 'CEG', 'SYNA', 'PLTR', 'GOOGL'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: After-hours check: divergent tape persists — Dow down ~300 on 24-year-high yields while S&P/Nasdaq hover near records led by NVDA/AMD, VIX benign at 15.1. Holding neutral/0.40: rising yields remain a real headwind, cash is critically tight at $30, and several holdings are extended (VST +15.3%, SNDK +7.1%, NBIS/NVDA +4-6%).
+- journal: Wed 10/7 18:19: Held neutral 0.40 post-close. VIX steady 15.1; yields near multi-decade high keep pressuring Dow while tech holds records. VST now +15.3%, SNDK +7.1% — still extended and avoided; IWM -7.9% worst laggard. Watching whether yield pressure finally drags tech lower tomorrow.
+
+### 2026-10-08T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'SNDK', 'NBIS', 'NVDA', 'BRZU', 'CEG', 'SYNA', 'PLTR', 'BKH'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: Soft jobs report cools Fed hike bets and VIX stays benign at 15.7, but tape is split with oil/inflation and trade-deficit worries pressuring futures. Holding neutral/0.40: cash critically tight at $30 and many holdings extended (VST +14.6%, BKH +8.2% on Google deal, SNDK/PLTR/NVDA/NBIS up 4-6%).
+- journal: Thu 10/8 09:00: Jobs report came in soft, boosting odds Fed skips October hike — modest positive. VIX 15.7 steady. BKH jumped 8.2% on Google data-center deal and CEG surging overnight; both added to avoid as extended. IWM still worst laggard at -8.6%. Watching whether oil-driven inflation fears drag futures lower.
+
+ journal_entry: .
+
+### 2026-10-08T14:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'VST', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: S&P at record (first close above 7,800) with VIX benign at 15.7 and tech leading, but yields near multi-decade highs and oil-driven inflation worries keep the tape split. Holding neutral/0.40: cash critically tight at $22, IWM -8.1% deep laggard, and several extended names (VST +8.7%, PLTR +5.6%) worth avoiding.
+- journal: Thu 10/8 14:55: Tech holding records (QQQ +3.1%, MSFT +3.6%, PLTR +5.6%) while IWM -8.1% and CEG -6% lag badly. VIX steady 15.7, yields still the key headwind. Cash near-zero at $22 limits new buys regardless. Watching whether bond-market turmoil/oil finally cracks tech into the close.
+
+### 2026-10-08T16:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR', 'VST', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: AI trade stumbling late on an OpenAI revenue setback (Nasdaq -1%, chips selling off) while Dow holds up as yields retreat; VIX still benign at 15.4. Holding neutral/0.40: cash critically tight at $22, IWM -7.9% deep laggard, and chip/AI names (NVDA, NBIS, SNDK) now under fresh pressure worth avoiding.
+- journal: Thu 10/8 16:45: Tape rotated — AI/chip stocks cracked into the close on OpenAI revenue report (Nasdaq -1%), reversing earlier tech leadership; added NVDA/SNDK back to avoid. Yields eased, Dow positive. Cash near-zero at $22 caps any new buys regardless. Watching whether AI-trade weakness carries into Friday.
+
+### 2026-10-08T18:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'BRZU', 'U', 'SYNA', 'NBIS', 'BKH', 'PLTR', 'VST', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX benign at 15.4 but tape remains split: oil-driven inflation worries, multi-decade-high yields, and lingering AI/chip wobble from the OpenAI revenue setback. Holding neutral/0.40 with cash critically tight at $22, IWM -7.8% deep laggard, and several extended/wobbly names (VST +8.4%, PLTR +6.3%, chips) worth avoiding.
+- journal: Thu 10/8 18:32: After-hours — CEG surging +4% overnight and NBIS getting a Rosenblatt Buy init, but AI-trade still shaky and yields the key headwind. Cash near-zero at $22 caps new buys regardless; day P&L just -$3. Watching whether AI weakness and oil/yields carry into Friday.
+
+### 2026-10-09T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 15.2 and tech futures rebounding after the OpenAI-driven selloff, but oil-driven inflation worries and multi-decade-high yields keep the tape split ahead of next week's CPI/bank earnings. Holding neutral/0.40 with cash critically tight at $22, IWM -7.7% deep laggard, and extended names (VST +10.2%, PLTR +7.4%) worth avoiding into the weekend.
+- journal: Fri 10/9 09:00: Tech bouncing back (MSFT +4.7%, QQQ +4.0%, NVDA/PLTR green) after yesterday's AI wobble; VIX eased to 15.2 and jobs report cooled Oct hike bets. Cash near-zero at $22 caps new buys regardless. Watching oil/yields and positioning into next week's CPI and bank earnings.
+
+### 2026-10-09T14:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 14.9 and tech rebounding (MSFT +6%, QQQ +3.7%, PLTR +10%, VST +12%), but oil-driven inflation worries and elevated yields keep the tape guarded ahead of next week's CPI and bank earnings. Holding neutral/0.40: cash critically tight at $17, IWM -7.4% deep laggard, and extended AI/power names overbought into the weekend.
+- journal: Fri 10/9 14:26: Tech recovered through the session — MSFT/QQQ leading, PLTR +10% and VST +12% now extended; VIX eased to 14.9. Cash near-zero at $17 caps any new buys regardless; day P&L +$2. Avoiding chasing extended names into the weekend; watching oil/yields and CPI/bank-earnings setup next week.
+
+### 2026-10-09T16:14 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 14.8 and tape constructive (Dow +400, winning week) but split by rising oil/inflation worries and elevated yields into next week's CPI and bank earnings. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.4%, and PLTR/VST extended into the weekend.
+- journal: Fri 10/9 16:14: Closing out a winning week — MSFT +6%, QQQ +3.7%, PLTR +11.7%, VST +12% extended; HUM -4.4% on CMS star ratings, IWM still -7.5% laggard. VIX eased to 14.8, day P&L +$2. Cash near-zero at $17 locks posture; weekend event risk ahead. Watching oil/yields and the CPI/bank-earnings setup next week.
+
+### 2026-10-09T17:54 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['QQQ', 'MSFT', 'SPY']
+- notes: VIX calm at 14.8 and tape ended a winning week (Dow +400), but Warsh hawkish rate-hike talk, sticky tariff-driven inflation, and next week's CPI/bank earnings keep conditions guarded into the weekend. Holding neutral/0.40: cash critically tight at $17 caps new buys anyway, IWM -7.5% deep laggard, HUM -4.3% on star ratings, and PLTR/VST extended.
+- journal: Fri 10/9 17:54: Week closes constructive — MSFT +6%, QQQ +3.7%, PLTR +11.3%, VST +11.7% all extended; HUM -4.3%, IWM -7.5% still the laggard. VIX 14.8, day P&L +$2, cash near-zero locks posture. Weekend event risk plus Warsh hike talk and CPI/bank earnings next week; watching oil/yields Monday.
+
+### 2026-10-12T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.35
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX ticked up to 15.5 and global bond yields are surging (France on the 'ugly side'), with earnings season kicking off and MSFT sliding ~4.5% on a Stifel PT cut/Xbox pricing — so MSFT moves off favor to avoid. Cash critically tight at $17 caps new buys regardless; holding neutral/0.35 defensive into a jittery, yield-driven tape.
+- journal: Mon 10/12 09:00: Yields spiking worldwide and futures wavering into bank-earnings season; VIX up to 15.5 from 14.8. MSFT lost its leadership (-4.5% on Stifel cut) so I pulled it from favor. IWM still deep laggard (-7.6%), PLTR/VST extended. Cash ~$17 locks posture; watching yields and early bank reports.
+
+### 2026-10-12T17:19 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX eased back to 15.2 and the tape stabilized (Dow up, Nasdaq slightly soft on oil/memory-chip weakness), but Wednesday's CPI and the big bank-earnings week keep me defensive. MSFT recovered to +7.2% intraday but stays off favor near an event-heavy week; cash at $17 caps new buys regardless.
+- journal: Mon 10/12 17:19: VIX back to 15.2 from 15.5, day P&L -$2. MSFT snapped back +7.2% (from morning weakness), PLTR +11.7% and VST +9.7% extended, IWM still worst laggard (-7.8%), SNDK/NBIS/HUM soft on memory-chip and healthcare drag. Holding neutral/0.40 into Wednesday CPI and bank earnings; cash ~$17 locks posture.
+
+### 2026-10-12T18:32 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.2 and tape flat-to-firm, but Wednesday CPI and the heavy bank-earnings week keep me defensive; HUM has earnings/valuation risk and memory-chip names (SNDK/NBIS) stay weak. Cash at $17 caps new buys regardless, so posture holds neutral/0.40.
+- journal: Mon 10/12 18:32: No material change since 17:19 check — VIX 15.2, day P&L -$2. PLTR +11.7% and VST +9.8% still extended, MSFT +7.3% recovered but stays off favor into events, IWM worst laggard (-7.8%), SNDK/NBIS soft on memory. Holding 0.40 into Wednesday CPI; cash ~$17 locks posture.
+
+### 2026-10-12T19:51 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['MSFT', 'IWM', 'CEG', 'VST', 'PLTR', 'U', 'SYNA', 'BRZU', 'BKH', 'NBIS', 'NVDA', 'SNDK', 'HUM'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.2 and tape mixed (Dow firm, Nasdaq soft on oil/memory-chip drag), but Wednesday CPI and the big bank-earnings week keep me defensive. HUM carries earnings/valuation risk, SNDK/NBIS weak on memory, and PLTR/VST/MSFT are extended; cash at $17 caps new buys regardless, so posture holds neutral/0.40.
+- journal: Mon 10/12 19:51: No material change into the close — VIX 15.2, day P&L -$3. PLTR +11.5% and VST +9.3% still stretched, MSFT +7.4% recovered but off favor into events, IWM worst laggard (-7.9%), SNDK -8.1%/NBIS -7.2% soft on memory. Holding 0.40 into Wednesday CPI; cash ~$17 locks posture.
+
+### 2026-10-13T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['HUM', 'SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.3 but the tape is split — Nasdaq soft on a memory-chip rout (Korea sell-off, SNDK -10.5%/NBIS -9.5%), oil rallying on Iran tensions, and Wednesday CPI plus heavy bank-earnings week keep me defensive. PLTR/VST/MSFT extended, IWM still worst laggard; cash at $17 caps new buys regardless, so posture holds neutral/0.40.
+- journal: Tue 10/13 09:00: Into the open VIX 15.3, day P&L -$2. Chip rout deepening (SNDK -10.5%, NBIS -9.5%) on Korea memory sell-off, oil up on Iran, CPI lands tomorrow. Holding neutral/0.40 — cash ~$17 locks posture; watching CPI and early bank earnings for the next read.
+
+### 2026-10-13T15:23 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.4 but tape is split — indexes little changed with memory/chip stocks dragging Nasdaq (SNDK -8.4%, NBIS -7.3%), bank earnings in progress and September CPI lands tomorrow. PLTR/VST/MSFT extended, IWM still worst laggard (-8.2%); cash at $22 caps new buys, so posture holds neutral/0.40 into the event.
+- journal: Tue 10/13 15:23: Day P&L roughly flat (-$1), VIX 15.4. Chip weakness persists but less acute than morning (SNDK -8.4%, NBIS -7.3%); PLTR +11.3% and VST +12.9% remain stretched, IWM lagging. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching CPI print and bank earnings reaction.
+
+### 2026-10-13T16:46 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.3 near the close but the tape stays split — Nasdaq soft on memory/chip weakness (SNDK -6.6%, NBIS -6.9%), and September CPI lands tomorrow with heavy bank earnings in progress. PLTR +11.5%/VST +12.7%/MSFT +7.7% extended, IWM worst laggard (-8.2%); cash at $22 caps new buys, so posture holds neutral/0.40 into the event.
+- journal: Tue 10/13 16:46: Day flat, VIX 15.3 into the close. Chip drag persists but stabilizing vs morning rout; winners (PLTR/VST/MSFT) stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.
+
+### 2026-10-13T17:59 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: VIX calm at 15.3 after the close but September CPI lands tomorrow and bank earnings keep rolling in, so event risk dominates; Nasdaq soft on chip/memory weakness (SNDK -6.3%, NBIS -6.2%) while PLTR +11.5%/VST +13.1%/MSFT +7.8% are extended and IWM is the worst laggard (-8.1%). Cash at $22 caps new buys regardless, so posture holds neutral/0.40 into the print.
+- journal: Tue 10/13 17:59: Day flat, VIX 15.3 post-close. Chip drag persists but stabilizing; winners stretched, IWM/SNDK/NBIS weakest. Holding 0.40 into Wednesday CPI — cash ~$22 locks posture; watching the inflation print and bank-earnings reaction for the next read.
+
+### 2026-10-14T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NBIS', 'IWM', 'CEG', 'PLTR', 'VST', 'MSFT', 'NVDA', 'SYNA', 'U', 'BRZU', 'BKH'] | favor: ['SPY', 'QQQ']
+- notes: September CPI came in hot, pushing yields higher and sending futures red with chip stocks leading the slide; VIX still modest at 15.8 but event-driven downside risk dominates. Shifting to risk-off/0.30 — cash at $22 caps new buys anyway, so defense is the posture.
+- journal: Wed 10/14 09:00: CPI printed hot, yields up, futures red, chips falling and earnings season opening. Moved neutral/0.40 to risk-off/0.30. NBIS -13.2% and SNDK -10.2% weakest; IWM -9.4% still laggard. Watching tape's digestion of the inflation beat and bank-earnings reaction.
+
+### 2026-10-14T13:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'CEG', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Hot September CPI confirmed: S&P down ~1%, yields surging, AI/memory names leading the slide — NBIS -16.8% and SNDK -10.5% in free-fall, IWM -10% worst laggard. VIX 16.6, elevated but not panicked; event-driven downside dominates, so holding risk-off/0.30 with cash at $24 capping new buys anyway.
+- journal: Wed 10/14 13:23: CPI came in hot as feared — tape red, chips/memory bleeding (NBIS -16.8%, SNDK -10.5%), IWM -10%. Day P&L only -$6, portfolio resilient. Staying risk-off/0.30; watching whether afternoon stabilizes or extends the inflation-driven selloff.
+
+### 2026-10-14T15:35 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Hot CPI selloff persists into the close with VIX ticking up to 17.0; AI/memory names still bleeding (NBIS -17.5%, SNDK -10.2%) and IWM -10.1% remains worst laggard. Inflation-driven downside dominates and cash at $29 caps new buys regardless, so holding risk-off/0.30.
+- journal: Wed 10/14 15:35: Late-day, VIX 17.0, tape still red on hot CPI. NBIS deepened to -17.5%, SNDK -10.2%, IWM -10.1% weakest; day P&L only -$6, portfolio resilient. Staying risk-off/0.30 into the close; watching for overnight stabilization and tomorrow's bank-earnings/yield reaction.
+
+### 2026-10-14T17:01 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Post-close read: hot CPI drove S&P -1%, AI/memory names led declines (NBIS -16.7%, SNDK -12.5%), IWM -10.1% in correction territory. VIX 16.9 elevated but not panicked; cash at $29 caps new buys regardless, so holding risk-off/0.30.
+- journal: Wed 10/14 17:01: Session closed red on hot CPI; VIX 16.9, day P&L only -$6 so portfolio held up well. NBIS -16.7%, SNDK -12.5%, IWM -10.1% remain weakest. Staying risk-off/0.30 overnight; watching tomorrow for yield/rate-hike reaction and bank-earnings follow-through.
+
+### 2026-10-15T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NBIS', 'SNDK', 'IWM', 'BRZU', 'SYNA', 'NVDA', 'PLTR', 'VST', 'MSFT', 'BKH', 'FTRE'] | favor: ['SPY', 'QQQ']
+- notes: Second straight down day — hot wholesale inflation (PPI) adds to Wed's CPI, semiconductor sell-off continuing and S&P futures sliding; VIX ticked up to 17.5. AI/memory names still the epicenter (NBIS -20.4%, SNDK -16.5%), IWM -9.8% in correction. Inflation/tech-downside dominates and cash at $29 caps new buys anyway, so holding risk-off/0.30.
+- journal: Thu 10/15 09:00: Selloff extended to a second day on hot PPI; semis leading declines again, VIX 17.5 (up from 16.9). NBIS deepened to -20.4%, SNDK -16.5%, IWM -9.8% still laggards; day P&L only -$2 overnight. Staying risk-off/0.30; watching whether the tech/chip bleed stabilizes or accelerates into the weekend.
+
+### 2026-10-15T13:12 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'BRZU', 'IWM', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'CTSH']
+- notes: Rotation out of tech on hot CPI/energy-driven inflation: Dow +400 while Nasdaq slides and AI/semis keep bleeding (SNDK -15.1%, NVDA -4.3%, BRZU -4.9%). VIX eased to 16.9 but tape is bifurcated and cash at $28 caps new buys, so holding risk-off/0.30.
+- journal: Thu 10/15 13:12: Tape split — Dow up on yield drop/rotation, Nasdaq down as tech/AI sells off. VIX back to 16.9 (from 17.5 AM). SNDK -15.1% worst, IWM -9.4% still in correction; day P&L only -$2, portfolio resilient. Staying risk-off/0.30; watching whether rotation into value/Dow persists or tech bleed drags the broad index lower.
+
+### 2026-10-15T15:18 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'BRZU', 'IWM', 'NVDA', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: VIX eased to 16.5 and Dow +500 as the market shakes off hot CPI via rotation into value, but AI/semis still bleeding (SNDK -13.5%, BRZU -6.0%, IWM -8.9%). With only $28 cash and <45 min to close, holding risk-off/0.30 and avoiding the weak-tech laggards.
+- journal: Thu 10/15 15:18: Tape firming into the close — Dow +500, VIX down to 16.5 from 16.9, QQQ/SPY roughly flat as rotation holds. SNDK worst at -13.5%, IWM -8.9% still in correction; day P&L only -$1, portfolio resilient. Staying risk-off/0.30; watching for overnight stabilization and bank-earnings/yield reaction into tomorrow.","journal_entry":"Thu 10/15 15:18: Dow +500 into close, VIX 16.5, rotation out of tech persisting; SNDK -13.5% and IWM -8.9% laggards. Portfolio resilient (P&L -$1). Holding risk-off/0.30 into close.
+
+### 2026-10-15T16:35 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'MSFT', 'VST', 'ARQT', 'FTRE', 'BKH'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: At the close, Dow finished +550 on rotation out of AI/tech after hot CPI/PPI, but semis/memory still bleeding (SNDK -12.1%, NVDA -4%) and IWM -8.7% in correction. VIX calm at 16.5 and day P&L only -$1, but bifurcated tape and $34 cash keep me risk-off/0.30.
+- journal: Thu 10/15 16:35: Session closed — Dow +550 on value rotation, Nasdaq/AI weak; VIX 16.5. SNDK -12.1% worst, IWM still in correction; portfolio resilient at -$1. Holding risk-off/0.30; watching overnight stabilization, bank earnings and yield/inflation follow-through into Friday.
+
+### 2026-10-16T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'VST', 'ARQT', 'FTRE', 'BKH', 'MSFT'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: Hot September CPI has a Fed rate hike back on the table and the tape is still bifurcated — Dow up on rotation into healthcare/value while AI/semis bleed (SNDK -14.6%, NVDA -4.4%, IWM -8.6% in correction). VIX calm at 16.0 but event/rate risk plus only $34 cash keep me risk-off/0.30; MSFT avoided ahead of earnings.
+- journal: Fri 10/16 09:00: Rotation-out-of-AI theme persists into Friday; hot CPI revives rate-hike odds. SNDK -14.6% worst, IWM still in correction, NVDA weak. MSFT earnings approaching — avoiding. Holding risk-off/0.30, watching yields and whether value rotation holds or broad index cracks.
+
+### 2026-10-16T12:48 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST'] | favor: ['SPY', 'QQQ', 'CTSH']
+- notes: Midday Friday the tape stays volatile and bifurcated after hot September CPI revived Fed rate-hike odds; AI/semis keep bleeding (SNDK -16.1%, NVDA -4.6%, IWM -10.1% deepening correction). VIX ticked up to 17.3 and with only $21 cash I'm holding risk-off/0.30.
+- journal: Fri 10/16 12:48: VIX up to 17.3 from 16.0; IWM worsened to -10.1% and SNDK -16.1% — small-cap/memory still leading declines while MSFT +4.8% holds. Day P&L -$3, portfolio stable. Staying risk-off/0.30; watching whether indices crack below midday lows into the weekend.
+
+### 2026-10-16T14:54 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST', 'QQQ'] | favor: ['SPY', 'CTSH']
+- notes: Late Friday the tape is deteriorating — Nasdaq down ~2% for its worst week since June, VIX up to 20.7, oil rising and hot CPI keeping Fed rate-hike odds alive; SNDK -17% and IWM -10.4% remain in freefall. With only $21 cash, an ugly into-the-weekend tape, and headlines of hidden market risk building, I'm firmly risk-off/0.30.
+- journal: Fri 10/16 14:54: VIX jumped to 20.7 (from 17.3) as Nasdaq -2% heads for worst week since June; SNDK -17%, IWM -10.4% deepening, NVDA -5.7%. Day P&L -$4, portfolio holding up. Staying risk-off/0.30 into the weekend close; watching for a late-day flush or stabilization and gap risk Monday.
+
+### 2026-10-16T16:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'PLTR', 'ARXS', 'ARQT', 'FTRE', 'BKH', 'MSFT', 'VST', 'QQQ'] | favor: ['SPY', 'CTSH']
+- notes: Into the Friday close the tape is ugly — Nasdaq down 2% for its worst week since June on an AI sell-off, oil topping $100 on Iran/Hormuz escalation, and hot September CPI keeping a Fed hike on the table; VIX at 20 with SNDK -18% and IWM -10% still in freefall. With only $21 cash and weekend gap risk, I'm staying firmly risk-off/0.30.
+- journal: Fri 10/16 16:08: Final-hour close — Nasdaq -2%, VIX ~20, oil over $100 on Hormuz attacks adding fresh geopolitical risk. SNDK worsened to -18%, IWM -10.3%, NVDA -5.7%; Day P&L -$4. Carrying risk-off/0.30 into the weekend; watching Monday gap and whether value rotation holds or indices crack further.
+
+### 2026-10-19T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'NVDA', 'IWM', 'SYNA', 'ARXS', 'FTRE', 'PLTR', 'CTSH'] | favor: ['MSFT', 'VST', 'SPY']
+- notes: VIX eased to 18.6 from 20 and futures are stabilizing as the AI trade rebounds and a soft jobs report lifts odds the Fed skips October; but hot September CPI and a heavy bank-earnings/CPI week keep risk two-sided, and SNDK (-14%) and IWM (-10%) are still broken. Nudging to neutral/0.40 with only $21 cash.
+- journal: Mon 10/19 09:00: Weekend gap is constructive — VIX 18.6 (down from 20), Nasdaq futures buying the dip. Upgraded to neutral/0.40 from Friday's risk-off/0.30. Still avoiding the AI/memory/small-cap wreckage (SNDK, NVDA, IWM); MSFT +4.8% and VST +7.3% leading. Watching earnings-season landmines this week and whether the rebound holds.
+
+### 2026-10-19T14:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
+- notes: Midday tape is constructive — AI trade rebounding, VIX eased to 18.4, and day P&L is green; but SNDK (-13%) and IWM (-10%) remain broken and a heavy bank-earnings/CPI week keeps risk two-sided. Holding neutral/0.45 with only $16 cash limiting new buys anyway.
+- journal: Mon 10/19 14:45: Rebound holding — VIX 18.4, Nasdaq buying the dip, MSFT +6% and PLTR +4% leading, Day P&L +$2. Nudged risk_scale to 0.45 from morning's 0.40 as the dip-buy sticks. BKH upgraded to strong-buy by Jefferies; added to favor. Still avoiding SNDK/IWM wreckage and watching earnings landmines this week.
+
+### 2026-10-19T16:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
+- notes: End-of-day tape held constructive — AI trade rebounded, VIX eased to 18.4, Day P&L finished green; but SNDK (-13%) and IWM (-10%) remain broken and a heavy bank-earnings/CPI week keeps risk two-sided. Holding neutral/0.45 into the close with only $16 cash capping any new buys anyway.
+- journal: Mon 10/19 16:40: Close — rebound stuck, VIX 18.4, MSFT +6% and PLTR +4% led, ARQT +14% after Guggenheim PT raise, Day P&L +$2. Maintaining neutral/0.45. Still avoiding SNDK/IWM wreckage; watching bank earnings and macro landmines this week for gap risk.
+
+### 2026-10-19T17:47 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'SPY']
+- notes: After-hours check: tape finished constructive today with the AI dip-buy holding, VIX at 18.4 and Day P&L green, but hot September CPI and a heavy bank-earnings week keep risk two-sided. Maintaining neutral/0.45 with only $16 cash capping new buys anyway.
+- journal: Mon 10/19 17:47: Post-close — no change in posture, VIX 18.4, MSFT +6%, PLTR +4%, ARQT +15% at new 52wk high. Holding neutral/0.45. Watching bank earnings and CPI-driven inflation fears for overnight gap risk; SNDK/IWM still broken and avoided.
+
+### 2026-10-20T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['SNDK', 'IWM', 'NVDA', 'SYNA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
+- notes: Futures mixed with chipmakers back under pressure after yesterday's rebound; VIX firmed to 18.7 and hot September CPI plus a busy bank-earnings week keep risk two-sided. Holding neutral but nudging risk to 0.40, and only $16 cash caps new buys regardless.
+- journal: Tue 10/20 09:00: Chip weakness resurfacing pre-market, VIX up to 18.7 from 18.4. Trimmed risk_scale to 0.40. ARQT still strong on fresh analyst upgrades, added to favor; MSFT/PLTR/BKH constructive. Still avoiding SNDK/IWM/NVDA wreckage; watching CPI inflation fears and bank earnings for landmines.
+
+### 2026-10-20T13:22 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
+- notes: Constructive midday tape — Dow up 400-500 on solid earnings and falling oil, VIX eased to 17.7, Fed held steady removing a major event overhang. Nudging risk to 0.50 but only $3 cash caps new buys regardless; still avoiding broken SNDK/IWM and chip weakness in NVDA.
+- journal: Tue 10/20 13:22: Tape improved — Dow +400-500 on earnings/oil relief, VIX down to 17.7 from 18.7, Fed held rates. Bumped risk_scale to 0.50 from 0.40. ARQT +16%, MSFT/PLTR/BKH green and leading. Cash nearly exhausted ($3). Watching SNDK (-13%) and IWM (-9%) wreckage plus any AI-stock wobble into earnings.
+
+### 2026-10-20T15:29 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'ARQT']
+- notes: Late-day tape constructive — Dow up 400+ on solid earnings and falling oil, VIX eased to 17.5, Fed held steady removing event overhang. Holding risk at 0.50 but only $21 cash caps new buys; still avoiding broken SNDK/IWM and chip weakness in NVDA.
+- journal: Tue 10/20 15:29: Into the close tape holding green, VIX down to 17.5, Day P&L +$1. ARQT +17%, MSFT/PLTR/BKH leading. Maintaining risk-on/0.50. Cash tight at $21. Watching SNDK (-13.6%) and IWM (-8.5%) wreckage plus any overnight AI/chip wobble.
+
+### 2026-10-20T16:56 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA', 'ARQT'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Constructive close — Dow +500 on earnings optimism, oil falling on US-Iran hopes, VIX eased to 17.3, Fed overhang cleared. Holding risk 0.50 but moving ARQT to avoid as it reports within ~7 days; cash near-zero ($21) caps new buys anyway.
+- journal: Tue 10/20 16:56: Closed green, Day P&L +$2, VIX 17.3. Shifted ARQT (+17%) from favor to avoid — earnings within ~7 days now a landmine, so dropped it to favor MSFT/PLTR/BKH. Still avoiding SNDK (-12%) and IWM (-8%) wreckage plus NVDA chip weakness; watching for overnight AI/earnings wobble.
+
+### 2026-10-21T09:00 ET — MORNING (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'ARXS', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive open — futures up on earnings optimism, Dow +500 prior session, VIX calm at 17.2, Fed overhang cleared. Holding risk 0.50; ARQT stays on avoid (earnings within ~7 days) and SNDK/IWM/NVDA wreckage still excluded; only $21 cash caps new buys anyway.
+- journal: Wed 10/21 09:00: Calm constructive open, VIX eased to 17.2, Day P&L +$1. Maintaining risk-on/0.50. ARQT earnings landmine within ~7 days keeps it on avoid; CTSH strong (+12% last week) added to favor alongside MSFT/PLTR/BKH. Watching SNDK (-11%)/IWM (-8%) laggards and any chip wobble in NVDA.
+
+### 2026-10-21T13:25 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive midday tape — tech rally resumed, Dow +500, VIX calm at 16.7, Fed overhang cleared. Holding risk 0.50; ARQT stays avoid on earnings within ~7 days, SNDK/IWM/NVDA wreckage excluded; $22 cash caps new buys anyway.
+- journal: Wed 10/21 13:25: Tape steady-green, VIX ticked down to 16.7, Day P&L +$2. Maintaining risk-on/0.50 and same avoid/favor lists. Watching SNDK (-12%)/IWM (-8%) laggards and NVDA chip softness; ARQT earnings landmine still pending.
+
+### 2026-10-21T15:28 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'SNDK', 'IWM', 'NVDA', 'FTRE', 'HONA'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive into the close — tech/AI rally holding, Dow up, VIX calm at 17.2, Fed overhang cleared. Holding risk 0.50; ARQT stays avoid on earnings within ~7 days, SNDK/IWM/NVDA/FTRE/HONA wreckage excluded; $22 cash caps new buys anyway.
+- journal: Wed 10/21 15:28: Final-half-hour tape steady-green, VIX 17.2, Day P&L +$2. Same risk-on/0.50 and avoid/favor lists into close. Watching SNDK (-12.6%)/IWM (-8.3%) laggards and NVDA (-2.5%) chip softness; ARQT earnings landmine still pending within ~7 days.
+
+### 2026-10-21T16:56 ET — INTRADAY (ok)
+- regime: risk-on | risk_scale: 0.5
+- avoid: ['ARQT', 'HONA', 'SNDK', 'IWM', 'NVDA', 'FTRE'] | favor: ['MSFT', 'PLTR', 'BKH', 'CTSH']
+- notes: Constructive close — 3-day S&P win streak, Nasdaq +1%, VIX calm 16.7, Fed hold digested. Holding risk 0.50; ARQT/HONA stay avoid on earnings within ~7 days, SNDK/IWM/NVDA/FTRE wreckage excluded; $22 cash caps new buys anyway.
+- journal: Wed 10/21 16:56: Closed green, Day P&L +$2, VIX 16.7. Maintained risk-on/0.50 all day, same avoid/favor lists. Watching SNDK (-12.9%)/IWM (-8.4%) laggards and NVDA (-2%) softness; ARQT and HONA earnings landmines pending within ~7 days.
+
+### 2026-10-22T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH', 'VST']
+- notes: Futures lower as AI trade falters on Meta/Tesla earnings and oil rallies, VIX up to 18.0 — stepping down to neutral/0.40. Earnings landmines ARQT/HONA/CTSH/FTRE excluded (CTSH moved off favor into avoid on earnings within ~7 days), SNDK/IWM/NVDA wreckage still out; $22 cash caps buys anyway.
+- journal: Thu 10/22 09:00: Tone shifted defensive overnight — AI trade cracking on Meta/Tesla, oil up, VIX 18.0 (from 16.7). Cut to neutral/0.40 and moved CTSH onto avoid (earnings soon). Watching AI/chip names NVDA/PLTR/MSFT and oil-driven inflation risk.
+
+### 2026-10-22T13:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Tape deteriorating — Nasdaq tumbling on AI-spending fears, oil surging on Mideast escalation, flight to bonds, VIX up to 19.2. Going risk-off/0.30; SNDK (-20%), IWM (-8.5%) and NVDA (-6%) in free-fall excluded, earnings landmines ARQT/HONA/CTSH/FTRE out, VST added (energy/AI-power weakness); $16 cash caps buys anyway.
+- journal: Thu 10/22 13:23: Conditions worsened since AM — AI trade cracking harder, oil spiking on Mideast, VIX 19.2, Day P&L -$4, SNDK collapsed -20%. Cut to risk-off/0.30 and added QQQ/VST to avoid. Watching for capitulation vs. stabilization in chips/AI into the close.
+
+### 2026-10-22T15:21 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Worst day since July — tech selloff deepening on AI-spend fears and oil/Mideast jitters, flight to Treasurys, VIX 20.2. Holding risk-off/0.30 into final hour; SNDK (-20%), IWM (-8%), NVDA (-6%) in free-fall out, earnings landmines ARQT/HONA/CTSH/FTRE out, VST/QQQ excluded; $16 cash caps buys regardless.
+- journal: Thu 10/22 15:21: VIX ticked up to 20.2, tape still ugly into the close, Day P&L -$4. Kept risk-off/0.30 and same avoid/favor lists. Watching whether chips/AI stabilize or capitulate into the bell; CTSH/FTRE/HONA earnings still pending next week.
+
+### 2026-10-22T16:53 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Market closed sharply lower — Nasdaq's worst day since June on revived AI-spend doubts and oil spike, though VIX eased to 19.0 off intraday highs. Holding risk-off/0.30 post-close; SNDK (-22%), IWM (-8%), NVDA (-6%) wreckage out, earnings landmines ARQT/HONA/CTSH/FTRE excluded, QQQ/VST still avoided; $16 cash caps buys regardless.
+- journal: Thu 10/22 16:53: Closing bell — tech selloff finished the session deep in red but VIX ticked down to 19.0 from 20.2, Day P&L -$4. Kept risk-off/0.30 and same lists into the close. Watching for AI/chip stabilization overnight and CTSH/FTRE/HONA earnings landing within ~7 days.
+
+### 2026-10-23T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'HONA', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Tech selloff continuing into Friday with flight to Treasurys, VIX at 20.0 and a Fed meeting plus earnings flood looming as pivotal tests for the shaky AI rally. Staying risk-off/0.30: SNDK (-19%), IWM (-9%), NVDA (-6.5%) wreckage out, earnings landmines ARQT/HONA/CTSH/FTRE excluded, QQQ/VST avoided; $16 cash caps buys regardless.
+- journal: Fri 10/23 09:00: Overnight futures firmer on US-Iran talk hopes but tape still fractured — VIX 20.0, AI/chip names weak, Fed in focus. Held risk-off/0.30 and same lists; watching whether AI/chips stabilize and CTSH/FTRE/HONA earnings landing within ~7 days.
+
+### 2026-10-23T13:19 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Fractured tape — Dow down 500 on Mideast tensions while AI/chips attempt a bounce; VIX 20.0 with a Fed meeting and earnings flood as looming tests. Holding risk-off/0.30: SNDK (-20%), IWM (-9%), NVDA (-6.7%) wreckage out, earnings landmines CTSH/FTRE/ARQT excluded, QQQ/VST avoided; $23 cash caps buys regardless.
+- journal: Fri 10/23 13:19: Dow tumbling 500 on Mideast escalation, selling broadening beyond tech even as Nasdaq tries to recover; VIX steady at 20.0, Day P&L -$1. Held risk-off/0.30 and lists; dropped HONA (no longer held). Watching whether afternoon bounce holds or rolls into the weekend/Fed.
+
+### 2026-10-23T15:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Dow down 600 on Mideast tensions with selling broadening beyond tech; VIX 19.6 and weekend/Fed event risk ahead. Holding risk-off/0.30 into the close: SNDK (-21%), IWM (-8.5%), NVDA (-6.7%) wreckage out, CTSH/FTRE/ARQT earnings landmines excluded, QQQ/VST avoided; $23 cash caps buys regardless.
+- journal: Fri 10/23 15:27: Dow tumbling 600 into the final hour as selloff broadens, VIX ticked down slightly to 19.6, Day P&L -$1. Held risk-off/0.30 and same lists heading into the weekend; watching whether the tape capitulates or steadies into the bell, Fed meeting and CTSH/FTRE earnings looming next week.
+
+### 2026-10-23T16:41 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA', 'QQQ', 'VST'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: End of a fractured risk-off Friday: Dow down 600+ on rising oil and renewed AI doubts, selloff broadening across sectors; VIX 19.5 with weekend plus next-week Fed meeting and earnings flood as event risk. Holding 0.30: SNDK (-21.6%), IWM (-8.5%), NVDA (-6.9%) wreckage out, CTSH/FTRE/ARQT earnings landmines excluded, QQQ/VST avoided; $23 cash caps buys regardless.
+- journal: Fri 10/23 16:41: Closing bell on a rough week — Dow off 600+, AI/tech sold hard, VIX 19.5, Day P&L -$1. Stayed risk-off/0.30 into the weekend with same lists. Watching for AI/chip stabilization, Mideast/oil headlines, and CTSH/FTRE earnings plus the Fed meeting next week.
+
+### 2026-10-26T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Constructive open — futures up, oil retreating, VIX easing to 19.2 after a rough Friday; but a Fed decision and a flood of Big Tech earnings loom this week, so posture stays cautious. Lifting to 0.40 from 0.30 as the tape steadies; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM wreckage stay off the buy list.
+- journal: Mon 10/26 09:00: Week opens with futures higher and oil dropping, VIX down to 19.2 from Friday's 19.5 — nudged risk to 0.40 and shifted to neutral. Trimmed QQQ/VST/ARQT off avoid as tech bounces, kept CTSH/FTRE (earnings ~7d) and SNDK/NVDA/IWM losers out. Watching the Fed decision and Big Tech earnings deluge this week; $23 cash still caps any buys.
+
+### 2026-10-26T14:44 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Constructive midday — Nasdaq +1% on Anthropic IPO/AI enthusiasm, oil lower, VIX easing to 18.4; but a Fed decision and a flood of Big Tech earnings loom this week, so posture stays measured. Nudging to 0.45; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM losers stay off the buy list.
+- journal: Mon 10/26 14:44: Tape firmly green, VIX down to 18.4 from this morning's 19.2, Day P&L +$2 — lifted risk to 0.45, staying neutral given Fed decision and Big Tech earnings ahead. SNDK still bleeding (-19.8%), kept it plus NVDA/IWM and CTSH/FTRE earnings names excluded; $17 cash caps buys regardless. Watching the Fed and tech earnings deluge.
+
+### 2026-10-26T16:40 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Closing on a green day — tech up on Anthropic IPO buzz, oil lower, VIX steady at 18.4, Day P&L +$2; but a Fed decision and a flood of Big Tech earnings dominate this week, so posture stays measured. Holding 0.45 neutral into the close; CTSH/FTRE earnings landmines and SNDK/NVDA/IWM losers stay off the buy list.
+- journal: Mon 10/26 16:40: Closing bell, calm constructive tape, VIX 18.4, Day P&L +$2 — kept risk 0.45/neutral with same lists. SNDK still deep red (-20.5%); $17 cash caps any buys anyway. Watching the Fed decision and Big Tech earnings deluge midweek — expect to dial defensive around those events.
+
+### 2026-10-26T17:57 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: After-hours recap of a green Monday — tech led by Anthropic IPO buzz, oil lower, VIX steady at 18.4, Day P&L +$2; holding measured posture into a week dominated by the Fed decision and a Big Tech earnings deluge. Keeping 0.45 neutral with CTSH/FTRE earnings landmines and SNDK/NVDA/IWM losers off the buy list.
+- journal: Mon 10/26 17:57: End-of-day check, constructive tape held, VIX 18.4, Day P&L +$2 — kept 0.45/neutral, same lists. SNDK still deep red (-20.2%), $17 cash caps buys regardless. Expect to dial defensive midweek around the Fed decision and Big Tech earnings.
+
+### 2026-10-27T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Futures modestly higher, VIX eased to 17.8, oil lower — constructive but we're heading into a Fed decision and a Big Tech earnings deluge this week, so posture stays measured. Holding 0.45 neutral; CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM remain losers off the buy list.
+- journal: Tue 10/27 09:00: VIX ticked down to 17.8 from 18.4, futures green on calmer tape — kept 0.45/neutral, same lists. SNDK still deep red (-19.1%); $17 cash caps buys anyway. Expect to dial defensive as the Fed decision and megacap earnings hit midweek.
+
+### 2026-10-27T14:07 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.45
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Midday tape constructive — chips leading a second-day tech bid on Anthropic IPO buzz, VIX eased to 17.7, oil lower, Day P&L +$2; but the Fed decision and a megacap earnings flood loom, so we stay measured at 0.45. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM remain off the buy list.
+- journal: Tue 10/27 14:07: Calm green session, VIX 17.7, chip-led tech strength, Day P&L +$2 — held 0.45/neutral, same lists. SNDK still deepest loser (-18.1%); $17 cash caps buys anyway. Planning to dial defensive into the Fed decision and Big Tech earnings midweek.
+
+### 2026-10-27T16:10 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: Closing bell of a second straight green day — chips led, oil slid, VIX calm at 17.6, Day P&L +$2; but a Fed decision and a Big Tech earnings deluge dominate midweek, so we trim slightly to 0.4 into the event risk. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM stay off the buy list.
+- journal: Tue 10/27 16:10: Constructive close, VIX eased to 17.6, chip-led tech bid held, Day P&L +$2 — nudged risk to 0.4 ahead of Fed/earnings week. SNDK still deepest loser (-18.5%); $17 cash caps buys regardless. Watching the Fed decision and megacap reports to dial further defensive.
+
+### 2026-10-27T17:30 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['MSFT', 'PLTR', 'BKH']
+- notes: After-hours check on a calm second green day — VIX 17.5, chips led, oil slid, Day P&L +$2; but tomorrow's Fed decision and a megacap earnings deluge are imminent event risk, so we hold a trimmed 0.4. CTSH/FTRE are earnings landmines (~7d) and SNDK/NVDA/IWM stay off the buy list.
+- journal: Tue 10/27 17:30: Session closed constructive, VIX 17.5, Day P&L +$2 — holding 0.4/neutral, same lists. SNDK still deepest loser (-18.5%); $17 cash caps buys anyway. Key watch: Fed decision + Big Tech earnings midweek, ready to dial further defensive.
+
+### 2026-10-28T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['BKH', 'PLTR']
+- notes: Fed rate decision this afternoon plus Microsoft and Alphabet earnings tonight make today a double event-risk landmine; VIX calm at 17.4 but the tape is drifting cautiously, so we cut to 0.3 risk-off. MSFT moves off the favor list onto avoid (reports tonight), CTSH/FTRE stay earnings landmines, SNDK/NVDA/IWM remain losers off the buy list.
+- journal: Wed 10/28 09:00: Event day — Fed decision + MSFT/GOOGL earnings tonight. Dropped to 0.3/risk-off and moved MSFT to avoid ahead of its print. VIX 17.4 but caution dominates; $17 cash caps buys anyway. Watching Fed outcome and megacap reactions to reset posture after the dust settles.
+
+### 2026-10-28T14:24 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['BKH', 'PLTR']
+- notes: Fed held rates steady as expected and the S&P sits higher, but MSFT and Alphabet earnings tonight remain a megacap landmine, so we hold 0.3 risk-off into the close. VIX calm at 17.4 yet IWM/NVDA/SNDK are red and CTSH/FTRE still carry ~7d earnings risk.
+- journal: Wed 10/28 14:24: Fed left rates unchanged, market firm but churning ahead of MSFT/GOOGL tonight — stayed 0.3/risk-off, same lists. SNDK deepest loser (-13.1%), IWM -7.3%; $17 cash caps buys regardless. Watching tonight's megacap prints to reset posture tomorrow.
+
+### 2026-10-28T16:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'ARQT', 'BKH', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['PLTR', 'IBM']
+- notes: Fed held as expected and the tape closed higher for a third day with VIX calm at 16.9, but MSFT and Alphabet report after the bell tonight — a megacap landmine — so we stay 0.3 risk-off into the close. Added ARQT/BKH (now ~7d earnings) to the avoid list alongside CTSH/FTRE; SNDK/NVDA/IWM remain red and off the buy list.
+- journal: Wed 10/28 16:27: Near the close, Fed non-event behind us, VIX eased to 16.9, Day P&L flat. Held 0.3/risk-off ahead of tonight's MSFT/GOOGL prints; moved ARQT and BKH to avoid as earnings near. $17 cash caps buys regardless. Watching megacap reactions overnight to reset posture tomorrow.
+
+### 2026-10-28T17:56 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['MSFT', 'ARQT', 'BKH', 'CTSH', 'FTRE', 'SNDK', 'IWM', 'NVDA'] | favor: ['PLTR', 'IBM']
+- notes: After-hours now: Fed held and tape closed higher a third day with VIX calm at 16.9, but MSFT and Alphabet report tonight — a megacap landmine that can swing QQQ/SPY/NVDA tomorrow, so we hold 0.3 risk-off. ARQT/BKH/CTSH/FTRE all carry ~7d earnings risk; SNDK/NVDA/IWM remain red.
+- journal: Wed 10/28 17:56: Post-close, awaiting MSFT/GOOGL prints after the bell. Held 0.3/risk-off, same lists. SNDK deepest loser (-12.9%), IWM -6.6%; $17 cash caps buys regardless. Watching megacap reactions overnight to reset posture Thursday morning.
+
+### 2026-10-29T09:00 ET — MORNING (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM'] | favor: ['PLTR', 'MSFT', 'IBM']
+- notes: Fed and the MSFT/GOOGL prints are now behind us — MSFT held up (+7.3%) but Alphabet and Caterpillar cracked and the tech rally is stalling, so the S&P is set for its first loss in four days. VIX calm at 17.1; I ease up to neutral/0.4 but keep earnings landmines (ARQT/BKH ~7d) and the deepest losers (SNDK -13%, NVDA -5%, IWM -6%) off the buy list.
+- journal: Thu 10/29 09:00: Megacap event risk cleared — MSFT reacted up so I pulled it off avoid and favor it; Alphabet/CAT disappointed and the broad tape is softening. Nudged from 0.3 risk-off to 0.4 neutral. Still avoiding ARQT/BKH earnings and red names SNDK/NVDA/IWM; $17 cash caps buys regardless. Watching whether the AI-rally wobble deepens today.
+
+### 2026-10-29T14:34 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
+- notes: AI-trade cracks are widening — Nasdaq 100 -1.5% with Alphabet on a record post-earnings drop and Caterpillar weak, dragging QQQ/SPY/NVDA; VIX still calm at 16.9 but the tape is deteriorating and SNDK gapped to -16%. Dialing back to 0.3 risk-off and keeping earnings landmines (ARQT/BKH ~7d) plus the deepest losers off the buy list.
+- journal: Thu 10/29 14:34: AI jitters deepened intraday — Alphabet record drop, Nasdaq leading lower, SNDK now -16% and NVDA/IWM/VST red. Stepped back from 0.4 neutral to 0.3 risk-off; added VST and QQQ to avoid given the tech/power selloff. $24 cash caps buys anyway. Watching whether the AI wobble turns into a broader flush.
+
+### 2026-10-29T16:27 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
+- notes: Near the close the AI-trade cracks persist — Alphabet set for a record ~$500B/-12% post-earnings drop, Nasdaq 100 -1.5%, dragging QQQ/SPY/NVDA; VIX firmed to 17.2 and Fed/CPI week keeps event risk elevated, so I hold 0.3 risk-off. Keeping ARQT/BKH earnings landmines and the deepest losers (SNDK -14%, NVDA -7%, IWM -6%, VST -6%) off the buy list.
+- journal: Thu 10/29 16:27: End of day — AI wobble held, Alphabet near record drop, VIX up to 17.2. Stayed 0.3 risk-off, same lists. $24 cash caps buys anyway. Watching megacap/AI-capex follow-through overnight and into Fed-heavy week to reset Friday.
+
+### 2026-10-29T18:04 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ'] | favor: ['PLTR', 'IBM', 'MSFT']
+- notes: Post-close recap: Alphabet's record ~$482B drop revived AI-capex jitters, Nasdaq 100 -1.5% and S&P snapped a 3-day advance; VIX firmed to 17.2 with the AI trade showing cracks, so I hold 0.3 risk-off. Keeping ARQT/BKH (earnings ~7d) landmines and deepest losers SNDK -19%, NVDA -7%, IWM -6%, VST -7% off the buy list.
+- journal: Thu 10/29 18:04: After-hours confirmation — Alphabet's historic drop drove AI-capex fears, SNDK slid further to -19%. Held 0.3 risk-off, same lists; $24 cash caps buys regardless. Watching overnight megacap/AI follow-through to reset Friday morning.
+
+### 2026-10-30T09:00 ET — MORNING (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'SNDK', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: AI-capex selloff is accelerating — Nasdaq futures -2%+ premarket as Amazon and Intel disappoint, piling onto Alphabet's record drop; VIX firmed to 18.7 and the tape is ugly, so I cut to 0.25 risk-off. Keeping ARQT/BKH earnings landmines and the deepest losers (SNDK -23%, NVDA -8%, VST -8%, IWM -6%) off the buy list; added SPY/QQQ given index weakness.
+- journal: Fri 10/30 09:00: AI wobble turned into a broad flush — Amazon/Intel misses dragged Nasdaq futures -2%+, VIX up to 18.7, SNDK now -23%. Trimmed from 0.3 to 0.25 risk-off and added SPY to avoid. $24 cash caps buys anyway; watching for a capitulation low vs. further downside into the open.
+
+### 2026-10-30T14:06 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: AI-capex selloff persists into midday with VIX up to 21.6 and the tape still ugly — Nasdaq at a 3-month low on Amazon/Intel/Alphabet jitters, NVDA -10.7% and indices broadly red, so I hold 0.25 risk-off. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA, IWM -7.8%, VST -7.5%, QQQ, SPY) off the buy list.
+- journal: Fri 10/30 14:06: Selloff deepened intraday — VIX climbed from 18.7 to 21.6, NVDA sliding to -10.7%, IWM -7.8%. Held 0.25 risk-off, same posture; $29 cash caps buys regardless. Watching for capitulation/stabilization into the close vs. a weekend-risk flush.
+
+### 2026-10-30T15:59 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: Final bell on an ugly AI-capex flush week — Nasdaq -3%, Alphabet's record drop and Amazon/Intel misses, VIX still elevated at 20.5 and CPI tomorrow plus a Fed meeting next week keep event risk high, so I hold 0.25 risk-off into the weekend. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA -9.8%, IWM -7.4%, VST -6.5%, QQQ, SPY) off the buy list.
+- journal: Fri 10/30 15:59: VIX eased slightly from 21.6 to 20.5 but the tape closed broadly red with no clean capitulation low. Holding 0.25 risk-off into weekend/CPI/Fed-week risk; $29 cash caps buys anyway. Watching CPI print and whether AI names stabilize or extend the slide Monday.
+
+### 2026-10-30T17:43 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: After-hours on an ugly AI-capex flush week — Nasdaq worst day since June, VIX 19.4 still elevated, with CPI due tomorrow and a Fed meeting next week keeping event risk high, so I hold 0.25 risk-off into the weekend. Keeping ARQT/BKH earnings landmines (~7d) and the deepest losers (NVDA -9.7%, IWM -7.4%, VST -6.2%, QQQ, SPY) off the buy list.
+- journal: Fri 10/30 17:43: Post-close recap confirms the broad tech selloff; VIX settled to 19.4 but no clean capitulation. Holding 0.25 risk-off into weekend/CPI/Fed-week risk; $29 cash caps buys regardless. Watching CPI print and whether AI names stabilize Monday.
+
+### 2026-11-02T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST'] | favor: ['IBM', 'MSFT', 'PLTR']
+- notes: Tape is stabilizing — VIX eased to 18.9, futures up as oil tumbles and AI names rebound after last week's capex flush, so I lift to neutral/0.4. But a loaded week (midterms, jobs data, Apple earnings, CPI/Fed) keeps me cautious, and ARQT/BKH earnings (~7d) plus the deepest losers (NVDA -8.7%, IWM, VST) stay off the buy list.
+- journal: Mon 11/2 10:00: Relief bounce off Friday's flush — VIX 19.4→18.9, futures green on oil drop/tech rebound. Upgraded risk-off→neutral, 0.4 (from 0.25). Dropped QQQ/SPY from avoid as broad tape steadies; still blocking ARQT/BKH earnings and NVDA/IWM/VST. Watching CPI, Fed, jobs, Apple earnings this week; $29 cash still caps buys.
+
+### 2026-11-02T17:49 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI', 'BKH']
+- notes: Morning bounce failed — Nasdaq melting down again, VIX back up to 21.1 and tech selling off hard (NVDA -10.8%, QQQ -5.7%, VST -8.6%, IWM -7.4%). Cutting back to risk-off/0.3 ahead of a loaded week (Apple earnings, midterms, jobs data) and keeping earnings landmines ARQT/BKH plus the deepest losers off the buy list.
+- journal: Mon 11/2 17:49: Downgraded neutral→risk-off (0.4→0.3). The relief bounce reversed — VIX 18.9→21.1, tech rolled over again. Re-added QQQ/SPY to avoid and flagged PLTR (post-earnings, -3.5%). $16 cash caps buys anyway. Watching for capitulation low, jobs data, and Apple earnings this week.
+
+### 2026-11-02T19:10 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI']
+- notes: Tech selloff persists with VIX at 21.1; NVDA -10.4%, VST -8.5%, PLTR -7.4%, IWM -7.4% and broad indices red into a loaded event week (midterms, jobs, Apple earnings, Fed uncertainty from Waller). Holding risk-off/0.3 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
+- journal: Mon 11/2 19:10: Posture unchanged risk-off/0.3. Tech still bleeding, VIX sticky at 21.1, no capitulation yet. $16 cash caps buys regardless. Watching for a washout low, midterm results, jobs data, and Apple earnings; IBM/CPRI are the only relative green holds.
+
+### 2026-11-02T20:05 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['ARQT', 'BKH', 'NVDA', 'IWM', 'VST', 'QQQ', 'SPY', 'PLTR'] | favor: ['IBM', 'CPRI', 'BKH']
+- notes: Tech melting down again to start November, VIX sticky at 21.1 with NVDA -10.2%, VST -9.0%, PLTR -7.1%, IWM -7.3% and broad indices red into a loaded event week (midterms, jobs data, Apple earnings). Holding risk-off/0.3 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
+- journal: Mon 11/2 20:05: Posture unchanged risk-off/0.3. No capitulation yet — tech still bleeding into the close, VIX 21.1. $16 cash caps buys regardless. IBM/CPRI/BKH the only relative-green holds; watching for a washout low, midterms, jobs data, Apple earnings.
+
+### 2026-11-03T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Modest relief this morning — S&P futures rebound, chips bounce, VIX easing to 20.8 — but it's Election Day with a loaded event week (jobs, Fed, midterm results) and AI names remain shaky. Holding risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers (NVDA -8.8%, PLTR -10.5%, VST -7.3%, IWM -7.0%) off the buy list.
+- journal: Tue 11/3 10:00: Nudged 0.3→0.35 on a steadier tape (VIX 21.1→20.8, chip bounce) but staying risk-off into midterms/jobs/Fed. $16 cash caps buys regardless. Watching for midterm results and whether the morning bounce holds; IBM/CPRI/AN relative strength.
+
+### 2026-11-03T15:39 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Tape stabilizing into the close — Nasdaq rebounds on a chip bounce, oil falling, VIX easing to 20.6 — but it's Election Day with midterm results tonight plus jobs data and Fed uncertainty (Waller) ahead. Staying risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers (NVDA -8.8%, QQQ -5.4%, VST -5.0%, IWM -7.0%, PLTR -7.0%) off the buy list.
+- journal: Tue 11/3 15:39: Posture held risk-off/0.35. Afternoon tape steadier (VIX 20.8→20.6, chips bounced, Dow dragged by Apple) but no catalyst to add risk into midterm results tonight + jobs/Fed this week. $16 cash caps buys regardless. IBM/CPRI/AN the relative-strength names; watching midterm outcome and whether the bounce holds tomorrow.
+
+### 2026-11-03T17:11 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Tape firmed slightly — S&P snapped a 3-day skid on a chip rebound, oil lower, VIX easing to 20.7 — but it's Election Day with midterm results tonight plus jobs data and AMD earnings ahead, and AI holdings (NVDA -8.6%, QQQ -5.4%, IWM -7.3%) remain weak. Holding risk-off/0.35 with earnings landmines ARQT/BKH and deepest losers off the buy list.
+- journal: Tue 11/3 17:11: Posture unchanged risk-off/0.35. Chips rebounded and VIX ticked to 20.7 but no catalyst to add risk into midterm results tonight + jobs/AMD earnings. $16 cash caps buys regardless. IBM/CPRI/AN the relative-strength holds; watching election outcome and whether the bounce extends tomorrow.
+
+### 2026-11-03T18:37 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'IWM', 'VST', 'QQQ', 'SPY'] | favor: ['IBM', 'CPRI', 'AN']
+- notes: Day flat (+$2) with a modest chip-led rebound and VIX easing to 20.8, but it's Election Day with midterm results tonight plus jobs data and AMD earnings ahead; AI holdings (NVDA -7.7%, QQQ -5.0%, IWM -7.2%, PLTR -6.3%) remain weak. Staying risk-off/0.35 with earnings landmines ARQT/BKH and the deepest losers off the buy list.
+- journal: Tue 11/3 18:37: Posture unchanged risk-off/0.35 into the close. Chips bounced and VIX steadied at 20.8 but no catalyst to add risk ahead of midterm results tonight + jobs/AMD this week. $16 cash caps buys regardless. IBM/CPRI/AN remain relative-strength holds; watching election outcome and whether the bounce extends tomorrow.
+
+### 2026-11-04T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
+- notes: Midterm uncertainty resolved with a broad relief rally and VIX easing to 18.2, so lifting from risk-off to neutral/0.5; still cautious with Friday's jobs report looming and deep losers (VST -14.9%, PLTR -11.1%, NVDA -10.2%) bleeding. ARQT/BKH stay off for earnings within ~7 days and AN after the JPMorgan downgrade.
+- journal: Wed 11/4 10:00: Upgraded to neutral/0.5 as midterms cleared and VIX fell 20.8→18.2 with futures rallying. Watching Friday jobs for a repricing; keeping earnings names ARQT/BKH and the worst drawdowns off the buy list. $16 cash still caps any adds.
+
+### 2026-11-04T15:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
+- notes: Broad relief rally — Dow +1,500 on election clarity and plunging oil, VIX down to 16.8 — supports a modest lift to neutral/0.6, but Friday's jobs report is a real repricing risk and several holdings (VST -19.6%, NVDA -10.7%, PLTR -8.5%) keep bleeding. ARQT/BKH stay off for earnings within ~7 days and AN after the JPMorgan downgrade.
+- journal: Wed 11/4 15:55: Nudged to neutral/0.6 as the post-election rally broadened and VIX fell 18.2→16.8 into the close. Still cautious ahead of Friday jobs; keeping earnings names (ARQT/BKH), AN, and deep losers (VST/NVDA/PLTR) off the buy list. $16 cash caps adds regardless — watching whether the bounce holds and the jobs print tomorrow.
+
+### 2026-11-04T17:26 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
+- notes: Calm constructive tape — Dow's best day since April 2025 on election clarity and falling oil, VIX steady at 16.7 — keeps posture at neutral/0.6, but data-center names are being hit hard (NVDA -11.4%, VST -18.1%, PLTR -7.7%) and Friday's jobs report is a real repricing risk. ARQT/BKH stay off for earnings, AN after the JPMorgan downgrade, deep losers off the buy list.
+- journal: Wed 11/4 17:26: Holding neutral/0.6 into the close; VIX 16.7 and broad relief rally intact but data-center/AI holdings keep bleeding (NVDA -11.4%, VST -18.1%). Main risk is Friday jobs — watching for a hawkish repricing. $16 cash caps any adds regardless.
+
+### 2026-11-04T18:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['ARQT', 'BKH', 'NVDA', 'PLTR', 'VST', 'AN'] | favor: ['IBM', 'CPRI', 'SPY']
+- notes: Constructive post-election tape holds with VIX calm at 16.6 and the Dow's best day in 44 years, keeping posture at neutral/0.6. Data-center/AI names keep bleeding (NVDA -11.2%, VST -18.1%, PLTR -7.6%) and Friday's jobs report is a real repricing risk, so no reach.
+- journal: Wed 11/4 18:56: Holding neutral/0.6 after the close; VIX steady 16.7->16.6 and rally intact but AI/utility holdings still deep red. Main catalyst is Friday jobs for a hawkish repricing. $16 cash caps adds; keeping earnings names (ARQT/BKH), AN, and deep losers off the buy list.
+
+### 2026-11-05T10:16 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.6
+- avoid: ['AN', 'ARQT', 'BKH', 'NVDA', 'PLTR', 'VST'] | favor: ['IBM', 'MSFT', 'SPY']
+- notes: Dow futures +300 extend the post-election rally and VIX is calm at 16.8, but the chipmaker/data-center rotation continues (NVDA -13.2%, VST -20.7%, PLTR -10.9%) and Friday's jobs report is a real repricing risk — keeping neutral/0.6. ARQT/BKH off for earnings, AN after the JPMorgan downgrade, deep AI/utility losers off the buy list.
+- journal: Thu 11/5 10:16: Holding neutral/0.6 into the open; VIX steady 16.6->16.8 and futures green, but AI names still bleeding hard and jobs print lands tomorrow. $16 cash caps any adds regardless — watching for a hawkish jobs repricing and whether chip rotation stabilizes.
+
+### 2026-11-05T16:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'AN', 'BKH', 'SPY'] | favor: ['MSFT', 'CPRI']
+- notes: Sharp regime shift: Nasdaq -5% in a chip/data-center wipeout, VIX spiked 16.8->23.8, post-election rally fully erased and AI-slowdown fears dominating. Going risk-off/0.3 — holdings bleeding hard (NVDA -19%, VST -23%, PLTR -17%, QQQ/IWM -10%), avoid the falling knives and index proxies into tomorrow's jobs print.
+- journal: Thu 11/5 16:08: Flipped neutral/0.6 -> risk-off/0.3 as the tape broke down hard — Nasdaq -5%, VIX 16.8->23.8, AI/chip names in freefall and the whole election rally gone. Watching Friday's jobs report for a hawkish repricing; $32 cash caps adds anyway, keeping all deep losers and index ETFs off the buy list.
+
+### 2026-11-05T17:30 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
+- notes: Conditions deteriorated further — VIX climbed 23.8->28.2, Nasdaq in correction territory (-5%) on an AI/chip/data-center wreck, Dow down 1,800. Deep in drawdown across holdings (VST -24%, NVDA -20%, PLTR -17%), so dialing to risk-off/0.25 into tomorrow's jobs print; $32 cash caps adds anyway.
+- journal: Thu 11/5 17:30: Held risk-off but cut 0.3->0.25 as VIX pushed to 28.2 and the AI wreck deepened into the close. Friday jobs report is the key catalyst — watching for hawkish repricing and whether chip names find a floor. All index ETFs and deep losers stay off the buy list.
+
+### 2026-11-05T18:56 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
+- notes: Holding risk-off/0.25 into the close — VIX elevated at 28.2, Nasdaq finished down ~5% on an AI/chip/data-center wipeout, and holdings are deep in drawdown (VST -24%, NVDA -20%, PLTR -17%). Friday's jobs print is the next catalyst and $32 cash caps adds regardless.
+- journal: Thu 11/5 18:56: No change — staying risk-off/0.25 into Friday's jobs report. Tape closed broken on AI/chip fears, VIX stuck near 28; watching for a hawkish repricing and whether chip names find a floor. All index ETFs and deep losers remain off the buy list.
+
+### 2026-11-06T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
+- notes: Jobs print cleared (165k, claims at 57-yr lows) but the AI/chip wreck continues — Nasdaq down another ~5%, $2.5T wiped out, VIX still elevated at 26.9. Holdings deep in drawdown (VST -19%, NVDA -16%, PLTR -15%); staying risk-off/0.25 and avoiding all falling-knife AI names and index proxies.
+- journal: Fri 11/6 10:00: Jobs report landed solid (strong labor/productivity) and VIX ticked 28.2->26.9, but AI panic isn't done — Nasdaq -5% again. Holding risk-off/0.25; watching whether chip names find a floor midday. $32 cash caps adds regardless.
+
+### 2026-11-06T15:35 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
+- notes: VIX easing 26.9->24.8 and the Nasdaq is attempting to claw back from its worst day in 19 months with some AI buying, but the tape is still fragile and holdings remain deep in drawdown (NVDA -17.5%, VST -16%, PLTR -14%). Staying risk-off/0.3 into the weekend; $32 cash caps adds anyway.
+- journal: Fri 11/6 15:35: VIX cooling (26.9->24.8) and AI names bouncing off the lows into the close, first sign of stabilization since the wreck. Nudged scale 0.25->0.3 but staying defensive into the weekend — watching whether the recovery holds Monday. Deep losers and index ETFs stay off the buy list.

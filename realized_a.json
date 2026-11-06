@@ -1,0 +1,1208 @@
+{
+ "arm": "A",
+ "buys": [
+  {
+   "qty": 0.080842343,
+   "symbol": "SPY",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.016234396,
+   "symbol": "SPY",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.047357265,
+   "symbol": "QQQ",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.048512602,
+   "symbol": "QQQ",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.007541415,
+   "symbol": "QQQ",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.069192685,
+   "symbol": "IWM",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.0656188,
+   "symbol": "IWM",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.049261574,
+   "symbol": "IWM",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.036877607,
+   "symbol": "IWM",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.02739245,
+   "symbol": "IWM",
+   "t": "2026-08-12"
+  },
+  {
+   "qty": 0.052096295,
+   "symbol": "MSTR",
+   "t": "2026-08-24"
+  },
+  {
+   "qty": 0.064912835,
+   "symbol": "MRNA",
+   "t": "2026-08-25"
+  },
+  {
+   "qty": 0.262052835,
+   "symbol": "SMCI",
+   "t": "2026-08-25"
+  },
+  {
+   "qty": 0.038344744,
+   "symbol": "MRVL",
+   "t": "2026-08-25"
+  },
+  {
+   "qty": 0.653560042,
+   "symbol": "BHVN",
+   "t": "2026-08-26"
+  },
+  {
+   "qty": 0.608116442,
+   "symbol": "BHVN",
+   "t": "2026-08-26"
+  },
+  {
+   "qty": 0.52218358,
+   "symbol": "BZ",
+   "t": "2026-08-26"
+  },
+  {
+   "qty": 0.066354061,
+   "symbol": "NBIS",
+   "t": "2026-08-27"
+  },
+  {
+   "qty": 0.054469495,
+   "symbol": "NVDA",
+   "t": "2026-08-27"
+  },
+  {
+   "qty": 0.929705215,
+   "symbol": "CXM",
+   "t": "2026-08-27"
+  },
+  {
+   "qty": 0.014695966,
+   "symbol": "MSFT",
+   "t": "2026-08-27"
+  },
+  {
+   "qty": 0.042013208,
+   "symbol": "PLTR",
+   "t": "2026-08-28"
+  },
+  {
+   "qty": 0.041386882,
+   "symbol": "SPCX",
+   "t": "2026-08-28"
+  },
+  {
+   "qty": 0.024478418,
+   "symbol": "CRWD",
+   "t": "2026-08-31"
+  },
+  {
+   "qty": 0.019234935,
+   "symbol": "ASND",
+   "t": "2026-08-31"
+  },
+  {
+   "qty": 0.406885758,
+   "symbol": "CRK",
+   "t": "2026-09-01"
+  },
+  {
+   "qty": 0.004539783,
+   "symbol": "SNDK",
+   "t": "2026-09-02"
+  },
+  {
+   "qty": 0.017434911,
+   "symbol": "AAPL",
+   "t": "2026-09-02"
+  },
+  {
+   "qty": 0.52235089,
+   "symbol": "SMMT",
+   "t": "2026-09-03"
+  },
+  {
+   "qty": 0.056908255,
+   "symbol": "SPCX",
+   "t": "2026-09-03"
+  },
+  {
+   "qty": 0.168694115,
+   "symbol": "HOOG",
+   "t": "2026-09-03"
+  },
+  {
+   "qty": 0.051036556,
+   "symbol": "SPCX",
+   "t": "2026-09-10"
+  },
+  {
+   "qty": 0.013885624,
+   "symbol": "ELV",
+   "t": "2026-09-10"
+  },
+  {
+   "qty": 0.076327554,
+   "symbol": "INSP",
+   "t": "2026-09-11"
+  },
+  {
+   "qty": 0.305716741,
+   "symbol": "SMMT",
+   "t": "2026-09-14"
+  },
+  {
+   "qty": 0.0474611,
+   "symbol": "SPCX",
+   "t": "2026-09-16"
+  },
+  {
+   "qty": 0.232081174,
+   "symbol": "ADPT",
+   "t": "2026-09-16"
+  },
+  {
+   "qty": 0.082298585,
+   "symbol": "INSP",
+   "t": "2026-09-21"
+  },
+  {
+   "qty": 0.06705969,
+   "symbol": "NICE",
+   "t": "2026-09-23"
+  },
+  {
+   "qty": 0.100130463,
+   "symbol": "BAND",
+   "t": "2026-09-23"
+  },
+  {
+   "qty": 0.224383182,
+   "symbol": "SRZN",
+   "t": "2026-09-24"
+  },
+  {
+   "qty": 0.195169896,
+   "symbol": "ADPT",
+   "t": "2026-09-24"
+  },
+  {
+   "qty": 0.079325853,
+   "symbol": "AKAM",
+   "t": "2026-09-25"
+  },
+  {
+   "qty": 0.080646955,
+   "symbol": "AAON",
+   "t": "2026-09-25"
+  },
+  {
+   "qty": 0.013932314,
+   "symbol": "TSLA",
+   "t": "2026-09-25"
+  },
+  {
+   "qty": 0.007983683,
+   "symbol": "META",
+   "t": "2026-09-28"
+  },
+  {
+   "qty": 0.0286495,
+   "symbol": "BE",
+   "t": "2026-09-29"
+  },
+  {
+   "qty": 0.075416258,
+   "symbol": "AXTI",
+   "t": "2026-09-29"
+  },
+  {
+   "qty": 0.032294562,
+   "symbol": "ACN",
+   "t": "2026-10-01"
+  },
+  {
+   "qty": 0.207760464,
+   "symbol": "EFXT",
+   "t": "2026-10-01"
+  },
+  {
+   "qty": 0.020321426,
+   "symbol": "GOOGL",
+   "t": "2026-10-02"
+  },
+  {
+   "qty": 0.043519347,
+   "symbol": "SYNA",
+   "t": "2026-10-02"
+  },
+  {
+   "qty": 0.051386,
+   "symbol": "BRZU",
+   "t": "2026-10-05"
+  },
+  {
+   "qty": 0.035762895,
+   "symbol": "VST",
+   "t": "2026-10-05"
+  },
+  {
+   "qty": 0.019622189,
+   "symbol": "CEG",
+   "t": "2026-10-06"
+  },
+  {
+   "qty": 0.077735908,
+   "symbol": "BKH",
+   "t": "2026-10-07"
+  },
+  {
+   "qty": 0.161235573,
+   "symbol": "U",
+   "t": "2026-10-08"
+  },
+  {
+   "qty": 0.042097488,
+   "symbol": "MANE",
+   "t": "2026-10-08"
+  },
+  {
+   "qty": 0.012400189,
+   "symbol": "HUM",
+   "t": "2026-10-09"
+  },
+  {
+   "qty": 0.253369023,
+   "symbol": "FTRE",
+   "t": "2026-10-14"
+  },
+  {
+   "qty": 0.101851287,
+   "symbol": "CTSH",
+   "t": "2026-10-15"
+  },
+  {
+   "qty": 0.198701484,
+   "symbol": "ARQT",
+   "t": "2026-10-15"
+  },
+  {
+   "qty": 0.03993923,
+   "symbol": "HONA",
+   "t": "2026-10-16"
+  },
+  {
+   "qty": 0.119971392,
+   "symbol": "ARXS",
+   "t": "2026-10-16"
+  },
+  {
+   "qty": 0.034038238,
+   "symbol": "VST",
+   "t": "2026-10-19"
+  },
+  {
+   "qty": 0.06624135,
+   "symbol": "BKH",
+   "t": "2026-10-21"
+  },
+  {
+   "qty": 0.021883428,
+   "symbol": "IBM",
+   "t": "2026-10-22"
+  },
+  {
+   "qty": 0.178741507,
+   "symbol": "ARQT",
+   "t": "2026-10-26"
+  },
+  {
+   "qty": 0.029423365,
+   "symbol": "AN",
+   "t": "2026-10-30"
+  },
+  {
+   "qty": 0.364830722,
+   "symbol": "CPRI",
+   "t": "2026-11-02"
+  },
+  {
+   "qty": 0.010434145,
+   "symbol": "MSFT",
+   "t": "2026-11-02"
+  }
+ ],
+ "closed": [
+  {
+   "basis": 33.453288,
+   "close_date": "2026-08-24",
+   "close_fill": 10,
+   "gain": -0.457622,
+   "open_date": "2026-08-12",
+   "open_fill": 0,
+   "proceeds": 32.995667,
+   "qty": 0.043278,
+   "sale": "72560fc6-7eb9-4aab-8368-1a6e21d7753f",
+   "symbol": "SPY",
+   "term": "ST"
+  },
+  {
+   "basis": 32.669656,
+   "close_date": "2026-08-24",
+   "close_fill": 11,
+   "gain": -0.948483,
+   "open_date": "2026-08-12",
+   "open_fill": 2,
+   "proceeds": 31.721173,
+   "qty": 0.04508,
+   "sale": "69405944-fabd-43be-a45d-6f7ed3027adf",
+   "symbol": "QQQ",
+   "term": "ST"
+  },
+  {
+   "basis": 20.88,
+   "close_date": "2026-08-24",
+   "close_fill": 12,
+   "gain": -0.217403,
+   "open_date": "2026-08-12",
+   "open_fill": 5,
+   "proceeds": 20.662596,
+   "qty": 0.069192685,
+   "sale": "3a13d4f5-c0b2-4a66-8bc6-683e017361bd",
+   "symbol": "IWM",
+   "term": "ST"
+  },
+  {
+   "basis": 12.626127,
+   "close_date": "2026-08-24",
+   "close_fill": 12,
+   "gain": -0.117868,
+   "open_date": "2026-08-12",
+   "open_fill": 6,
+   "proceeds": 12.508259,
+   "qty": 0.041886315,
+   "sale": "3a13d4f5-c0b2-4a66-8bc6-683e017361bd",
+   "symbol": "IWM",
+   "term": "ST"
+  },
+  {
+   "basis": 6.28,
+   "close_date": "2026-08-26",
+   "close_fill": 18,
+   "gain": 0.090335,
+   "open_date": "2026-08-24",
+   "open_fill": 13,
+   "proceeds": 6.370335,
+   "qty": 0.052096295,
+   "sale": "32c84e2c-e97d-4018-8bb7-7b3c893aa09f",
+   "symbol": "MSTR",
+   "term": "ST"
+  },
+  {
+   "basis": 9.86,
+   "close_date": "2026-08-27",
+   "close_fill": 23,
+   "gain": -0.698462,
+   "open_date": "2026-08-25",
+   "open_fill": 14,
+   "proceeds": 9.161538,
+   "qty": 0.064912835,
+   "sale": "522bc223-7479-4796-83ba-07b1a79f0604",
+   "symbol": "MRNA",
+   "term": "ST"
+  },
+  {
+   "basis": 9.42,
+   "close_date": "2026-08-28",
+   "close_fill": 26,
+   "gain": -0.820501,
+   "open_date": "2026-08-25",
+   "open_fill": 16,
+   "proceeds": 8.599499,
+   "qty": 0.038344744,
+   "sale": "cefcfae1-920c-4ad4-a71d-70ac8315ef24",
+   "symbol": "MRVL",
+   "term": "ST"
+  },
+  {
+   "basis": 9.86,
+   "close_date": "2026-08-31",
+   "close_fill": 29,
+   "gain": -0.306078,
+   "open_date": "2026-08-25",
+   "open_fill": 15,
+   "proceeds": 9.553922,
+   "qty": 0.262052835,
+   "sale": "8fdcfc7b-e87a-4dc6-8176-850c1ac08f42",
+   "symbol": "SMCI",
+   "term": "ST"
+  },
+  {
+   "basis": 5.88,
+   "close_date": "2026-09-01",
+   "close_fill": 32,
+   "gain": 0.021521,
+   "open_date": "2026-08-28",
+   "open_fill": 28,
+   "proceeds": 5.901521,
+   "qty": 0.041386882,
+   "sale": "30c8fdd0-08b3-4214-a15d-d529a97709b3",
+   "symbol": "SPCX",
+   "term": "ST"
+  },
+  {
+   "basis": 5.62,
+   "close_date": "2026-09-01",
+   "close_fill": 34,
+   "gain": -0.396159,
+   "open_date": "2026-08-31",
+   "open_fill": 30,
+   "proceeds": 5.223841,
+   "qty": 0.024478418,
+   "sale": "7816e96f-8757-42d3-94ab-c5dbf227196f",
+   "symbol": "CRWD",
+   "term": "ST"
+  },
+  {
+   "basis": 7.38,
+   "close_date": "2026-09-02",
+   "close_fill": 35,
+   "gain": -0.56898,
+   "open_date": "2026-08-27",
+   "open_fill": 24,
+   "proceeds": 6.81102,
+   "qty": 0.929705215,
+   "sale": "c419c6b4-4b29-4c76-aa5d-c49a78d09392",
+   "symbol": "CXM",
+   "term": "ST"
+  },
+  {
+   "basis": 9.84,
+   "close_date": "2026-09-02",
+   "close_fill": 38,
+   "gain": 0.002614,
+   "open_date": "2026-08-26",
+   "open_fill": 17,
+   "proceeds": 9.842614,
+   "qty": 0.653560042,
+   "sale": "6c3755d8-b49d-40e0-b8ad-266ed7851dea",
+   "symbol": "BHVN",
+   "term": "ST"
+  },
+  {
+   "basis": 5.617177,
+   "close_date": "2026-09-02",
+   "close_fill": 38,
+   "gain": -0.399792,
+   "open_date": "2026-08-26",
+   "open_fill": 19,
+   "proceeds": 5.217386,
+   "qty": 0.346439958,
+   "sale": "6c3755d8-b49d-40e0-b8ad-266ed7851dea",
+   "symbol": "BHVN",
+   "term": "ST"
+  },
+  {
+   "basis": 4.242823,
+   "close_date": "2026-09-02",
+   "close_fill": 39,
+   "gain": -0.301975,
+   "open_date": "2026-08-26",
+   "open_fill": 19,
+   "proceeds": 3.940848,
+   "qty": 0.261676484,
+   "sale": "6c3755d8-b49d-40e0-b8ad-266ed7851dea",
+   "symbol": "BHVN",
+   "term": "ST"
+  },
+  {
+   "basis": 5.66,
+   "close_date": "2026-09-09",
+   "close_fill": 43,
+   "gain": -0.153881,
+   "open_date": "2026-09-02",
+   "open_fill": 37,
+   "proceeds": 5.506119,
+   "qty": 0.017434911,
+   "sale": "fd27c68c-690e-46e5-9f52-3a889a1447df",
+   "symbol": "AAPL",
+   "term": "ST"
+  },
+  {
+   "basis": 6.49,
+   "close_date": "2026-09-09",
+   "close_fill": 44,
+   "gain": -0.508444,
+   "open_date": "2026-09-03",
+   "open_fill": 42,
+   "proceeds": 5.981556,
+   "qty": 0.168694115,
+   "sale": "812a59d0-ac95-49fe-b5d0-2a878a76832f",
+   "symbol": "HOOG",
+   "term": "ST"
+  },
+  {
+   "basis": 5.15,
+   "close_date": "2026-09-10",
+   "close_fill": 45,
+   "gain": -0.146916,
+   "open_date": "2026-08-31",
+   "open_fill": 31,
+   "proceeds": 5.003084,
+   "qty": 0.019234935,
+   "sale": "45e32499-d18e-4d6a-a014-95896dfa38de",
+   "symbol": "ASND",
+   "term": "ST"
+  },
+  {
+   "basis": 6.24,
+   "close_date": "2026-09-11",
+   "close_fill": 49,
+   "gain": -0.257152,
+   "open_date": "2026-09-01",
+   "open_fill": 33,
+   "proceeds": 5.982848,
+   "qty": 0.406885758,
+   "sale": "a8435ea2-23a8-4721-a2f3-ec2a77803071",
+   "symbol": "CRK",
+   "term": "ST"
+  },
+  {
+   "basis": 8.4,
+   "close_date": "2026-09-15",
+   "close_fill": 51,
+   "gain": -0.060095,
+   "open_date": "2026-09-03",
+   "open_fill": 41,
+   "proceeds": 8.339905,
+   "qty": 0.056908255,
+   "sale": "7f9e7d87-49b2-4be3-b370-261305e30926",
+   "symbol": "SPCX",
+   "term": "ST"
+  },
+  {
+   "basis": 7.74,
+   "close_date": "2026-09-15",
+   "close_fill": 51,
+   "gain": -0.260593,
+   "open_date": "2026-09-10",
+   "open_fill": 46,
+   "proceeds": 7.479407,
+   "qty": 0.051036556,
+   "sale": "7f9e7d87-49b2-4be3-b370-261305e30926",
+   "symbol": "SPCX",
+   "term": "ST"
+  },
+  {
+   "basis": 5.79,
+   "close_date": "2026-09-18",
+   "close_fill": 54,
+   "gain": -0.122971,
+   "open_date": "2026-09-10",
+   "open_fill": 47,
+   "proceeds": 5.667029,
+   "qty": 0.013885624,
+   "sale": "5a0ccbca-afe6-45b7-a39f-7f7ad6d75439",
+   "symbol": "ELV",
+   "term": "ST"
+  },
+  {
+   "basis": 8.39,
+   "close_date": "2026-09-22",
+   "close_fill": 56,
+   "gain": 0.449222,
+   "open_date": "2026-09-03",
+   "open_fill": 40,
+   "proceeds": 8.839222,
+   "qty": 0.52235089,
+   "sale": "d5ad68e9-9321-4d43-83f3-e0fb6474a3a3",
+   "symbol": "SMMT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.69,
+   "close_date": "2026-09-22",
+   "close_fill": 56,
+   "gain": -0.516661,
+   "open_date": "2026-09-14",
+   "open_fill": 50,
+   "proceeds": 5.173339,
+   "qty": 0.305716741,
+   "sale": "d5ad68e9-9321-4d43-83f3-e0fb6474a3a3",
+   "symbol": "SMMT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.6,
+   "close_date": "2026-09-23",
+   "close_fill": 59,
+   "gain": -0.316301,
+   "open_date": "2026-09-11",
+   "open_fill": 48,
+   "proceeds": 5.283699,
+   "qty": 0.076327554,
+   "sale": "2cf57c93-7853-436f-87b4-74bed51a30f3",
+   "symbol": "INSP",
+   "term": "ST"
+  },
+  {
+   "basis": 6.27,
+   "close_date": "2026-09-23",
+   "close_fill": 59,
+   "gain": -0.572963,
+   "open_date": "2026-09-21",
+   "open_fill": 55,
+   "proceeds": 5.697037,
+   "qty": 0.082298585,
+   "sale": "2cf57c93-7853-436f-87b4-74bed51a30f3",
+   "symbol": "INSP",
+   "term": "ST"
+  },
+  {
+   "basis": 7.04,
+   "close_date": "2026-09-24",
+   "close_fill": 60,
+   "gain": -0.052492,
+   "open_date": "2026-09-16",
+   "open_fill": 52,
+   "proceeds": 6.987508,
+   "qty": 0.0474611,
+   "sale": "f4a92f8e-ee69-4550-8fbe-6b31c8dd18f4",
+   "symbol": "SPCX",
+   "term": "ST"
+  },
+  {
+   "basis": 9.91,
+   "close_date": "2026-09-24",
+   "close_fill": 61,
+   "gain": -2.529457,
+   "open_date": "2026-08-26",
+   "open_fill": 20,
+   "proceeds": 7.380543,
+   "qty": 0.52218358,
+   "sale": "3c4545ce-48dd-4c70-973a-9046fe583cba",
+   "symbol": "BZ",
+   "term": "ST"
+  },
+  {
+   "basis": 8.19,
+   "close_date": "2026-09-24",
+   "close_fill": 64,
+   "gain": -0.586638,
+   "open_date": "2026-09-23",
+   "open_fill": 57,
+   "proceeds": 7.603362,
+   "qty": 0.06705969,
+   "sale": "8b4bcfd1-dbc6-43be-8cfb-a78dc2455d99",
+   "symbol": "NICE",
+   "term": "ST"
+  },
+  {
+   "basis": 7.13,
+   "close_date": "2026-09-25",
+   "close_fill": 68,
+   "gain": -0.614361,
+   "open_date": "2026-09-24",
+   "open_fill": 62,
+   "proceeds": 6.515639,
+   "qty": 0.224383182,
+   "sale": "fae1693f-c2c4-4ba1-9c79-7f59c8e25033",
+   "symbol": "SRZN",
+   "term": "ST"
+  },
+  {
+   "basis": 9.63,
+   "close_date": "2026-09-28",
+   "close_fill": 70,
+   "gain": -0.737254,
+   "open_date": "2026-09-25",
+   "open_fill": 65,
+   "proceeds": 8.892745,
+   "qty": 0.079325853,
+   "sale": "b9307a70-8ace-4bf8-b473-b7b67b9065d5",
+   "symbol": "AKAM",
+   "term": "ST"
+  },
+  {
+   "basis": 7.25,
+   "close_date": "2026-09-28",
+   "close_fill": 71,
+   "gain": -0.550335,
+   "open_date": "2026-09-25",
+   "open_fill": 66,
+   "proceeds": 6.699665,
+   "qty": 0.080646955,
+   "sale": "42e39c60-1705-4468-87d8-5b035845608a",
+   "symbol": "AAON",
+   "term": "ST"
+  },
+  {
+   "basis": 5.16,
+   "close_date": "2026-09-30",
+   "close_fill": 74,
+   "gain": -0.326183,
+   "open_date": "2026-09-25",
+   "open_fill": 67,
+   "proceeds": 4.833816,
+   "qty": 0.013932314,
+   "sale": "e7f22372-a239-432c-9bce-02fc078b55c8",
+   "symbol": "TSLA",
+   "term": "ST"
+  },
+  {
+   "basis": 6.16,
+   "close_date": "2026-09-30",
+   "close_fill": 75,
+   "gain": -0.440883,
+   "open_date": "2026-09-29",
+   "open_fill": 73,
+   "proceeds": 5.719117,
+   "qty": 0.075416258,
+   "sale": "1899f6c1-3e0b-4b02-8b04-abb783b16843",
+   "symbol": "AXTI",
+   "term": "ST"
+  },
+  {
+   "basis": 6.45,
+   "close_date": "2026-10-01",
+   "close_fill": 78,
+   "gain": -0.088191,
+   "open_date": "2026-09-16",
+   "open_fill": 53,
+   "proceeds": 6.361809,
+   "qty": 0.232081174,
+   "sale": "12dbecf2-4325-422c-97ee-bfa5a8c05581",
+   "symbol": "ADPT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.56,
+   "close_date": "2026-10-01",
+   "close_fill": 78,
+   "gain": -0.210003,
+   "open_date": "2026-09-24",
+   "open_fill": 63,
+   "proceeds": 5.349997,
+   "qty": 0.195169896,
+   "sale": "12dbecf2-4325-422c-97ee-bfa5a8c05581",
+   "symbol": "ADPT",
+   "term": "ST"
+  },
+  {
+   "basis": 7.25,
+   "close_date": "2026-10-02",
+   "close_fill": 79,
+   "gain": -0.580785,
+   "open_date": "2026-10-01",
+   "open_fill": 76,
+   "proceeds": 6.669215,
+   "qty": 0.032294562,
+   "sale": "81d8b09a-7027-4d89-bb60-a5e373ec424e",
+   "symbol": "ACN",
+   "term": "ST"
+  },
+  {
+   "basis": 5.44,
+   "close_date": "2026-10-02",
+   "close_fill": 82,
+   "gain": -0.376046,
+   "open_date": "2026-10-01",
+   "open_fill": 77,
+   "proceeds": 5.063954,
+   "qty": 0.207760464,
+   "sale": "4ca9818f-0e5c-41ae-ac49-5401dbc3fb8b",
+   "symbol": "EFXT",
+   "term": "ST"
+  },
+  {
+   "basis": 8.22,
+   "close_date": "2026-10-05",
+   "close_fill": 84,
+   "gain": -0.060279,
+   "open_date": "2026-09-29",
+   "open_fill": 72,
+   "proceeds": 8.159721,
+   "qty": 0.0286495,
+   "sale": "5783e247-d569-4143-b23e-95bfe26cbda2",
+   "symbol": "BE",
+   "term": "ST"
+  },
+  {
+   "basis": 5.769999,
+   "close_date": "2026-10-06",
+   "close_fill": 87,
+   "gain": 0.146261,
+   "open_date": "2026-09-28",
+   "open_fill": 69,
+   "proceeds": 5.91626,
+   "qty": 0.007983683,
+   "sale": "5ddb1d2a-cde4-4fe0-b70d-bc978eb956f4",
+   "symbol": "META",
+   "term": "ST"
+  },
+  {
+   "basis": 7.0,
+   "close_date": "2026-10-07",
+   "close_fill": 88,
+   "gain": -0.006015,
+   "open_date": "2026-10-02",
+   "open_fill": 80,
+   "proceeds": 6.993985,
+   "qty": 0.020321426,
+   "sale": "851529a9-95c9-4605-926c-3c9f4b3efbd2",
+   "symbol": "GOOGL",
+   "term": "ST"
+  },
+  {
+   "basis": 6.14,
+   "close_date": "2026-10-07",
+   "close_fill": 90,
+   "gain": -0.397318,
+   "open_date": "2026-09-23",
+   "open_fill": 58,
+   "proceeds": 5.742682,
+   "qty": 0.100130463,
+   "sale": "14833b32-b30b-4ef8-b39c-92ee1738cf64",
+   "symbol": "BAND",
+   "term": "ST"
+  },
+  {
+   "basis": 5.7,
+   "close_date": "2026-10-08",
+   "close_fill": 93,
+   "gain": -0.42771,
+   "open_date": "2026-10-08",
+   "open_fill": 92,
+   "proceeds": 5.272289,
+   "qty": 0.042097488,
+   "sale": "7cf9fece-7d4c-4fd1-a7c4-94ae8ee7abe1",
+   "symbol": "MANE",
+   "term": "ST"
+  },
+  {
+   "basis": 5.6,
+   "close_date": "2026-10-13",
+   "close_fill": 95,
+   "gain": -0.413918,
+   "open_date": "2026-10-09",
+   "open_fill": 94,
+   "proceeds": 5.186081,
+   "qty": 0.012400189,
+   "sale": "fdb502e4-97d7-4158-9756-c122eb56448f",
+   "symbol": "HUM",
+   "term": "ST"
+  },
+  {
+   "basis": 7.6,
+   "close_date": "2026-10-14",
+   "close_fill": 97,
+   "gain": -0.535302,
+   "open_date": "2026-10-08",
+   "open_fill": 91,
+   "proceeds": 7.064698,
+   "qty": 0.161235573,
+   "sale": "4026fc36-2118-402e-a654-c2d5cf92afe9",
+   "symbol": "U",
+   "term": "ST"
+  },
+  {
+   "basis": 5.9,
+   "close_date": "2026-10-14",
+   "close_fill": 98,
+   "gain": -0.418581,
+   "open_date": "2026-10-06",
+   "open_fill": 86,
+   "proceeds": 5.481419,
+   "qty": 0.019622189,
+   "sale": "81eabf39-d377-4c2c-aa43-5a0c6ea9510c",
+   "symbol": "CEG",
+   "term": "ST"
+  },
+  {
+   "basis": 14.83,
+   "close_date": "2026-10-15",
+   "close_fill": 100,
+   "gain": -3.726975,
+   "open_date": "2026-08-27",
+   "open_fill": 21,
+   "proceeds": 11.103025,
+   "qty": 0.066354061,
+   "sale": "4ed0aa2c-4abb-4881-8189-5f6b838df07c",
+   "symbol": "NBIS",
+   "term": "ST"
+  },
+  {
+   "basis": 6.87,
+   "close_date": "2026-10-15",
+   "close_fill": 102,
+   "gain": -0.525884,
+   "open_date": "2026-10-05",
+   "open_fill": 83,
+   "proceeds": 6.344116,
+   "qty": 0.051386,
+   "sale": "12e9d9fd-d4c6-4bff-82e6-4b0d705a636f",
+   "symbol": "BRZU",
+   "term": "ST"
+  },
+  {
+   "basis": 5.25,
+   "close_date": "2026-10-20",
+   "close_fill": 106,
+   "gain": -0.13961,
+   "open_date": "2026-10-02",
+   "open_fill": 81,
+   "proceeds": 5.11039,
+   "qty": 0.043519347,
+   "sale": "8a53970c-479d-4edf-be31-b7e3b64aa642",
+   "symbol": "SYNA",
+   "term": "ST"
+  },
+  {
+   "basis": 6.71,
+   "close_date": "2026-10-21",
+   "close_fill": 108,
+   "gain": -0.473887,
+   "open_date": "2026-10-16",
+   "open_fill": 104,
+   "proceeds": 6.236113,
+   "qty": 0.119971392,
+   "sale": "b6b5f800-68d2-463d-a811-90e7d9378327",
+   "symbol": "ARXS",
+   "term": "ST"
+  },
+  {
+   "basis": 6.73,
+   "close_date": "2026-10-23",
+   "close_fill": 110,
+   "gain": -0.416566,
+   "open_date": "2026-10-16",
+   "open_fill": 103,
+   "proceeds": 6.313434,
+   "qty": 0.03993923,
+   "sale": "c9b15d9b-b6b7-4afc-9500-5fe9c36792d4",
+   "symbol": "HONA",
+   "term": "ST"
+  },
+  {
+   "basis": 6.69,
+   "close_date": "2026-10-29",
+   "close_fill": 112,
+   "gain": -0.067629,
+   "open_date": "2026-10-15",
+   "open_fill": 99,
+   "proceeds": 6.622371,
+   "qty": 0.101851287,
+   "sale": "9f235a6a-06b3-4c37-8c5f-4db20ea82320",
+   "symbol": "CTSH",
+   "term": "ST"
+  },
+  {
+   "basis": 5.49,
+   "close_date": "2026-10-30",
+   "close_fill": 114,
+   "gain": -0.061315,
+   "open_date": "2026-10-14",
+   "open_fill": 96,
+   "proceeds": 5.428685,
+   "qty": 0.253369023,
+   "sale": "a7e5a7b2-5ba5-4dcb-8cb5-0571b10b69d8",
+   "symbol": "FTRE",
+   "term": "ST"
+  },
+  {
+   "basis": 7.189999,
+   "close_date": "2026-10-30",
+   "close_fill": 115,
+   "gain": -1.798989,
+   "open_date": "2026-09-02",
+   "open_fill": 36,
+   "proceeds": 5.39101,
+   "qty": 0.004539783,
+   "sale": "f26816ae-0a27-42ed-8953-9d22fcc5a01f",
+   "symbol": "SNDK",
+   "term": "ST"
+  },
+  {
+   "basis": 5.57,
+   "close_date": "2026-11-05",
+   "close_fill": 118,
+   "gain": 0.001987,
+   "open_date": "2026-10-15",
+   "open_fill": 101,
+   "proceeds": 5.571987,
+   "qty": 0.198701484,
+   "sale": "f96fed51-3c87-4ea4-b71e-763bde5289ea",
+   "symbol": "ARQT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.63,
+   "close_date": "2026-11-05",
+   "close_fill": 118,
+   "gain": -0.617731,
+   "open_date": "2026-10-26",
+   "open_fill": 111,
+   "proceeds": 5.012269,
+   "qty": 0.178741507,
+   "sale": "f96fed51-3c87-4ea4-b71e-763bde5289ea",
+   "symbol": "ARQT",
+   "term": "ST"
+  },
+  {
+   "basis": 5.42,
+   "close_date": "2026-11-05",
+   "close_fill": 119,
+   "gain": -0.030024,
+   "open_date": "2026-10-22",
+   "open_fill": 109,
+   "proceeds": 5.389976,
+   "qty": 0.021883428,
+   "sale": "590fa805-ead2-49a5-899c-67e34b91c57c",
+   "symbol": "IBM",
+   "term": "ST"
+  }
+ ],
+ "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
+ "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
+ "open": {
+  "AN": 0.029423365,
+  "BKH": 0.143977258,
+  "CPRI": 0.364830722,
+  "IWM": 0.137264116,
+  "MSFT": 0.025130111,
+  "NVDA": 0.054469495,
+  "PLTR": 0.042013208,
+  "QQQ": 0.058331282,
+  "SPY": 0.053798739,
+  "VST": 0.069801133
+ },
+ "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
+ "summary": {
+  "by_year": {
+   "2026": {
+    "lt": {
+     "gains": 0.0,
+     "losses": 0.0,
+     "net": 0.0,
+     "sales": 0
+    },
+    "net": -24.7,
+    "sales": 48,
+    "st": {
+     "gains": 0.26,
+     "losses": -24.96,
+     "net": -24.7,
+     "sales": 48
+    }
+   }
+  },
+  "fills": 120,
+  "last_fill": "2026-11-05T18:00:31.801007Z",
+  "last_sale": "2026-11-05",
+  "lt": {
+   "gains": 0.0,
+   "losses": 0.0,
+   "net": 0.0,
+   "sales": 0
+  },
+  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
+  "net": -24.7,
+  "reconciliation_residual": -0.0414,
+  "sales": 48,
+  "since": "2026-08-12",
+  "st": {
+   "gains": 0.26,
+   "losses": -24.96,
+   "net": -24.7,
+   "sales": 48
+  },
+  "state": "ok",
+  "wash_watch": {
+   "cross_account": {
+    "sales": 0,
+    "upper_bound": 0.0
+   },
+   "same_account": {
+    "sales": 5,
+    "upper_bound": -1.77
+   }
+  }
+ },
+ "wash_watch": [
+  {
+   "loss": -0.34,
+   "replacement_buys": 3,
+   "replacement_qty": 0.113532,
+   "sale_date": "2026-08-24",
+   "scope": "same-account",
+   "sold_qty": 0.111079,
+   "symbol": "IWM",
+   "upper_bound": -0.34
+  },
+  {
+   "loss": -0.95,
+   "replacement_buys": 2,
+   "replacement_qty": 0.056054,
+   "sale_date": "2026-08-24",
+   "scope": "same-account",
+   "sold_qty": 0.04508,
+   "symbol": "QQQ",
+   "upper_bound": -0.95
+  },
+  {
+   "loss": -0.46,
+   "replacement_buys": 1,
+   "replacement_qty": 0.016234,
+   "sale_date": "2026-08-24",
+   "scope": "same-account",
+   "sold_qty": 0.043278,
+   "symbol": "SPY",
+   "upper_bound": -0.17
+  },
+  {
+   "loss": -0.32,
+   "replacement_buys": 2,
+   "replacement_qty": 0.088848,
+   "sale_date": "2026-09-15",
+   "scope": "same-account",
+   "sold_qty": 0.107945,
+   "symbol": "SPCX",
+   "upper_bound": -0.26
+  },
+  {
+   "loss": -0.05,
+   "replacement_buys": 3,
+   "replacement_qty": 0.149332,
+   "sale_date": "2026-09-24",
+   "scope": "same-account",
+   "sold_qty": 0.047461,
+   "symbol": "SPCX",
+   "upper_bound": -0.05
+  }
+ ]
+}
