@@ -2574,3 +2574,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
 - notes: Holding risk-off/0.25 into the close — VIX elevated at 28.2, Nasdaq finished down ~5% on an AI/chip/data-center wipeout, and holdings are deep in drawdown (VST -24%, NVDA -20%, PLTR -17%). Friday's jobs print is the next catalyst and $32 cash caps adds regardless.
 - journal: Thu 11/5 18:56: No change — staying risk-off/0.25 into Friday's jobs report. Tape closed broken on AI/chip fears, VIX stuck near 28; watching for a hawkish repricing and whether chip names find a floor. All index ETFs and deep losers remain off the buy list.
+
+### 2026-11-06T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
+- notes: Jobs print cleared (165k, claims at 57-yr lows) but the AI/chip wreck continues — Nasdaq down another ~5%, $2.5T wiped out, VIX still elevated at 26.9. Holdings deep in drawdown (VST -19%, NVDA -16%, PLTR -15%); staying risk-off/0.25 and avoiding all falling-knife AI names and index proxies.
+- journal: Fri 11/6 10:00: Jobs report landed solid (strong labor/productivity) and VIX ticked 28.2->26.9, but AI panic isn't done — Nasdaq -5% again. Holding risk-off/0.25; watching whether chip names find a floor midday. $32 cash caps adds regardless.
