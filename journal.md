@@ -2604,3 +2604,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY'] | favor: ['MSFT', 'BKH']
 - notes: Monday open is constructive: VIX cooling 25.6->23.2, Dow futures +600 as oil drops and the AI unwind stabilizes, though an NVDA CEO scandal and this week's CPI keep risk two-sided. Nudging to neutral/0.4 but keeping deep losers (NVDA -23%, PLTR/VST -14%) and broken index ETFs off the buy list; $32 cash caps adds anyway.
 - journal: Mon 11/9 10:00: Weekend gap held up — recovery stuck, VIX 25.6->23.2, futures strongly green on oil drop. Upgraded risk-off->neutral, scale 0.3->0.4. Watching the NVDA scandal fallout and Oct CPI this week; chip/high-beta names and index ETFs stay off buys until a real floor forms.
+
+### 2026-11-09T18:34 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY'] | favor: ['MSFT', 'BKH', 'CPRI']
+- notes: Strong relief rally — Dow +1,100, Nasdaq +2%, VIX cooling to 19.9 as buyers step in despite the NVDA CEO probe weighing on chips. Upgrading scale to 0.5 but staying neutral into CPI and a hawkish Fed (rate-hike chatter) this week; deep losers and broken index ETFs stay off buys and $19 cash caps adds anyway.
+- journal: Mon 11/9 18:34: Recovery confirmed — VIX 23.2->19.9, broad rally, AI trade rebounding though NVDA (-21%) still bleeding on CEO investigation. Nudged scale 0.4->0.5. Watching Oct CPI and Fed speakers this week; keeping NVDA/high-beta and index ETFs off buys until the macro events clear.
