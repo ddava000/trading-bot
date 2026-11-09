@@ -2598,3 +2598,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY', 'AN', 'BKH', 'CPRI'] | favor: ['MSFT']
 - notes: After-hours Friday into the weekend: VIX ticked back up to 25.6 after the worst Nasdaq rout in 19 months, and the recovery is still tentative with holdings deep in drawdown (NVDA -17%, VST -15%, PLTR -14%). Staying risk-off/0.3 with weekend gap risk; $32 cash caps any adds anyway.
 - journal: Fri 11/6 18:27: Post-close — VIX crept 24.9->25.6, no durable AI floor yet and weekend gap risk looms. Holding risk-off/0.3; watching Monday open for whether the dip-buying holds or the unwind resumes. Deep losers and index ETFs stay off the buy list; cash nearly exhausted.
+
+### 2026-11-09T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['NVDA', 'PLTR', 'VST', 'QQQ', 'IWM', 'SPY'] | favor: ['MSFT', 'BKH']
+- notes: Monday open is constructive: VIX cooling 25.6->23.2, Dow futures +600 as oil drops and the AI unwind stabilizes, though an NVDA CEO scandal and this week's CPI keep risk two-sided. Nudging to neutral/0.4 but keeping deep losers (NVDA -23%, PLTR/VST -14%) and broken index ETFs off the buy list; $32 cash caps adds anyway.
+- journal: Mon 11/9 10:00: Weekend gap held up — recovery stuck, VIX 25.6->23.2, futures strongly green on oil drop. Upgraded risk-off->neutral, scale 0.3->0.4. Watching the NVDA scandal fallout and Oct CPI this week; chip/high-beta names and index ETFs stay off buys until a real floor forms.
