@@ -1,6 +1,6 @@
 {
  "degraded": "broker_unreachable",
- "degraded_since_passes": 46,
+ "degraded_since_passes": 51,
  "dry": false,
  "equity": 337.33,
  "holds": [],
@@ -10,5 +10,5 @@
   "QQQ": 0.166305,
   "SPY": 0.145479
  },
- "ts": "2026-11-09T12:37"
+ "ts": "2026-11-09T12:43"
 }
