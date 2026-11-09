@@ -1,35 +1,35 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-11-09T14:45Z",
+ "as_of_utc": "2026-11-09T15:00Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-11-09T14:45:31+00:00",
+  "checked_at": "2026-11-09T15:00:37+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 25.79,
+ "cash": 19.34,
  "crypto_enabled": true,
- "day_pnl": 2.88,
+ "day_pnl": 3.3,
  "earnings_guard": "live",
- "equity": 214.58,
+ "equity": 215.0,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": 6.6,
-  "NVDA": -22.4,
-  "PLTR": -10.9,
-  "VST": -12.8
+  "MSFT": 5.9,
+  "NVDA": -21.4,
+  "PLTR": -10.5,
+  "VST": -12.4
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-11-09T15:05Z",
+ "next_expected_utc": "2026-11-09T15:20Z",
  "orders_this_run": 1,
  "plan": {
   "date": "2026-11-09",
@@ -55,9 +55,9 @@
     }
    }
   },
-  "checked_at": "2026-11-09T14:45:29+00:00",
-  "fills": 121,
-  "last_fill": "2026-11-09T14:45:26.622183Z",
+  "checked_at": "2026-11-09T15:00:35+00:00",
+  "fills": 122,
+  "last_fill": "2026-11-09T15:00:33.175683Z",
   "last_sale": "2026-11-05",
   "lt": {
    "gains": 0.0,
@@ -91,12 +91,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 39.26,
-  "index": 117.5,
-  "trade": 25.59
+  "hold": 39.36,
+  "index": 117.75,
+  "trade": 32.1
  },
- "ts": "2026-11-09T09:45 ET",
- "vix": 23.2,
+ "ts": "2026-11-09T10:00 ET",
+ "vix": 21.8,
  "vix_live": true,
- "vs_baseline_pct": -13.44
+ "vs_baseline_pct": -13.27
 }
