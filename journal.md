@@ -2628,3 +2628,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN'] | favor: ['MSFT', 'BKH', 'CPRI']
 - notes: Hot Oct CPI reignited inflation fears — S&P futures dropped and Fed rate-hike bets are building, with VIX ticking back up to 21.1. Downgrading to risk-off/0.3 on the macro shock; adding AN (JPMorgan downgrade) to avoids, keeping NVDA/high-beta and index ETFs off buys until the tape settles.
 - journal: Tue 11/10 10:00: CPI came in hotter than expected — the event risk I was waiting on broke against us, futures red and rate-hike chatter rising, VIX 19.9->21.1. Cut scale 0.5->0.3, regime neutral->risk-off, added AN after JPM downgrade. Watching how the tape digests CPI and whether the relief rally reverses.
+
+### 2026-11-10T15:52 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
+- notes: Hot CPI still weighing on the tape with VIX at 20 and rate-hike bets elevated; index ETFs and high-beta names are red. Holding risk-off/0.3 into the close and moving MSFT to avoids on the Anthropic competitive-threat headline.
+- journal: Tue 11/10 15:52: VIX eased 21.1->20.0 but tape stayed soft post-CPI; index ETFs/PLTR/VST bleeding. Added MSFT to avoids (Anthropic office-tools news). Near close with $29 cash, staying defensive; watching for tomorrow's follow-through and Fed speakers.
