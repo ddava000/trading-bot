@@ -1095,6 +1095,19 @@
    "sale": "590fa805-ead2-49a5-899c-67e34b91c57c",
    "symbol": "IBM",
    "term": "ST"
+  },
+  {
+   "basis": 12.36,
+   "close_date": "2026-11-10",
+   "close_fill": 122,
+   "gain": -3.091689,
+   "open_date": "2026-08-27",
+   "open_fill": 22,
+   "proceeds": 9.268311,
+   "qty": 0.054469495,
+   "sale": "1824b433-b922-49f8-ba70-8f2af36e1744",
+   "symbol": "NVDA",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -1106,7 +1119,6 @@
   "IMVT": 0.185206521,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
-  "NVDA": 0.054469495,
   "PLTR": 0.042013208,
   "QQQ": 0.058331282,
   "SPY": 0.053798739,
@@ -1122,19 +1134,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -24.7,
-    "sales": 48,
+    "net": -27.79,
+    "sales": 49,
     "st": {
      "gains": 0.26,
-     "losses": -24.96,
-     "net": -24.7,
-     "sales": 48
+     "losses": -28.05,
+     "net": -27.79,
+     "sales": 49
     }
    }
   },
-  "fills": 122,
-  "last_fill": "2026-11-09T15:00:33.175683Z",
-  "last_sale": "2026-11-05",
+  "fills": 123,
+  "last_fill": "2026-11-10T14:52:34.159612Z",
+  "last_sale": "2026-11-10",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1142,15 +1154,15 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -24.7,
-  "reconciliation_residual": -0.0414,
-  "sales": 48,
+  "net": -27.79,
+  "reconciliation_residual": -0.0597,
+  "sales": 49,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -24.96,
-   "net": -24.7,
-   "sales": 48
+   "losses": -28.05,
+   "net": -27.79,
+   "sales": 49
   },
   "state": "ok",
   "wash_watch": {
