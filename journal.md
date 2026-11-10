@@ -2640,3 +2640,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
 - notes: Hot Oct CPI continues to pressure the tape with rate-hike bets building and VIX at 19.5; index ETFs and high-beta names stay red. Holding risk-off/0.3 after the close with only $29 cash, keeping NVDA/MSFT/high-beta/index ETFs off buys.
 - journal: Tue 11/10 17:23: After-hours check, posture unchanged post-CPI. VIX eased to 19.5 but rate-hike fears persist and NVDA sell-off drags. Watching tomorrow's follow-through and Fed speakers before loosening; BKH/CPRI still the only constructive holds.
+
+### 2026-11-10T18:35 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
+- notes: Hot Oct CPI keeps rate-hike bets elevated with a December hike in play; VIX 19.5 but the tape stayed soft with NVDA sell-off dragging indices. Staying risk-off/0.3 after the close with just $29 cash capping any adds anyway.
+- journal: Tue 11/10 18:35: Posture unchanged post-close. CPI damage persists, VIX steady 19.5, deep losers (VST -11%, PLTR -10%, IWM/QQQ broken) stay off buys. Watching tomorrow's follow-through and Fed speakers before loosening; BKH/CPRI remain the only green holds.
