@@ -2622,3 +2622,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY'] | favor: ['MSFT', 'BKH', 'CPRI']
 - notes: Strong relief rally held into the close — Dow +1,100, Nasdaq +2%, VIX at 19.9 — but Oct CPI and Fed speakers mid-week keep risk two-sided. Holding neutral/0.5; NVDA still bleeding on the CEO probe, deep losers and broken index ETFs stay off buys and $19 cash caps adds anyway.
 - journal: Mon 11/9 20:53: End-of-day posture unchanged — rally intact, VIX steady 19.9, no new catalysts. Watching Oct CPI print and Fed speeches before adding risk; NVDA/high-beta and index ETFs stay off the buy list until macro clears.
+
+### 2026-11-10T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN'] | favor: ['MSFT', 'BKH', 'CPRI']
+- notes: Hot Oct CPI reignited inflation fears — S&P futures dropped and Fed rate-hike bets are building, with VIX ticking back up to 21.1. Downgrading to risk-off/0.3 on the macro shock; adding AN (JPMorgan downgrade) to avoids, keeping NVDA/high-beta and index ETFs off buys until the tape settles.
+- journal: Tue 11/10 10:00: CPI came in hotter than expected — the event risk I was waiting on broke against us, futures red and rate-hike chatter rising, VIX 19.9->21.1. Cut scale 0.5->0.3, regime neutral->risk-off, added AN after JPM downgrade. Watching how the tape digests CPI and whether the relief rally reverses.
