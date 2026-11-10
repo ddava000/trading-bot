@@ -2616,3 +2616,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY'] | favor: ['MSFT', 'BKH', 'CPRI']
 - notes: Relief rally holding into the close with VIX at 19.9 and tech rebounding, but Oct CPI and hawkish Fed rate-hike chatter this week keep risk two-sided. Holding neutral/0.5; NVDA still bleeding on CEO probe, deep losers and broken index ETFs stay off buys and $19 cash caps adds anyway.
 - journal: Mon 11/9 19:49: Rally intact, VIX steady 19.9, no new catalysts since last check. Watching CPI release and Fed speakers mid-week before adding risk; keeping NVDA/high-beta and index ETFs off the buy list until macro clears.
+
+### 2026-11-09T20:53 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY'] | favor: ['MSFT', 'BKH', 'CPRI']
+- notes: Strong relief rally held into the close — Dow +1,100, Nasdaq +2%, VIX at 19.9 — but Oct CPI and Fed speakers mid-week keep risk two-sided. Holding neutral/0.5; NVDA still bleeding on the CEO probe, deep losers and broken index ETFs stay off buys and $19 cash caps adds anyway.
+- journal: Mon 11/9 20:53: End-of-day posture unchanged — rally intact, VIX steady 19.9, no new catalysts. Watching Oct CPI print and Fed speeches before adding risk; NVDA/high-beta and index ETFs stay off the buy list until macro clears.
