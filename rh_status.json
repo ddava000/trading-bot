@@ -1,7 +1,7 @@
 {
- "arm_a_watch_at": "2026-11-11T15:21",
+ "arm_a_watch_at": "2026-11-11T15:38",
  "dry": false,
- "equity": 342.04,
+ "equity": 341.96,
  "held": [
   "IWM",
   "QQQ",
@@ -9,7 +9,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 341.75,
+ "index": 341.8,
  "machine": {
   "guards": {
    "fast_startup": 1,
@@ -91,5 +91,5 @@
  "risk": 0.4,
  "settled": 0.12,
  "trade": 0.0,
- "ts": "2026-11-11T15:25"
+ "ts": "2026-11-11T15:40"
 }
