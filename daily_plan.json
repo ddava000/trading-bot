@@ -1,6 +1,6 @@
 {
-  "regime": "risk-off",
-  "risk_scale": 0.3,
+  "regime": "neutral",
+  "risk_scale": 0.4,
   "avoid_symbols": [
     "NVDA",
     "PLTR",
@@ -15,9 +15,9 @@
     "BKH",
     "CPRI"
   ],
-  "notes": "Hot Oct CPI keeps rate-hike bets elevated with a December hike in play; VIX 19.5 but the tape stayed soft with NVDA sell-off dragging indices. Staying risk-off/0.3 after the close with just $29 cash capping any adds anyway.",
-  "journal_entry": "Tue 11/10 18:35: Posture unchanged post-close. CPI damage persists, VIX steady 19.5, deep losers (VST -11%, PLTR -10%, IWM/QQQ broken) stay off buys. Watching tomorrow's follow-through and Fed speakers before loosening; BKH/CPRI remain the only green holds.",
-  "date": "2026-11-10",
+  "notes": "VIX eased to 18.4 and tech is attempting a rebound on CoreWeave's beat, but hot CPI keeps a December hike in play and the 10-yr near 5% caps upside; nudging to neutral/0.4 while keeping broken high-beta and index ETFs off buys.",
+  "journal_entry": "Wed 11/11 10:00: VIX 20->18.4 and futures firmer on CoreWeave, so I upgraded risk-off->neutral and 0.3->0.4. Still cautious with rate-hike fears and 10-yr near 5%; IWM/QQQ/SPY/PLTR/VST remain red and off buys. Watching whether the tech bounce holds vs. yields. BKH/CPRI still the only green holds; $29 cash caps adds anyway.",
+  "date": "2026-11-11",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-10T18:35 ET"
+  "updated_at": "2026-11-11T10:00 ET"
 }
