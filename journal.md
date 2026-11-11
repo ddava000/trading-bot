@@ -2652,3 +2652,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
 - notes: VIX eased to 18.4 and tech is attempting a rebound on CoreWeave's beat, but hot CPI keeps a December hike in play and the 10-yr near 5% caps upside; nudging to neutral/0.4 while keeping broken high-beta and index ETFs off buys.
 - journal: Wed 11/11 10:00: VIX 20->18.4 and futures firmer on CoreWeave, so I upgraded risk-off->neutral and 0.3->0.4. Still cautious with rate-hike fears and 10-yr near 5%; IWM/QQQ/SPY/PLTR/VST remain red and off buys. Watching whether the tech bounce holds vs. yields. BKH/CPRI still the only green holds; $29 cash caps adds anyway.
+
+### 2026-11-11T15:45 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
+- notes: VIX eased to 17.6 and tech is firmer on the CoreWeave-led rebound, but hot CPI keeps a December hike in play and rate-hike fears persist, so I'm holding neutral/0.4 and keeping broken high-beta and index ETFs off buys.
+- journal: Wed 11/11 15:45: VIX 18.4->17.6, Nasdaq rebounding on CoreWeave/chip rally into the close. Posture unchanged at neutral/0.4; IWM/QQQ/SPY/PLTR/VST still red and off buys, MSFT held out on Anthropic threat. BKH/CPRI remain the only green holds; $29 cash caps adds. Watching Fed speakers and whether the tech bounce holds vs yields.
