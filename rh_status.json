@@ -1,5 +1,5 @@
 {
- "arm_a_watch_at": "2026-11-11T14:04",
+ "arm_a_watch_at": "2026-11-11T14:21",
  "dry": false,
  "equity": 342.41,
  "held": [
@@ -9,7 +9,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 342.33,
+ "index": 341.92,
  "machine": {
   "guards": {
    "fast_startup": 1,
@@ -91,5 +91,5 @@
  "risk": 0.4,
  "settled": 0.12,
  "trade": 0.0,
- "ts": "2026-11-11T14:08"
+ "ts": "2026-11-11T14:23"
 }
