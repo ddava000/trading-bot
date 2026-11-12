@@ -2670,3 +2670,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
 - notes: VIX steady at 17.5 and the CoreWeave-led AI rebound held, but hot October CPI keeps a December hike in play with yields a persistent headwind, so I'm holding neutral/0.4 and keeping broken high-beta and index ETFs off buys.
 - journal: Wed 11/11 19:45: End-of-day check, posture unchanged at neutral/0.4. VIX flat 17.5; tech firmer on CoreWeave but CPI/rate-hike overhang persists. IWM/QQQ/SPY/PLTR/VST still red and off buys; BKH/CPRI the only green holds and $29 cash caps adds. Watching Fed speakers and whether the tech bounce holds vs yields.
+
+### 2026-11-12T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.35
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
+- notes: VIX ticked up to 18.8 and an Nvidia leadership/scandal story is pressuring the AI trade even as CoreWeave spikes, while hot October CPI keeps a December hike live; I'm trimming risk to 0.35 and keeping broken high-beta and index ETFs off buys.
+- journal: Thu 11/12 10:00: VIX 17.5->18.8 and an NVDA board/Huang-future scandal is whipsawing the AI complex (CoreWeave up, NVDA down). Nudged risk 0.4->0.35. IWM/QQQ/SPY/PLTR/VST still red and off buys; MSFT held out on AI-contagion risk. BKH/CPRI the only green holds; $29 cash caps adds. Watching whether NVDA headlines spill into the broad tape vs yields.
