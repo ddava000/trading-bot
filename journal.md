@@ -2688,3 +2688,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
 - notes: VIX 18.7 with a jittery tape: Nvidia weakness from the Huang exit, jumping bond yields on a hot October CPI keeping a December hike live, and oil spiking. Holding neutral/0.35 with broken high-beta and index ETFs off buys.
 - journal: Thu 11/12 17:53: After-close check, posture unchanged at neutral/0.35. VIX 18.5->18.7; Nvidia drag outweighs energy gains, yields jumped on Fed hike bets. IWM(-7.6%)/QQQ(-5%)/PLTR(-8.1%)/VST(-9%) still red and off buys; BKH(+14%) only strong green hold. $29 cash caps adds. Watching yields and AI-complex stability.
+
+### 2026-11-12T18:55 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.35
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
+- notes: VIX 18.7 with a jittery tape: Nvidia CEO-exit fallout dragging the AI complex, jumping bond yields on a hot October CPI keeping a December hike live, and oil elevated. Holding neutral/0.35 with broken high-beta and index ETFs off buys; only $29 cash caps any adds anyway.
+- journal: Thu 11/12 18:55: After-hours check, posture unchanged at neutral/0.35. VIX steady at 18.7; NVDA/Huang drag plus rising yields on Fed hike bets keep the tape soft. IWM(-7.6%)/QQQ(-5%)/SPY(-2%)/PLTR(-8.2%)/VST(-9.1%) still red and off buys; BKH(+14%) the standout green hold. Watching yields and whether AI-complex stabilizes into tomorrow.
