@@ -2694,3 +2694,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'AN', 'MSFT'] | favor: ['BKH', 'CPRI']
 - notes: VIX 18.7 with a jittery tape: Nvidia CEO-exit fallout dragging the AI complex, jumping bond yields on a hot October CPI keeping a December hike live, and oil elevated. Holding neutral/0.35 with broken high-beta and index ETFs off buys; only $29 cash caps any adds anyway.
 - journal: Thu 11/12 18:55: After-hours check, posture unchanged at neutral/0.35. VIX steady at 18.7; NVDA/Huang drag plus rising yields on Fed hike bets keep the tape soft. IWM(-7.6%)/QQQ(-5%)/SPY(-2%)/PLTR(-8.2%)/VST(-9.1%) still red and off buys; BKH(+14%) the standout green hold. Watching yields and whether AI-complex stabilizes into tomorrow.
+
+### 2026-11-13T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'MSFT', 'AN'] | favor: ['BKH', 'CPRI', 'SPY']
+- notes: Tape steadying: VIX eased to 17.8, Dow futures +200 as Nvidia stabilizes and inflation data printed slightly softer, but a hot 6.5% annual PPI and a divided Fed keep a December hike live. Nudging risk to 0.40 from 0.35; MSFT off buys on a live global outage, broken high-beta/small-caps still avoided.
+- journal: Fri 11/13 10:00: Conditions improved modestly vs yesterday — VIX 18.7->17.8, futures green, NVDA calming. Bumped risk 0.35->0.40. Added MSFT to avoid on Outlook/Teams/Copilot outage. Still watching yields, PPI/rate-hike overhang, and whether the AI complex holds its bounce; $29 cash caps adds.
