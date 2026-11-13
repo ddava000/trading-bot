@@ -1,0 +1,155 @@
+{
+ "_comment": "Contributed capital for the Robinhood agentic account (Arm B). Subtract from equity before any performance comparison. Source: Devon's Robinhood transfer history, read 2026-08-17. This SUPERSEDES the earlier log-derived estimates, which were wrong on both dates and count.",
+ "baseline": {
+  "date": "2026-07-23",
+  "note": "Account value when the bot began trading. Deposits before this date (weekly $10 back to at least 2026-06-23, less a $0.24 transfer out on 07-22) are already inside this figure and must NOT be added again.",
+  "starting_equity": 59.92
+ },
+ "covers_from": "2026-07-24",
+ "currency": "USD",
+ "detection": "Authoritative broker transfer history. Ongoing deposits are captured live by rh_daemon.py from the broker pending_deposits rising edge.",
+ "events": [
+  {
+   "amount": 50.0,
+   "confidence": "confirmed",
+   "date": "2026-07-24",
+   "note": "manual top-up from Savings",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-07-28",
+   "note": "weekly recurring from Bank of Little Rock",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-04",
+   "note": "weekly recurring",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 75.0,
+   "confidence": "confirmed",
+   "date": "2026-08-05",
+   "note": "manual top-up",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-11",
+   "note": "weekly recurring",
+   "source": "broker transfer history"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-17",
+   "note": "weekly recurring",
+   "source": "broker transfer history + pending_deposits"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-24",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-08-31",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-09-08",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-09-14",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-09-21",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-09-28",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-10-05",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-10-12",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-10-19",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-10-26",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-11-02",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  },
+  {
+   "amount": 10.0,
+   "confidence": "confirmed",
+   "date": "2026-11-09",
+   "note": "pending went 0.00 -> 10.00",
+   "source": "broker pending_deposits (rising edge)"
+  }
+ ],
+ "experiment_window": {
+  "adjusted_basis": 351.3,
+  "deposits_in_window": 120.0,
+  "how_to_use": "For the A/B decision use THIS block, not total_contributed_capital: arm_B return = current_total_value - adjusted_basis. The totals above measure the bot since 2026-07-23 inception, which is a different question and a different sign.",
+  "start_equity": 231.3,
+  "window_opened": "2026-08-24"
+ },
+ "how_to_use": "performance = current_total_value - total_contributed_capital. Do NOT use starting_equity alone as the baseline, and do NOT add pre-2026-07-23 deposits.",
+ "recurring": {
+  "amount": 10.0,
+  "cadence": "weekly",
+  "typical_day": "Tuesday"
+ },
+ "total_contributed_capital": 344.92,
+ "total_deposited": 285.0,
+ "total_deposited_since_start": 285.0
+}

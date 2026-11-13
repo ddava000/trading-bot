@@ -1,0 +1,349 @@
+# Trading bots - operating guide for any Claude working in this repo
+
+This repo runs two automated trading bots. One trades REAL MONEY. Read the hard
+rails before doing anything.
+
+**Then read `ECOSYSTEM.md`**: the five named sessions, every automation, the ONE mail channel, and the
+order to follow when Devon says "check mail".
+
+## HARD SAFETY RAILS (never violate)
+- **Never place, move, or approve a real-money trade yourself.** Claude engineers
+  the automation; the BOT places orders. Do not buy, sell, or transfer on Devon's
+  behalf in a conversation, ever.
+- **Never change trading strategy or risk limits without Devon's explicit say-so.**
+  Fixing a bug is fine. Retuning stops, sizing, or the universe is not, unless he
+  asks.
+- **Cash only. No options, no leverage, no shorting, no margin.** These are the
+  standing rails for both bots.
+- **Never commit account numbers or secrets.** The repo is PUBLIC. Account numbers
+  live in `rh_config.json` (gitignored). Email/API passwords are GitHub secrets.
+- **Backtests are hypothetical by default.** Running `backtest.py` touches nothing
+  live. Never apply a backtest finding to a live bot without Devon saying so.
+
+## EVIDENCE RULES (Devon 2026-11-04: "no more sloppy decisions"). Both sessions, no exceptions.
+Why they exist: in the fortnight before this was written, wrong statements reached Devon or reached code. An
+"Arm A is late" alert was false (2026-11-04 11:11, status.json 40 seconds old). A run was reported as having
+overrun its timeout and left stops uncovered; it had not, the report came from a stale run row. "The daemon does
+not run overnight" went into code and tests as the reason for a safety bound; it usually does. A comment calling
+the repeat-trim "deliberate" survived four reviews. A mailbox entry described a state the commit was not in.
+A rule cannot make a mistake impossible. Rules 2 and 3 are the ones a test can enforce. For Arm A's QUEUED alert they
+are enforced as of 2026-11-04: tests/test_arm_a_watch_replay.py replays 12 recorded instants through the real
+run_once, each with a control that must say the opposite, and pins that a first-level queued alert stays quiet when
+git shows the run's own pass committed even though both Actions endpoints say queued. The class where a stale read
+lands while the pass is still running (wait 6 to about 10.5 minutes) has no status.json commit to read yet; from
+2026-11-05 the run-start marker (branch arm-a-start) is the git proof there, and without a marker (the step failed, or
+before it was deployed) that alert still rests on the Actions API alone, and a test says so. Every OTHER alert (the Arm B watchdog,
+the daily digest) is still discipline, and so are rules 1, 4, 5 and 6; a reviewer should check them.
+1. **A fact is something you reproduced in this session.** Anything you tell Devon or write into mail, a
+   comment or a test as fact (what happened, why, for how long, whether money or stops were exposed) comes from
+   output you read: a command, a run id, a commit, a log line, a file:line. Say which. Say what you did NOT
+   check in the same breath ("not verified: ..."). A cause nobody measured is a hypothesis and is labelled one,
+   never a "because". Do not repeat the other session's or a subagent's claim as fact; verify it or attribute it.
+2. **No first-level alert rests on one source.** An alert that can mail Devon needs a second signal that shares
+   no failure mode with the first (git against the Actions API, the broker against the laptop's own counter).
+   If a source can lie (GitHub served job state 21 minutes stale on 2026-11-04), say what corroborates it, or the
+   alert is not allowed to fire alone. An unreadable source is "cannot tell", never "fine".
+3. **Replay before you change an alarm.** Any change to when an alert fires (threshold, mute, gate, dedupe, a
+   new signal) is run against EVERY dated past episode on record, the real alarms that must still fire AND
+   the false ones that must now stay quiet, in a test that loads the recorded episodes and calls the real
+   function. The episode table lives in tests/ and grows with every incident. No replay, not done. A change
+   that quiets a path must carry the control proving a true event still gets through.
+4. **A false alert is a defect with a deadline.** Keep the evidence next to the alert (written to disk or into
+   the body, never only a module global that a restart wipes). Name the owner in the next mail. Fix it or
+   replace the signal within one trading day. Tell Devon once, what it was and what changed, not in pieces.
+5. **Re-read before you send.** Before a mailbox entry, commit message or report to Devon goes out, check every
+   sentence that describes a state (what the repo contains, what a test does, what a file says) against the
+   final diff or data with a command, not from memory. If the draft predates the last change, redo it.
+6. **Think it through before you code (Devon 2026-11-04: "sloppy coding without thinking it through").** For a
+   change to a money path, an alert or a monitor, write the design down BEFORE the first edit (in the commit body
+   or the mail, short): what each input can do wrong (stale, missing, late, wrong, unreadable); what each of those
+   does to the output (who is mailed, what trades or stops are affected); which recorded constraint the change
+   must not break (find the existing test or replay that pins it and RUN it first); and which cases must still
+   work afterwards. A design that was not run against the recorded episodes is a guess. A suggestion from
+   another session or a subagent is a hypothesis: run it through the same steps before you write it. Example,
+   2026-11-04: LAPTOP BOT suggested suppressing first-level "queued" while status.json is under 13 minutes old.
+   On the recorded 2026-10-05 stuck run that moves the detection from 6.8 to 9.8 minutes and fails the test that
+   pins the six-minute detection; it was caught because the code and that test were read before anything was written.
+
+## The two bots (both trade REAL money; corrected 2026-09-30, this section used to say paper)
+- **Arm A, the cloud bot** (`alpaca_bot.py`): Alpaca LIVE, ~$240, the HYBRID: index 50 /
+  hold 25 / trade 20 / crypto 0. Runs in GitHub Actions every 15 min (triggered by
+  cron-job.org) with a 60s protective loop. Crypto is PERMANENTLY retired: Alpaca does not
+  offer it in Colorado, so do not "re-enable" it.
+- **Arm B, the Robinhood laptop bot** (`rh_bot.py` decision engine, `rh_daemon.py` runner):
+  ~$280, plain INDEX ETFs buy-and-hold (SPY/QQQ/IWM, no stops), on an always-on Windows
+  laptop. `rh_bot.py` imports every rail from `alpaca_bot` so the mechanics cannot drift,
+  but its sleeve allocation is set explicitly (index-only) and is NOT inherited.
+- **They are an A/B experiment.** Window opened 2026-08-24, decision no earlier than
+  2026-11-24. Read `experiment.json` (`rule`, `question_being_answered`) before comparing
+  them, and do not draw conclusions early.
+
+> IMPORTANT, learned the hard way (2026-07-28): the `rh_daemon` order EXECUTOR (a
+> headless `claude -p` turn) is SANCTIONED, approved automation, not a rogue agent
+> placing trades. It is the only supported path to Robinhood, and it merely places
+> the exact order list `rh_bot.decide()` already produced. It MUST run with a
+> working directory OUTSIDE this repo: if it starts inside the repo it reads this
+> CLAUDE.md, sees "never place a real-money trade," and refuses the orders it was
+> handed, silently blocking all trading (including protective stops). The "never
+> trade" rule below governs INTERACTIVE, human-directed sessions only; the executor
+> is kept isolated instead. Do NOT move the executor back into the repo dir, and do
+> NOT "fix" it by weakening the rule, that isolation is the design.
+
+## Two-session coordination
+Two Claude sessions may work here at once. Coordinate through the repo (commit +
+pull); the sessions cannot talk directly.
+- **Cloud session owns:** `alpaca_bot.py`, `brief.py`, `review.py`, `backtest.py`,
+  `.github/workflows/`, `realized.py`, `realized_report.py`, `build_realized_b.py`,
+  `pnl.py`, `check_ascii.py`, `slack_notify.py`, `mail_check.py`,
+  `mailbox_notify.py` and `tests/`.
+- **Laptop session owns:** `rh_bot.py`, `rh_daemon.py`, `rh_watchdog.py`,
+  `setup_laptop.ps1`, `rh_deposits.json`, and refreshing `realized_b.json`.
+- **Tests and CI.** Run `python -m unittest discover -s tests` before pushing code.
+  `.github/workflows/ci.yml` runs it on any push that touches code, workflows, tests or
+  the mailbox, and a red run is a finding, not noise. It validates every workflow file (an
+  invalid one once never ran for ten weeks), syntax-checks their shell, scans for
+  credentials and personal email addresses in this PUBLIC repo, and covers the realized
+  gain/loss code that feeds Devon's tax number. Every check that hunts for something also
+  proves it can find it.
+- `git pull --rebase` before any edit. Prefer not to edit the other session's files;
+  if you must (at Devon's request), say so in the commit message and post a note in
+  the mailbox below so the owner has context.
+- **Never `git add -A` or `git commit -a`.** Commit EXPLICIT paths. A broad add
+  sweeps up whoever else is mid-edit.
+- **Prove an edited live file still imports.** A running process keeps its code in memory, so a syntax or
+  indentation error in `rh_daemon.py` (or a module it imports) is invisible until the next restart (exit 42,
+  a Task Scheduler retry, a crash), when the daemon fails to come back on a market day. After editing one,
+  run `python -c "import rh_daemon"` from the repo root (2026-10-06: caught an IndentationError that had
+  sat on disk for minutes).
+- **Look before you pull.** Sessions share ONE working tree on this PC. Run
+  `git log origin/main..HEAD` first: if it lists a commit you did not make, another session has
+  work waiting to push. Do not `git pull --rebase` over it (2026-10-02: a pull rebased BOT DAILY
+  CHECK's unpushed reply into a mailbox conflict that blocked its push); let it push, or ask.
+- **Never autostash on a tree that may contain work that is not yours.** On a SHARED
+  tree: commit your own work by explicit path, `git status`, then a plain `git pull`,
+  and if status shows files you did not touch, STOP and report rather than resolving
+  it. On 2026-08-25 autostash lifted and replaced a third session's uncommitted file
+  on every pull for an afternoon; one conflict would have destroyed it.
+  On a SINGLE-SESSION tree autostash is fine, and is specifically fine for a generated
+  file the local process owns. (Corrected 2026-08-26 after laptop showed the blanket
+  ban was unworkable: `rh_status.json` is TRACKED and its daemon rewrites it every
+  pass, so that tree is never clean and a plain pull would refuse during market hours.
+  The hazard is other people's work, not dirtiness as such.)
+- **Verify a push landed by reading the remote, not the command output.** An `rm` that
+  failed once short-circuited an `&&` chain so `git add`/`git commit` never ran, while
+  a `git push` on the next line ran anyway and printed success. The "fix" sat
+  uncommitted for two days and everyone believed it had shipped.
+
+## Best-practices audit: CROSS-audit, never self-audit
+Devon 2026-08-26: two sessions only, cloud and laptop, and the two of them handle the
+audit. That works ONLY as a cross-audit, and the distinction is not pedantic:
+- **The laptop audits the cloud's files** (`alpaca_bot.py`, `brief.py`, `review.py`,
+  `.github/workflows/`). **The cloud audits the laptop's files** (`rh_bot.py`,
+  `rh_daemon.py`, `rh_watchdog.py`). **Neither audits its own work.**
+- Why: every real defect found the week of 2026-08-25 crossed a session boundary, and
+  none came from a session checking itself. A session re-reads its own code with the
+  same assumptions that produced the bug.
+- Verify, do not accept. When the other session reports a fix, CHECK it: read the
+  remote, run the failing case, prove the guard can still say "no". A report is not
+  evidence. This caught three wrong claims in two days, in both directions.
+- **A cross-audit is CODE REVIEW, not behavioural verification, and saying "audited"
+  when you mean "read" is how a wrong result gets believed.** Neither session can run
+  the other's code where it actually runs: cloud has no laptop, no broker bridge and
+  no live ledger; laptop has no Alpaca keys, by design. The laptop's quote-gap money
+  bug was only findable by REPRODUCING it against a live ledger, and a careful reader
+  would have called that code correct. So when a finding depends on RUNTIME behaviour,
+  say so and ask the owner to run the case, rather than reporting it as established
+  either way.
+- **Shared files** (`slack_notify.py`, `mail_check.py`, `CLAUDE.md`,
+  `.github/audit-prompt.md`, `experiment.json`, `rh_deposits.json`) are
+  write-by-either, audit-by-both. Owners for tie-breaks: cloud owns `slack_notify.py`
+  and `mail_check.py`; laptop owns `rh_deposits.json` (its daemon writes it). Any
+  change to `audit-prompt.md`, `experiment.json` or `rh_deposits.json` must be
+  announced in AGENT_MAIL in the SAME commit: those three decide what Sunday's audit
+  knows, what the experiment claims, and whether Arm B's number is real.
+- `.github/workflows/weekly-audit.yml` (Sundays, cold context in Actions) is a third
+  reviewer that costs no window and starts with no assumptions. It reads
+  `.github/audit-prompt.md`, so that file is the ONLY channel to it. Keep it current.
+  It was an INVALID workflow file from 2026-06-12 until 2026-08-26 and never ran once;
+  a local scheduled task was silently producing the audit everyone credited to it.
+
+## Realized gain/loss: EVERY report carries a running total (Devon 2026-09-29)
+Devon wants a running total of REALIZED gains versus losses in every report, audit and
+check, to track tax implications. This is NOT the equity change pnl.py prints: equity
+includes unrealized paper P&L, and only positions actually SOLD are taxable.
+- **One shared reader.** Never format these numbers yourself. Run
+  `python -c "import realized; print(chr(10).join(realized.repo_report_lines()))"` from
+  the repo root and quote the lines. It reads committed files only, so any session or
+  runner gets the same answer. (`pnl.py`, the bot email, the weekly review, the audit and
+  both daily checks all use it.)
+- **Arm A** is computed by the bot every 15-min cycle from the full Alpaca fill history
+  and published in `status.json` under `realized`, with a per-lot ledger in
+  `realized_a.json`. It carries an accounting-identity residual (cash + market value -
+  contributions - income == FIFO realized + unrealized) that must stay within 0.50 dollars.
+- **Arm B** comes from the BROKER's own figures (`realized_b.json`, built by
+  `build_realized_b.py` from Robinhood's get_pnl_trade_history and get_equity_orders).
+  It is index-only and rarely sells, so the ledger can sit unchanged and be right, which is
+  exactly how it goes silently wrong after the next sale. **After ANY sale by the Robinhood
+  daemon, the laptop must refresh it.** The runnable procedure,
+  with a copy-ready prompt for the headless export, is the docstring of `build_realized_b.py`
+  (raw exports go OUTSIDE the repo; the builder refuses an empty or truncated export). `realized.arm_b_block()` detects a missed refresh
+  by comparing sells logged in `rh_trade_log.jsonl` against the count the ledger accounted
+  for, and reports `stale`. Treat a stale Arm B figure as a finding, never as a number.
+- **State is part of the number.** ok / unverified / stale / unknown. Never report a
+  non-ok figure as if it were clean, and never render unknown as zero.
+- **Per calendar year.** Tax nets per year, so the current-year line restarts in January.
+  From Jan 1 to Oct 31 the reader also prints the PRIOR year's lines (returns are being
+  prepared and extended ones are due mid-October), so last year's final figures do not vanish.
+  Wash-sale exposure on a line is that year's own: a loss belongs to the year it was SOLD.
+- **Wash sales are WATCHED, never adjusted.** Reports carry an upper bound on losses that may
+  be wash sales, same-account and cross-account (both arms buy SPY/QQQ/IWM, and no broker
+  reports cross-account ones). The rule also spans accounts no session can see, including
+  IRAs. Report the figure; only Devon's tax preparer decides what applies.
+- **Not a tax document.** The broker's 1099-B is authoritative. Do not give tax advice.
+- **After a split, spinoff, symbol change or securities transfer** the FIFO is wrong: the bot
+  marks Arm A unverified. Run the `realized-report` workflow to see every closed lot.
+
+## Agent mailbox (how the two sessions talk)
+The sessions cannot chat live (neither runs continuously). They leave notes in
+`AGENT_MAIL.md` at the repo root. **RULE: at the start of any work session, `git
+pull` and read `AGENT_MAIL.md`. If there is a message addressed to you with no reply
+from you, handle it and reply by APPENDING a new entry (never edit or delete an
+existing one).** Use it for cross-domain heads-ups, questions, and handoffs. The
+format and protocol are documented at the top of that file.
+**Stamp the heading from the REAL clock, never an estimate** (2026-09-30: six entries were dated
+up to 3 hours into the future, because the writer guessed elapsed time). Use
+`python -c "from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %H:%M ET'))"`.
+In Git Bash `TZ=America/New_York date` silently returns UTC. The commit time is the authority
+when stamps disagree. If `zoneinfo` raises (the plain `python` on PATH can be C:/Python314, which
+has no tzdata), use C:/Users/devon/AppData/Local/Python/bin/python, or take `date -u` minus 4h
+until Nov 1 2026 and minus 5h after.
+**Session names (Devon 2026-10-01: he could never tell from a mail alert who must check mail).**
+Every mail alert now leads with "Have <name> check mail." Names: CLOUD (the interactive cloud
+session; mail addressed to `cloud`), BOT DAILY CHECK (cloud[daily]), LAPTOP BOT (`laptop`, the
+interactive session that owns the daemon), LAPTOP BOT DAILY CHECK (`laptop[daily]`), and BOT WEEKLY
+AUDIT (`audit`, the Sunday GitHub workflow: it reads mail itself, so alerts never ask Devon to wake
+it). They live in `mail_check.DISPLAY`, one line each; heading tokens (cloud, laptop, audit)
+never change. When Devon names a session, that session introduces itself in AGENT_MAIL and adds its
+line. `rh_daemon.SESSION_NAME` is a copy kept in step by a test. BOT DAILY CHECK and LAPTOP BOT DAILY CHECK were RETIRED
+2026-10-17 (Devon): one froze, one was killed by the shared Claude limit, both silently, and a GitHub workflow (DAILY DIGEST) now
+sends the daily summary. They stay in `mail_check.DISPLAY` under their plain names (so old headings still parse) and are marked retired by
+the separate `mail_check.RETIRED` dict (`--aligned` reads that): mail addressed to them wakes nobody.
+**"Check mail" (Devon 2026-10-01) means the same thing to every session**: `git pull`, then
+`python mail_check.py --inbox "<YOUR NAME>" --ack` (unread by HEADING against the list you have already seen,
+never by comparing timestamps and not by position: a merge can put another session's entry above your own), reply to what is yours, then confirm alignment with one `ALIGNED: <NAME>`
+entry `-> all` after reading ECOSYSTEM.md. If no `ALIGNMENT CHECK` is open, open one. Devon is messaged
+automatically (MAILBOX NOTIFY) whenever a push adds mail that needs an interactive session woken. CLOUD's "check mail" ALSO starts with a LIVE read of Slack (Devon 2026-10-22): `python slack_live.py`. CLOUD has no Slack token and the
+relay that files Slack into the mailbox lags by minutes to hours (a run, or GitHub's schedule), so the mailbox alone can be stale. A
+quiet answer ends "(looked at N message(s) since the last relay)"; judge "nothing" by that N. The other sessions read only the mailbox.
+The
+full order is in ECOSYSTEM.md.
+
+**Trading window (2026-10-13).** The bots' window is `alpaca_bot.session_bounds(day)`: 09:45 to 15:55 ET, 09:45 to 12:55 on
+the NYSE 1 pm early closes in `EARLY_CLOSE` (2026-11-27, 2026-12-24, 2027-11-26), None on weekends and `MARKET_HOLIDAYS`.
+Anything that needs to know when a bot should be working asks that function; never write a second 15:55 (a test fails if a
+cloud-owned module does). Extend `EARLY_CLOSE` together with `MARKET_HOLIDAYS`.
+
+## Kill switch
+Create a file named `rh_HALT` in the repo folder to pause the real-money bot on its
+next check.
+
+## Monitoring
+Both bots publish status files read from the public repo: `status.json` (cloud) and
+`rh_status.json` (Robinhood). Liveness uses `next_expected_utc`: a bot is "down"
+only if the current UTC time is well past it. An old timestamp on a weekend or
+overnight is normal, both bots rest when markets are closed.
+Arm A's `ts` is stamped when a run STARTS, about 11 minutes before the commit that carries it, so it reads 11 to 26 minutes
+behind a healthy 15-minute cadence (LAPTOP BOT measured it 2026-10-13). Judge Arm A's liveness from the run list and
+`arm_a_watch`, never from that field.
+
+The cloud watchdog for the laptop (`rh_watchdog.py`, `rh-watchdog.yml`) runs on TWO paths: after every
+Arm A run (`workflow_run`, deep checkout, one alert per threshold; the primary) and its own */30 cron
+(a backup: GitHub ran it only 1 to 3 times a day). A third path, a step inside the Arm A workflow at
+every :00/:30 (the "piggyback", 2026-08-13), was REMOVED 2026-10-06 at Devon's say-so: its shallow
+checkout could not measure outages, so it mailed "could not measure how long" at every slot (8 mails on
+2026-09-30). I once reported the watchdog ran "once a day" because I counted only this workflow's own
+runs and missed that step; count every path before claiming a gap. A test fails if a watchdog step is
+added back to the Arm A workflow. The laptop's own daemon alerts at 15 minutes of broker trouble, so the
+first CLOUD-side alert for a degraded laptop is the 60-minute backstop.
+
+Arm A's own liveness is watched by `arm_a_watch.py` (workflow ARM A WATCH; Devon 2026-10-06), because
+Arm A's stop-losses run inside each run with no stop orders at the broker. It alerts on a run waiting
+for a machine (6 min), no run triggered (22), and status.json uncommitted (35); the second level of each
+is urgent. The workflow shares fate with GitHub, so the same check should also run on the laptop
+(`run_once()` from rh_daemon's loop, the laptop's call). Never lower a threshold without re-measuring
+the normal gaps (worst commit gap seen: 24.5 min). Do not RAISE the queued threshold either: the 10-05 replay
+test (a stuck run caught at 6 minutes) fails if you do.
+The QUEUED signal asks the run's JOB, not only its row (2026-10-22: three false "Arm A is late" alerts while every job
+started within 3 seconds; GitHub had an Actions incident open). A row that says queued while a job runs is not counted and
+the summary line says so; an unreadable job is never read as calm; a first-level queued alert is read again just before it
+is sent and withdrawn if nothing is waiting. Every alert subject now ends "(checked by GitHub)" or "(checked by LAPTOP BOT)".
+Every read it makes is a cache miss by construction (unique query parameter, no-cache headers; an unauthenticated REST read is
+"public, max-age=60" and only the laptop's copy, which has no token, false-alerted), and a queued alert ends with a sentence
+saying what GitHub returned to that check (run row, jobs, cache headers). Do not remove either without reading the 10-22 mailbox thread.
+The QUEUED signal has a second source that is NOT the Actions API (2026-11-04: the API served a finished job as queued for 6 minutes and
+a false alert went out 32 s after the run completed). status.json's `ts` is when a pass STARTED, and the workflow runs passes one at a time
+in creation order, so a queued run is not waiting if the newest status.json commit holds a pass that started at or after that run was
+created (`arm_a_watch.pass_started_after`). Not a commit age (a healthy pass and the 10-05 stuck run both show ~10 minutes at the six-minute
+mark; a 13-minute guard moved 10-05 from 6.8 to 9.8 minutes) and not "any commit since" (a slow predecessor's commit would hide a run still
+waiting). It corrects the FIRST level only: urgent (20 min), no_trigger and stale are judged on the raw data. A job counts as started on a
+step that ran or a runner assigned as well as its status word; started_at, completed_at and conclusion are NOT proof (the 10-05 job that never
+got a machine carries all three). Missing or inconsistent git data leaves the run counted as waiting.
+RUN-START MARKER (2026-11-05, Devon chose it from clickable options): the workflow step "Mark run start" force-pushes one parentless commit to the branch
+`arm-a-start` right after checkout (message `arm-a run-start run=<id> attempt=<n> started=<UTC>`; never main; continue-on-error, step timeout 2 min,
+`timeout 60` on the push; ci.yml and mailbox-notify.yml trigger only on main, so no workflow starts). arm_a_watch reads it through git (`git_start_marker`;
+only when the run list and the commit time are the real readers, `marker_reader`) and a queued run whose id is at or before the marker's is not waiting
+(`marker_proves`; run ids only grow and runs execute one at a time, so the newest marker proves every earlier run). First level only, like the ts rule.
+This is what closes the stale read DURING a pass (the five 10-22 mails), where status.json has no commit yet. Residuals: no marker means no proof (the
+push failed, GitHub rejecting writes); a stale "queued" row that outlives 20 minutes still pages as urgent; not yet seen firing in production.
+STALE STOP SELLS and BLIND PRICES (2026-11-05, Devon's choices): under CHEAP_PX a stop sells with a DAY limit at 98% of the price and exit_pass skips a
+symbol with a resting order, so a falling price left the sell unfilled forever. A resting sell of OURS (order id in trade_log.jsonl with stop_loss /
+hold_stop / news_exit; NEVER a bracket's take-profit leg, which rests above the market on purpose) that has waited 5 minutes with the price below its
+limit is CANCELLED; the next pass places a fresh stop at 98% of the current price (cancel only, never a re-place in the same pass: Alpaca holds the shares
+for the old order until the cancel lands). A held stock with no live price for 3 consecutive passes emails Devon once (back-off 2 h kept in outage.json
+under `blind_alert_utc`; no other price source, no trading change). The workflow's brief step has a hard timeout (run 42040796649 hung 14 min).
+Arm A's COVERAGE (the DAILY DIGEST's unplanned minutes, `arm_a_downtime.py --by-jobs`) is measured from each run's JOB, not the run span: a run can sit
+4 to 13 minutes before GitHub creates its job (seven times on 2026-10-26, no incident listed) and nothing is executing meanwhile, so the run-span figure said 0 for
+a morning with 34 unwatched minutes. The 6-minute QUEUED alert was right on those; it was wrong on 2026-10-22 when the job existed from second zero.
+status.json `earnings_guard` is live | degraded | unknown. As of 2026-11-04 `degraded` also means a per-symbol Yahoo query failed or came back with no
+`result` during that run (the guard is still fail-open: the entry is NOT blocked); it used to say `live` whenever the crumb handshake worked. A news fetch that
+fails prints "tripwire is blind" in the run log (it used to return nothing silently). Neither changes what the bot trades.
+A frozen status.json is not proof Arm A stopped: on 2026-10-07 GitHub rejected writes for 9 minutes and a healthy
+run's heartbeat push was lost. The persist step now goes through `.github/scripts/push_retry.sh` (retries, then a
+`::warning` annotation for a heartbeat or a FAILED step for trade_log/holds, whose loss would drop stop levels), so
+look for "Arm A heartbeat not saved" / "Arm A state not saved" in the run before calling a quiet bot dead.
+A second cause of a lost heartbeat, found 2026-11-04: a run that WAITS for a machine used to check out the commit that was current when the run was
+CREATED (actions/checkout with no `ref` uses the event's SHA), so after a 4 to 13 minute wait it worked from stale state files and, if the previous pass
+had committed meanwhile, its push hit `CONFLICT (content): Merge conflict in status.json` four times and was discarded (three in-session runs on 2026-10-26:
+40340139520, 40357285384 and 40362102978, the last found by LAPTOP BOT and a wait of only 53 s: the trigger is a predecessor commit AFTER the run was
+created, not a long wait; the log shows `fetch ... +<creation sha>`). Fixed: the checkout names `ref: ${{ github.ref_name }}` (tests/test_arm_a_checkout.py). A pass
+that traded would have started from a stale holds.json, i.e. without a stop level the predecessor had just written.
+
+## Work from your phone (Claude Code on the web)
+Devon can drive this repo from a phone with zero computer running, via Claude Code
+on the web (claude.ai/code, or the Code tab in the Claude app). One-time: connect
+GitHub (one approval), then pick `ddava000/trading-bot` and start a session. Edits,
+test runs, commits and PRs all happen in Anthropic's cloud.
+
+To make a web session as capable as a local one, paste this into the cloud
+environment's **Setup script** field (claude.ai environment settings). It installs
+`gh` (for triggering/reading the bot's Actions runs) and the Python deps:
+
+```bash
+#!/bin/bash
+apt update && apt install -y gh || true
+pip install -r requirements-alpaca.txt || true
+```
+
+Not covered by that script: the Robinhood account-lookup MCP connector is a
+claude.ai connector, so a web session may need it connected separately, or it may
+not be available there. Core dev work (edit, run tests, fix, commit) needs none of
+it.
+
+## Working with Devon (hard preferences)
+- **Never use em dashes.** Hard rule.
+- **No emojis in email subject lines** (he prints mail to PDF; the subject becomes
+  the filename and emoji break it).
+- **No multi-step setup flows or option menus.** One decisive path, or do it fully
+  yourself. Warn up front about any unavoidable login clicks.
+- **Put copy-ready text in a fenced code block.**
+- Be decisive and honest. Report failures plainly. Do not oversell.

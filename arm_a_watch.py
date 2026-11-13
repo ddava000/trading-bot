@@ -1,0 +1,688 @@
+#!/usr/bin/env python3
+"""ARM A WATCH: a dead-man's switch for Arm A, the Alpaca bot. Alerts when it stops running.
+
+WHY IT EXISTS (2026-10-05). GitHub had an Actions incident and Arm A's 15:30 and 15:45 ET runs never got
+a machine. The bot checks its stop-losses itself, in a 60 second loop inside each run (there are no stop
+orders at the broker), so for about 28 minutes before the close nothing could have fired. Nothing noticed:
+rh_watchdog watches the laptop, and status.json's next_expected_utc is published for a monitor that did
+not exist. The only signal was GitHub's failed-run emails.
+
+THREE SIGNALS, each measured on the real history before its threshold was set:
+  queued      a run has waited N minutes for a machine (a healthy run starts within seconds). Catches an
+              Actions incident about 6 minutes in. This is the one that would have caught 10-05. It rests on the
+              Actions API (run row, jobs endpoint), which can serve stale state (2026-10-22, 2026-11-04), so a
+              first-level wait is corrected by git: see pass_started_after and tests/test_arm_a_watch_replay.py, and,
+              when the workflow's run-start marker is there, marker_proves (exact proof a run started).
+  no_trigger  no run has been CREATED for N minutes (cron-job.org should create one every 15 minutes).
+  stale       status.json has not been committed for N minutes. Normally every 15 (worst gap in 9 trading
+              days: 24.5), so a crash loop or a wedged push shows here.
+Each has two thresholds. The first emails and posts to Slack ("late"); the second is urgent and also uses
+SMS/push when they are configured ("not running").
+
+WHERE IT RUNS, and why two places. A watcher that lives on GitHub Actions shares fate with what it watches:
+on 10-05 a watcher triggered by Arm A's own runs would have been blind, because the stuck runs never
+completed. So the same check runs (1) as the ARM A WATCH workflow, best effort, and (2) on the Arm B
+laptop, which does not depend on GitHub Actions at all (rh_daemon calls run_once() from its loop, see
+the integration note in AGENT_MAIL). Each arm then watches the other.
+
+Never places, moves or cancels a trade. Reads status.json, git history and the public Actions runs list.
+
+Usage:
+  python arm_a_watch.py                  one check, alert if a threshold was just crossed (stateless windows)
+  python arm_a_watch.py --force          send a TEST alert by email and Slack (FORCE_ALERT=true does too)
+  python arm_a_watch.py --force-urgent   the same, but also SMS and push, to prove those channels (FORCE_ALERT=urgent)
+  python arm_a_watch.py --fetch --ref origin/main      what the laptop does: git fetch, then read origin/main
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import datetime, timedelta, timezone
+
+# alpaca_bot reads its keys at import; this module never uses them (same pattern as rh_watchdog).
+os.environ.setdefault("ALPACA_API_KEY", "unused-in-arm-a-watch")
+os.environ.setdefault("ALPACA_SECRET_KEY", "unused-in-arm-a-watch")
+import alpaca_bot as bot  # noqa: E402  (holiday table and the bot's own Eastern time zone)
+
+STATUS_F = "status.json"
+REPO = (os.environ.get("GITHUB_REPOSITORY") or "ddava000/trading-bot").strip()
+WORKFLOW_FILE = "alpaca-bot.yml"
+
+# Minutes. (first, urgent). Set from measurements, 2026-10-06:
+#   queued:     a run starts within seconds when healthy (started == created in every observed run).
+#   no_trigger: cron-job.org fires every 15 minutes with about 7 seconds of jitter.
+#   stale:      status.json commits are 15 minutes apart, worst gap 24.5 in 237 market-hours gaps.
+THRESHOLDS = {
+    "queued": (6, 20),
+    "no_trigger": (22, 50),
+    "stale": (35, 75),
+}
+MAX_DELIVERY_TRIES = 3        # exact mode: retry a failed delivery on the next check, then stop (do not repost forever)
+COMMIT_LAG_MIN = 11          # normal delay between the ts INSIDE status.json and its commit (p95 10.9)
+QUEUED_STATES = ("queued", "pending", "waiting", "requested")
+
+
+def _env_int(name, default):
+    try:
+        return int((os.environ.get(name) or "").strip() or default)
+    except ValueError:
+        return default
+
+
+# A threshold counts as crossed if it fell in the last WINDOW minutes. Wider than the spacing between
+# checks so a late check cannot skip it; a rare duplicate beats a missed alert. The laptop passes
+# `fired` instead and is exact (once per threshold per episode).
+WINDOW_MIN = _env_int("WATCH_WINDOW_MIN", 20)
+
+
+# ---------------------------------------------------------------------------------------------------
+# Pure logic
+
+def session_bounds(now_utc):
+    """(open_utc, close_utc) if Arm A is expected to be running today, else None. Asks alpaca_bot.session_bounds, the one place
+    that knows about holidays and the 1 pm early closes: on 2026-11-27, 2026-12-24 and 2027-11-26 the session ends at 12:55 and
+    this watch must stop expecting runs and commits then, or it would page about three hours of correct silence."""
+    b = bot.session_bounds(now_utc.astimezone(bot.ET_TZ).date())
+    return None if b is None else (b[0].astimezone(timezone.utc), b[1].astimezone(timezone.utc))
+
+
+def parse_status_ts(status):
+    """The ts inside status.json as UTC, or None."""
+    try:
+        return datetime.strptime(status["ts"], "%Y-%m-%dT%H:%M ET").replace(tzinfo=bot.ET_TZ).astimezone(timezone.utc)
+    except Exception:
+        return None
+
+
+def _mins(a, b):
+    return (a - b).total_seconds() / 60.0
+
+
+def measure(now_utc, open_utc, commit_utc=None, status=None, runs=None):
+    """The three signals in minutes, or None for one that could not be measured. NEVER 0 for unknown:
+    a check that cannot see must say so, not report calm.
+
+    Every signal is clamped to the session: an overnight silence is not an outage, so at the open the
+    clock starts at the open and not at yesterday's last commit.
+    """
+    out = {"queued": None, "no_trigger": None, "stale": None}
+    fresh = commit_utc
+    if fresh is None and status is not None:
+        ts = parse_status_ts(status)
+        if ts is not None:
+            fresh = ts + timedelta(minutes=COMMIT_LAG_MIN)        # no git history: assume the normal lag
+    if fresh is not None:
+        out["stale"] = max(0.0, _mins(now_utc, max(fresh, open_utc)))
+    if runs is not None:
+        created = [r["created_at"] for r in runs if r.get("created_at")]
+        out["no_trigger"] = max(0.0, _mins(now_utc, max(max(created) if created else open_utc, open_utc)))
+        waits = [_mins(now_utc, r["created_at"]) for r in runs
+                 if r.get("status") in QUEUED_STATES and r.get("created_at")]
+        out["queued"] = max(waits) if waits else 0.0
+    return out
+
+
+def crossings(signals, fired=None, window=None):
+    """Which thresholds need an alert NOW.
+
+    fired=None: stateless. A threshold fires if it was crossed within the last `window` minutes.
+    fired=dict: exact. Each (signal, threshold) fires once until the signal recovers below its first
+    threshold, which clears it. The dict is updated in place.
+    """
+    window = WINDOW_MIN if window is None else window
+    out = []
+    for name, ths in THRESHOLDS.items():
+        m = signals.get(name)
+        if m is None:
+            continue
+        if fired is not None and m < ths[0]:
+            fired.pop(name, None)
+            for k in [k for k in fired.get("_failed", {}) if k[0] == name]:
+                fired["_failed"].pop(k)
+            continue
+        for i, t in enumerate(ths):
+            if m < t:
+                continue
+            if fired is None:
+                if m - t >= window:
+                    continue
+            else:
+                done = fired.setdefault(name, set())
+                if t in done:
+                    continue
+                done.add(t)
+            out.append({"signal": name, "threshold": t, "minutes": m, "urgent": i == len(ths) - 1})
+    return out
+
+
+def _active(fired):
+    """True if exact mode has an unresolved episode (the retry counter alone is not one)."""
+    return bool(fired) and any(not k.startswith("_") and v for k, v in fired.items())
+
+
+def _hm(dt):
+    return dt.astimezone(bot.ET_TZ).strftime("%H:%M ET")
+
+
+def describe(c, now_utc, runs, git=None):
+    m = int(c["minutes"])
+    if c["signal"] == "queued":
+        waiting = [r for r in (runs or []) if r.get("status") in QUEUED_STATES and r.get("created_at")]
+        since = _hm(min(r["created_at"] for r in waiting)) if waiting else "?"
+        return ("An Arm A run created at %s has waited %d minutes for GitHub to give it a machine; a healthy "
+                "run starts within seconds. This is usually a GitHub Actions incident: "
+                "https://www.githubstatus.com" % (since, m)) + evidence_text(waiting, git)
+    if c["signal"] == "no_trigger":
+        return ("No Arm A run has been triggered for %d minutes. cron-job.org should trigger one every 15. "
+                "Check its job, and the Actions tab." % m)
+    return ("Arm A's status.json has not been committed for %d minutes (normally every 15). A run may be "
+            "crashing or stuck, or its push is failing." % m)
+
+
+def evidence_text(waiting, git=None):
+    """One ASCII sentence: what the run list and the jobs endpoint returned for the runs counted as waiting, then, when `git`
+    is given, what the status.json history said (the one input that does not come from the Actions API).
+
+    Appended after the sentence rh_daemon's mute matches on ("give it a machine"), never inside it.
+    The jobs part names how many steps had run and whether a runner was assigned, because on 2026-11-04 nobody could say
+    whether a stale "queued" read had carried that evidence (see job_started).
+    """
+    if not waiting:
+        return ""
+    bits = []
+    for r in waiting[:3]:
+        j = EVIDENCE["jobs"].get(r.get("id"))
+        if j is None:
+            jobs = "unreadable"
+        elif not j["statuses"]:
+            jobs = "none listed yet"
+        else:
+            jobs = "%s (steps that ran %s, runner assigned %s)" % (j["statuses"], j.get("steps_ran"), j.get("runner"))
+        bits.append("run %s: list row %r, jobs %s" % (r.get("id"), r.get("status"), jobs))
+    meta = ", ".join("%s=%s" % (k, v) for k, v in EVIDENCE["runs_meta"].items() if k in ("Date", "Age", "X-Cache", "Via"))
+    text = " Evidence (what GitHub returned to this check): %s; list response %s." % ("; ".join(bits), meta or "headers: none")
+    if git is not None:
+        ran = [r.get("id") for r in waiting if r.get("id") in (git.get("ran_ids") or ())]
+        ran_marker = [r.get("id") for r in waiting if r.get("id") in (git.get("marker_ids") or ())]
+        if (git.get("commit") is None or git.get("pass_started") is None) and not ran_marker:
+            text += " Git side (not the Actions API): status.json history unreadable here, so nothing could corroborate."
+        elif ran_marker and not ran and (git.get("commit") is None or git.get("pass_started") is None):
+            pass                                               # the marker below is the whole git side here
+        elif ran:
+            # Only reachable when the wait reached the URGENT level, which git proof may not hide (measure_with_git).
+            text += (" Git side (not the Actions API): newest status.json commit %s UTC, its pass started %s UTC, which is after "
+                     "run(s) %s were created: git says that pass ran while the Actions API still reports them queued. Reported "
+                     "anyway because the wait reached the urgent level." % (
+                         git["commit"].strftime("%H:%M:%S"), git["pass_started"].strftime("%H:%M"), ", ".join(map(str, ran))))
+        else:
+            text += (" Git side (not the Actions API): newest status.json commit %s UTC, its pass started %s UTC; no pass that "
+                     "started after the waiting run was created has committed." % (
+                         git["commit"].strftime("%H:%M:%S"), git["pass_started"].strftime("%H:%M")))
+        if ran_marker:
+            # Only reachable at the URGENT level, like the sentence above: a marker proof may not hide a 20 minute wait either.
+            text += (" The run-start marker shows run(s) %s already started while the Actions API still reports them queued. Reported "
+                     "anyway because the wait reached the urgent level." % ", ".join(map(str, ran_marker)))
+        if git.get("marker_checked"):
+            mk = git.get("marker")
+            text += (" Run-start marker (git branch %s): run %s started %s UTC." % (
+                START_BRANCH, mk["run_id"], mk["started"].strftime("%H:%M:%S") if mk.get("started") else "?")
+                if mk else " Run-start marker (git branch %s): none readable." % START_BRANCH)
+    return text
+
+
+def sender_label(sender="auto"):
+    """Who is running this check, for the subject. "auto": GitHub on a runner, LAPTOP BOT otherwise.
+
+    The subject is all that shows in an inbox list or a Slack line, and on 2026-10-22 Devon could not tell
+    which session had sent three false alerts and briefly thought a third one existed. Two modules build one
+    alert (this one makes the subject, rh_daemon prepends a line to the body), so the sender goes where it is
+    seen. None or "" means no suffix.
+    """
+    if sender == "auto":
+        return "GitHub" if (os.environ.get("GITHUB_ACTIONS") or "").strip().lower() == "true" else "LAPTOP BOT"
+    return sender or ""
+
+
+def build_alert(cs, now_utc, runs, sender=None, git=None):
+    """(subject, body, urgent) for the crossings in `cs`. Plain ASCII: Devon prints mail by subject.
+    git: {"commit": newest status.json commit time, "pass_started": the ts inside it} for the queued evidence, or None."""
+    urgent = any(c["urgent"] for c in cs)
+    subject = "ARM A WATCH ALERT: Arm A is not running" if urgent else "ARM A WATCH: Arm A is late"
+    if sender:
+        subject += " (checked by %s)" % sender
+    lines = ["Arm A (the Alpaca bot) looks stuck as of %s." % _hm(now_utc), ""]
+    lines += ["- " + describe(c, now_utc, runs, git) for c in cs]
+    lines += ["",
+              "Why it matters: Arm A checks its stop-losses itself, in a loop inside each run, with no stop",
+              "orders at the broker. While runs are not happening, open positions are NOT being protected.",
+              "A single late run is normal; this fires only past the normal range (see arm_a_watch.py).",
+              "",
+              "Nothing here places, moves or cancels a trade. If it persists: check githubstatus.com, the",
+              "Actions tab, and the cron-job.org job. Arm B (Robinhood, index-only) is unaffected."]
+    return subject, "\n".join(lines), urgent
+
+
+# ---------------------------------------------------------------------------------------------------
+# Inputs
+
+def _git(*args, timeout=60):
+    return subprocess.run(["git", *args], capture_output=True, text=True, timeout=timeout)
+
+
+def git_commit_time(ref="HEAD", path=STATUS_F):
+    """When status.json was last committed on `ref`, UTC, or None (no history in a shallow clone)."""
+    try:
+        r = _git("log", "-1", "--format=%cI", ref, "--", path)
+        s = r.stdout.strip()
+        return datetime.fromisoformat(s).astimezone(timezone.utc) if r.returncode == 0 and s else None
+    except Exception as e:
+        print("  [arm a watch: git log failed: %s]" % e)
+        return None
+
+
+def read_status(ref=None, path=STATUS_F):
+    """status.json as a dict from the working tree (ref=None) or from git `ref`, or None."""
+    try:
+        if ref:
+            r = _git("show", "%s:%s" % (ref, path))
+            return json.loads(r.stdout) if r.returncode == 0 else None
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print("  [arm a watch: could not read %s: %s]" % (path, e))
+        return None
+
+
+def fetch_runs(repo=REPO, workflow=WORKFLOW_FILE, token=None, per_page=8):
+    """Recent Arm A runs from the Actions API as [{status, conclusion, created_at}], or None on failure.
+    The repo is public, so this works without a token; a token only raises the rate limit."""
+    url = "https://api.github.com/repos/%s/actions/workflows/%s/runs?per_page=%d" % (repo, workflow, per_page)
+    try:
+        d, meta = _get_json(url, token)
+        EVIDENCE["runs_meta"] = meta
+        return [{"id": x.get("id"), "status": x.get("status"), "conclusion": x.get("conclusion"),
+                 "created_at": datetime.strptime(x["created_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)}
+                for x in d.get("workflow_runs", [])]
+    except Exception as e:
+        print("  [arm a watch: could not read the Actions runs list: %s]" % e)
+        return None
+
+
+# What GitHub said, kept so an alert can show it. 2026-10-22: ten false "Arm A is late" mails from the laptop in one
+# day, none from GitHub's own copy of this check, and nobody able to say what either endpoint had returned.
+EVIDENCE = {"runs_meta": {}, "jobs": {}}
+_META_HEADERS = ("Date", "Age", "X-Cache", "Via", "Cache-Control", "X-GitHub-Request-Id")
+
+
+def _get_json(url, token=None):
+    """(parsed json, {response header: value}). The request cannot be answered from a shared cache.
+
+    An UNAUTHENTICATED read of the REST API is marked public, max-age=60, so a CDN or proxy in between may serve it,
+    and may serve it stale while GitHub is degraded; an authenticated one is private. The laptop reads without a
+    token and was the only side that false-alerted, so every read here carries a unique query parameter (a new URL is
+    a cache miss by construction) and no-cache request headers. The headers GitHub returned are kept as evidence.
+    """
+    sep = "&" if "?" in url else "?"
+    req = urllib.request.Request(url + "%s_cb=%d" % (sep, int(time.time() * 1000)),
+                                 headers=dict(_api_headers(token), **{"Cache-Control": "no-cache", "Pragma": "no-cache"}))
+    with urllib.request.urlopen(req, timeout=20) as r:
+        d = json.loads(r.read().decode("utf-8"))
+        h = getattr(r, "headers", None)
+        meta = {k: h.get(k) for k in _META_HEADERS if h is not None and h.get(k)} if h is not None else {}
+    return d, meta
+
+
+def _api_headers(token=None):
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "arm-a-watch"}
+    token = token or os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    return headers
+
+
+def _steps_ran(job):
+    """How many steps of this job have started or finished. A job that never got a machine has none."""
+    return sum(1 for s in (job.get("steps") or []) if s.get("status") in ("in_progress", "completed"))
+
+
+def _job_ran(job):
+    """Did a machine work on this job? Judged on what only a machine can have produced, not on the status word alone.
+
+    The status in_progress / completed (the old test, kept). Or a step that ran, or a runner assigned: on 2026-11-04 the
+    jobs endpoint returned a finished job as "in_progress" with every step completed, so the status can lag its own
+    payload. NOT used, deliberately: started_at, completed_at and conclusion. The recorded 2026-10-05 job that never got
+    a machine (run 37363799207) has started_at == created_at, a completed_at and conclusion "cancelled", with runner_id 0
+    and no steps; every job that did run has runner_id > 0 and 11 or 12 steps. Real payloads: tests/arm_a_replay_data.py.
+    (A job cancelled in the queue also reads status "completed", which still counts as started here, as before. Its run row is
+    then completed as well, so the run is not counted as waiting either way.)
+    """
+    return (job.get("status") in ("in_progress", "completed") or bool(job.get("runner_id")) or _steps_ran(job) > 0)
+
+
+def job_started(run_id, repo=REPO, token=None):
+    """Has a runner picked up a job of this run? True / False, or None if it could not be read.
+
+    The run ROW says "queued" until GitHub updates it, and on 2026-10-22 it said so for runs whose jobs had
+    started within 2 to 3 seconds (Arm A was on cadence all morning; GitHub had an "Actions Results" incident
+    open from 10:18 ET). The question the QUEUED signal exists to ask is "is a machine working on this run",
+    and the job answers it directly. None (unreadable, or no job listed yet) is NOT an answer: the caller keeps
+    the run counted as waiting, because a check that cannot see must not say calm. ("No job listed" is exactly what
+    the three TRUE stuck runs of 2026-10-26 returned, so it must stay None.)
+    """
+    url = "https://api.github.com/repos/%s/actions/runs/%s/jobs?per_page=30" % (repo, run_id)
+    try:
+        d, meta = _get_json(url, token)
+        jobs = d.get("jobs") or []
+        EVIDENCE["jobs"][run_id] = {"statuses": [j.get("status") for j in jobs], "meta": meta,
+                                    "steps_ran": [_steps_ran(j) for j in jobs], "runner": [bool(j.get("runner_id")) for j in jobs]}
+        while len(EVIDENCE["jobs"]) > 20:                      # the daemon is long-lived; keep the newest few
+            EVIDENCE["jobs"].pop(next(iter(EVIDENCE["jobs"])))
+        if not jobs:
+            return None
+        return any(_job_ran(j) for j in jobs)
+    except Exception as e:
+        print("  [arm a watch: could not read the jobs of run %s: %s]" % (run_id, e))
+        return None
+
+
+def reconcile(runs, job_state):
+    """(runs, lagged): a run whose row says queued but whose job has started is no longer waiting for a machine.
+
+    Returns copies, status "in_progress", row_status keeps what the row said. `lagged` counts them so the
+    summary line can show that the row was behind, instead of the correction being invisible.
+    """
+    if not runs or job_state is None:
+        return runs, 0
+    out, lagged = [], 0
+    for r in runs:
+        if r.get("status") in QUEUED_STATES and r.get("id"):
+            try:
+                started = job_state(r["id"])
+            except Exception as e:
+                print("  [arm a watch: job check failed for run %s: %s]" % (r.get("id"), e))
+                started = None
+            if started is True:
+                r = dict(r, status="in_progress", row_status=r.get("status"))
+                lagged += 1
+        out.append(r)
+    return out, lagged
+
+
+PASS_CLOCK_SLACK_MIN = 1      # minutes of disagreement tolerated between status.json's minute-resolution ts and GitHub's clock
+
+
+def pass_started_after(status, commit_utc, created_at, now_utc):
+    """True if status.json PROVES the run created at `created_at` has already run: it records a pass that STARTED at or after
+    that moment and was COMMITTED. The proof comes from git, not from the Actions API, which is what served stale state on
+    2026-11-04 (a finished job read "queued" six minutes after it completed).
+
+    Why a start time and not "any commit since": a pass's ts is stamped when it STARTS (alpaca_bot.run_bot), and the workflow's
+    concurrency group runs passes one at a time in creation order, so a pass that started at or after R was created can only be
+    R (or a pass that ran after R). A SLOW PREDECESSOR committing late has an OLDER ts and proves nothing about R: on 2026-10-26
+    run 40357285384 was still legitimately waiting at 16:24:52 behind a pass that committed at 16:23:52 with ts 16:13, and "any
+    commit since it was created" would have hidden it. Why not a commit AGE: a healthy pass and the stuck run of 2026-10-05 both
+    show a newest commit about 10 minutes old at the six-minute mark, so age cannot tell them apart.
+
+    Every input that is missing or inconsistent answers False, which leaves the run counted as waiting, exactly as before:
+    no history (a shallow clone), no readable ts, a start stamp later than its own commit or later than now.
+    """
+    ts = parse_status_ts(status) if status else None
+    if ts is None or commit_utc is None or created_at is None:
+        return False
+    slack = timedelta(minutes=PASS_CLOCK_SLACK_MIN)
+    if ts > commit_utc + slack or ts > now_utc + slack:
+        return False
+    return ts >= created_at.replace(second=0, microsecond=0)
+
+
+START_BRANCH = "arm-a-start"
+_MARKER_RUN = re.compile(r"\brun=(\d+)")
+_MARKER_AT = re.compile(r"\bstarted=(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)")
+
+
+def parse_start_marker(message):
+    """{"run_id": int, "started": datetime or None} from a marker commit message ("arm-a run-start run=<id> attempt=<n> started=<UTC>"),
+    or None if it is not one. The workflow step "Mark run start" writes it; see tests/test_arm_a_workflow_steps.py."""
+    m = _MARKER_RUN.search(message or "")
+    if not m:
+        return None
+    started = None
+    t = _MARKER_AT.search(message)
+    if t:
+        started = datetime.strptime(t.group(1), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    return {"run_id": int(m.group(1)), "started": started}
+
+
+def git_start_marker(fetch=True):
+    """The newest run-start marker on the remote branch arm-a-start, parsed, or None (no branch yet, no network, anything wrong).
+
+    The Arm A workflow force-pushes one parentless commit there the moment a job starts. This reads it through GIT, which shares no failure mode
+    with the Actions API that served stale state on 2026-10-22 and 2026-11-04. Fails soft: no marker means no proof, and the alert is exactly what
+    it was before the marker existed.
+    """
+    try:
+        if fetch:
+            r = _git("fetch", "-q", "origin", "+refs/heads/%s:refs/remotes/origin/%s" % (START_BRANCH, START_BRANCH), timeout=30)
+            if r.returncode != 0:
+                return None
+        r = _git("log", "-1", "--format=%B", "refs/remotes/origin/" + START_BRANCH)
+        return parse_start_marker(r.stdout) if r.returncode == 0 else None
+    except Exception as e:
+        print("  [arm a watch: start marker unreadable: %s]" % e)
+        return None
+
+
+def marker_proves(marker, run, now_utc):
+    """True if the marker proves `run` has STARTED: its run id is at or after this run's. Run ids only grow, and the workflow runs one job at a
+    time in creation order, so a marker for run N means every run up to N started (or was cancelled while still waiting, which a stale row can
+    still call queued). The newest marker alone is enough because the branch is force-pushed. Anything missing or inconsistent says False."""
+    try:
+        rid = run.get("id")
+        if not marker or rid is None or marker.get("run_id") is None:
+            return False
+        started = marker.get("started")
+        if started is not None and started > now_utc + timedelta(minutes=PASS_CLOCK_SLACK_MIN):
+            return False                                     # a start stamp in the future is not evidence
+        return int(marker["run_id"]) >= int(rid)
+    except (TypeError, ValueError):
+        return False
+
+
+def marker_reader(get_marker, get_runs, get_commit_time):
+    """Which function reads the run-start marker. An explicit one is kept. Left at None it is git_start_marker ONLY when the run list and the
+    commit time are the real readers (production: the laptop daemon and the workflow leave them at their defaults). With either stubbed there is
+    no real run list for a real marker to say anything about, and a test must not reach the network or meet today's marker (a real run id is
+    larger than any id a test uses, so it would 'prove' every test row started)."""
+    if get_marker is None and get_runs is fetch_runs and get_commit_time is git_commit_time:
+        return git_start_marker
+    return get_marker
+
+
+def corroborate(runs, status, commit_utc, now_utc, marker=None):
+    """(runs, corrected): a run whose row says queued but which git shows already started is not waiting.
+
+    Two independent proofs, both from git: status.json holds a pass that started at or after the run was created (proof "status.json"), or the
+    workflow's run-start marker is for this run or a later one (proof "start marker"). Copies, status "in_progress", row_status keeps what the
+    row said. Run AFTER reconcile (which asks the jobs endpoint) so the jobs evidence is still recorded for the run.
+    """
+    if not runs:
+        return runs, []
+    out, corrected = [], []
+    for r in runs:
+        if r.get("status") in QUEUED_STATES:
+            proof = ("status.json" if pass_started_after(status, commit_utc, r.get("created_at"), now_utc)
+                     else "start marker" if marker_proves(marker, r, now_utc) else None)
+            if proof:
+                r = dict(r, status="in_progress", row_status=r.get("status"), proof=proof)
+                corrected.append(r)
+        out.append(r)
+    return out, corrected
+
+
+def measure_with_git(now_utc, open_utc, commit_utc, status, runs, marker=None):
+    """(signals, runs to show in an alert, corrected runs). measure() on the runs after the git correction, with one exception:
+    a wait that reaches the URGENT threshold is judged on the uncorrected runs. Git proof may lower a first-level wait; it never
+    hides a run that has waited the urgent time (Devon's brief 2026-11-04: urgent, no_trigger and stale stay untouched)."""
+    view, corrected = corroborate(runs, status, commit_utc, now_utc, marker)
+    sig = measure(now_utc, open_utc, commit_utc, status, view)
+    shown = view
+    if corrected:
+        raw = measure(now_utc, open_utc, commit_utc, status, runs)["queued"]
+        if raw is not None and raw >= THRESHOLDS["queued"][1]:
+            sig["queued"], shown = raw, runs
+    return sig, shown, corrected
+
+
+def proof_text(corrected, commit_utc, status, marker=None):
+    """For the summary line: which rows were not counted, and the git facts that decided it."""
+    bits = []
+    for r in corrected[:3]:
+        if r.get("proof") == "start marker" and marker:
+            bits.append("run %s created %s, start marker for run %s%s" % (
+                r.get("id"), r["created_at"].strftime("%H:%M:%SZ"), marker["run_id"],
+                (" at " + marker["started"].strftime("%H:%M:%SZ")) if marker.get("started") else ""))
+        else:
+            ts = parse_status_ts(status)
+            bits.append("run %s created %s, newest status.json committed %s, its pass started %s" % (
+                r.get("id"), r["created_at"].strftime("%H:%M:%SZ"), commit_utc.strftime("%H:%M:%SZ"), ts.strftime("%H:%MZ")))
+    return "; ".join(bits)
+
+
+def default_deliver(subject, body, urgent):
+    """Email + Slack always; SMS and push only when urgent (rh_watchdog.alert owns the secrets rules)."""
+    import rh_watchdog
+    return rh_watchdog.alert(body, urgent=urgent, subject=subject, title=subject)
+
+
+# ---------------------------------------------------------------------------------------------------
+# One check
+
+def run_once(now=None, fetch=False, ref=None, fired=None, deliver=default_deliver, window=None,
+             get_commit_time=git_commit_time, get_status=read_status, get_runs=fetch_runs,
+             get_job_state=job_started, sender="auto", get_marker=None):
+    """One check. Returns (exit_code, one_line_summary, [alerts delivered]).
+
+    exit 0: fine, or an alert was due and delivered.  exit 1: an alert was due and NOT delivered, or
+    nothing could be measured at all. Either makes a GitHub run red, which emails the owner: a watcher
+    that fails quietly is the failure this exists to remove.
+    fired: pass a dict to alert exactly once per threshold and to send a recovery notice (the daemon).
+    get_job_state: asked about every run whose row says queued (see job_started); a run whose job has
+    started is not waiting for a machine. sender: who is checking, shown in the subject (see sender_label).
+
+    After the jobs check, a queued row is checked against GIT (measure_with_git): not waiting if status.json shows a pass that
+    started at or after the run was created had committed, or the workflow's run-start marker (branch arm-a-start) is for this run
+    or a later one. That corrects the first level only; an urgent wait is judged on the uncorrected runs. The summary line names every
+    row that was not counted and the git facts that decided it.
+    get_marker: reads the marker. Left at None it is git_start_marker ONLY when the run list and the commit time are the real readers
+    (production: the daemon and the workflow leave them at their defaults); with either stubbed there is no real run list for a real marker
+    to say anything about, and a test must not reach the network or meet today's marker.
+
+    A first-level QUEUED alert gets a SECOND LOOK just before it is delivered: runs and jobs are read again
+    and the alert is withdrawn if nothing is waiting any more. It is not a pause. The laptop checks every
+    five minutes, so waiting for a second check would delay a real stuck run by up to five minutes against
+    a 6 and 20 minute threshold, and the 2026-10-05 replay is why those numbers stay.
+    """
+    now = now or datetime.now(timezone.utc)
+    bounds = session_bounds(now)
+    if bounds is None or not (bounds[0] <= now <= bounds[1]):
+        return 0, "ARM A WATCH: market closed, nothing expected", []
+    open_utc = bounds[0]
+    if fetch:
+        try:
+            _git("fetch", "-q", "origin", "main", timeout=60)
+        except Exception as e:
+            print("  [arm a watch: git fetch failed: %s]" % e)
+    commit = get_commit_time(ref or "HEAD")
+    status = get_status(ref)
+    who = sender_label(sender)
+    get_marker = marker_reader(get_marker, get_runs, get_commit_time)
+    try:
+        marker = get_marker() if get_marker else None
+    except Exception as e:                                  # a marker that cannot be read is no proof, never an error
+        print("  [arm a watch: start marker read failed: %s]" % e)
+        marker = None
+    runs, lagged = reconcile(get_runs(), get_job_state)
+    sig, runs, by_git = measure_with_git(now, open_utc, commit, status, runs, marker)
+    if all(v is None for v in sig.values()):
+        return 1, "ARM A WATCH: could not measure anything (no git history, no status.json, no runs list)", []
+
+    def f(k):
+        return "unknown" if sig[k] is None else "%.0fm" % sig[k]
+    line = "ARM A WATCH: status commit age %s, last run created %s ago, longest wait for a machine %s" % (
+        f("stale"), f("no_trigger"), f("queued"))
+    if lagged:
+        line += " (%d run row(s) said queued while their job was already running; not counted)" % lagged
+    by_ts = [r for r in by_git if r.get("proof") != "start marker"]
+    by_mark = [r for r in by_git if r.get("proof") == "start marker"]
+    if by_ts:
+        line += (" (%d run row(s) said queued although git shows their pass had already committed; not counted at the first "
+                 "level: %s)" % (len(by_ts), proof_text(by_ts, commit, status)))
+    if by_mark:
+        line += (" (%d run row(s) said queued although git's run-start marker shows they had already started; not counted at the "
+                 "first level: %s)" % (len(by_mark), proof_text(by_mark, commit, status, marker)))
+    git = {"commit": commit, "pass_started": parse_status_ts(status) if status else None,
+           "ran_ids": {r.get("id") for r in by_git if r.get("proof") != "start marker"},
+           "marker_ids": {r.get("id") for r in by_git if r.get("proof") == "start marker"},
+           "marker": marker, "marker_checked": get_marker is not None}
+    had_active = _active(fired)
+    cs = crossings(sig, fired, window)
+    if any(c["signal"] == "queued" for c in cs) and not any(c["signal"] == "queued" and c["urgent"] for c in cs):
+        again = get_runs()                                  # the second look; unreadable keeps the alert
+        if again is not None:
+            again, _ = reconcile(again, get_job_state)
+            q = measure_with_git(now, open_utc, commit, status, again, marker)[0]["queued"]
+            if q is not None and q < THRESHOLDS["queued"][0]:
+                cs = [c for c in cs if c["signal"] != "queued"]
+                if fired is not None:
+                    fired.get("queued", set()).discard(THRESHOLDS["queued"][0])
+                line += " | queued alert withdrawn: a second look found no run waiting for a machine"
+                runs = again
+    sent = []
+    if cs:
+        subject, body, urgent = build_alert(cs, now, runs, who, git)
+        ok = deliver(subject, body, urgent)
+        print("ALERT:", subject)
+        if not ok:
+            if fired is not None:                       # exact mode: do not let a lost alert count as sent
+                failed = fired.setdefault("_failed", {})
+                for c in cs:
+                    k = (c["signal"], c["threshold"])
+                    failed[k] = failed.get(k, 0) + 1
+                    if failed[k] < MAX_DELIVERY_TRIES:
+                        fired.get(c["signal"], set()).discard(c["threshold"])
+            return 1, line + " | ALERT NOT DELIVERED: " + subject, []
+        sent.append(subject)
+        line += " | ALERTED: " + subject
+    elif fired is not None and had_active and not _active(fired):
+        # Exact mode only (a stateless run cannot know there was an episode): say it is over.
+        subject = "ARM A WATCH: Arm A is running again" + (" (checked by %s)" % who if who else "")
+        body = ("Arm A is back inside its normal range as of %s: %s." % (_hm(now), line[len("ARM A WATCH: "):]))
+        if deliver(subject, body, False):
+            sent.append(subject)
+            line += " | RECOVERED"
+    return 0, line, sent
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    force = (os.environ.get("FORCE_ALERT") or "").strip().lower()
+    urgent_test = "--force-urgent" in argv or force == "urgent"
+    if urgent_test or "--force" in argv or force in ("true", "yes"):
+        ok = default_deliver("ARM A WATCH: TEST alert",
+                             "TEST alert from ARM A WATCH. This is not a real outage and nothing is wrong "
+                             "with Arm A. " + ("It was sent as URGENT, so SMS and push were used too."
+                                               if urgent_test else "Email and Slack only."), urgent_test)
+        print("test alert", "delivered" if ok else "NOT DELIVERED")
+        return 0 if ok else 1
+    ref = argv[argv.index("--ref") + 1] if "--ref" in argv else None
+    rc, line, _ = run_once(fetch="--fetch" in argv, ref=ref)
+    print(line)
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

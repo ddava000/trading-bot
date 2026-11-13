@@ -1,0 +1,55 @@
+name: ci
+
+# Runs the regression and hygiene tests whenever code, workflows, tests or the mailbox change.
+# It exists because this repo has failed SILENTLY before:
+#   - weekly-audit.yml was an invalid workflow file for ten weeks and never ran once.
+#   - Devon's personal addresses stayed in mailbox prose in a PUBLIC repo after the code
+#     literals were removed.
+#   - a non-ASCII character in a success print turned a delivered email into a reported failure
+#     on the Windows laptop, which no GitHub runner can reproduce.
+# A red run emails Devon, which is the point: a broken tax number or an invalid workflow should
+# be loud on the push that caused it, not weeks later.
+#
+# The path filter is deliberate. The bots commit their heartbeats and ledgers every 15 minutes
+# (those pushes use GITHUB_TOKEN and never trigger workflows anyway), and the laptop pushes
+# status files constantly. None of those paths are listed, so this stays quiet on routine traffic.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.py"
+      - ".github/**"
+      - "tests/**"
+      - "requirements*.txt"
+      - "AGENT_MAIL*.md"
+      - "CLAUDE.md"
+      - "experiment.json"
+      - "realized_b.json"
+  pull_request:
+    paths:
+      - "**.py"
+      - ".github/**"
+      - "tests/**"
+      - "requirements*.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-alpaca.txt pyyaml
+      # -W error::ResourceWarning turns an unclosed file into a failure, which is how the first
+      # version of this suite found unclosed handles in the live engine.
+      - name: Regression and hygiene tests
+        run: python -W error::ResourceWarning -m unittest discover -s tests -v

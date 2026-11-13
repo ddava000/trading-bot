@@ -1,0 +1,23 @@
+{
+  "regime": "neutral",
+  "risk_scale": 0.35,
+  "avoid_symbols": [
+    "NVDA",
+    "PLTR",
+    "VST",
+    "IWM",
+    "QQQ",
+    "MSFT",
+    "AN",
+    "SPY"
+  ],
+  "favor_symbols": [
+    "BKH",
+    "CPRI"
+  ],
+  "notes": "VIX ticked back up to 19.0 into the close with the chip selloff accelerating (Nvidia still sliding post-Huang) and a hot 6.5% PPI keeping a December hike in play. Late-Friday weekend risk plus Nvidia earnings next week argue for trimming risk to 0.35 and keeping broken high-beta/index ETFs off buys.",
+  "journal_entry": "Fri 11/13 15:54: Into-close check \u2014 conditions softened again vs morning: VIX 17.8->19.0, chip selloff accelerating, Nasdaq leading lower. Dialed risk 0.40->0.35 for weekend gap risk and next-week NVDA earnings/Fed minutes. VST(-11%)/PLTR(-9.6%)/IWM(-8.1%)/QQQ(-6.4%) still red; BKH(+13.5%)/CPRI(+4%) only green holds. $29 cash caps adds anyway.",
+  "date": "2026-11-13",
+  "mode": "INTRADAY",
+  "updated_at": "2026-11-13T15:54 ET"
+}

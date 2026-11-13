@@ -1,0 +1,58 @@
+name: slack-test
+
+# Manual only. Proves the SLACK_WEBHOOK_URL secret reaches a runner and that the
+# channel accepts posts. Touches no broker API, reads no keys, places no orders.
+# Kept as a permanent tool: any time the channel goes quiet, run this to tell
+# "nothing happened" apart from "the pipe is broken".
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: "mode=say: the message to post. mode=peek: a regex; only matching lines of recent BOT alerts are printed."
+        default: ""
+      limit:
+        description: "mode=peek only: how many of the newest channel messages to look through (default 20, at most 200)."
+        default: "20"
+      mode:
+        description: "test = hello line. mail = newest AGENT_MAIL entry. alert = real send_email path. read = pull channel messages back (read side). peek = print only the lines of recent bot alerts that match text (what did an alert actually say). scan = list EVERY message in the channel, humans and bots, thread replies included, with how pull would classify it (text = a limit, default 50; add the word since to ask Slack exactly as the 15-minute pull does)."
+        type: choice
+        options: [test, mail, alert, read, say, peek, scan]
+        default: test
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-alpaca.txt
+      - name: Post to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SAY_TEXT: ${{ inputs.text }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID:  ${{ secrets.SLACK_CHANNEL_ID }}
+          PEEK_LIMIT:        ${{ inputs.limit }}
+        # slack_notify exits non-zero when the post fails, so a broken webhook
+        # shows up as a RED run instead of a green one that quietly did nothing.
+        # "read" is the same deal for the read side: it exits non-zero when the
+        # channel returns nothing, so an unset token or a missing invite is RED
+        # rather than a green run that silently read zero messages.
+        run: |
+          if [ "${{ inputs.mode }}" = "mail" ]; then
+            python slack_notify.py --mail-latest
+          elif [ "${{ inputs.mode }}" = "alert" ]; then
+            python slack_alert_probe.py
+          elif [ "${{ inputs.mode }}" = "say" ]; then
+            python -c "import os,sys,slack_notify; sys.exit(0 if slack_notify.post(os.environ['SAY_TEXT']) else 1)"
+          elif [ "${{ inputs.mode }}" = "peek" ]; then
+            python slack_notify.py --peek "$SAY_TEXT"
+          elif [ "${{ inputs.mode }}" = "scan" ]; then
+            python slack_notify.py --scan "${SAY_TEXT:-50}"
+          elif [ "${{ inputs.mode }}" = "read" ]; then
+            python slack_notify.py --pull 25
+          else
+            python slack_notify.py --test
+          fi

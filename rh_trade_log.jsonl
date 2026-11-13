@@ -1,0 +1,122 @@
+{"action": "buy", "symbol": "SPY", "notional": 9.99, "reason": "INDEX-CORE toward $9.99", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 9.99, "reason": "INDEX-CORE toward $9.99", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 9.99, "reason": "INDEX-CORE toward $9.99", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "NVCR", "notional": 5.99, "sleeve": "HOLD", "reason": "HOLD +1 RSI 63 up (4 votes)", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IMAX", "notional": 5.99, "sleeve": "HOLD", "reason": "HOLD +1 RSI 66 up (4 votes)", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "CLF", "notional": 5.99, "sleeve": "TRADE", "reason": "TRADE +1 RSI 68 up (3 votes)", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "ALLE", "notional": 3.0, "sleeve": "TRADE", "reason": "TRADE +1 RSI 73 up (3 votes)", "ts": "2026-07-23T12:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "LMT", "notional": 1.79, "sleeve": "HOLD", "reason": "HOLD +1 RSI 57 up (4 votes)", "ts": "2026-07-23T14:06", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "DGX", "notional": 1.79, "sleeve": "HOLD", "reason": "HOLD +1 RSI 62 up (4 votes)", "ts": "2026-07-23T14:19", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "WEX", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 70 up (4 votes)", "ts": "2026-07-23T15:28", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 8.4, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 8.48, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 8.38, "reason": "INDEX-CORE toward $18.40", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "RNG", "notional": 4.42, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (3 votes)", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "THC", "notional": 1.2, "sleeve": "TRADE", "reason": "TRADE +1 RSI 68 up (3 votes)", "ts": "2026-07-24T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "CLF", "qty": 0.524522, "reason": "SELL signal RSI 69 (-1.4%)", "ts": "2026-07-24T10:33", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SSNC", "notional": 4.14, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "FAF", "notional": 1.1, "sleeve": "TRADE", "reason": "TRADE +1 RSI 60 up (3 votes)", "ts": "2026-07-24T10:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "NVDA", "notional": 4.16, "sleeve": "HOLD", "reason": "HOLD +1 RSI 63 up (5 votes)", "ts": "2026-07-24T12:06", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 1.45, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 1.56, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 1.39, "reason": "INDEX-CORE toward $19.96", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "BMNR", "notional": 2.04, "sleeve": "TRADE", "reason": "TRADE +1 RSI 65 up (3 votes)", "ts": "2026-07-27T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "GENI", "notional": 5.38, "sleeve": "HOLD", "reason": "HOLD +1 RSI 66 up (4 votes)", "ts": "2026-07-27T15:01", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "MSFT", "notional": 5.4, "sleeve": "HOLD", "reason": "HOLD +1 RSI 60 up (5 votes)", "ts": "2026-07-28T11:36", "status": "unknown", "venue": "robinhood"}
+{"action": "buy", "symbol": "INCY", "notional": 5.41, "sleeve": "HOLD", "reason": "HOLD +1 RSI 70 up (4 votes)", "ts": "2026-07-28T13:33", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "COUR", "notional": 1.08, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-07-29T14:25", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "BMNR", "qty": 0.113907, "reason": "STOP-LOSS -7.4%", "ts": "2026-07-29T15:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "MSFT", "notional": 1.25, "sleeve": "TRADE", "reason": "TRADE +1 RSI 73 up (5 votes)", "ts": "2026-07-30T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 1.6, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 1.42, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 1.89, "reason": "INDEX-CORE toward $22.15", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "PLTR", "notional": 2.73, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (6 votes)", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "W", "notional": 1.4, "sleeve": "TRADE", "reason": "TRADE +1 RSI 68 up (3 votes)", "ts": "2026-08-04T11:00", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 12.54, "reason": "INDEX-CORE toward $34.89", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 12.44, "reason": "INDEX-CORE toward $34.89", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 12.54, "reason": "INDEX-CORE toward $34.89", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "TDW", "notional": 12.56, "sleeve": "HOLD", "reason": "HOLD +1 RSI 65 up (4 votes)", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IT", "notional": 11.26, "sleeve": "TRADE", "reason": "TRADE +1 RSI 75 up (3 votes)", "ts": "2026-08-04T15:21", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SHOP", "notional": 6.26, "sleeve": "HOLD", "reason": "HOLD +1 RSI 65 up (4 votes)", "ts": "2026-08-05T11:11", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "FAF", "qty": 0.014818, "reason": "TIME-STOP +0.8% after 13d", "ts": "2026-08-06T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "INSM", "notional": 1.16, "sleeve": "TRADE", "reason": "TRADE +1 RSI 77 up (4 votes)", "ts": "2026-08-06T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INSM", "qty": 0.008451, "reason": "STOP-LOSS -27.9%", "ts": "2026-08-06T10:14", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "W", "qty": 0.01228, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-06T11:16", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "INSM", "notional": 2.01, "sleeve": "TRADE", "reason": "TRADE +1 RSI 74 up (4 votes)", "ts": "2026-08-06T11:27", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPCX", "notional": 1.82, "sleeve": "TRADE", "reason": "TRADE +1 RSI 56 neutral (4 votes)", "ts": "2026-08-10T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "ACHR", "notional": 1.53, "sleeve": "HOLD", "reason": "HOLD +1 RSI 67 up (4 votes)", "ts": "2026-08-10T11:09", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 2.21, "reason": "INDEX-CORE toward $36.84", "ts": "2026-08-10T15:17", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 2.22, "reason": "INDEX-CORE toward $36.87", "ts": "2026-08-11T11:26", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "IT", "qty": 0.059762, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-13T11:28", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "ARX", "notional": 9.88, "sleeve": "TRADE", "reason": "TRADE +1 RSI 71 up (4 votes)", "ts": "2026-08-13T11:43", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "RDDT", "notional": 1.42, "sleeve": "TRADE", "reason": "TRADE +1 RSI 50 up (3 votes)", "ts": "2026-08-14T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.74, "reason": "INDEX-CORE toward $38.76", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SNDK", "notional": 1.6, "sleeve": "TRADE", "reason": "TRADE +1 RSI 74 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "MU", "notional": 1.14, "sleeve": "HOLD", "reason": "HOLD +1 RSI 69 up (5 votes)", "ts": "2026-08-17T10:15", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "RDDT", "qty": 0.007918, "reason": "STOP-LOSS -7.6%", "ts": "2026-08-17T15:41", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "FIGR", "notional": 1.19, "sleeve": "TRADE", "reason": "TRADE +1 RSI 72 up (4 votes)", "ts": "2026-08-17T15:49", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "ALLE", "qty": 0.019017, "reason": "TIME-STOP +2.0% after 26d", "ts": "2026-08-18T10:02", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "TRGP", "notional": 2.64, "sleeve": "TRADE", "reason": "TRADE +1 RSI 67 up (3 votes)", "ts": "2026-08-18T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SNDK", "qty": 0.000899, "reason": "STOP-LOSS -7.1%", "ts": "2026-08-18T10:14", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SNDK", "notional": 1.23, "sleeve": "TRADE", "reason": "TRADE +1 RSI 72 up (5 votes)", "ts": "2026-08-18T10:23", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "RNG", "qty": 0.090555, "reason": "TAKE-PROFIT +33.6%", "ts": "2026-08-19T09:50", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "THC", "qty": 0.004984, "reason": "TAKE-PROFIT +15.1%", "ts": "2026-08-19T09:54", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "TWST", "notional": 6.87, "sleeve": "TRADE", "reason": "TRADE +1 RSI 75 up (3 votes)", "ts": "2026-08-19T10:03", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "MSFT", "qty": 0.002775, "reason": "WIND-DOWN to index (+7.4%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "NVDA", "qty": 0.0197, "reason": "WIND-DOWN to index (-0.8%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "NVCR", "qty": 0.310079, "reason": "WIND-DOWN to index (-13.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "IMAX", "qty": 0.135092, "reason": "WIND-DOWN to index (+23.0%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "LMT", "qty": 0.003188, "reason": "WIND-DOWN to index (+0.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "DGX", "qty": 0.007897, "reason": "WIND-DOWN to index (+8.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "WEX", "qty": 0.006326, "reason": "WIND-DOWN to index (+17.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SSNC", "qty": 0.056082, "reason": "WIND-DOWN to index (+13.2%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "GENI", "qty": 0.727085, "reason": "WIND-DOWN to index (+8.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INCY", "qty": 0.04185, "reason": "WIND-DOWN to index (-1.3%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "COUR", "qty": 0.17476, "reason": "WIND-DOWN to index (-3.8%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "PLTR", "qty": 0.017283, "reason": "WIND-DOWN to index (+9.2%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TDW", "qty": 0.148358, "reason": "WIND-DOWN to index (+11.9%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SHOP", "qty": 0.042497, "reason": "WIND-DOWN to index (+0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "INSM", "qty": 0.015341, "reason": "WIND-DOWN to index (-5.9%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SPCX", "qty": 0.013544, "reason": "WIND-DOWN to index (+1.0%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "ACHR", "qty": 0.236611, "reason": "WIND-DOWN to index (-7.1%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "ARX", "qty": 0.505632, "reason": "WIND-DOWN to index (+0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SNDK", "qty": 0.000741, "reason": "WIND-DOWN to index (-14.3%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "MU", "qty": 0.001119, "reason": "WIND-DOWN to index (-11.6%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "FIGR", "qty": 0.033547, "reason": "WIND-DOWN to index (+9.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TRGP", "qty": 0.00891, "reason": "WIND-DOWN to index (-0.5%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "TWST", "qty": 0.050738, "reason": "WIND-DOWN to index (+2.7%)", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 35.28, "reason": "INDEX-CORE toward $79.75", "ts": "2026-08-24T09:48", "status": "ok", "venue": "robinhood"}
+{"action": "sell", "symbol": "SPY", "qty": 0.031573, "reason": "INDEX-TRIM to $49.30", "ts": "2026-08-24T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 30.44, "reason": "INDEX-CORE toward $79.90", "ts": "2026-08-25T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 43.52, "reason": "INDEX-CORE toward $79.90", "ts": "2026-08-25T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 37.4, "reason": "INDEX-CORE toward $79.90", "ts": "2026-08-25T10:05", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 5.57, "reason": "INDEX-CORE toward $79.87", "ts": "2026-08-25T10:09", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.04, "reason": "INDEX-CORE toward $83.01", "ts": "2026-08-31T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 2.66, "reason": "INDEX-CORE toward $83.01", "ts": "2026-08-31T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 4.08, "reason": "INDEX-CORE toward $83.01", "ts": "2026-08-31T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.48, "reason": "INDEX-CORE toward $86.65", "ts": "2026-09-08T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 3.31, "reason": "INDEX-CORE toward $86.65", "ts": "2026-09-08T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 3.25, "reason": "INDEX-CORE toward $86.65", "ts": "2026-09-08T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 2.78, "reason": "INDEX-CORE toward $88.53", "ts": "2026-09-14T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 3.36, "reason": "INDEX-CORE toward $88.53", "ts": "2026-09-14T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 3.87, "reason": "INDEX-CORE toward $88.53", "ts": "2026-09-14T09:47", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.52, "reason": "INDEX-CORE toward $93.53", "ts": "2026-09-21T13:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 6.22, "reason": "INDEX-CORE toward $93.53", "ts": "2026-09-21T13:38", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.06, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 3.38, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 3.81, "reason": "INDEX-CORE toward $96.08", "ts": "2026-09-28T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.81, "reason": "INDEX-CORE toward $100.23", "ts": "2026-10-05T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 4.51, "reason": "INDEX-CORE toward $100.23", "ts": "2026-10-05T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 6.2, "reason": "INDEX-CORE toward $103.59", "ts": "2026-10-12T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 3.82, "reason": "INDEX-CORE toward $103.59", "ts": "2026-10-12T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 4.36, "reason": "INDEX-CORE toward $104.05", "ts": "2026-10-19T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 4.56, "reason": "INDEX-CORE toward $104.05", "ts": "2026-10-19T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 2.75, "reason": "INDEX-CORE toward $104.05", "ts": "2026-10-19T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.84, "reason": "INDEX-CORE toward $107.41", "ts": "2026-10-26T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 4.96, "reason": "INDEX-CORE toward $107.41", "ts": "2026-10-26T09:51", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.6, "reason": "INDEX-CORE toward $110.58", "ts": "2026-11-02T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 5.06, "reason": "INDEX-CORE toward $110.58", "ts": "2026-11-02T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 2.76, "reason": "INDEX-CORE toward $110.58", "ts": "2026-11-02T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "QQQ", "notional": 4.88, "reason": "INDEX-CORE toward $111.53", "ts": "2026-11-09T09:46", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "SPY", "notional": 3.42, "reason": "INDEX-CORE toward $113.23", "ts": "2026-11-09T14:42", "status": "ok", "venue": "robinhood"}
+{"action": "buy", "symbol": "IWM", "notional": 2.19, "reason": "INDEX-CORE toward $114.15", "ts": "2026-11-11T12:04", "status": "ok", "venue": "robinhood"}
