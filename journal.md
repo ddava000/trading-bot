@@ -2712,3 +2712,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'MSFT', 'AN', 'SPY'] | favor: ['BKH', 'CPRI']
 - notes: Post-close Friday: VIX firmed to 19.3, Nasdaq dragged lower by a deepening Nvidia selloff, and a hot 6.5% PPI keeps a December hike debate alive. Weekend gap risk plus next week's NVDA earnings and Fed minutes argue for trimming to 0.30 and keeping broken high-beta/index ETFs off buys.
 - journal: Fri 11/13 17:30: Final post-close check — VIX 19.0->19.3, Nvidia plunge deepened though indexes still booked a weekly gain. Dialed risk 0.35->0.30 for weekend/event risk (NVDA earnings, Fed minutes next week). VST/PLTR/IWM/QQQ still deep red; BKH(+13%)/CPRI(+5%) the only green holds. $29 cash caps adds regardless; watching AI-complex stability and yields into next week.
+
+### 2026-11-13T18:56 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.3
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'MSFT', 'AN', 'SPY'] | favor: ['BKH', 'CPRI']
+- notes: After-hours Friday: VIX 19.3, Nvidia selloff deepened while indexes still booked a weekly gain; hot 6.5% PPI keeps a December hike debate alive. Weekend gap risk plus next week's NVDA earnings and Fed minutes argue for holding risk at 0.30 and keeping broken high-beta/index ETFs off buys.
+- journal: Fri 11/13 18:56: End-of-day reaffirm — no new changes vs 17:30 check; VIX steady at 19.3, AI complex still soft. Holding risk 0.30 for weekend/event risk. BKH(+13%)/CPRI(+5%) only green holds; $29 cash caps adds anyway. Watching NVDA earnings and Fed minutes next week.
