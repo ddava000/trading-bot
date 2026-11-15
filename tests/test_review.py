@@ -116,5 +116,69 @@ class ReviewRealizedSectionTests(unittest.TestCase):
         self.assertIn("Equity: $235.79", body)                # and the rest is intact
 
 
+class PerfComparisonTests(unittest.TestCase):
+    """The equity-vs-SPY block must fail CLOSED: a failed/empty portfolio-history fetch must never
+    fabricate a 0.00% week that then prints a flattering "BEAT SPY". Regression for the fail-open
+    LAPTOP BOT found 2026-11-09 (review.py: `wk_start = eqs[0] if eqs else equity`)."""
+
+    def test_empty_equity_history_suppresses_the_comparison(self):
+        lines, wk_pct = review._perf_lines(equity=235.79, eqs=[], spy_pct=-2.70)
+        self.assertIsNone(wk_pct)
+        text = "\n".join(lines)
+        self.assertIn("equity history unavailable", text)
+        # The whole defect: a missing leg must NOT turn into a BEAT.
+        self.assertNotIn("BEAT", text)
+        self.assertNotIn("TRAILED", text)
+
+    def test_present_history_still_produces_a_result(self):
+        """Positive control: with real points the comparison line must appear, or the test above
+        proves nothing (it would pass on code that never prints a result at all)."""
+        # SPY +4.81% (fakes), Arm A 240 -> 235.79 = -1.75%, gap well outside the tie band.
+        lines, wk_pct = review._perf_lines(equity=235.79, eqs=[240.0, 236.0, 235.79], spy_pct=4.81)
+        self.assertAlmostEqual(wk_pct, (235.79 - 240.0) / 240.0 * 100, places=4)
+        self.assertIn("TRAILED", "\n".join(lines))
+
+    def test_close_to_close_uses_last_history_point_not_live_equity(self):
+        """The Arm A leg runs eqs[0]->eqs[-1], matching the SPY close-to-close leg; a live intraday
+        `equity` argument that differs from eqs[-1] must not change the number."""
+        lines, wk_pct = review._perf_lines(equity=999.0, eqs=[100.0, 105.0, 110.0], spy_pct=0.0)
+        self.assertAlmostEqual(wk_pct, 10.0, places=4)  # (110-100)/100, not touched by equity=999
+
+    def test_margin_inside_the_spread_is_not_a_decisive_result(self):
+        """A gap under the measurement spread must read as a tie, not a BEAT/TRAILED headline
+        (the 2026-11-06 audit quoted a 0.19-pt BEAT that was inside a 0.43-pt spread)."""
+        # Arm A 100->99.80 = -0.20%; SPY -0.10%; gap -0.10 pt, inside the 0.50-pt band.
+        lines, _ = review._perf_lines(equity=99.80, eqs=[100.0, 99.80], spy_pct=-0.10)
+        text = "\n".join(lines)
+        self.assertIn("roughly matched", text)
+        self.assertNotIn("BEAT SPY by", text)
+        self.assertNotIn("TRAILED SPY by", text)
+
+    def test_tie_band_still_lets_a_real_gap_through(self):
+        """Positive control for the band: a gap larger than the band must still print BEAT/TRAILED."""
+        lines, _ = review._perf_lines(equity=103.0, eqs=[100.0, 103.0], spy_pct=0.0)  # +3.00 pt gap
+        self.assertIn("BEAT", "\n".join(lines))
+
+    def test_review_main_does_not_print_a_beat_when_history_is_empty(self):
+        """End to end through main(): patch portfolio-history to return no points; the emailed body
+        must say the comparison was suppressed and must NOT contain a BEAT line."""
+        def no_history(path, *a, **k):
+            if path.startswith("/v2/account/portfolio/history"):
+                return {"equity": []}
+            return fake_alpaca_get(path, *a, **k)
+        sent = []
+        out = io.StringIO()
+        with mock.patch.object(bot, "alpaca_get", no_history), \
+                mock.patch.object(bot, "yf_ohlcv", lambda sym: ([100.0 + i for i in range(10)], None)), \
+                mock.patch.object(bot, "send_email", lambda s, b: sent.append((s, b)) or True), \
+                mock.patch.object(bot, "realized_for_run", lambda: a_block()), \
+                contextlib.redirect_stdout(out):
+            review.main()
+        body = sent[0][1]
+        self.assertIn("equity history unavailable", body)
+        self.assertNotIn("BEAT", body)
+        self.assertIn("SPY this week:", body)  # SPY leg still reported, just no comparison
+
+
 if __name__ == "__main__":
     unittest.main()
