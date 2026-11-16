@@ -1,7 +1,8 @@
 {
- "arm_a_watch_at": "2026-11-16T14:58",
+ "arm_a_watch_at": "2026-11-16T15:09",
  "dry": false,
- "equity": 340.25,
+ "equity": 340.46,
+ "equity_source": "broker_total_value",
  "held": [
   "IWM",
   "QQQ",
@@ -85,5 +86,6 @@
    }
   }
  },
- "ts": "2026-11-16T14:58"
+ "ts": "2026-11-16T15:14",
+ "unsettled_excluded_from_buying_power": 0.69
 }
