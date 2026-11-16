@@ -2724,3 +2724,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'AN', 'IMVT'] | favor: ['CPRI', 'HZN']
 - notes: VIX up to 20.6 with futures sliding as the Nvidia-led AI selloff carries into a heavy event week (NVDA earnings, Anthropic IPO, FOMC minutes). Broad index ETFs and high-beta names remain broken; holding posture defensive at 0.25.
 - journal: Mon 11/16 10:00: Gap-down open, VIX 19.3->20.6, AI complex still bleeding ahead of NVDA earnings/Fed minutes this week. Dropped to risk-off 0.25. Holdings mostly red (VST -12%, PLTR -11%, IWM -8.5%, QQQ -7.4%); only CPRI(+5%)/HZN(+13%) green. $29 cash caps adds regardless. Watching whether indexes find footing into NVDA print.
+
+### 2026-11-16T18:23 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'IMVT', 'CPRI'] | favor: ['HZN']
+- notes: VIX up to 22.9 with Nasdaq down 1.5% as the Nvidia drama drags on ahead of its earnings and the Anthropic IPO; broken index ETFs and high-beta AI names (PLTR -14%, VST -13%, QQQ -9%) remain in free-fall. Staying defensive at 0.25 into a landmine-heavy event week.
+- journal: Mon 11/16 18:23: VIX climbed 20.6->22.9 intraday, tape stayed ugly (Nasdaq -1.5%) with NVDA print looming this week. Holding risk-off 0.25; only HZN(+13%) still clearly green, MSFT barely positive. Watching NVDA earnings reaction and whether indexes stabilize before dialing risk back up.
