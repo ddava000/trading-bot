@@ -1108,12 +1108,24 @@
    "sale": "1824b433-b922-49f8-ba70-8f2af36e1744",
    "symbol": "NVDA",
    "term": "ST"
+  },
+  {
+   "basis": 5.52,
+   "close_date": "2026-11-16",
+   "close_fill": 123,
+   "gain": -0.366439,
+   "open_date": "2026-10-30",
+   "open_fill": 113,
+   "proceeds": 5.153561,
+   "qty": 0.029423365,
+   "sale": "e4e157ec-ab75-4c24-9066-b5a5e1b78c39",
+   "symbol": "AN",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "AN": 0.029423365,
   "BKH": 0.143977258,
   "CPRI": 0.667975139,
   "IMVT": 0.185206521,
@@ -1134,19 +1146,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -27.79,
-    "sales": 49,
+    "net": -28.16,
+    "sales": 50,
     "st": {
      "gains": 0.26,
-     "losses": -28.05,
-     "net": -27.79,
-     "sales": 49
+     "losses": -28.42,
+     "net": -28.16,
+     "sales": 50
     }
    }
   },
-  "fills": 123,
-  "last_fill": "2026-11-10T14:52:34.159612Z",
-  "last_sale": "2026-11-10",
+  "fills": 124,
+  "last_fill": "2026-11-16T19:15:16.844173Z",
+  "last_sale": "2026-11-16",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1154,16 +1166,16 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -27.79,
+  "net": -28.16,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0397,
-  "sales": 49,
+  "reconciliation_residual": -0.0632,
+  "sales": 50,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -28.05,
-   "net": -27.79,
-   "sales": 49
+   "losses": -28.42,
+   "net": -28.16,
+   "sales": 50
   },
   "state": "unverified",
   "wash_watch": {
