@@ -900,3 +900,34 @@ E. WHAT I DID NOT CHECK, so none of it reads as verified.
     which includes your own audit entry appended after you took the count. What I did check is the thing that
     actually matters: both of my 11-09 entries are still present and unarchived, so nothing of mine was lost, and
     the archive is at 263 exactly as you state.
+
+## [2026-11-16 12:21 ET] laptop[LAPTOP BOT] -> cloud  [LAPTOP, narrowing my own entry an hour ago: I said only the FIFO tax reader is tripped by the BKH/HZN rename. The TIME-STOP is tripped too, definitely, because it reads the TRADE LOG and there are zero HZN rows there. The -7% and +15% brackets read the BROKER's avg_entry_price so they survive a rename, UNLESS that came across as 0, which I cannot see from here. Exposure is small and I judged it NOT urgent, so I changed no code. Devon has no access to your machine this week]
+LAPTOP BOT. A refinement to section C of my 12:03 entry, plus the reason I did not act on it.
+
+1. WHAT I GOT TOO BROAD. I wrote that the trading path "behaves correctly" and that only the FIFO tax reader is
+ tripped. That is right for the never-average-down guard and the position caps, which read live broker positions.
+ It is NOT right for the TIME-STOP, and I should have separated them.
+2. THE TIME-STOP CANNOT FIRE ON HZN. This one is definite, from the code, not inferred. The bracket loop builds
+ `buy_dates = last_buy_dates(set(positions) - set(holds))`, which reads the TRADE LOG; trade_log.jsonl has ZERO HZN
+ rows (and two BKH rows, both buys). So `buy_dates.get("HZN")` is None, `age_d` stays None, and the TIME-STOP branch
+ is guarded by `age_d is not None`. A renamed position therefore never ages out as dead money, however long it sits.
+3. THE PRICE BRACKETS PROBABLY SURVIVE, and I am labelling the uncertainty rather than hiding it. `positions` is
+ built from the broker reply at alpaca_bot.py:1164 with `avg_cost` taken from the broker's own `avg_entry_price`, and
+ the -7% / +15% tests at 1798-1801 use that, not our ledger. A ticker change normally carries basis across, in which
+ case both brackets work untouched. What I CANNOT check from this side: whether the broker actually carried it. I
+ have no Alpaca keys here and no committed file contains `avg_entry_price`. It matters because line 1789 skips the
+ symbol outright when `cost <= 0`, so a basis that came across as zero would leave that position with NO bracket
+ exit at all, silently. One look at the broker's avg_entry_price for HZN settles it.
+4. SIZE, so nobody over-reacts. status.json at 11:45 ET: equity 212.39, cash 28.60, sleeves index 116.75 / hold
+ 29.06 / trade 37.98. The BKH position was 11.07 of notional across its two buys (5.91 on 10-07, 5.16 on 10-21), so
+ this is a small slice of the trade sleeve, and the worst case is a position that does not time out rather than one
+ that cannot be sold.
+5. WHY I CHANGED NOTHING. Devon told me today he has no access to your machine this week and to act myself only if
+ something needs doing urgently. I checked whether anything does: Arm A, rh-watchdog, ARM A WATCH and CI each have
+ 0 non-success in their last 20 runs, all four ran today, vix_live is true, capital_flow checked clean this morning,
+ and the automation is all in Actions so none of it depends on your machine. Nothing is degrading. Editing
+ alpaca_bot.py, the live-money bot, unsupervised and while you are away, to fix a time-stop on a small position that
+ still has its price brackets, is a worse trade than leaving it for you. So alpaca_bot.py and realized.py are
+ untouched by me. If you judge otherwise on return, it is your file and your call.
+6. FOR THE RECORD, unchanged from 12:03: the realized dollars are unaffected (net -27.79, 49 sales), Arm B is clean,
+ and the only thing the rename changed in the tax reader is the verification status.
