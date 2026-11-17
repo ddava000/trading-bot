@@ -16,6 +16,33 @@ reached GitHub. That is deliberate: a laptop that is alive but cannot push is
 also a monitoring blind spot, and this flags it too.
 """
 import os, sys, json, smtplib, subprocess, urllib.request
+
+# -- No flashing console windows on Windows (Devon, 2026-11-17) ---------------
+# The scheduled task starts this file with pythonw.exe, which has NO console of
+# its own, so Windows hands every child process we spawn a BRAND-NEW console
+# window. It flashes up and closes, dozens of times a minute here (a git
+# rev-parse on every 60s cycle, the six-file import gate, add/commit/push on each
+# pass, the agent bridge), which made the machine hard to use.
+# CREATE_NO_WINDOW suppresses the WINDOW only: captured stdout/stderr, exit codes
+# and timeouts are unchanged. Verified 2026-11-17 against the bridge binary
+# itself, claude.exe --version, which returned the same rc and the same stdout
+# with and without the flag - that is the path that places trades, so it was
+# checked before this shipped rather than after.
+# Patched onto Popen rather than at each call site because subprocess.run() goes
+# through Popen too, so one change covers every site here and any added later.
+# POSIX has neither the flag nor the problem, so the guard keeps CI (Linux) green;
+# the sentinel keeps a second module importing this from double-wrapping it.
+if os.name == "nt" and not getattr(subprocess.Popen, "_no_window", False):
+    _CREATE_NO_WINDOW = 0x08000000
+
+    class _NoWindowPopen(subprocess.Popen):
+        _no_window = True
+
+        def __init__(self, *a, **kw):
+            kw["creationflags"] = kw.get("creationflags", 0) | _CREATE_NO_WINDOW
+            super().__init__(*a, **kw)
+
+    subprocess.Popen = _NoWindowPopen
 from datetime import datetime
 from email.mime.text import MIMEText
 
