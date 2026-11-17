@@ -2742,3 +2742,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'IMVT', 'CPRI'] | favor: ['HZN']
 - notes: VIX 22.9 with Nasdaq down ~1.5% on a third straight AI-led slide ahead of NVDA earnings, Anthropic IPO, and Fed minutes this week; index ETFs and high-beta names remain broken (PLTR -14%, VST -13%, IWM -10%, QQQ -9%). Staying defensive at 0.25 into a landmine-heavy event week.
 - journal: Mon 11/16 21:09: Posture unchanged after hours — tape still soft, VIX 22.9, AI complex bleeding into NVDA print. HZN(+11%) only clear green; $34 cash caps adds regardless. Watching NVDA earnings reaction and Fed minutes before dialing risk back up.
+
+### 2026-11-17T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'IMVT', 'CPRI'] | favor: ['HZN']
+- notes: VIX 23.1 and rising, Dow futures -200 on Home Depot drag with traders frozen ahead of Nvidia earnings and the Fed outlook; AI complex and high-beta still broken (PLTR -14%, VST -12%, IWM -10%, QQQ -8%). Staying defensive at 0.25 into a landmine-heavy event week.
+- journal: Tue 11/17 10:00: VIX ticked up 22.9->23.1, tape still weak at the open with NVDA print the key binary this week. Holdings mostly red; HZN(+11%) only clear green, MSFT flat. $34 cash caps adds anyway. Watching NVDA reaction and Fed tone before dialing risk back up.
