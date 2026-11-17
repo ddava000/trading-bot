@@ -1121,13 +1121,38 @@
    "sale": "e4e157ec-ab75-4c24-9066-b5a5e1b78c39",
    "symbol": "AN",
    "term": "ST"
+  },
+  {
+   "basis": 7.22,
+   "close_date": "2026-11-17",
+   "close_fill": 124,
+   "gain": -0.295513,
+   "open_date": "2026-11-02",
+   "open_fill": 116,
+   "proceeds": 6.924487,
+   "qty": 0.364830722,
+   "sale": "77e1a023-2070-4324-815a-22161a53e779",
+   "symbol": "CPRI",
+   "term": "ST"
+  },
+  {
+   "basis": 6.44,
+   "close_date": "2026-11-17",
+   "close_fill": 124,
+   "gain": -0.686319,
+   "open_date": "2026-11-09",
+   "open_fill": 121,
+   "proceeds": 5.753681,
+   "qty": 0.303144417,
+   "sale": "77e1a023-2070-4324-815a-22161a53e779",
+   "symbol": "CPRI",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
   "BKH": 0.143977258,
-  "CPRI": 0.667975139,
   "IMVT": 0.185206521,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
@@ -1146,19 +1171,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -28.16,
-    "sales": 50,
+    "net": -29.14,
+    "sales": 51,
     "st": {
      "gains": 0.26,
-     "losses": -28.42,
-     "net": -28.16,
-     "sales": 50
+     "losses": -29.4,
+     "net": -29.14,
+     "sales": 51
     }
    }
   },
-  "fills": 124,
-  "last_fill": "2026-11-16T19:15:16.844173Z",
-  "last_sale": "2026-11-16",
+  "fills": 125,
+  "last_fill": "2026-11-17T14:45:17.85544Z",
+  "last_sale": "2026-11-17",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1166,16 +1191,16 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -28.16,
+  "net": -29.14,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0632,
-  "sales": 50,
+  "reconciliation_residual": -0.0614,
+  "sales": 51,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -28.42,
-   "net": -28.16,
-   "sales": 50
+   "losses": -29.4,
+   "net": -29.14,
+   "sales": 51
   },
   "state": "unverified",
   "wash_watch": {
