@@ -2766,3 +2766,9 @@
 - avoid: ['NVDA', 'PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'IMVT', 'HZN'] | favor: []
 - notes: Dow -800, S&P at lowest close since July, VIX 25.5; NVDA earnings out tonight (sales outlook beats headline) but market reaction still unresolved, with a hawkish Fed and broken high-beta (PLTR -14%, VST -14%, IWM -10%, QQQ -8%). Staying maximally defensive at 0.25 into the digestion of the print.
 - journal: Tue 11/17 20:04: NVDA sales outlook reportedly beats but Asian futures soft and tape still at July lows, VIX 25.5. No clear green left (HZN fading to +5%), $46 cash caps adds anyway. Holding risk-off 0.25; watching whether NVDA beat lifts the tape tomorrow or sells off into Fed minutes before any risk-up.
+
+### 2026-11-18T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['PLTR', 'VST', 'IWM', 'IMVT', 'HZN'] | favor: ['QQQ', 'SPY', 'MSFT']
+- notes: NVDA beat and lifted futures, VIX easing 26->24, giving the tape a relief bid after the S&P's July-low close. Still cautious given the hawkish Fed overhang and a QQQ still ~9% off highs; nudging risk up modestly to 0.4 but keeping broken high-beta (PLTR -16%, VST -13%, IWM -11%) on avoid.
+- journal: Wed 11/18 10:00: NVDA print landed as a beat and futures are green, VIX 26->24 — first constructive signal in days. Dialed risk 0.25->0.4, favoring index/MSFT quality over broken high-beta. Watching whether the bounce holds through the session and Fed tone before any further risk-up.
