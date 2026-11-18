@@ -385,6 +385,11 @@
    "qty": 0.191942972,
    "symbol": "GDXD",
    "t": "2026-11-18"
+  },
+  {
+   "qty": 0.025921658,
+   "symbol": "TTWO",
+   "t": "2026-11-18"
   }
  ],
  "closed": [
@@ -1167,12 +1172,24 @@
    "sale": "77e1a023-2070-4324-815a-22161a53e779",
    "symbol": "CPRI",
    "term": "ST"
+  },
+  {
+   "basis": 6.2,
+   "close_date": "2026-11-18",
+   "close_fill": 129,
+   "gain": -0.444617,
+   "open_date": "2026-11-18",
+   "open_fill": 125,
+   "proceeds": 5.755383,
+   "qty": 0.136889516,
+   "sale": "eaee324c-f198-45fd-bbf1-bab1b94d970b",
+   "symbol": "AAOZ",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "AAOZ": 0.136889516,
   "BKH": 0.143977258,
   "CALM": 0.077077651,
   "GDXD": 0.191942972,
@@ -1183,6 +1200,7 @@
   "QQQ": 0.058331282,
   "SPY": 0.053798739,
   "SRRK": 0.129477503,
+  "TTWO": 0.025921658,
   "VST": 0.069801133
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
@@ -1195,19 +1213,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -29.14,
-    "sales": 51,
+    "net": -29.58,
+    "sales": 52,
     "st": {
      "gains": 0.26,
-     "losses": -29.4,
-     "net": -29.14,
-     "sales": 51
+     "losses": -29.84,
+     "net": -29.58,
+     "sales": 52
     }
    }
   },
-  "fills": 129,
-  "last_fill": "2026-11-18T15:30:23.796193Z",
-  "last_sale": "2026-11-17",
+  "fills": 131,
+  "last_fill": "2026-11-18T18:00:27.911979Z",
+  "last_sale": "2026-11-18",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1215,16 +1233,16 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -29.14,
+  "net": -29.58,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0514,
-  "sales": 51,
+  "reconciliation_residual": -0.0568,
+  "sales": 52,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -29.4,
-   "net": -29.14,
-   "sales": 51
+   "losses": -29.84,
+   "net": -29.58,
+   "sales": 52
   },
   "state": "unverified",
   "wash_watch": {
