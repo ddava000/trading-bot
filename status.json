@@ -1,38 +1,38 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-11-17T20:45Z",
+ "as_of_utc": "2026-11-18T14:45Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-11-17T20:45:21+00:00",
+  "checked_at": "2026-11-18T14:45:32+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
   "state": "clean",
   "window_opened": "2026-08-24"
  },
- "cash": 46.39,
+ "cash": 34.79,
  "crypto_enabled": true,
- "day_pnl": -3.7,
- "earnings_guard": "unknown",
- "equity": 206.93,
+ "day_pnl": 0.11,
+ "earnings_guard": "degraded",
+ "equity": 207.1,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": -0.8,
-  "PLTR": -16.0,
-  "VST": -13.9
+  "MSFT": -1.4,
+  "PLTR": -17.1,
+  "VST": -14.2
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-11-17T21:05Z",
- "orders_this_run": 0,
+ "next_expected_utc": "2026-11-18T15:05Z",
+ "orders_this_run": 2,
  "plan": {
-  "date": "2026-11-17",
-  "risk": 0.25,
+  "date": "2026-11-18",
+  "risk": 0.4,
   "stale": false
  },
  "realized": {
@@ -54,9 +54,9 @@
     }
    }
   },
-  "checked_at": "2026-11-17T20:45:28+00:00",
-  "fills": 125,
-  "last_fill": "2026-11-17T14:45:17.85544Z",
+  "checked_at": "2026-11-18T14:45:30+00:00",
+  "fills": 127,
+  "last_fill": "2026-11-18T14:45:23.250813Z",
   "last_sale": "2026-11-17",
   "lt": {
    "gains": 0.0,
@@ -67,7 +67,7 @@
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -29.14,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0614,
+  "reconciliation_residual": -0.0514,
   "sales": 51,
   "since": "2026-08-12",
   "st": {
@@ -91,12 +91,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 28.19,
-  "index": 114.48,
-  "trade": 17.87
+  "hold": 28.02,
+  "index": 114.53,
+  "trade": 18.16
  },
- "ts": "2026-11-17T15:45 ET",
- "vix": 26.6,
+ "ts": "2026-11-18T09:45 ET",
+ "vix": 24.3,
  "vix_live": true,
- "vs_baseline_pct": -16.53
+ "vs_baseline_pct": -16.46
 }

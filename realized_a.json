@@ -365,6 +365,16 @@
    "qty": 0.303144417,
    "symbol": "CPRI",
    "t": "2026-11-09"
+  },
+  {
+   "qty": 0.136889516,
+   "symbol": "AAOZ",
+   "t": "2026-11-18"
+  },
+  {
+   "qty": 0.077077651,
+   "symbol": "CALM",
+   "t": "2026-11-18"
   }
  ],
  "closed": [
@@ -1152,7 +1162,9 @@
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
+  "AAOZ": 0.136889516,
   "BKH": 0.143977258,
+  "CALM": 0.077077651,
   "IMVT": 0.185206521,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
@@ -1181,8 +1193,8 @@
     }
    }
   },
-  "fills": 125,
-  "last_fill": "2026-11-17T14:45:17.85544Z",
+  "fills": 127,
+  "last_fill": "2026-11-18T14:45:23.250813Z",
   "last_sale": "2026-11-17",
   "lt": {
    "gains": 0.0,
@@ -1193,7 +1205,7 @@
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -29.14,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0614,
+  "reconciliation_residual": -0.0514,
   "sales": 51,
   "since": "2026-08-12",
   "st": {
