@@ -2784,3 +2784,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'GDXD'] | favor: ['HZN', 'MSFT']
 - notes: Fifth down day for the S&P with a new July-low close, Dow -500/-800 as the NVDA earnings rally sputtered; VIX 24.6 and a hawkish Fed overhang keep conditions dangerous. Staying defensive at 0.3 with broken high-beta and weak indices on avoid.
 - journal: Wed 11/18 18:39: NVDA relief fully faded — S&P down fifth straight to July lows, Dow -500+, VIX 24.6. Holding risk-off 0.3; only HZN (+6%) green. Watching for tape stabilization and Fed tone before any risk-up.
+
+### 2026-11-18T19:38 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'GDXD'] | favor: ['HZN', 'MSFT']
+- notes: Conditions unchanged from prior check: fifth down day, S&P at July lows, Dow -560, VIX 24.6 with a hawkish Fed overhang. Staying defensive at 0.3; broken high-beta (PLTR -15%, VST -14%, IWM -10%) and weak indices remain on avoid.
+- journal: Wed 11/18 19:38: No change — tape still heavy, S&P fifth down day, VIX 24.6, HZN (+6%) the only real green. Holding risk-off 0.3; watching for stabilization and Fed tone before any risk-up.
