@@ -2778,3 +2778,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'IMVT', 'GDXD', 'QQQ', 'SPY'] | favor: ['HZN', 'MSFT']
 - notes: The NVDA relief bounce fizzled — Dow closed down ~500-800, S&P at its lowest since July, VIX back up to 24.8. The attempted risk-up this morning didn't hold, so I'm dialing back toward defensive; indices broke lower (QQQ -9%, SPY -5.5%) and high-beta remains ugly (PLTR -16%, VST -15%, IWM -10%).
 - journal: Wed 11/18 16:45: Morning relief bid faded hard — NVDA bounce sputtered, Dow -500/-800, S&P new July-low close, VIX ticked back to 24.8. Cutting risk 0.4->0.3; the only green is HZN (+6%). Watching for stabilization and Fed tone before risking up again.
+
+### 2026-11-18T18:39 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'GDXD'] | favor: ['HZN', 'MSFT']
+- notes: Fifth down day for the S&P with a new July-low close, Dow -500/-800 as the NVDA earnings rally sputtered; VIX 24.6 and a hawkish Fed overhang keep conditions dangerous. Staying defensive at 0.3 with broken high-beta and weak indices on avoid.
+- journal: Wed 11/18 18:39: NVDA relief fully faded — S&P down fifth straight to July lows, Dow -500+, VIX 24.6. Holding risk-off 0.3; only HZN (+6%) green. Watching for tape stabilization and Fed tone before any risk-up.
