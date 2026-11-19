@@ -1,6 +1,6 @@
 {
-  "regime": "neutral",
-  "risk_scale": 0.4,
+  "regime": "risk-off",
+  "risk_scale": 0.3,
   "avoid_symbols": [
     "PLTR",
     "VST",
@@ -8,15 +8,18 @@
     "QQQ",
     "SPY",
     "IMVT",
+    "TTWO",
+    "MSFT",
     "GDXD"
   ],
   "favor_symbols": [
     "HZN",
-    "MSFT"
+    "SRRK",
+    "CALM"
   ],
-  "notes": "Nasdaq futures up ~2% on the Anthropic IPO debut and VIX eased 24.6->22.6 \u2014 first constructive open after five down days. Nudging risk 0.3->0.4 but staying measured given hawkish Fed overhang and still-broken high-beta (PLTR -14%, VST -13%, IWM -10%).",
-  "journal_entry": "Thu 11/19 10:00: Relief bid genuine this time \u2014 Nasdaq futures +2% on Anthropic IPO, VIX 24.6->22.6. Upgraded risk-off->neutral, 0.3->0.4, keeping broken high-beta and weak indices on avoid. Watching whether the bounce holds through the session and if Fed tone stays hawkish before further risk-up.",
+  "notes": "Morning Anthropic-IPO relief bid collapsed into a rout \u2014 Dow -1,000, VIX spiked 22.6->28.4, broad crash-warning headlines, and high-beta is bleeding (PLTR -17.5%, VST -15.6%, IWM -12.1%, QQQ -10.7%). Back to risk-off 0.4->0.3 with indices and broken momentum names on avoid.",
+  "journal_entry": "Thu 11/19 16:51: The bounce I flagged this morning fully reversed \u2014 Dow -1,000, VIX 22.6->28.4, sixth down leg with crash-warning press. Cut neutral/0.4 back to risk-off/0.3. Only green holds HZN/SRRK/CALM; watching for a real VIX reset and Fed tone before risking up again.",
   "date": "2026-11-19",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-19T10:00 ET"
+  "updated_at": "2026-11-19T16:51 ET"
 }
