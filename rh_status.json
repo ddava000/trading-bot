@@ -1,8 +1,7 @@
 {
- "arm_a_watch_at": "2026-11-19T12:05",
+ "arm_a_watch_at": "2026-11-19T12:22",
  "dry": false,
- "equity": 335.74,
- "equity_source": "broker_total_value",
+ "equity": 332.97,
  "held": [
   "IWM",
   "QQQ",
@@ -10,7 +9,7 @@
  ],
  "hold": 0,
  "holds": [],
- "index": 329.02,
+ "index": 331.16,
  "machine": {
   "guards": {
    "fast_startup": 1,
@@ -92,6 +91,5 @@
  "risk": 0.4,
  "settled": 1.93,
  "trade": 0.0,
- "ts": "2026-11-19T12:06",
- "unsettled_excluded_from_buying_power": 4.79
+ "ts": "2026-11-19T12:22"
 }
