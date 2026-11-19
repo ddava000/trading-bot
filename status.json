@@ -1,13 +1,13 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-11-18T20:45Z",
+ "as_of_utc": "2026-11-19T14:45Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-11-18T20:45:22+00:00",
+  "checked_at": "2026-11-19T14:45:30+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
@@ -16,22 +16,22 @@
  },
  "cash": 22.81,
  "crypto_enabled": true,
- "day_pnl": -0.39,
+ "day_pnl": 1.91,
  "earnings_guard": "unknown",
- "equity": 206.6,
+ "equity": 208.59,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": -0.6,
-  "PLTR": -16.3,
-  "VST": -14.9
+  "MSFT": 2.6,
+  "PLTR": -11.2,
+  "VST": -12.5
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-11-18T21:05Z",
+ "next_expected_utc": "2026-11-19T15:05Z",
  "orders_this_run": 0,
  "plan": {
-  "date": "2026-11-18",
+  "date": "2026-11-19",
   "risk": 0.4,
   "stale": false
  },
@@ -54,7 +54,7 @@
     }
    }
   },
-  "checked_at": "2026-11-18T20:45:29+00:00",
+  "checked_at": "2026-11-19T14:45:26+00:00",
   "fills": 131,
   "last_fill": "2026-11-18T18:00:27.911979Z",
   "last_sale": "2026-11-18",
@@ -67,7 +67,7 @@
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -29.58,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0568,
+  "reconciliation_residual": -0.0368,
   "sales": 52,
   "since": "2026-08-12",
   "st": {
@@ -91,12 +91,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 28.09,
-  "index": 114.81,
-  "trade": 40.89
+  "hold": 29.2,
+  "index": 116.07,
+  "trade": 40.52
  },
- "ts": "2026-11-18T15:45 ET",
- "vix": 24.9,
+ "ts": "2026-11-19T09:45 ET",
+ "vix": 22.5,
  "vix_live": true,
- "vs_baseline_pct": -16.66
+ "vs_baseline_pct": -15.86
 }
