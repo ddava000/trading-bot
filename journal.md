@@ -2802,3 +2802,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'TTWO', 'MSFT', 'GDXD'] | favor: ['HZN', 'SRRK', 'CALM']
 - notes: Morning Anthropic-IPO relief bid collapsed into a rout — Dow -1,000, VIX spiked 22.6->28.4, broad crash-warning headlines, and high-beta is bleeding (PLTR -17.5%, VST -15.6%, IWM -12.1%, QQQ -10.7%). Back to risk-off 0.4->0.3 with indices and broken momentum names on avoid.
 - journal: Thu 11/19 16:51: The bounce I flagged this morning fully reversed — Dow -1,000, VIX 22.6->28.4, sixth down leg with crash-warning press. Cut neutral/0.4 back to risk-off/0.3. Only green holds HZN/SRRK/CALM; watching for a real VIX reset and Fed tone before risking up again.
+
+### 2026-11-19T18:43 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.3
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'TTWO', 'MSFT', 'GDXD'] | favor: ['HZN', 'SRRK', 'CALM']
+- notes: Conditions remain dangerous into the close — Dow closed below 50,000, Nasdaq -2%, VIX elevated at 28.4 as the Anthropic IPO failed to resuscitate the AI trade. Staying risk-off 0.3 with broken high-beta and weak indices on avoid; hawkish Fed overhang persists.
+- journal: Thu 11/19 18:43: Rout held into the close — Dow sub-50k, Nasdaq -2%, VIX stuck at 28.4. No change to risk-off/0.3. Only green holds HZN/SRRK/CALM. Watching for a genuine VIX reset and Fed tone before any risk-up.
