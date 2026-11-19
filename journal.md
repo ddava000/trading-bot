@@ -2790,3 +2790,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'GDXD'] | favor: ['HZN', 'MSFT']
 - notes: Conditions unchanged from prior check: fifth down day, S&P at July lows, Dow -560, VIX 24.6 with a hawkish Fed overhang. Staying defensive at 0.3; broken high-beta (PLTR -15%, VST -14%, IWM -10%) and weak indices remain on avoid.
 - journal: Wed 11/18 19:38: No change — tape still heavy, S&P fifth down day, VIX 24.6, HZN (+6%) the only real green. Holding risk-off 0.3; watching for stabilization and Fed tone before any risk-up.
+
+### 2026-11-19T10:00 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.4
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'GDXD'] | favor: ['HZN', 'MSFT']
+- notes: Nasdaq futures up ~2% on the Anthropic IPO debut and VIX eased 24.6->22.6 — first constructive open after five down days. Nudging risk 0.3->0.4 but staying measured given hawkish Fed overhang and still-broken high-beta (PLTR -14%, VST -13%, IWM -10%).
+- journal: Thu 11/19 10:00: Relief bid genuine this time — Nasdaq futures +2% on Anthropic IPO, VIX 24.6->22.6. Upgraded risk-off->neutral, 0.3->0.4, keeping broken high-beta and weak indices on avoid. Watching whether the bounce holds through the session and if Fed tone stays hawkish before further risk-up.
