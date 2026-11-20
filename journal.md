@@ -2826,3 +2826,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'GDXD', 'CALM', 'IMVT', 'TTWO'] | favor: ['HZN', 'SRRK']
 - notes: VIX spiked further to 35.5 as S&P/Dow confirmed corrections and Nasdaq wiped out 2026 gains amid an intensifying AI selloff into the Friday close. This is max-stress territory — holding risk-off at 0.25 with all broken high-beta and indices on avoid; GDXD's gain is inverse-gold, not a buy.
 - journal: Fri 11/20 16:35: Selloff accelerated into the week's close — VIX 31.2->35.5, worst week since 'liberation day', corrections confirmed. Staying risk-off/0.25. Only HZN/SRRK green. Need a real VIX reset below ~25 and calmer tape before risking up; weekend headline risk high.
+
+### 2026-11-20T18:17 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'GDXD', 'CALM', 'IMVT', 'TTWO'] | favor: ['HZN', 'SRRK']
+- notes: VIX at 35.9 into the Friday close with S&P/Dow in correction and Nasdaq having erased 2026 gains amid an intensifying AI rout; this is max-stress territory. Holding risk-off at 0.25 with all broken high-beta and indices on avoid; GDXD's gain is inverse-gold, not a buy.
+- journal: Fri 11/20 18:17: No relief into the close — VIX 35.5->35.9, worst week in 19 months, corrections confirmed. Staying risk-off/0.25, only HZN/SRRK green. Weekend headline risk high; need a real VIX reset below ~25 and calmer tape before risking up.
