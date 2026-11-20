@@ -1185,6 +1185,19 @@
    "sale": "eaee324c-f198-45fd-bbf1-bab1b94d970b",
    "symbol": "AAOZ",
    "term": "ST"
+  },
+  {
+   "basis": 6.43,
+   "close_date": "2026-11-20",
+   "close_fill": 131,
+   "gain": -0.488575,
+   "open_date": "2026-11-09",
+   "open_fill": 120,
+   "proceeds": 5.941425,
+   "qty": 0.185206521,
+   "sale": "bb2c12a9-4757-424c-ad6d-b55c1145795c",
+   "symbol": "IMVT",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -1193,7 +1206,6 @@
   "BKH": 0.143977258,
   "CALM": 0.077077651,
   "GDXD": 0.191942972,
-  "IMVT": 0.185206521,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
   "PLTR": 0.042013208,
@@ -1213,19 +1225,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -29.58,
-    "sales": 52,
+    "net": -30.07,
+    "sales": 53,
     "st": {
      "gains": 0.26,
-     "losses": -29.84,
-     "net": -29.58,
-     "sales": 52
+     "losses": -30.33,
+     "net": -30.07,
+     "sales": 53
     }
    }
   },
-  "fills": 131,
-  "last_fill": "2026-11-18T18:00:27.911979Z",
-  "last_sale": "2026-11-18",
+  "fills": 132,
+  "last_fill": "2026-11-20T15:30:22.520191Z",
+  "last_sale": "2026-11-20",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1233,16 +1245,16 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -29.58,
+  "net": -30.07,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0368,
-  "sales": 52,
+  "reconciliation_residual": -0.0582,
+  "sales": 53,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -29.84,
-   "net": -29.58,
-   "sales": 52
+   "losses": -30.33,
+   "net": -30.07,
+   "sales": 53
   },
   "state": "unverified",
   "wash_watch": {
