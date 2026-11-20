@@ -1198,6 +1198,19 @@
    "sale": "bb2c12a9-4757-424c-ad6d-b55c1145795c",
    "symbol": "IMVT",
    "term": "ST"
+  },
+  {
+   "basis": 5.67,
+   "close_date": "2026-11-20",
+   "close_fill": 132,
+   "gain": -0.447615,
+   "open_date": "2026-11-18",
+   "open_fill": 130,
+   "proceeds": 5.222385,
+   "qty": 0.025921658,
+   "sale": "a7aa165c-aee8-4367-ba0a-e4d1f9b2eb2d",
+   "symbol": "TTWO",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
@@ -1212,7 +1225,6 @@
   "QQQ": 0.058331282,
   "SPY": 0.053798739,
   "SRRK": 0.129477503,
-  "TTWO": 0.025921658,
   "VST": 0.069801133
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
@@ -1225,18 +1237,18 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -30.07,
-    "sales": 53,
+    "net": -30.52,
+    "sales": 54,
     "st": {
      "gains": 0.26,
-     "losses": -30.33,
-     "net": -30.07,
-     "sales": 53
+     "losses": -30.78,
+     "net": -30.52,
+     "sales": 54
     }
    }
   },
-  "fills": 132,
-  "last_fill": "2026-11-20T15:30:22.520191Z",
+  "fills": 133,
+  "last_fill": "2026-11-20T19:23:36.218044Z",
   "last_sale": "2026-11-20",
   "lt": {
    "gains": 0.0,
@@ -1245,16 +1257,16 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -30.07,
+  "net": -30.52,
   "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0582,
-  "sales": 53,
+  "reconciliation_residual": -0.0606,
+  "sales": 54,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -30.33,
-   "net": -30.07,
-   "sales": 53
+   "losses": -30.78,
+   "net": -30.52,
+   "sales": 54
   },
   "state": "unverified",
   "wash_watch": {
