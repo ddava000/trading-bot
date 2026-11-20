@@ -2814,3 +2814,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'TTWO', 'MSFT', 'GDXD'] | favor: ['HZN', 'SRRK', 'CALM']
 - notes: Post-close conditions still dangerous — Dow below 50,000, Nasdaq -2%, VIX stuck at 28.4 after the Anthropic IPO failed to revive AI sentiment. Holding risk-off 0.3; broken high-beta and weak indices stay on avoid amid hawkish Fed overhang.
 - journal: Thu 11/19 19:56: No change into the evening — rout held, VIX 28.4, sixth down leg. Staying risk-off/0.3. Only HZN/SRRK/CALM green. Watching for a real VIX reset and Fed tone before any risk-up.
+
+### 2026-11-20T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.25
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'IMVT', 'TTWO', 'MSFT', 'GDXD', 'CALM'] | favor: ['HZN', 'SRRK']
+- notes: Rout deepened overnight — VIX pushed higher from 28.4 to 31.2, Nasdaq futures down again as Anthropic debut failed to stem AI selloff and Dow sits in correction territory. Russell death cross plus hawkish Fed overhang keep this dangerous; cutting to 0.25 with indices and broken high-beta on avoid.
+- journal: Fri 11/20 10:00: Conditions got worse, not better — VIX 28.4->31.2, AI trade still broken, Dow near correction. Trimmed risk-off 0.3->0.25. Only HZN/SRRK holding green (GDXD gain is inverse-gold, not a buy). Watching for a genuine VIX reset below ~25 before any risk-up.
