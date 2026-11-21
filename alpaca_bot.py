@@ -2524,7 +2524,12 @@ if __name__ == "__main__":
             _ca = [a for a in (alpaca_activity_history() or []) if str(a.get("activity_type")) in BREAKS_FIFO_SET]
             print(f"  corp-actions: {len(_ca)} activity row(s) of a FIFO-breaking type ({BREAKS_FIFO_TYPES})")
             for a in _ca[:12]:
-                print("    activity " + json.dumps({k: a.get(k) for k in sorted(a) if k != "account_id"}, default=str)[:420])
+                # The fields that say WHAT happened print first, so no cap can ever hide them (the first live run, 2026-11-20, sorted the keys
+                # alphabetically and a 420-character cap cut every row off before "qty" and "symbol"). The rest follow, sorted.
+                _first = ("symbol", "qty", "side", "price", "date", "description", "activity_sub_type", "net_amount")
+                _row = {k: a.get(k) for k in _first if k in a}
+                _row.update({k: a[k] for k in sorted(a) if k not in _row and k != "account_id"})
+                print("    activity " + json.dumps(_row, default=str)[:1500])
             _blob = json.dumps(_ca, default=str)
             _nobasis = []
             for p in (alpaca_get("/v2/positions") or []):

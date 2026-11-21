@@ -86,6 +86,27 @@ class CorporateActionsAreShown(unittest.TestCase):
         self.assertIn('"avg_entry_price": "77.0"', out)                       # the datum LAPTOP BOT could not see
         self.assertIn("every held position has a positive avg_entry_price", out)
 
+    def test_a_realistic_length_row_still_shows_its_symbol_and_qty(self):
+        """2026-11-20: the first live run cut each real NC row off at the 420-character cap, in ALPHABETICAL order, so the row ended at "price" and the
+        symbol and qty (the fields the whole check exists to show) never printed. Short rows in the other tests could not catch that. This row is the
+        real shape: the full field set Alpaca sent, ids and all."""
+        real = {"account_id": "acct-secret", "activity_sub_type": "SNC", "activity_type": "NC",
+                "corporate_action_id": "0bbf827c-e765-4887-a603-e5f5e4236212", "created_at": "2026-11-16T12:06:55.507987Z", "currency": "USD",
+                "cusip": "092113109", "date": "2026-11-16", "description": "Name Change from BKH to HZN",
+                "group_id": "e54ff29b-0935-4acf-99d5-aa6f955a8647", "id": "20261116000000000::8efd7046-f94e-439a-8d43-9c585e1386e7",
+                "net_amount": "0", "price": "76.75", "qty": "-0.143977258", "status": "executed", "symbol": "BKH",
+                "system_date": "2026-11-16", "per_share_amount": "0", "leaves_qty": "0", "side": "sell"}
+        err, out = run_account_test([position("HZN", 0.143977258, 76.75)], [real, dict(real, id="20261116000000000::fdfab492-a77c-4c5e-832e-fe6cfe5dbda4", symbol="HZN", qty="0.143977258")])
+        self.assertEqual(err.code, 0)
+        rows = [ln for ln in out.splitlines() if ln.startswith("    activity ")]
+        self.assertEqual(len(rows), 2)
+        for ln in rows:
+            for needle in ('"symbol": ', '"qty": ', '"price": "76.75"', '"date": "2026-11-16"', '"description": "Name Change from BKH to HZN"'):
+                self.assertIn(needle, ln)                                 # nothing the check exists to show may fall behind a cap
+        self.assertIn('"symbol": "BKH"', rows[0] + rows[1])
+        self.assertIn('"qty": "-0.143977258"', rows[0] + rows[1])
+        self.assertNotIn("acct-secret", out)
+
     def test_an_unrelated_position_is_not_printed(self):
         _, out = run_account_test([position("SPY", 0.2, 600.0), position("HZN", 0.144, 77.0)], [NC_OUT, NC_IN])
         self.assertNotIn('"symbol": "SPY"', out)
