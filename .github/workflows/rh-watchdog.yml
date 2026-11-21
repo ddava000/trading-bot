@@ -1,0 +1,79 @@
+name: RH laptop watchdog
+
+# Cloud dead-man's-switch for the Robinhood laptop bot. Owned by the laptop
+# session (monitors rh_status.json / rh_watchdog.py) but lives here because a
+# watchdog must run independently of the laptop. Additive; touches no other
+# workflow. See rh_watchdog.py for the logic.
+
+on:
+  schedule:
+    # Every 30 min, 13:00-21:00 UTC, weekdays. That brackets 9:30-16:00 ET in
+    # both EST and EDT; rh_watchdog.py's check_market() is the precise gate, so
+    # off-hours runs just exit 0.
+    # MEASURED 2026-09-30: this STANDALONE workflow ran only 1 to 3 times a day (9/09 to 9/30), once
+    # inside market hours, not the 17 the cron implies.
+    # CORRECTION 2026-10-05: that was NOT the whole picture. alpaca-bot.yml ran rh_watchdog.py in a step at
+    # every :00/:30 trigger from 2026-08-13 (the "piggyback"), so laptop coverage was every 30 minutes all
+    # along; I counted only this workflow's own runs. That step had a SHALLOW checkout, so it could not
+    # measure how long an outage had lasted and mailed "could not measure how long" at every slot (8 mails
+    # during the 9/30 outage). REMOVED 2026-10-06 at Devon's say-so; the workflow_run trigger below replaces
+    # it. This cron path passes no overrides (the legacy behaviour) and is only a backup.
+    - cron: "*/30 13-21 * * 1-5"
+  # PRIMARY path (added 2026-10-01). Runs after every Arm A run, with a deep checkout so it can measure outage
+  # duration, and thins its alerts to one per threshold. Arm A is triggered by cron-job.org through
+  # workflow_dispatch and ran 26 times in each market day (9/28, 9/29, 9/30), so its completions are
+  # a ~15 minute clock that GitHub's own scheduler does not give us. The watchdog stays
+  # independent of the LAPTOP, which is the point; it fires whatever Arm A's conclusion was.
+  workflow_run:
+    workflows: ["Alpaca Trading Bot"]
+    types: [completed]
+  workflow_dispatch:      # manual run; set force=true to send a test alert now
+    inputs:
+      force:
+        description: "Send a TEST alert to all channels regardless of bot state"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # The degraded-duration check walks rh_status.json history. A default
+          # shallow clone gives one commit, so it would report "cannot tell" on
+          # every run and alert every 30 min during an outage.
+          fetch-depth: 400
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install --quiet requests
+      - name: Check laptop bot liveness and alert if silent
+        env:
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          # Recipient. Safe to add before the secret exists: an unset secret
+          # expands to "" and rh_watchdog falls back, so wiring it now costs
+          # nothing and lets the hardcoded address be deleted the moment
+          # Devon sets it. Without this the scrub would kill email silently.
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+          NTFY_TOPIC:         ${{ secrets.NTFY_TOPIC }}
+          SMS_TO:             ${{ secrets.SMS_TO }}
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          FORCE_ALERT:        ${{ inputs.force }}
+          # Per-trigger tuning, empty on the sparse paths (= original behaviour). At ~26 runs a day
+          # the watchdog must not mail on every one while the laptop is down, so this path alerts
+          # once per threshold, only within 20 min of crossing it, counted in minutes THIS SESSION.
+          # Grace 30 keeps Devon's intent from 2026-08-04 that the first live check lands about
+          # 10:00 ET, after the laptop's first heartbeat; at 15-minute density a 5-minute grace
+          # would check at 9:36 and call a laptop that has not pushed yet "silent".
+          WATCHDOG_GRACE_MIN:        ${{ github.event_name == 'workflow_run' && '30' || '' }}
+          WATCHDOG_CROSS_WINDOW_MIN: ${{ github.event_name == 'workflow_run' && '20' || '' }}
+          WATCHDOG_STALE_ALERT_MIN:  ${{ github.event_name == 'workflow_run' && '30,120,360' || '' }}
+        run: python rh_watchdog.py

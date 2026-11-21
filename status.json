@@ -1,0 +1,102 @@
+{
+ "acct": "8736",
+ "as_of_utc": "2026-11-20T20:15Z",
+ "baseline": {
+  "equity": 247.91,
+  "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
+ },
+ "bot": "alpaca-cloud",
+ "capital_flow": {
+  "checked_at": "2026-11-20T20:15:21+00:00",
+  "events": [],
+  "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
+  "net": 0.0,
+  "state": "clean",
+  "window_opened": "2026-08-24"
+ },
+ "cash": 33.95,
+ "crypto_enabled": true,
+ "day_pnl": -4.43,
+ "earnings_guard": "unknown",
+ "equity": 199.53,
+ "halted": false,
+ "holds_pct_vs_basis": {
+  "MSFT": -4.7,
+  "PLTR": -22.6,
+  "VST": -21.7
+ },
+ "market_open": true,
+ "mode": "LIVE",
+ "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
+ "next_expected_utc": "2026-11-20T20:35Z",
+ "orders_this_run": 0,
+ "plan": {
+  "date": "2026-11-20",
+  "risk": 0.25,
+  "stale": false
+ },
+ "realized": {
+  "by_year": {
+   "2026": {
+    "lt": {
+     "gains": 0.0,
+     "losses": 0.0,
+     "net": 0.0,
+     "sales": 0
+    },
+    "net": -30.52,
+    "sales": 54,
+    "st": {
+     "gains": 0.26,
+     "losses": -30.78,
+     "net": -30.52,
+     "sales": 54
+    }
+   }
+  },
+  "checked_at": "2026-11-20T20:15:26+00:00",
+  "fills": 133,
+  "last_fill": "2026-11-20T19:23:36.218044Z",
+  "last_sale": "2026-11-20",
+  "lt": {
+   "gains": 0.0,
+   "losses": 0.0,
+   "net": 0.0,
+   "sales": 0
+  },
+  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
+  "net": -30.52,
+  "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
+  "reconciliation_residual": -0.0606,
+  "sales": 54,
+  "since": "2026-08-12",
+  "st": {
+   "gains": 0.26,
+   "losses": -30.78,
+   "net": -30.52,
+   "sales": 54
+  },
+  "state": "unverified",
+  "wash_watch": {
+   "cross_account": {
+    "sales": 0,
+    "upper_bound": 0.0
+   },
+   "same_account": {
+    "sales": 5,
+    "upper_bound": -1.77
+   }
+  }
+ },
+ "regime": "risk-off",
+ "sleeves": {
+  "crypto": 0,
+  "hold": 26.35,
+  "index": 108.44,
+  "trade": 30.78
+ },
+ "ts": "2026-11-20T15:15 ET",
+ "vix": 34.3,
+ "vix_live": true,
+ "vs_baseline_pct": -19.52
+}
