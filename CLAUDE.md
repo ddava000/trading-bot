@@ -200,8 +200,19 @@ includes unrealized paper P&L, and only positions actually SOLD are taxable.
   reports cross-account ones). The rule also spans accounts no session can see, including
   IRAs. Report the figure; only Devon's tax preparer decides what applies.
 - **Not a tax document.** The broker's 1099-B is authoritative. Do not give tax advice.
-- **After a split, spinoff, symbol change or securities transfer** the FIFO is wrong: the bot
+- **After a split, spinoff or securities transfer** the FIFO is wrong: the bot
   marks Arm A unverified. Run the `realized-report` workflow to see every closed lot.
+- **A pure ticker change is the one exception, and the proof is strict** (2026-11-20, BKH to HZN on 11-16). `realized.rename_map` accepts a
+  pair of NC rows only if the broker itself shows a pure rename: exactly two rows, sub type SNC, net amount 0 on both, equal and opposite
+  quantities, two different symbols, same date, same cusip when stated, status executed, one corporate_action_id. Then the old name's fills are
+  relabelled to the new name (the lots follow the shares), those two rows stop counting as FIFO-breaking, and the block shows
+  `renames: {BKH: HZN}`. Anything less (cash in lieu, a lone row, a merger, a split, an ambiguous or cyclic chain) stays FIFO-breaking exactly as
+  before. The same map gives a renamed position its old buy date (`last_buy_dates`, looked up lazily, only when a held name has no buy in the
+  log) so the time stop can fire on it. To see the raw rows and the broker's cost basis, dispatch the read-only account test:
+  `gh workflow run alpaca-bot.yml -f account_test=true`. It prints every FIFO-breaking activity row (identifying fields first), the raw broker
+  row of each symbol they name, any held position with no usable avg_entry_price, what the realized block says, and each position's buy date.
+- **A held position with a broker cost basis of 0 has no stop of any kind** (every exit is measured from cost). Both passes skip it, and now say
+  so in the log: `[NO STOP on SYM: ...]`. It is a log line, not an email; making it an alert is a separate decision (EVIDENCE RULE 3).
 
 ## Agent mailbox (how the two sessions talk)
 The sessions cannot chat live (neither runs continuously). They leave notes in

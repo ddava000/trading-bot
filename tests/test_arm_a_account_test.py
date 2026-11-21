@@ -13,6 +13,7 @@ import io
 import json
 import os
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -64,7 +65,8 @@ def run_account_test(positions, activities, activity_error=None, positions_error
             return list(positions)
         return {"message": "stub"}
     out, err = io.StringIO(), None
-    with mock.patch.object(bot, "alpaca_get", get), mock.patch.dict(os.environ, {"ACCOUNT_TEST": "true"}), contextlib.redirect_stdout(out):
+    with mock.patch.object(bot, "alpaca_get", get), mock.patch.dict(os.environ, {"ACCOUNT_TEST": "true"}), mock.patch.object(bot.time, "sleep", lambda s: None), \
+            contextlib.redirect_stdout(out):
         g = dict(vars(bot))
         g["__name__"] = "__main__"
         try:
@@ -133,6 +135,40 @@ class CorporateActionsAreShown(unittest.TestCase):
         bad.pop("avg_entry_price")
         _, out = run_account_test([bad], [])
         self.assertIn("NO usable avg_entry_price for ['HZN']", out)
+
+
+class RealizedBlockAndBuyDatesAreShown(unittest.TestCase):
+    """2026-11-20: the account test also prints what the real realized block says and which buy date each position's time stop will use, so a
+    corporate-action change can be replayed on live data instead of argued about."""
+
+    def test_the_realized_line_shows_the_state_and_the_proven_renames(self):
+        err, out = run_account_test([position("HZN", 0.144, 77.0)], [FILL, NC_OUT, NC_IN])
+        self.assertEqual(err.code, 0)
+        line = [ln for ln in out.splitlines() if ln.startswith("  realized :")]
+        self.assertEqual(len(line), 1, out)
+        self.assertIn("state=", line[0])
+        self.assertIn('renames={}', line[0])                  # these short test rows are not a proven pair (no group key): the strict rule says so
+
+    def test_a_proven_pair_is_reported_as_a_rename(self):
+        real = {"activity_sub_type": "SNC", "activity_type": "NC", "corporate_action_id": "ca1", "cusip": "1", "date": "2026-11-16",
+                "net_amount": "0", "status": "executed"}
+        rows = [dict(real, id="a1", symbol="BKH", qty="-0.144"), dict(real, id="a2", symbol="HZN", qty="0.144")]
+        cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as d:               # buy dates come from trade_log.jsonl in the working directory: never the repo's real one
+            os.chdir(d)
+            try:
+                with open("trade_log.jsonl", "w") as f:
+                    f.write(json.dumps({"ts": "2026-10-21T09:45", "side": "buy", "symbol": "BKH"}) + "\n")
+                err, out = run_account_test([position("HZN", 0.144, 77.0)], [FILL] + rows)
+            finally:
+                os.chdir(cwd)
+        self.assertEqual(err.code, 0)
+        self.assertIn('renames={"BKH": "HZN"}', out)
+        self.assertIn('"HZN": "2026-10-21T09:45"', out)         # the BKH buy was credited to HZN, so its time stop has a date
+
+    def test_the_buy_dates_line_is_printed(self):
+        _, out = run_account_test([position("SPY", 0.2, 600.0)], [])
+        self.assertIn("  buy dates: ", out)
 
 
 class ItCanNeverFailTheTest(unittest.TestCase):

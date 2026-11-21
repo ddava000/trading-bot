@@ -268,6 +268,91 @@ def verify_positions(open_qty, live, tol=1e-6):
     return bad
 
 
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
+def rename_map(acts, tol=1e-9):
+    """Ticker changes the broker's own activity rows PROVE are pure renames.
+
+    WHY (2026-11-20). On 2026-11-16 BKH became HZN. Alpaca reported it as two NC rows: -0.143977258 BKH and +0.143977258 HZN, sub type SNC,
+    net amount 0, one corporate_action_id, one cusip. Counting any NC row as FIFO-breaking left the realized block UNVERIFIED for good, and the
+    trade log's BKH buys never reached HZN, so the time stop could not date the position. A pure rename moves shares between two names and
+    changes nothing about what was paid, so it is safe to treat the two names as one. Anything LESS than a pure rename is not: a merger, a
+    cash-in-lieu, a split or a swap must keep breaking FIFO, so the proof is strict and any doubt leaves the rows unproven.
+
+    A group of NC rows (one corporate_action_id, else one group_id) is a proven pure rename only if ALL of these hold:
+      exactly two rows, both activity_type NC and sub type SNC; status executed when stated; net_amount 0 on both; one qty negative (the
+      old symbol) and one positive (the new), equal in size; two different non-empty symbols; the same date; the same cusip when both
+      rows carry one.
+
+    Returns (aliases, proven_ids): {old_symbol: new_symbol} resolved through chains (A to B to C gives A to C and B to C; a cycle is
+    dropped), and the set of row ids that are proven, which a caller must stop counting as FIFO-breaking.
+    """
+    groups = {}
+    for a in acts or []:
+        if str(a.get("activity_type")) != "NC":
+            continue
+        key = a.get("corporate_action_id") or a.get("group_id")
+        if key:
+            groups.setdefault(("g", key), []).append(a)
+        else:
+            groups.setdefault(("row", a.get("id")), []).append(a)    # no key: it can only ever be a lone, unproven row
+    direct, ids, ambiguous = {}, {}, set()
+    for rows in groups.values():
+        if len(rows) != 2:
+            continue
+        q = [_num(r.get("qty")) for r in rows]
+        net = [_num(r.get("net_amount")) for r in rows]
+        sym = [str(r.get("symbol") or "").replace("/", "") for r in rows]
+        if None in q or None in net or not all(sym) or sym[0] == sym[1]:
+            continue
+        if any(str(r.get("activity_sub_type")) != "SNC" for r in rows):
+            continue
+        if any(r.get("status") not in (None, "executed") for r in rows):
+            continue
+        if any(abs(n) > tol for n in net):
+            continue
+        if not (q[0] * q[1] < 0 and abs(abs(q[0]) - abs(q[1])) <= tol * max(1.0, abs(q[0]))):
+            continue
+        if rows[0].get("date") != rows[1].get("date"):
+            continue
+        cus = [r.get("cusip") for r in rows]
+        if cus[0] and cus[1] and cus[0] != cus[1]:
+            continue
+        old = sym[0] if q[0] < 0 else sym[1]
+        new = sym[1] if q[0] < 0 else sym[0]
+        if old in direct:
+            ambiguous.add(old)               # the same old name renamed twice: do not guess which one is right
+            continue
+        direct[old] = new
+        ids[old] = {r.get("id") for r in rows}
+    for old in ambiguous:
+        direct.pop(old, None)
+        ids.pop(old, None)
+    aliases, proven = {}, set()
+    for old in direct:
+        cur, hops = old, 0
+        while cur in direct and hops < 8:
+            cur = direct[cur]
+            hops += 1
+        if cur in direct or cur == old:      # still renaming after 8 hops, or back where it started: a cycle, nothing safe to resolve
+            continue
+        aliases[old] = cur
+        proven |= ids[old]                   # only rows whose rename was RESOLVED stop counting as FIFO-breaking
+    return aliases, proven
+
+
+def relabel_fills(fills, aliases):
+    """Fills with each renamed symbol replaced by its current name. Returns new dicts; the input is not touched."""
+    if not aliases:
+        return list(fills)
+    return [dict(f, symbol=aliases.get(f.get("symbol"), f.get("symbol"))) for f in fills]
+
+
 def combine(*blocks):
     """Sum several arms' summaries into one running total."""
     tot = {"st": {"gains": 0.0, "losses": 0.0, "net": 0.0, "sales": 0},

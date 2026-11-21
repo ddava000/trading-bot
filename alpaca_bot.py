@@ -950,6 +950,13 @@ def fills_from(acts):
             for a in acts if a.get("activity_type") == "FILL"]
 
 
+def fills_with_renames(R, acts):
+    """(fills, aliases, proven_row_ids): the FILL rows with every PROVEN pure ticker rename applied (BKH fills become HZN fills), the
+    {old: new} map, and the ids of the NC rows that proved it. See realized.rename_map for what counts as proof."""
+    aliases, proven = R.rename_map(acts)
+    return R.relabel_fills(fills_from(acts), aliases), aliases, proven
+
+
 def alpaca_fill_history(since=REALIZED_SINCE, page_size=100):
     """Fills only, or None if the history is incomplete."""
     acts = alpaca_activity_history(since, page_size)
@@ -1023,8 +1030,8 @@ def alpaca_realized_block():
     acts = alpaca_activity_history()
     if acts is None:
         return {"state": "unknown", "reason": "activity history unavailable"}, None
-    fills = fills_from(acts)
     try:
+        fills, renames, renamed_rows = fills_with_renames(R, acts)
         res = R.fifo(fills)
         summ = R.summarize(res["closed"])
         watch = R.wash_watch(res["closed"], fills)
@@ -1044,7 +1051,8 @@ def alpaca_realized_block():
             acts2 = alpaca_activity_history()
             live2 = alpaca_positions_total()
             if acts2 is not None and live2 is not None:
-                acts, fills, live = acts2, fills_from(acts2), live2
+                acts, live = acts2, live2
+                fills, renames, renamed_rows = fills_with_renames(R, acts)
                 res = R.fifo(fills)
                 summ = R.summarize(res["closed"])
                 watch = R.wash_watch(res["closed"], fills)
@@ -1066,7 +1074,11 @@ def alpaca_realized_block():
         reasons.append("identity check unavailable: %s" % idetail)
     elif abs(resid) > IDENTITY_TOL:
         reasons.append("does not reconcile to the account: residual %.2f dollars" % resid)
-    hits = {t: n for t, n in types.items() if t in BREAKS_FIFO_SET}
+    hits = {}
+    for a in acts:                                   # a row the broker PROVED is half of a pure ticker rename no longer breaks FIFO
+        t = str(a.get("activity_type"))
+        if t in BREAKS_FIFO_SET and a.get("id") not in renamed_rows:
+            hits[t] = hits.get(t, 0) + 1
     if hits:
         reasons.append("split/transfer/corporate-action event(s) break FIFO: "
                        + ", ".join("%s x%d" % kv for kv in sorted(hits.items())))
@@ -1084,6 +1096,8 @@ def alpaca_realized_block():
         "reconciliation_residual": resid,
         "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
     })
+    if renames:
+        summary["renames"] = dict(sorted(renames.items()))     # shown, not hidden: these names were treated as one security
     if reasons:
         summary["reason"] = "; ".join(reasons)
     ledger = {
@@ -1314,18 +1328,52 @@ def recent_stop_outs(days=STOP_COOLDOWN_D):
     cut = (datetime.now(ET_TZ) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
     return {s for s, ts in latest.items() if ts >= cut}
 
-def last_buy_dates(held_syms):
-    """Most recent buy timestamp per held symbol, from the local trade log.
-    Drives the time stop: an add resets the clock (renewed conviction)."""
-    out = {}
+def _renames_from_broker():
+    """{old: new} for every ticker change the broker PROVES (realized.rename_map). {} if the history cannot be read: the caller then behaves
+    exactly as it did before renames were understood, never worse."""
     try:
-        for line in open("trade_log.jsonl"):
-            try: d = json.loads(line)
-            except Exception: continue
-            if d.get("side") == "buy" and d.get("symbol") in held_syms:
-                out[d["symbol"]] = d.get("ts", "")
-    except Exception:
-        pass
+        import realized as R
+        acts = alpaca_activity_history()
+        return R.rename_map(acts)[0] if acts is not None else {}
+    except Exception as e:
+        print(f"  [rename lookup failed: {type(e).__name__}: {e}]")
+        return {}
+
+
+def last_buy_dates(held_syms, get_renames=None):
+    """Most recent buy timestamp per held symbol, from the local trade log.
+    Drives the time stop: an add resets the clock (renewed conviction).
+
+    A RENAMED position keeps its clock (2026-11-20). BKH became HZN on 2026-11-16: the log has BKH buys, the broker holds HZN, so the time
+    stop read "no buy date" and could never fire on it. When a held symbol has no buy in the log, ONE read of the broker's activity history
+    finds the proven renames and the old name's buys are credited to the new one. The read happens only in that case (a steady-state pass
+    makes no extra call), and a failed read changes nothing."""
+    held = set(held_syms)
+
+    def scan(alias):
+        out = {}
+        try:
+            for line in open("trade_log.jsonl"):
+                try: d = json.loads(line)
+                except Exception: continue
+                if d.get("side") != "buy":
+                    continue
+                sym = alias.get(d.get("symbol"), d.get("symbol"))
+                if sym in held:
+                    out[sym] = d.get("ts", "")
+        except Exception:
+            pass
+        return out
+
+    out = scan({})
+    if held - set(out):
+        try:
+            aliases = (get_renames or _renames_from_broker)() or {}
+        except Exception as e:
+            print(f"  [rename lookup failed: {type(e).__name__}: {e}]")
+            aliases = {}
+        if aliases:
+            out = scan(aliases)
     return out
 
 
@@ -1782,10 +1830,14 @@ def run_bot():
     #    what the signals say; take-profit +15% banked unless the signal is still
     #    an active buy (let confirmed winners run). ~2:1 reward:risk. Plus a TIME
     #    stop: a position going nowhere for 5+ days with no signal is dead money.
-    buy_dates = last_buy_dates(set(positions) - set(holds))
+    buy_dates = last_buy_dates(set(positions) - set(holds) - set(INDEX_ETFS))   # index ETFs are skipped by this loop, so they never need a date
     for sym, p in list(positions.items()):
         if sym in holds or sym in pending or sym in crypto_flat or sym in INDEX_ETFS: continue
         live = market.get(sym, {}).get("live"); cost = float(p.get("avg_cost") or 0)
+        if live and cost <= 0 and p["qty"] > 0:
+            # Said out loud (2026-11-20). A position whose broker cost basis is 0 has no stop, no take-profit and no time stop, because every
+            # one of them is measured from cost. It was skipped silently; nobody could tell from the log that a held position was unprotected.
+            print(f"  [NO STOP on {sym}: broker avg_entry_price is {cost}, so stop, take-profit and time stop cannot run for it]")
         if not live or cost <= 0 or p["qty"] <= 0: continue
         con = sigs.get(sym, {}).get("consensus", 0)
         age_d = None
@@ -2430,6 +2482,8 @@ def exit_pass(et, alerted):
         if sym in pending or sym in INDEX_ETFS: continue
         qty = p.get("qty") or 0
         cost = float(p.get("avg_cost") or 0)
+        if qty > 0 and cost <= 0:
+            print(f"  [NO STOP on {sym}: broker avg_entry_price is {cost}, so the stop cannot run for it (fast pass {et.strftime('%H:%M')})]")   # 2026-11-20
         if qty <= 0 or cost <= 0: continue
         if sym in crypto_flat:
             live = clasts.get(crypto_flat[sym])
@@ -2543,6 +2597,12 @@ if __name__ == "__main__":
                                                                            "market_value", "current_price")}, default=str))
             print("  cost basis: " + (f"NO usable avg_entry_price for {sorted(_nobasis)}: the bracket loop SKIPS these, they have no stop"
                                        if _nobasis else "every held position has a positive avg_entry_price"))
+            # What the real realized block says about this account right now, read-only, so a corporate-action change can be replayed on live data.
+            _blk, _ = alpaca_realized_block()
+            print("  realized : state=%s fills=%s renames=%s%s" % (_blk.get("state"), _blk.get("fills"), json.dumps(_blk.get("renames") or {}),
+                                                                  ("\n             reason: " + str(_blk["reason"])[:600]) if _blk.get("reason") else ""))
+            print("  buy dates: " + json.dumps(last_buy_dates({str(p.get("symbol")) for p in (alpaca_get("/v2/positions") or []) if isinstance(p, dict)}
+                                                              - set(INDEX_ETFS)), sort_keys=True))
         except Exception as e:
             print(f"  corp-actions: could not read ({type(e).__name__}: {e})")
         raise SystemExit(0)
