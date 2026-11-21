@@ -2515,6 +2515,31 @@ if __name__ == "__main__":
                   f"Arm A's raw return is CONTAMINATED by this much")
             for e in _ev:
                 print(f"             {e['date']}  {e['type']}  ${e['amount']:+,.2f}")
+        # CORPORATE ACTIONS and COST BASIS (2026-11-20). READ-ONLY. A ticker change (BKH to HZN, 2026-11-16) tripped the realized reconciliation
+        # for good (any NC activity counts as FIFO-breaking), and the bracket loop silently SKIPS a held position whose broker avg_entry_price is 0,
+        # which nobody could see from outside. So this prints (a) every FIFO-breaking activity row, RAW, so a rename can be handled from the real
+        # payload, (b) the raw broker row of every held symbol those rows name, and (c) every held position with no usable cost basis. Nothing else
+        # about positions is printed. It can never fail the test: any error is printed and the check ends normally.
+        try:
+            _ca = [a for a in (alpaca_activity_history() or []) if str(a.get("activity_type")) in BREAKS_FIFO_SET]
+            print(f"  corp-actions: {len(_ca)} activity row(s) of a FIFO-breaking type ({BREAKS_FIFO_TYPES})")
+            for a in _ca[:12]:
+                print("    activity " + json.dumps({k: a.get(k) for k in sorted(a) if k != "account_id"}, default=str)[:420])
+            _blob = json.dumps(_ca, default=str)
+            _nobasis = []
+            for p in (alpaca_get("/v2/positions") or []):
+                if not isinstance(p, dict):
+                    continue
+                _bad = float(p.get("avg_entry_price") or 0) <= 0
+                if _bad:
+                    _nobasis.append(str(p.get("symbol")))
+                if _bad or (p.get("symbol") and '"%s"' % p.get("symbol") in _blob):
+                    print("    position " + json.dumps({k: p.get(k) for k in ("symbol", "qty", "qty_available", "avg_entry_price", "cost_basis",
+                                                                           "market_value", "current_price")}, default=str))
+            print("  cost basis: " + (f"NO usable avg_entry_price for {sorted(_nobasis)}: the bracket loop SKIPS these, they have no stop"
+                                       if _nobasis else "every held position has a positive avg_entry_price"))
+        except Exception as e:
+            print(f"  corp-actions: could not read ({type(e).__name__}: {e})")
         raise SystemExit(0)
 
     # Order-path test: `gh workflow run alpaca-bot.yml -f order_test=true`
