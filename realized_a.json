@@ -1211,13 +1211,25 @@
    "sale": "a7aa165c-aee8-4367-ba0a-e4d1f9b2eb2d",
    "symbol": "TTWO",
    "term": "ST"
+  },
+  {
+   "basis": 5.87,
+   "close_date": "2026-11-23",
+   "close_fill": 133,
+   "gain": -0.12745,
+   "open_date": "2026-11-18",
+   "open_fill": 128,
+   "proceeds": 5.74255,
+   "qty": 0.191942972,
+   "sale": "584ec9d1-427d-42c9-a722-cfdd3c0da8ec",
+   "symbol": "GDXD",
+   "term": "ST"
   }
  ],
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
   "CALM": 0.077077651,
-  "GDXD": 0.191942972,
   "HZN": 0.143977258,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
@@ -1237,19 +1249,19 @@
      "net": 0.0,
      "sales": 0
     },
-    "net": -30.52,
-    "sales": 54,
+    "net": -30.65,
+    "sales": 55,
     "st": {
      "gains": 0.26,
-     "losses": -30.78,
-     "net": -30.52,
-     "sales": 54
+     "losses": -30.91,
+     "net": -30.65,
+     "sales": 55
     }
    }
   },
-  "fills": 133,
-  "last_fill": "2026-11-20T19:23:36.218044Z",
-  "last_sale": "2026-11-20",
+  "fills": 134,
+  "last_fill": "2026-11-23T15:30:20.408703Z",
+  "last_sale": "2026-11-23",
   "lt": {
    "gains": 0.0,
    "losses": 0.0,
@@ -1257,18 +1269,18 @@
    "sales": 0
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
-  "net": -30.52,
-  "reconciliation_residual": -0.0406,
+  "net": -30.65,
+  "reconciliation_residual": -0.0631,
   "renames": {
    "BKH": "HZN"
   },
-  "sales": 54,
+  "sales": 55,
   "since": "2026-08-12",
   "st": {
    "gains": 0.26,
-   "losses": -30.78,
-   "net": -30.52,
-   "sales": 54
+   "losses": -30.91,
+   "net": -30.65,
+   "sales": 55
   },
   "state": "ok",
   "wash_watch": {
