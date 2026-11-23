@@ -2838,3 +2838,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'GDXD', 'CALM', 'IMVT', 'TTWO'] | favor: ['HZN', 'SRRK']
 - notes: After-hours Friday: VIX still elevated at 35.9 with S&P/Dow in correction and Nasdaq negative on the year amid an intensifying AI rout. Max-stress territory into the weekend — holding risk-off at 0.25 with all broken high-beta and indices on avoid; GDXD's gain is inverse-gold, not a buy.
 - journal: Fri 11/20 19:25: No change post-close — worst week in 19 months, VIX ~36, corrections confirmed. Staying risk-off/0.25, only HZN/SRRK green. High weekend headline risk; need a VIX reset below ~25 and calmer tape before any risk-up.
+
+### 2026-11-23T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'GDXD', 'CALM'] | favor: ['HZN', 'SRRK']
+- notes: Sharp relief rally Monday — Nasdaq futures +3%, Dow +800, VIX cooling 35.9->31.5 after Friday's bloodbath. Still elevated above 30 and this is a bounce within a correction, so nudging risk 0.25->0.35 but staying risk-off; indices and broken high-beta remain on avoid until VIX confirms below ~25.
+- journal: Mon 11/23 10:00: First real bounce — futures surging, VIX 35.9->31.5. Lifted risk 0.25->0.35 but not convinced; need a VIX reset under 25 and follow-through before adding meaningfully. Watching holiday-week thin liquidity and whether the AI names stabilize. HZN/SRRK still the only green.

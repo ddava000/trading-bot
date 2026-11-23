@@ -1,6 +1,6 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.25,
+  "risk_scale": 0.35,
   "avoid_symbols": [
     "PLTR",
     "VST",
@@ -9,17 +9,15 @@
     "SPY",
     "MSFT",
     "GDXD",
-    "CALM",
-    "IMVT",
-    "TTWO"
+    "CALM"
   ],
   "favor_symbols": [
     "HZN",
     "SRRK"
   ],
-  "notes": "After-hours Friday: VIX still elevated at 35.9 with S&P/Dow in correction and Nasdaq negative on the year amid an intensifying AI rout. Max-stress territory into the weekend \u2014 holding risk-off at 0.25 with all broken high-beta and indices on avoid; GDXD's gain is inverse-gold, not a buy.",
-  "journal_entry": "Fri 11/20 19:25: No change post-close \u2014 worst week in 19 months, VIX ~36, corrections confirmed. Staying risk-off/0.25, only HZN/SRRK green. High weekend headline risk; need a VIX reset below ~25 and calmer tape before any risk-up.",
-  "date": "2026-11-20",
+  "notes": "Sharp relief rally Monday \u2014 Nasdaq futures +3%, Dow +800, VIX cooling 35.9->31.5 after Friday's bloodbath. Still elevated above 30 and this is a bounce within a correction, so nudging risk 0.25->0.35 but staying risk-off; indices and broken high-beta remain on avoid until VIX confirms below ~25.",
+  "journal_entry": "Mon 11/23 10:00: First real bounce \u2014 futures surging, VIX 35.9->31.5. Lifted risk 0.25->0.35 but not convinced; need a VIX reset under 25 and follow-through before adding meaningfully. Watching holiday-week thin liquidity and whether the AI names stabilize. HZN/SRRK still the only green.",
+  "date": "2026-11-23",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-20T19:25 ET"
+  "updated_at": "2026-11-23T10:00 ET"
 }
