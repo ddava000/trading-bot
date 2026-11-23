@@ -278,7 +278,7 @@
   },
   {
    "qty": 0.077735908,
-   "symbol": "BKH",
+   "symbol": "HZN",
    "t": "2026-10-07"
   },
   {
@@ -328,7 +328,7 @@
   },
   {
    "qty": 0.06624135,
-   "symbol": "BKH",
+   "symbol": "HZN",
    "t": "2026-10-21"
   },
   {
@@ -1216,9 +1216,9 @@
  "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
  "note": "NOT a tax document. The broker 1099-B is authoritative. Wash-sale figures are an UPPER BOUND for a tax preparer to judge, not an adjustment.",
  "open": {
-  "BKH": 0.143977258,
   "CALM": 0.077077651,
   "GDXD": 0.191942972,
+  "HZN": 0.143977258,
   "IWM": 0.137264116,
   "MSFT": 0.025130111,
   "PLTR": 0.042013208,
@@ -1258,8 +1258,10 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -30.52,
-  "reason": "positions do not reconcile: BKH fills=0.1440 broker=0.0000, HZN fills=0.0000 broker=0.1440; split/transfer/corporate-action event(s) break FIFO: NC x2",
-  "reconciliation_residual": -0.0606,
+  "reconciliation_residual": -0.0406,
+  "renames": {
+   "BKH": "HZN"
+  },
   "sales": 54,
   "since": "2026-08-12",
   "st": {
@@ -1268,7 +1270,7 @@
    "net": -30.52,
    "sales": 54
   },
-  "state": "unverified",
+  "state": "ok",
   "wash_watch": {
    "cross_account": {
     "sales": 0,
