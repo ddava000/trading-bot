@@ -2844,3 +2844,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'GDXD', 'CALM'] | favor: ['HZN', 'SRRK']
 - notes: Sharp relief rally Monday — Nasdaq futures +3%, Dow +800, VIX cooling 35.9->31.5 after Friday's bloodbath. Still elevated above 30 and this is a bounce within a correction, so nudging risk 0.25->0.35 but staying risk-off; indices and broken high-beta remain on avoid until VIX confirms below ~25.
 - journal: Mon 11/23 10:00: First real bounce — futures surging, VIX 35.9->31.5. Lifted risk 0.25->0.35 but not convinced; need a VIX reset under 25 and follow-through before adding meaningfully. Watching holiday-week thin liquidity and whether the AI names stabilize. HZN/SRRK still the only green.
+
+### 2026-11-23T20:08 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['PLTR', 'VST', 'IWM', 'CALM', 'GDXD'] | favor: ['HZN', 'SRRK', 'QQQ']
+- notes: Massive relief rally — Nasdaq +6% (best day since Apr '25), Dow +1,400 on Huang's Nvidia reinstatement; VIX cooling 31.5->26.6. Constructive but still above 25 inside a correction and a thin holiday week with a CPI print due, so lifting risk 0.35->0.45 while staying defensive; big-cap indices/MSFT thawing but broken high-beta (PLTR/VST) and CALM (earnings risk) stay on avoid.
+- journal: Mon 11/23 20:08: Huge follow-through — VIX 31.5->26.6, Nasdaq +6%. Nudged risk 0.35->0.45; moving QQQ off avoid as mega-cap AI stabilizes but keeping PLTR/VST/IWM blocked until they prove footing. Watching for VIX under 25, holiday thin liquidity, and the CPI report this week before risking up further.
