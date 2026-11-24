@@ -2868,3 +2868,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'CALM', 'GDXD', 'SPY', 'QQQ'] | favor: ['HZN', 'SRRK']
 - notes: Monday's relief rally is fading — Nvidia giving back gains, futures lower and VIX back up 26.6->29.6 inside a confirmed correction with a hawkish Fed/December-hike narrative and thin holiday liquidity. Dialing risk 0.45->0.40 and re-blocking the broad indices until the tape stabilizes; only HZN/SRRK remain constructive.
 - journal: Tue 11/24 10:00: Rally unraveling — VIX re-expanded to 29.6, Nvidia pulling back, futures red. Cut risk 0.45->0.40 and moved SPY/QQQ back onto avoid as the bounce fails. Watching Thursday's GDP+PCE double-print, the Dec hike debate, and whether AI mega-caps hold Monday's lows; VIST/PLTR still broken.
+
+### 2026-11-24T18:38 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'CALM', 'GDXD'] | favor: ['HZN', 'SRRK']
+- notes: Nasdaq slid ~1.5% as the Nvidia bounce reversed and the chip/AI complex sold off again; VIX eased from 29.6 to 26.4 but remains elevated inside a confirmed correction with a hawkish-Fed/Dec-hike debate and thin holiday tape. Holding risk at 0.40 and keeping broken high-beta and the AI-heavy indices on avoid until the tape proves footing.
+- journal: Tue 11/24 18:38: AI sell-off resumed intraday (NVDA -6%, Anthropic below IPO), but VIX cooled 29.6->26.4. Holding 0.40 risk-off; added MSFT to avoid given mega-cap tech weakness. Watching Thursday's GDP+PCE double-print, Dec hike odds, and whether AI names hold Monday's lows; still want VIX under 25 before adding.
