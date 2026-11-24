@@ -2850,3 +2850,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'CALM', 'GDXD'] | favor: ['HZN', 'SRRK', 'QQQ']
 - notes: Massive relief rally — Nasdaq +6% (best day since Apr '25), Dow +1,400 on Huang's Nvidia reinstatement; VIX cooling 31.5->26.6. Constructive but still above 25 inside a correction and a thin holiday week with a CPI print due, so lifting risk 0.35->0.45 while staying defensive; big-cap indices/MSFT thawing but broken high-beta (PLTR/VST) and CALM (earnings risk) stay on avoid.
 - journal: Mon 11/23 20:08: Huge follow-through — VIX 31.5->26.6, Nasdaq +6%. Nudged risk 0.35->0.45; moving QQQ off avoid as mega-cap AI stabilizes but keeping PLTR/VST/IWM blocked until they prove footing. Watching for VIX under 25, holiday thin liquidity, and the CPI report this week before risking up further.
+
+### 2026-11-23T22:28 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.45
+- avoid: ['PLTR', 'VST', 'IWM', 'CALM', 'GDXD'] | favor: ['HZN', 'SRRK', 'QQQ']
+- notes: Big relief rally held into the close — Nasdaq +6%, Dow +1,400 on Huang's Nvidia reinstatement with VIX cooling to 26.6. Constructive but still above 25 inside a confirmed correction, with a hawkish-Fed/December-hike narrative and thin holiday liquidity, so holding risk at 0.45 and keeping broken high-beta (PLTR/VST/IWM) and earnings-risk CALM on avoid.
+- journal: Mon 11/23 22:28: No material change since 20:08 — rally confirmed on the close, VIX steady ~26.6. Holding 0.45 risk-off; still want VIX under 25 and clarity on the Dec Fed hike debate before adding. Watching holiday thin tape and whether PLTR/VST find footing.
