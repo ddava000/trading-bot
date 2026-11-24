@@ -1,13 +1,13 @@
 {
  "acct": "8736",
- "as_of_utc": "2026-11-23T20:45Z",
+ "as_of_utc": "2026-11-24T14:45Z",
  "baseline": {
   "equity": 247.91,
   "set": "2026-08-24T09:45 ET (first session after the strategy swap)"
  },
  "bot": "alpaca-cloud",
  "capital_flow": {
-  "checked_at": "2026-11-23T20:45:21+00:00",
+  "checked_at": "2026-11-24T14:45:35+00:00",
   "events": [],
   "how_to_use": "state=clean means start_equity is a complete basis. contaminated means subtract net before computing Arm A return. unknown means the check FAILED and Arm A's basis is UNVERIFIED -- do not read it as clean.",
   "net": 0.0,
@@ -16,23 +16,23 @@
  },
  "cash": 39.67,
  "crypto_enabled": true,
- "day_pnl": 5.94,
+ "day_pnl": -0.33,
  "earnings_guard": "unknown",
- "equity": 204.59,
+ "equity": 203.84,
  "halted": false,
  "holds_pct_vs_basis": {
-  "MSFT": -2.5,
-  "PLTR": -14.3,
-  "VST": -15.5
+  "MSFT": -3.3,
+  "PLTR": -13.4,
+  "VST": -18.0
  },
  "market_open": true,
  "mode": "LIVE",
  "monitor_note": "Down ONLY if current UTC is >45 min past next_expected_utc. An old ts outside market hours (nights/weekends/holidays) is normal, not a failure.",
- "next_expected_utc": "2026-11-23T21:05Z",
+ "next_expected_utc": "2026-11-24T15:05Z",
  "orders_this_run": 0,
  "plan": {
-  "date": "2026-11-23",
-  "risk": 0.35,
+  "date": "2026-11-24",
+  "risk": 0.4,
   "stale": false
  },
  "realized": {
@@ -54,7 +54,7 @@
     }
    }
   },
-  "checked_at": "2026-11-23T20:45:22+00:00",
+  "checked_at": "2026-11-24T14:45:34+00:00",
   "fills": 134,
   "last_fill": "2026-11-23T15:30:20.408703Z",
   "last_sale": "2026-11-23",
@@ -66,7 +66,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -30.65,
-  "reconciliation_residual": -0.0631,
+  "reconciliation_residual": -0.0431,
   "renames": {
    "BKH": "HZN"
   },
@@ -93,12 +93,12 @@
  "regime": "risk-off",
  "sleeves": {
   "crypto": 0,
-  "hold": 27.95,
-  "index": 113.51,
-  "trade": 23.47
+  "hold": 27.7,
+  "index": 112.62,
+  "trade": 23.84
  },
- "ts": "2026-11-23T15:45 ET",
- "vix": 26.7,
+ "ts": "2026-11-24T09:45 ET",
+ "vix": 29.3,
  "vix_live": true,
- "vs_baseline_pct": -17.47
+ "vs_baseline_pct": -17.78
 }

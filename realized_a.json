@@ -1270,7 +1270,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -30.65,
-  "reconciliation_residual": -0.0631,
+  "reconciliation_residual": -0.0431,
   "renames": {
    "BKH": "HZN"
   },
