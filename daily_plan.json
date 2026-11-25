@@ -1,6 +1,6 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.4,
+  "risk_scale": 0.3,
   "avoid_symbols": [
     "PLTR",
     "VST",
@@ -8,16 +8,13 @@
     "QQQ",
     "SPY",
     "MSFT",
-    "CALM",
-    "GDXD"
-  ],
-  "favor_symbols": [
     "HZN",
     "SRRK"
   ],
-  "notes": "VIX 26.4 still elevated inside a confirmed correction; AI/chip complex sold off again today (NVDA -6%, Anthropic below IPO) on choppy, thin pre-holiday tape with a hawkish-Fed/Dec-hike debate and Thursday's GDP+PCE ahead. Holding risk at 0.40 and keeping broken high-beta and AI-heavy indices blocked until footing is proven.",
-  "journal_entry": "Tue 11/24 21:39: No posture change into the close \u2014 AI sell-off persisted, VIX steady ~26.4, book still red (VST -19%, PLTR -14%, QQQ -12%). Staying 0.40 risk-off with indices and broken high-beta on avoid, only HZN/SRRK constructive. Watching Thursday's GDP+PCE double-print and Dec hike odds; want VIX under 25 before adding.",
-  "date": "2026-11-24",
+  "favor_symbols": [],
+  "notes": "VIX spiked to 31.5 as futures tumbled on a hot inflation print, new Trump tariffs (up to 20% on China/EU/12 nations), and a fresh NVDA-led AI sell-off; Dec hike odds rising and Thursday's GDP+PCE still ahead. Cutting risk to 0.30 and blocking the whole high-beta/index book \u2014 this is a deteriorating tape, not a dip to reach for.",
+  "journal_entry": "Wed 11/25 10:00: Conditions worsened vs yesterday \u2014 VIX 26.4->31.5, hot CPI + new tariffs hit the tape, AI complex selling off again. Dropped risk 0.40->0.30, pulled favors (thin pre-holiday liquidity), broadened avoid. Watching Thursday's GDP+PCE double-print, Dec hike odds, and whether VIX backs off 30 before I even consider adding.",
+  "date": "2026-11-25",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-24T21:39 ET"
+  "updated_at": "2026-11-25T10:00 ET"
 }
