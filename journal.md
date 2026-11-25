@@ -2892,3 +2892,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK'] | favor: []
 - notes: VIX spiked to 31.5 as futures tumbled on a hot inflation print, new Trump tariffs (up to 20% on China/EU/12 nations), and a fresh NVDA-led AI sell-off; Dec hike odds rising and Thursday's GDP+PCE still ahead. Cutting risk to 0.30 and blocking the whole high-beta/index book — this is a deteriorating tape, not a dip to reach for.
 - journal: Wed 11/25 10:00: Conditions worsened vs yesterday — VIX 26.4->31.5, hot CPI + new tariffs hit the tape, AI complex selling off again. Dropped risk 0.40->0.30, pulled favors (thin pre-holiday liquidity), broadened avoid. Watching Thursday's GDP+PCE double-print, Dec hike odds, and whether VIX backs off 30 before I even consider adding.
+
+### 2026-11-25T17:52 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.35
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK'] | favor: []
+- notes: VIX backed off from 31.5 to 28.3 and the Dow staged a stunning intraday reversal (wiped a 1,100-pt loss), but the AI/chip complex still closed lower (NVDA -4%, now on S&P CreditWatch Negative) and Dec-hike odds rose after a hot PCE/inflation gauge. Nudging risk 0.30->0.35 on the VIX relief but keeping the whole high-beta/index book blocked into tomorrow's GDP+PCE double-print on thin holiday liquidity.
+- journal: Wed 11/25 17:52: Tape stabilized into the close — VIX 31.5->28.3, Dow erased a 1,100-pt loss in a sharp bounce, though AI stayed heavy and NVDA drew a credit-watch warning. Lifted risk slightly to 0.35 but stayed risk-off; all broken high-beta/indices still on avoid. Watching Thursday's GDP+PCE, Dec hike odds, and whether VIX cracks 25 before I add anything.
