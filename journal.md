@@ -2910,3 +2910,9 @@
 - avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK'] | favor: []
 - notes: VIX steady at 28.3 inside a confirmed correction; Dow held its stunning reversal but AI/chip leadership stayed heavy (NVDA -4%, on S&P CreditWatch) and a hot PCE lifted Dec-hike odds. Holding risk-off at 0.35 with the entire broken high-beta/index book blocked into the holiday gap and thin liquidity.
 - journal: Wed 11/25 21:13: End-of-day check — no material change since 19:43; VIX ~28.3, bounce held but AI complex unresolved and macro hawkish. Keeping 0.35 risk-off, full avoid list intact into Thanksgiving. Watching whether VIX cracks 25 and if AI finds footing before adding.
+
+### 2026-11-26T10:00 ET — INTRADAY (ok)
+- regime: risk-off | risk_scale: 0.4
+- avoid: ['PLTR', 'VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK'] | favor: []
+- notes: VIX eased to 26.9 from 28.3 and global stocks are rallying as bargain-hunters shrug off fresh 20% tariffs and AI jitters, but we're still inside a correction with sticky inflation and live Dec-hike odds. Holiday-thinned tape and a broken high-beta/index book keep me risk-off; nudging risk 0.35->0.40 on the VIX relief only.
+- journal: Thu 11/26 10:00: VIX slipped to 26.9 and the bounce extended into a global risk rally, but new tariffs and hawkish inflation data keep the backdrop fragile. Lifted risk to 0.40, still risk-off, full avoid list intact on thin holiday liquidity. Watching for VIX to crack 25 and AI to stabilize before adding.
