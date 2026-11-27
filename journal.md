@@ -2940,3 +2940,9 @@
 - avoid: ['VST', 'PLTR', 'QQQ', 'IWM', 'SPY', 'MSFT', 'HZN', 'SRRK'] | favor: []
 - notes: Black Friday half-session with thin, gappy liquidity; Dow futures +600 and AI trade rebounding into the best week since April 2025, and VIX finally cracked 25 to 25.4. Constructive but unconfirmed in a low-liquidity tape, and next week brings jobs data plus live Fed-stance risk, so nudging risk up only modestly to 0.45 while keeping the broken book blocked.
 - journal: Fri 11/27 10:00: VIX ticked under my 25 trigger (26.8->25.4) and tape is risk-on with a strong AI rebound, but it's a thin half-day so I'm only lifting to 0.45, still risk-off. Watching VIX follow-through and next week's jobs report before trusting the bounce and reopening names.
+
+### 2026-11-27T17:29 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK', 'LFTO'] | favor: ['PLTR']
+- notes: Dow rallied ~600 to close the best week since 2022 with AI stocks rebounding, and VIX eased further to 23.8 — the risk-off correction is stabilizing. Upgrading to neutral at 0.5, but it's a thin post-holiday session and next week brings jobs data plus live Fed-stance risk, so I'm keeping the beaten-up book blocked and only modestly adding.
+- journal: Fri 11/27 17:29: Strong close, VIX 23.8 (from 25.4), best week since 2022 confirms the bounce held through the full session, not just the half-day open. Moved to neutral/0.5; flagging PLTR constructive on its $300M Poland defense deal. Watching next week's jobs report and Fed tone before trusting further and reopening index/high-beta names.
