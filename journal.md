@@ -2946,3 +2946,9 @@
 - avoid: ['VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK', 'LFTO'] | favor: ['PLTR']
 - notes: Dow rallied ~600 to close the best week since 2022 with AI stocks rebounding, and VIX eased further to 23.8 — the risk-off correction is stabilizing. Upgrading to neutral at 0.5, but it's a thin post-holiday session and next week brings jobs data plus live Fed-stance risk, so I'm keeping the beaten-up book blocked and only modestly adding.
 - journal: Fri 11/27 17:29: Strong close, VIX 23.8 (from 25.4), best week since 2022 confirms the bounce held through the full session, not just the half-day open. Moved to neutral/0.5; flagging PLTR constructive on its $300M Poland defense deal. Watching next week's jobs report and Fed tone before trusting further and reopening index/high-beta names.
+
+### 2026-11-27T19:38 ET — INTRADAY (ok)
+- regime: neutral | risk_scale: 0.5
+- avoid: ['VST', 'IWM', 'QQQ', 'SPY', 'MSFT', 'HZN', 'SRRK', 'LFTO', 'TSLA'] | favor: ['PLTR']
+- notes: Market's closed on a strong note — best week since 2022 with the AI trade rebounding and VIX easing to 23.8, so the correction looks stabilized. Holding neutral at 0.5 since it was a thin holiday session and next week brings jobs data plus live Fed-stance risk; keeping the deeply underwater high-beta/index book blocked.
+- journal: Fri 11/27 19:38: After-hours wrap confirms the bounce held into the close (VIX 23.8, Dow +600). No posture change — neutral/0.5, PLTR still favored on defense-deal strength. Watching next week's jobs report and Fed tone before reopening VST/QQQ/SPY/IWM; VST still my worst holding at -17%.
