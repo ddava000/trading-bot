@@ -390,6 +390,11 @@
    "qty": 0.025921658,
    "symbol": "TTWO",
    "t": "2026-11-18"
+  },
+  {
+   "qty": 0.017414792,
+   "symbol": "TSLA",
+   "t": "2026-11-27"
   }
  ],
  "closed": [
@@ -1249,6 +1254,7 @@
   "QQQ": 0.058331282,
   "SPY": 0.053798739,
   "SRRK": 0.129477503,
+  "TSLA": 0.017414792,
   "VST": 0.069801133
  },
  "source": "alpaca live /v2/account/activities FILL since 2026-01-01",
@@ -1271,8 +1277,8 @@
     }
    }
   },
-  "fills": 135,
-  "last_fill": "2026-11-24T15:45:18.89864Z",
+  "fills": 136,
+  "last_fill": "2026-11-27T17:00:27.207979Z",
   "last_sale": "2026-11-24",
   "lt": {
    "gains": 0.0,
@@ -1282,7 +1288,7 @@
   },
   "method": "FIFO, per-sale, NY trade date; realized capital gain/loss only",
   "net": -30.7,
-  "reconciliation_residual": -0.0398,
+  "reconciliation_residual": -0.0498,
   "renames": {
    "BKH": "HZN"
   },
