@@ -1,20 +1,20 @@
 {
   "regime": "risk-off",
-  "risk_scale": 0.4,
+  "risk_scale": 0.45,
   "avoid_symbols": [
-    "PLTR",
     "VST",
-    "IWM",
+    "PLTR",
     "QQQ",
+    "IWM",
     "SPY",
     "MSFT",
     "HZN",
     "SRRK"
   ],
   "favor_symbols": [],
-  "notes": "Holiday close; tomorrow is a thin Black Friday half-session with illiquid, gappy tape. VIX still elevated at 26.8 inside a confirmed correction with sticky inflation and live Dec-hike odds; Wednesday's rebound and futures tick-up are constructive but unconfirmed. Staying risk-off at 0.40 with the broken high-beta/index book blocked.",
-  "journal_entry": "Thu 11/26 21:11: No change on the holiday close; VIX ~26.8, futures modestly higher into Black Friday's half-day. Holding 0.40 risk-off, full avoid list intact on thin liquidity. Watching for VIX to crack 25 and AI leadership to confirm before adding.",
-  "date": "2026-11-26",
+  "notes": "Black Friday half-session with thin, gappy liquidity; Dow futures +600 and AI trade rebounding into the best week since April 2025, and VIX finally cracked 25 to 25.4. Constructive but unconfirmed in a low-liquidity tape, and next week brings jobs data plus live Fed-stance risk, so nudging risk up only modestly to 0.45 while keeping the broken book blocked.",
+  "journal_entry": "Fri 11/27 10:00: VIX ticked under my 25 trigger (26.8->25.4) and tape is risk-on with a strong AI rebound, but it's a thin half-day so I'm only lifting to 0.45, still risk-off. Watching VIX follow-through and next week's jobs report before trusting the bounce and reopening names.",
+  "date": "2026-11-27",
   "mode": "INTRADAY",
-  "updated_at": "2026-11-26T21:11 ET"
+  "updated_at": "2026-11-27T10:00 ET"
 }
