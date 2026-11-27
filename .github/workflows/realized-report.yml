@@ -1,0 +1,35 @@
+name: realized-report
+
+# Manual only, READ-ONLY. Prints Arm A's realized gain/loss report (closed lots, running
+# totals, wash-sale watch) and tries to falsify its own machinery before printing a
+# total: pagination is checked two ways, the transfer-event query is tested against a
+# known positive, and fills are reconciled against the broker's live positions.
+#
+# Places no orders and writes nothing. It uses the same code the bot runs every cycle,
+# so a disagreement with status.json's `realized` block would be a bug.
+#
+# Kept as a permanent tool. The bot publishes the running total every cycle; run this
+# when a number looks wrong, at tax time to see the lot table, or after any transfer,
+# split or spinoff, since those break the FIFO the total is built on.
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-alpaca.txt
+      - name: Realized report
+        env:
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
+        run: python realized_report.py

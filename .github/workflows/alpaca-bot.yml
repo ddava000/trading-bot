@@ -1,0 +1,182 @@
+name: Alpaca Trading Bot
+
+on:
+  # Sole trigger: cron-job.org hits this workflow_dispatch endpoint every 15 min
+  # during market hours (America/Chicago). The GitHub-native schedule was removed
+  # so the two don't double-fire (which risks duplicate orders). The bot's own
+  # 9:45–3:55 ET gate is the real control.
+  workflow_dispatch:
+    inputs:
+      email_test:
+        description: "Send a test email and exit"
+        type: boolean
+        default: false
+      order_test:
+        description: "Place a $1 paper test order and exit (paper only)"
+        type: boolean
+        default: false
+      account_test:
+        description: "READ-ONLY connection check (safe on live) and exit"
+        type: boolean
+        default: false
+      capital_since:
+        description: "account_test only: capital-flow window (YYYY-MM-DD). Early date proves the detector can report non-zero."
+        default: ""
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# One run at a time — stops overlapping runs from racing to commit trade_log.jsonl
+# (the cause of the intermittent "job cancelled" emails). In-progress runs finish;
+# a new trigger queues behind them. Trading is unaffected either way.
+concurrency:
+  group: alpaca-bot
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14   # runs target ~12 min (setup + ~9.5m fast loop). 14 is a
+                          # backstop that still finishes BEFORE the next 15-min
+                          # trigger, so a pathological run can't overlap and pile up.
+    permissions:
+      contents: write   # allow committing trade_log.jsonl back to the repo
+      actions: write    # allow dispatching brief.yml when the plan is stale
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          # The CURRENT tip of the branch, fetched when this job starts. Without `ref` the action checks out the commit that was
+          # current when the RUN WAS CREATED, and a run can wait 4 to 13 minutes for a machine (seven did on 2026-10-26). If the
+          # previous pass committed during that wait, this pass worked from stale state files (holds.json, trade_log.jsonl) and its
+          # heartbeat push hit a merge conflict in status.json on all four attempts and was discarded: runs 40340139520, 40357285384
+          # and 40362102978, the three in-session passes of that day with no status.json commit (the third waited only 53 seconds: what
+          # matters is a predecessor commit AFTER the run was created, not a long wait). A pass that TRADED would have lost its stop levels.
+          ref: ${{ github.ref_name }}
+
+      # RUN-START MARKER (Devon 2026-11-05, chosen from clickable options). The moment this job has a machine and the code, push ONE tiny parentless
+      # commit to a SEPARATE branch whose message carries this run's id. arm_a_watch reads it through git, not through the Actions API (which served
+      # stale state on 2026-10-22 and 2026-11-04), as exact proof that this run STARTED: a run the API still calls "queued" is not waiting for a machine
+      # if its marker is there. It never touches main (ci.yml and mailbox-notify.yml trigger only on pushes to main, so no workflow starts). It is a
+      # force-push, so the branch holds only the newest marker; run ids only grow and runs execute one at a time in order, so the newest marker, for
+      # run N, proves every earlier run started or was cancelled. It must never cost the bot a run: continue-on-error, its own timeout and a hard
+      # `timeout` on the push. If it fails the only loss is the proof, and the watcher alerts exactly as it did before this step existed.
+      - name: Mark run start
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          marker="arm-a run-start run=${GITHUB_RUN_ID} attempt=${GITHUB_RUN_ATTEMPT} started=$(date -u +%FT%TZ)"
+          commit=$(git -c user.name=alpaca-bot -c user.email=alpaca-bot@users.noreply.github.com commit-tree "$(git rev-parse 'HEAD^{tree}')" -m "$marker")
+          timeout 60 git push --force origin "${commit}:refs/heads/arm-a-start"
+          echo "marker pushed: $marker"
+
+      # GitHub's native cron (brief.yml) regularly fires hours late or not at all
+      # (skipped entirely on 2026-06-10). cron-job.org triggers THIS workflow
+      # reliably — so bootstrap the brief from here: if daily_plan.json isn't
+      # today's, dispatch it. The bot trades neutral this run and picks up the
+      # fresh plan next run (15 min later).
+      - name: Ensure fresh research brief
+        # 2026-11-05: run 42040796649 (09:00 ET, pre-market) hung 14 minutes HERE, `gh workflow run` never returned (the log ends "Terminate orphan
+        # process: pid (gh)"), until the 14 minute job timeout cancelled the whole run. This step runs BEFORE the bot on every run, so a hang
+        # mid-session is a lost run: no bot, no stop checks. The brief is an optimisation (the bot trades neutral without it and picks it up next
+        # run), so this step may fail but must never block: a hard `timeout` on the call, a step timeout, and continue-on-error.
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          today=$(TZ=America/New_York date +%F)
+          plan_date=$(python3 -c "import json; print(json.load(open('daily_plan.json')).get('date',''))" 2>/dev/null || echo "none")
+          if [ "$plan_date" != "$today" ]; then
+            echo "plan stale ($plan_date != $today) — dispatching brief.yml"
+            timeout 60 gh workflow run brief.yml --repo "$GITHUB_REPOSITORY" || echo "brief dispatch did not complete (timeout or error); continuing without it"
+          else
+            echo "plan is fresh ($plan_date)"
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: requirements-alpaca.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-alpaca.txt
+
+      - name: Run Alpaca bot
+        env:
+          # A/B ARM SELECTOR. 2026-08-22 STRATEGY SWAP (Devon): Alpaca now runs the
+          # HYBRID and Robinhood runs plain index. Rationale: the hybrid's stops must
+          # be honoured within minutes, and Alpaca's REST API is the only execution
+          # path here that is reliable enough for that. Robinhood's agentic bridge had
+          # 3 outages / 291 min in one week, which is survivable for buy-and-hold and
+          # not for stop enforcement. "false" => full hybrid.
+          STRATEGY_INDEX_ONLY: "false"
+          ALPACA_API_KEY:     ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY:  ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_BASE_URL:    ${{ secrets.ALPACA_BASE_URL }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          ALERT_EMAIL:        ${{ secrets.ALERT_EMAIL }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+          EMAIL_TEST:         ${{ inputs.email_test }}
+          ORDER_TEST:         ${{ inputs.order_test }}
+          ACCOUNT_TEST:       ${{ inputs.account_test }}
+          CAPITAL_SINCE:      ${{ inputs.capital_since }}
+        run: python alpaca_bot.py
+
+      # The laptop watchdog used to run HERE as a step at every :00/:30 trigger (added 2026-08-13, after a
+      # 51-minute laptop outage fell inside a skipped native-cron slot). REMOVED 2026-10-06 at Devon's say-so: it
+      # duplicated rh-watchdog.yml's workflow_run trigger, which fires after every run of THIS workflow (the same
+      # reliable cron-job.org clock) with a deep checkout. This step's checkout is shallow, so it could not measure
+      # how long an outage had lasted and mailed "could not measure how long" at every slot (8 mails on
+      # 2026-09-30). The laptop is still watched by rh-watchdog.yml; Arm A itself by arm-a-watch.yml. A test
+      # (tests/test_rh_watchdog.py) fails if a watchdog step is added back to this workflow.
+
+      # Slack READ side (Devon 2026-08-25: "should be able to communicate in slack
+      # with the others"). The webhook can only post; this pulls his replies back
+      # and files them into AGENT_MAIL.md, which is still the channel of record.
+      # Rides the same reliable 15-min trigger as the rest of this job. Silent
+      # no-op until SLACK_BOT_TOKEN + SLACK_CHANNEL_ID exist. Commits on its own so
+      # a relayed message is never mislabelled as a trade.
+      - name: Pull Slack messages into the mailbox
+        if: always()
+        env:
+          SLACK_BOT_TOKEN:  ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        # Files in a throwaway worktree of the newest main and never rebases (2026-10-22: another session had
+        # appended to the end of AGENT_MAIL.md, the rebase conflicted, the relay was discarded under a green run).
+        run: bash .github/scripts/slack_relay.sh
+
+      - name: Persist trade log + holds ledger
+        if: always()
+        run: |
+          changed=""; trades=""
+          for f in trade_log.jsonl holds.json status.json outage.json realized_a.json; do
+            if [ -n "$(git status --porcelain -- "$f")" ]; then
+              git add -- "$f"; changed=1
+              # status.json updates every run (the monitoring heartbeat); only
+              # trade_log/holds changing means an actual order. Label honestly so
+              # the history isn't 30+ "trade log" commits that were really just
+              # heartbeats (which reads like the bot went haywire).
+              # outage.json is the cross-run "have we already alerted" state; it
+              # MUST be committed or the alert backoff cannot survive the process,
+              # but it is not a trade either.
+              case "$f" in status.json|outage.json|realized_a.json) ;; *) trades=1 ;; esac
+            fi
+          done
+          if [ -n "$changed" ]; then
+            git config user.name  "alpaca-bot"
+            git config user.email "alpaca-bot@users.noreply.github.com"
+            if [ -n "$trades" ]; then msg="trade log $(date -u +%FT%TZ)"; else msg="status heartbeat $(date -u +%FT%TZ)"; fi
+            git commit -m "$msg"
+            # push_retry.sh retries, and is LOUD when it never lands (2026-10-07: GitHub rejected every write
+            # for 9 minutes and this line used to end in "|| true", so a run finished green with its state
+            # unsaved and status.json frozen). Trade data (trade_log/holds, i.e. the stop levels) failing to
+            # save FAILS the step; a heartbeat alone leaves a warning annotation.
+            if [ -n "$trades" ]; then mode=fatal; else mode=warn; fi
+            bash .github/scripts/push_retry.sh "$msg" "$mode"
+          else
+            echo "nothing to persist"
+          fi

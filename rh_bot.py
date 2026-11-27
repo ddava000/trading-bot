@@ -1,0 +1,434 @@
+"""
+rh_bot.py — Robinhood laptop bot: the DECISION ENGINE.
+
+IDENTICAL strategy to the cloud bot. Every threshold, rail and helper is
+IMPORTED from alpaca_bot, never copied, so the two cannot drift: change a stop
+in the cloud bot, `git pull` on the laptop, and this inherits it.
+
+THE LLM NEVER DECIDES A TRADE. This module is pure: account state in, an
+explicit order list out. The laptop daemon (rh_daemon.py) runs it on the cloud
+bot's exact cadence and only spends tokens when there is an order to place.
+
+  IN  : state JSON  (cash / unsettled / positions / holds ledger / last buys)
+  OUT : {"orders":[...], "notes":[...], "snapshot":{...}}
+
+Market data comes from Yahoo (keyless; a home IP dodges the 429s that block
+cloud runners). If real Alpaca keys are present the news tripwire also runs;
+without them it fails open and is simply skipped.
+
+The ONE forced difference from the cloud bot: no crypto sleeve. Robinhood's
+agentic API is equities + options only today ("more assets soon"), so the 5%
+crypto slice sits in cash instead. Options are never used.
+
+Usage:  python rh_bot.py < state.json > orders.json
+        python rh_bot.py --fast < state.json      (exits only, for 60s passes)
+        python rh_bot.py --selftest
+"""
+
+import os, sys, json
+from datetime import datetime
+
+os.environ.setdefault("ALPACA_API_KEY", "unused-on-laptop")
+os.environ.setdefault("ALPACA_SECRET_KEY", "unused-on-laptop")
+import alpaca_bot as bot   # THE strategy: signals, rails, screeners, tripwire
+
+MIN_ORDER = 1.00   # Robinhood fractional minimum (the cloud bot's $5 floor exists
+                   # to dodge Alpaca whole-share rejections; RH fractions everything)
+
+# ── STRATEGY: set EXPLICITLY here, deliberately NOT inherited ────────────────
+# 2026-08-22, Devon swapped the arms. Robinhood drops the hybrid day-trader and
+# becomes plain buy-and-hold index ETFs; the hybrid moved to Alpaca, whose REST
+# API can honour a stop in seconds. The reason is execution reliability, not
+# strategy preference: this bot's only path to the broker is a headless claude -p
+# turn that went down four times in one week (expired CLI logins, exhausted usage
+# quota), leaving real positions with no enforceable stops for 291 minutes. Index
+# buy-and-hold has no stops to miss, so an outage now costs a delayed purchase.
+#
+# These MUST live here. alpaca_bot now resolves to the HYBRID for importers, so
+# reading INDEX_CORE_PCT / HOLD_PCT / MAX_INVESTED_PCT from it would silently keep
+# day-trading Robinhood, which is the exact thing being stopped. Risk RAILS
+# (stops, ratchet, correlation, news, earnings) are still imported unchanged.
+INDEX_ONLY       = True   # no active sleeves: no new HOLD or TRADE entries
+WIND_DOWN        = True   # liquidate every non-index holding into the ETFs
+INDEX_TARGET_PCT = 1.00   # equal weight across INDEX_ETFS; budget keeps a 5% buffer
+
+
+def _quote(sym, meme):
+    """(live, signal, closes) from Yahoo. Nones when data is unusable."""
+    closes, vols = bot.yf_ohlcv(sym)
+    if not closes or len(closes) < 35:
+        return None, None, None
+    live = bot.yf_live(sym) or closes[-1]
+    return live, bot.compute_signals(sym, closes, vols, live, meme), closes
+
+
+def decide(state, fast=False):
+    """Pure: account state -> order list. `fast` = exits only (the 60s pass)."""
+    cash      = float(state.get("cash") or 0)
+    unsettled = float(state.get("unsettled") or 0)
+    settled   = max(0.0, cash - unsettled)          # T+1: today's proceeds are locked
+    positions = {p["symbol"]: p for p in state.get("positions") or []}
+    holds     = dict(state.get("holds") or {})       # {sym: {basis, peak}} — the hold ledger
+    last_buy  = dict(state.get("last_buy") or {})
+    today     = datetime.now().strftime("%Y-%m-%d")
+    orders, notes = [], []
+
+    meme = [] if fast else (bot.fetch_wsb() or [])
+    held = {}
+    for sym, p in positions.items():
+        live, sig, closes = _quote(sym, meme)
+        if live:
+            held[sym] = {"live": live, "sig": sig, "closes": closes,
+                         "qty": float(p.get("qty") or 0),
+                         "cost": float(p.get("avg_cost") or 0)}
+        else:
+            notes.append(f"{sym}: no market data — untouched this pass")
+
+    invested = sum(h["live"] * h["qty"] for h in held.values())
+    equity   = cash + invested
+    index_val = sum(held[s]["live"] * held[s]["qty"] for s in bot.INDEX_ETFS if s in held)
+    hold_val  = sum(held[s]["live"] * held[s]["qty"] for s in holds if s in held)
+    trade_val = max(0.0, invested - hold_val - index_val)
+
+    # News tripwire (needs real Alpaca keys; fails open to {} without them).
+    watch   = set(held) - set(bot.INDEX_ETFS)
+    bad_now = bot.news_flags(watch, bot.NEWS_ALERT_MIN) if watch else {}
+
+    def _sell(sym, qty, why):
+        orders.append({"action": "sell", "symbol": sym, "qty": qty, "reason": why})
+
+    # ── EXITS (identical rails; always run, even on a halt/fast pass) ─────────
+    sold = set()
+    for sym, h in held.items():
+        if sym in bot.INDEX_ETFS:
+            continue                                  # index core is buy-and-hold
+        if h["qty"] <= 0:
+            continue
+        if h["cost"] <= 0:
+            # No basis, so every PRICED rail (stop, take-profit, trail, time stop) has
+            # nothing to compare against. WIND-DOWN is the exception and cloud's review
+            # (item 9) is right that it was wrongly caught here: it liquidates to index
+            # regardless of where a name sits, which is the whole point, and these
+            # basis-less legacy holdings are exactly what it exists to clear. The only
+            # reason it was excluded is that the reason string divides by cost, so it
+            # would have raised ZeroDivisionError - a crash dressed as a guard. Now the
+            # wind-down sells it with a basis-free reason, and every other case says so
+            # out loud instead of skipping in silence, because a position no rail can
+            # act on must never be invisible. Dormant today: the book is three ETFs.
+            if WIND_DOWN:
+                _sell(sym, h["qty"], "WIND-DOWN to index (no cost basis on record)")
+                sold.add(sym)
+            else:
+                notes.append(f"{sym}: no usable cost basis (cost {h['cost']}) — priced "
+                             f"exit rails cannot evaluate it, left untouched")
+            continue
+        if WIND_DOWN:
+            # Exit the whole legacy book regardless of where it sits against
+            # its rails. These are being liquidated into ETFs, so a stop level
+            # is irrelevant; holding on for a better price would just extend
+            # exposure on the bridge we no longer trust for urgent selling.
+            pct_ = (h["live"] / h["cost"] - 1) * 100
+            _sell(sym, h["qty"], f"WIND-DOWN to index ({pct_:+.1f}%)")
+            sold.add(sym)
+            continue
+        live, cost = h["live"], h["cost"]
+        con = (h["sig"] or {}).get("consensus", 0)
+        pct, why = (live / cost - 1) * 100, None
+        if sym in holds:                              # HOLD sleeve: basis stop + peak ratchet
+            basis = float(holds[sym].get("basis") or cost) or cost
+            peak  = max(float(holds[sym].get("peak") or 0), live)
+            floor_ = max(basis * bot.HOLD_STOP, peak * bot.HOLD_TRAIL)
+            if live <= floor_:
+                why = (f"HOLD-STOP {pct:+.1f}% (floor ${floor_:.2f}, "
+                       f"{'basis -25%' if floor_ == basis * bot.HOLD_STOP else f'gave back from peak ${peak:.2f}'})")
+        else:                                         # TRADE sleeve: brackets + signal + time stop
+            age = None
+            if last_buy.get(sym):
+                try:
+                    age = (datetime.now() - datetime.strptime(last_buy[sym][:10], "%Y-%m-%d")).days
+                except Exception:
+                    age = None
+            if live <= cost * bot.STOP_LOSS_PCT:
+                why = f"STOP-LOSS {pct:+.1f}%"
+            elif live >= cost * bot.TAKE_PROFIT_PCT and con <= 0:
+                why = f"TAKE-PROFIT {pct:+.1f}%"
+            elif con == -1:
+                why = f"SELL signal RSI {h['sig']['rsi']:.0f} ({pct:+.1f}%)"
+            elif age is not None and age >= bot.TIME_STOP_DAYS and con <= 0 and live < cost * 1.02:
+                why = f"TIME-STOP {pct:+.1f}% after {age}d"
+        if not why and sym in bad_now and sym not in holds:
+            why = f"NEWS-EXIT ({bad_now[sym][:70]})"   # holds are alerted, never auto-sold
+        if why:
+            _sell(sym, h["qty"], why); sold.add(sym)
+    for sym in (s for s in bad_now if s in holds and s not in sold):
+        notes.append(f"ALERT {sym} (HOLD): danger headline — {bad_now[sym][:90]}")
+
+    if fast:
+        return {"orders": orders, "notes": notes, "fast": True,
+                "snapshot": {"equity": round(equity, 2), "held": sorted(held)}}
+
+    budget = min(settled * 0.95, settled)             # settled cash only
+
+    # ── RESEARCH PLAN: the cloud brief reaches this laptop through git ────────
+    # brief.py writes daily_plan.json and commits it; rh_daemon pulls it every
+    # full cycle. load_plan is alpaca_bot's, not a copy, so the two bots read the
+    # same file the same way: risk clamped to [0,1], a stale or missing plan
+    # falling back to neutral. Applied EXACTLY where the cloud applies it, to
+    # active entries only. The index core is deliberately untouched, matching
+    # alpaca_bot, which gates the core on halt and low cash but never on the plan.
+    plan = bot.load_plan(datetime.now(bot.ET_TZ))
+    if plan["risk"] < 1.0 or plan["avoid"]:
+        notes.append(f"plan: {plan['regime']} risk {plan['risk']} "
+                     f"avoid {sorted(plan['avoid']) or 'none'}")
+
+    # ── INDEX CORE: equal-weight SPY/QQQ/IWM ─────────────────────────────────
+    # INDEX_TARGET_PCT is ours; bot.INDEX_CORE_PCT is the hybrid's 50% and would
+    # leave half the account permanently in cash under an index-only strategy.
+    #
+    # QUOTE-GAP GUARD. `held` only contains symbols whose _quote() returned a
+    # price, and equity is summed over `held`, so ONE failed Yahoo quote silently
+    # values that holding at zero. per_tgt then collapses and the ETFs that DID
+    # quote breach the 1.25x overweight test, emitting real INDEX-TRIM market
+    # sells. Reproduced against the live book: dropping a single ETF quote
+    # understated equity 239.67 -> 159.81 and generated ~$53 of sells, about 22%
+    # of the account, on nothing but a transient data failure. Selling on data we
+    # know is incomplete is never right, so the whole rebalance is skipped for the
+    # pass. Skipping costs a delayed purchase; not skipping costs real shares.
+    missing = [s for s in positions if s not in held]
+    if missing:
+        notes.append(f"index rebalance skipped: no quote for {sorted(missing)}, "
+                     f"equity would be understated")
+    else:
+        index_pct = INDEX_TARGET_PCT if INDEX_ONLY else bot.INDEX_CORE_PCT
+        per_tgt = equity * index_pct / len(bot.INDEX_ETFS)
+        for etf in bot.INDEX_ETFS:
+            h = held.get(etf)
+            val = (h["live"] * h["qty"]) if h else 0.0
+            if val > per_tgt * 1.25 and h:            # overweight -> trim back to target
+                _sell(etf, round((val - per_tgt) / h["live"], 6), f"INDEX-TRIM to ${per_tgt:.2f}")
+            elif val < per_tgt - equity * 0.01:       # underweight -> buy toward target
+                amt = min(per_tgt - val, budget)
+                if amt >= MIN_ORDER:
+                    orders.append({"action": "buy", "symbol": etf, "notional": round(amt, 2),
+                                   "reason": f"INDEX-CORE toward ${per_tgt:.2f}"})
+                    budget -= amt
+
+    # ── ACTIVE ENTRIES: same sleeve routing, theme cap, guards ───────────────
+    # Skipped entirely under INDEX_ONLY. Relying on zero sleeve room to block
+    # these would be fragile, since those percentages now come from a module
+    # that resolves to the hybrid.
+    if not INDEX_ONLY and budget >= MIN_ORDER:
+        universe, seen = [], set(held) | sold | set(bot.INDEX_ETFS)
+        for s in ((bot.fetch_day_gainers() or []) + (bot.fetch_smallcaps() or [])
+                  + meme + (bot.fetch_screener() or [])):
+            if s and s.isalpha() and s not in seen:
+                seen.add(s); universe.append(s)
+            if len(universe) >= 25:
+                break
+
+        block = bot.news_flags(set(universe), bot.NEWS_BLOCK_MIN) if universe else {}
+        cands = []
+        for sym in universe:
+            live, sig, closes = _quote(sym, meme)
+            if not live or not sig or sig["consensus"] != 1:      continue
+            if sig["rsi"] > bot.RSI_ENTRY_MAX:                    continue
+            if sym in block:
+                notes.append(f"{sym}: blocked — danger news"); continue
+            if sym in plan["avoid"]:
+                notes.append(f"{sym}: skipped — plan avoid-list"); continue
+            cands.append((sig["buys"], sym, live, sig, closes))
+        cands.sort(key=lambda r: -r[0])
+
+        # Theme cap: identical rule to the cloud bot — correlation is measured
+        # against the HOLD book (multi-day risk), not short-lived trade positions.
+        # Each name is already capped at MAX_POS_PCT, so 2 per theme = the same
+        # ~20%-of-equity theme exposure the cloud bot allows.
+        book = {s: held[s]["closes"] for s in holds
+                if s in held and s not in sold and held[s].get("closes")}
+        for _b, sym, live, sig, closes in cands:
+            if budget < MIN_ORDER:
+                break
+            peers = [s for s, cl in book.items() if cl and bot._pair_corr(closes, cl) > bot.CORR_MAX]
+            if len(peers) >= bot.HOLD_CLUSTER_MAX:
+                notes.append(f"{sym}: skipped — moves with {sorted(peers)} (theme at max)"); continue
+            if bot.earnings_within(sym):
+                notes.append(f"{sym}: skipped — earnings within {bot.EARNINGS_BLOCK_D}d"); continue
+            strong  = (sig["buys"] >= 4 and sig["trend"] == "up"
+                       and sig["rsi"] <= bot.HOLD_RSI_MAX)
+            sleeve  = "HOLD" if strong else "TRADE"
+            room    = (equity * bot.HOLD_PCT - hold_val) if strong else \
+                      (equity * bot.MAX_INVESTED_PCT - trade_val)
+            # plan["risk"] scales the per-name cap, same as the cloud's
+            # name_cap * plan["risk"]. It can only size DOWN: load_plan clamps to
+            # [0,1], so research can never push past the bot's own hard rails.
+            amount  = min(equity * bot.MAX_POS_PCT * plan["risk"], room, budget)
+            if amount < MIN_ORDER:
+                continue
+            orders.append({"action": "buy", "symbol": sym, "notional": round(amount, 2),
+                           "sleeve": sleeve,
+                           "reason": f"{sleeve} +1 RSI {sig['rsi']:.0f} {sig['trend']} ({sig['buys']} votes)"})
+            budget -= amount
+            if strong:
+                book[sym] = closes        # joins the hold book -> counts toward its theme
+                hold_val  += amount
+            else:
+                trade_val += amount
+
+    return {"orders": orders, "notes": notes, "fast": False,
+            "snapshot": {"equity": round(equity, 2), "settled": round(settled, 2),
+                         "index": round(index_val, 2), "hold": round(hold_val, 2),
+                         "trade": round(trade_val, 2), "held": sorted(held),
+                         # regime/risk mirror the cloud's status.json field names,
+                         # so one monitoring prompt can read both bots.
+                         "regime": plan["regime"], "risk": plan["risk"]}}
+
+
+def _selftest():
+    import random
+    random.seed(11)
+
+    # Pin the plan to neutral. This selftest is the code-sync gate: rh_daemon runs
+    # it on freshly pulled code and hard-resets when it fails. Letting it read the
+    # live daily_plan.json would make the gate depend on today's research, so a
+    # risk-off day whose avoid-list happened to name a fixture symbol would reject
+    # perfectly good code and roll the laptop back. Rails get tested, not weather.
+    bot.load_plan = lambda et: {"regime": "neutral", "risk": 1.0,
+                                "avoid": set(), "favor": [], "notes": "selftest"}
+
+    # The rail tests below exercise stops, ratchet and the theme cap, which are
+    # still IMPORTED from alpaca_bot and must keep working even though Robinhood
+    # no longer trades them: this selftest is the gate on upstream code. Run them
+    # with the hybrid config, then restore the live index-only config and test
+    # what this bot actually does.
+    _live_cfg = (INDEX_ONLY, WIND_DOWN)
+    globals()["INDEX_ONLY"], globals()["WIND_DOWN"] = False, False
+    flat  = [10.0 + random.gauss(0, 0.05) for _ in range(60)]
+    theme = [random.gauss(0, 0.02) for _ in range(60)]
+
+    def series(load):
+        px = [50.0]
+        for i in range(59):
+            px.append(px[-1] * (1 + load * theme[i] + random.gauss(0, 0.004)))
+        return px
+    oil_a, oil_b, other = series(1.0), series(1.0), series(0.0)
+
+    q = {}
+    globals()["_quote"] = lambda sym, meme: q.get(sym, (None, None, None))
+    bot.fetch_wsb = bot.fetch_day_gainers = bot.fetch_smallcaps = bot.fetch_screener = lambda: []
+    bot.news_flags = lambda syms, mins: {}
+    bot.earnings_within = lambda sym, days=2: False
+
+    # exits: trade stop / take-profit / hold ratchet / untouched
+    q.update({"F": (10.0, {"consensus": -1, "rsi": 40, "trend": "down", "buys": 0}, flat),
+              "T": (11.5, {"consensus":  0, "rsi": 55, "trend": "up",   "buys": 2}, flat),
+              "H": ( 6.0, {"consensus":  1, "rsi": 55, "trend": "up",   "buys": 4}, flat),
+              "X": ( 9.0, {"consensus":  0, "rsi": 50, "trend": "up",   "buys": 2}, flat)})
+    out = decide({"cash": 0.0, "positions": [
+        {"symbol": "F", "qty": 2, "avg_cost": 12.0},    # -16.7% -> stop
+        {"symbol": "T", "qty": 1, "avg_cost": 10.0},    # +15%   -> take-profit
+        {"symbol": "H", "qty": 1, "avg_cost": 10.0},    # hold, -40% -> basis stop
+        {"symbol": "X", "qty": 1, "avg_cost":  9.0}],
+        "holds": {"H": {"basis": 10.0, "peak": 12.0}}}, fast=True)
+    kinds = {o["symbol"]: o["reason"].split()[0] for o in out["orders"]}
+    assert kinds.get("F") == "STOP-LOSS" and kinds.get("T") == "TAKE-PROFIT", kinds
+    assert kinds.get("H") == "HOLD-STOP" and "X" not in kinds, kinds
+    print("exits: trade stop, take-profit, hold ratchet, untouched  OK")
+
+    # fast pass never buys
+    assert not [o for o in out["orders"] if o["action"] == "buy"]
+    print("fast pass: exits only, zero buys  OK")
+
+    # T+1: unsettled cash buys nothing
+    out = decide({"cash": 50.0, "unsettled": 50.0, "positions": []})
+    assert not [o for o in out["orders"] if o["action"] == "buy"], out["orders"]
+    print("settlement guard: unsettled cash buys nothing  OK")
+
+    # index core funded first, equal weight
+    out = decide({"cash": 60.0, "unsettled": 0.0, "positions": []})
+    idx = {o["symbol"]: o["notional"] for o in out["orders"] if o.get("reason", "").startswith("INDEX")}
+    assert set(idx) == set(bot.INDEX_ETFS), idx
+    assert all(abs(v - 10.0) < 0.5 for v in idx.values()), idx   # 50% of $60 / 3
+    print(f"index core: {idx} funded first  OK")
+
+    # theme cap: 3 correlated hold-grade names -> the THIRD is blocked (cloud rule),
+    # while an uncorrelated name still gets in.
+    strong = {"consensus": 1, "rsi": 55, "trend": "up", "buys": 4}   # 4 votes -> HOLD sleeve
+    oil_c = series(1.0)
+    q.update({"OILA": (10.0, strong, oil_a), "OILB": (10.0, strong, oil_b),
+              "OILC": (10.0, strong, oil_c), "INDY": (10.0, strong, other)})
+    bot.fetch_day_gainers = lambda: ["OILA", "OILB", "OILC", "INDY"]
+    out = decide({"cash": 60.0, "unsettled": 0.0, "positions": []})
+    bought = [o["symbol"] for o in out["orders"]
+              if o["action"] == "buy" and o["symbol"] not in bot.INDEX_ETFS]
+    assert "OILA" in bought and "OILB" in bought, bought
+    assert "OILC" not in bought, f"theme cap failed, 3rd correlated name got in: {bought}"
+    assert any("OILC" in n and "theme" in n for n in out["notes"]), out["notes"]
+    assert "INDY" in bought, f"uncorrelated name wrongly blocked: {bought}"
+    print(f"theme cap: bought {bought} — 3rd correlated name blocked, independent allowed  OK")
+
+    # ── LIVE CONFIG: index-only buy-and-hold + wind-down ────────────────────
+    # Everything above ran with the hybrid config restored, because those rails
+    # are imported from alpaca_bot and an upstream change could still break them.
+    # What follows tests what this bot ACTUALLY does now.
+    globals()["INDEX_ONLY"], globals()["WIND_DOWN"] = _live_cfg
+
+    # wind-down liquidates every non-index holding, whatever its P/L, and the
+    # index core is never sold out from under us
+    q.update({"WIN": (20.0, {"consensus": 1, "rsi": 60, "trend": "up", "buys": 4}, flat),
+              "LOSS": (5.0, {"consensus": 0, "rsi": 45, "trend": "down", "buys": 1}, flat),
+              "SPY": (100.0, {"consensus": 0, "rsi": 50, "trend": "up", "buys": 2}, flat)})
+    out = decide({"cash": 0.0, "positions": [
+        {"symbol": "WIN",  "qty": 1, "avg_cost": 10.0},   # +100%, still exits
+        {"symbol": "LOSS", "qty": 1, "avg_cost": 10.0},   # -50%,  still exits
+        {"symbol": "SPY",  "qty": 1, "avg_cost": 90.0}]}, fast=True)
+    sells = {o["symbol"]: o["reason"].split()[0] for o in out["orders"] if o["action"] == "sell"}
+    assert sells.get("WIN") == "WIND-DOWN" and sells.get("LOSS") == "WIND-DOWN", sells
+    assert "SPY" not in sells, f"wind-down must not sell the index core: {sells}"
+    print("wind-down: winners and losers exit, index core untouched  OK")
+
+    # index-only opens NO active positions even with a screener full of buys
+    bot.fetch_day_gainers = lambda: ["OILA", "INDY"]
+    out = decide({"cash": 60.0, "unsettled": 0.0, "positions": []})
+    active = [o["symbol"] for o in out["orders"]
+              if o["action"] == "buy" and o["symbol"] not in bot.INDEX_ETFS]
+    assert not active, f"index-only must not open active positions: {active}"
+    print("index-only: screener ignored, zero active entries  OK")
+
+    # index target is OURS (100% equal weight), not the inherited hybrid 50%.
+    # From all cash the last ETF is short by the 5% budget buffer, and later
+    # cycles top it up because the funded ones are already at target, so the
+    # book converges on equal weight rather than reaching it in one pass.
+    idx = {o["symbol"]: o["notional"] for o in out["orders"] if o.get("reason", "").startswith("INDEX")}
+    per_tgt = 60.0 / len(bot.INDEX_ETFS)
+    assert set(idx) == set(bot.INDEX_ETFS), idx
+    assert all(v <= per_tgt + 0.01 for v in idx.values()), f"over target: {idx}"
+    assert abs(sum(idx.values()) - 60.0 * 0.95) < 0.51, f"should deploy ~95%: {idx}"
+    print(f"index target: {idx} toward ${per_tgt:.2f} each (100% equal weight)  OK")
+
+    # convergence: with the leaders already at target, spare cash goes to the laggard
+    q.update({"SPY": (100.0, None, flat), "QQQ": (100.0, None, flat), "IWM": (100.0, None, flat)})
+    out2 = decide({"cash": 6.0, "unsettled": 0.0, "positions": [
+        {"symbol": "SPY", "qty": 0.20, "avg_cost": 100.0},   # $20, at target
+        {"symbol": "QQQ", "qty": 0.20, "avg_cost": 100.0},   # $20, at target
+        {"symbol": "IWM", "qty": 0.17, "avg_cost": 100.0}]}) # $17, short
+    tops = {o["symbol"]: o["notional"] for o in out2["orders"] if o["action"] == "buy"}
+    # New cash lifts equity, so every target rises and all three get a top-up.
+    # Convergence is that the LAGGARD takes the largest share.
+    assert tops and max(tops, key=tops.get) == "IWM",         f"laggard should take the largest top-up, got {tops}"
+    print(f"index rebalance: laggard IWM takes the largest share {tops}  OK")
+
+    # the config cannot silently revert to the hybrid by inheritance
+    assert INDEX_ONLY and WIND_DOWN, "live config must be index-only + wind-down"
+    assert INDEX_TARGET_PCT == 1.00, INDEX_TARGET_PCT
+    print("config: explicit index-only, not inherited from alpaca_bot  OK")
+
+    print("SELFTEST PASS")
+
+
+if __name__ == "__main__":
+    if "--selftest" in sys.argv:
+        _selftest()
+    else:
+        json.dump(decide(json.load(sys.stdin), fast="--fast" in sys.argv),
+                  sys.stdout, indent=1)
+        sys.stdout.write("\n")

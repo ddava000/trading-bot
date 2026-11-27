@@ -1,0 +1,20 @@
+{
+  "regime": "risk-off",
+  "risk_scale": 0.45,
+  "avoid_symbols": [
+    "VST",
+    "PLTR",
+    "QQQ",
+    "IWM",
+    "SPY",
+    "MSFT",
+    "HZN",
+    "SRRK"
+  ],
+  "favor_symbols": [],
+  "notes": "Black Friday half-session with thin, gappy liquidity; Dow futures +600 and AI trade rebounding into the best week since April 2025, and VIX finally cracked 25 to 25.4. Constructive but unconfirmed in a low-liquidity tape, and next week brings jobs data plus live Fed-stance risk, so nudging risk up only modestly to 0.45 while keeping the broken book blocked.",
+  "journal_entry": "Fri 11/27 10:00: VIX ticked under my 25 trigger (26.8->25.4) and tape is risk-on with a strong AI rebound, but it's a thin half-day so I'm only lifting to 0.45, still risk-off. Watching VIX follow-through and next week's jobs report before trusting the bounce and reopening names.",
+  "date": "2026-11-27",
+  "mode": "INTRADAY",
+  "updated_at": "2026-11-27T10:00 ET"
+}

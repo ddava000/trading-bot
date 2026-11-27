@@ -1,0 +1,541 @@
+"""The daemon must announce a gap that nothing could announce while it was happening.
+
+2026-10-08 the laptop went down twice. The 04:54 ET bugcheck (0x154, no dump written)
+reached Devon only because LAPTOP BOT DAILY CHECK happened to run at 10:24; the 11:27 ET
+outage, wholly inside the trading session, reached him not at all - the daemon came back
+at 11:32:52, logged "rh_daemon starting", and said nothing. Every other blindness in this
+file emails: broker unreachable, selftest failing, login expired, Arm A silent. The one
+that takes the whole process down had no alert, because a dead daemon cannot report
+itself and nothing looked back on the way up.
+
+report_downtime closes that. These tests pin the two gates that keep it from crying wolf
+(a code-pull restart, and a weekend with no reboot in it) and the dedupe that keeps a
+second restart inside one outage from re-alerting - the dampener bug this file has now
+produced five times. All five of these were mutation-checked: breaking either gate, the
+dedupe, the reboot comparison or the subject line each fails at least one test here.
+
+Run:  python -m unittest discover -s tests -v
+"""
+import os
+import sys
+import time
+import unittest
+from datetime import timedelta
+from unittest import mock
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import rh_daemon as D
+
+
+class DowntimeReportTests(unittest.TestCase):
+    def setUp(self):
+        self.sent, self.logged, self.ledger = [], [], {}
+        # EVERY outward call report_downtime and retry_pending_downtime make has to be
+        # stubbed here, and save_ledger is in that list for a reason: on 2026-10-08 I
+        # added a save_ledger call to the parking path, ran this file, and it wrote the
+        # TEST's dict straight over the live rh_ledger.json - the real positions, cash
+        # and alert dampeners, on a file that is gitignored and has no backup. The suite
+        # had been safe only because the code happened to go through _remember_alerts.
+        # A test must not be able to reach live state by accident, so _save is stubbed
+        # too: it is the single floor under every writer in this module, and anything
+        # that tries to write a real file from here fails loudly instead of silently
+        # succeeding.
+        for name, fn in (
+            ("notify", lambda s, b, untrusted=False: (self.sent.append((s, b)), True)[1]),
+            ("log", self.logged.append),
+            ("_remember_alerts",
+             lambda led, **kw: led.setdefault("alerts", {}).update(kw)),
+            ("save_ledger", lambda led: None),
+            ("_save", self._refuse_write),
+        ):
+            p = mock.patch.object(D, name, fn)
+            p.start()
+            self.addCleanup(p.stop)
+
+    @staticmethod
+    def _refuse_write(path, obj):
+        raise AssertionError("a test tried to write the real file %r - stub the writer" % path)
+
+    def call(self, stamp, mins, boot, led=None):
+        """One report_downtime call with everything outside it pinned."""
+        with mock.patch.object(D, "_load", lambda p, d: ({"ts": stamp} if stamp else {})), \
+             mock.patch.object(D, "market_minutes_since", lambda ts: mins), \
+             mock.patch.object(D, "_implied_boot_epoch", lambda: boot):
+            D.report_downtime(self.ledger if led is None else led)
+        return self.sent, self.logged
+
+    @staticmethod
+    def stamp_ago(minutes):
+        return (D.now_et() - timedelta(minutes=minutes)).strftime("%Y-%m-%dT%H:%M")
+
+    # ---- the gates that keep it quiet -------------------------------------------------
+
+    def test_a_restart_for_code_is_not_an_outage(self):
+        """sync_code restarts take well under a minute and must never mail."""
+        sent, _ = self.call(self.stamp_ago(2), 999, time.time())
+        self.assertEqual(sent, [])
+        self.assertEqual(self.ledger, {}, "a non-event must not write the dedupe key either")
+
+    def test_a_closed_market_gap_with_no_reboot_is_logged_not_mailed(self):
+        """Without this gate the first code pull each Monday mails about the weekend.
+
+        The mocked value here is 1, not 0. It used to be 0, and cloud's 2026-10-08
+        audit showed 0 is a value the real market_minutes_since CANNOT return for an
+        after-hours restart: the last stamp of a session is 15:54, and counting from
+        the start of that minute bills 15:54-15:55 as one blind minute. The test
+        passed while production mailed a false alert on every such restart, because
+        the mock was kinder than reality. 1 is what really happens; assert against
+        that. tests/test_downtime_report_real_clock.py pins the real function.
+        """
+        sent, logged = self.call(self.stamp_ago(4000), 1, time.time() - 999999)
+        self.assertEqual(sent, [])
+        self.assertTrue(any("not alerting" in m for m in logged), logged)
+        self.assertIn("downtime_reported", self.ledger.get("alerts", {}),
+                      "still dedupe it, or every restart re-logs the same gap")
+
+    def test_the_floor_is_two_minutes_not_one(self):
+        """One market minute is heartbeat resolution; two is time Arm B could not act."""
+        self.call(self.stamp_ago(4000), D.DOWNTIME_MIN_MARKET_MIN - 1, time.time() - 999999)
+        self.assertEqual(self.sent, [], "below the floor must stay quiet")
+        self.call(self.stamp_ago(4001), D.DOWNTIME_MIN_MARKET_MIN, time.time() - 999999, led={})
+        self.assertEqual(len(self.sent), 1, "at the floor it must mail")
+        self.assertIn("blind 2 market minute(s)", self.sent[0][0])
+
+    # ---- the daemon's OWN restart is a note, not an alert (Devon, 2026-11-03) --------
+    #
+    # report_downtime is cause-agnostic on purpose, and that is right for every cause it
+    # was written for: a bugcheck, a power loss, a stopped task and a closed lid all cost
+    # the same blind minutes. A restart the daemon SCHEDULED for itself is different - it
+    # passed the selftest gate, it logged the exit on the way down, and the ~50s before
+    # the task trigger brings it back was arriving as "Arm B was blind 2 market minute(s)"
+    # every morning after a push. The minutes are real, so they are still reported and
+    # still counted; only the framing changes. Every test below has the same gap WITHOUT
+    # the mark as its control, because what must not change is everything else.
+    #
+    # THE MARK EXPLAINS THE MARKET MINUTES, NOT THE GAP, and the fixtures here use a
+    # multi-day gap deliberately. The stamp it keys on is the heartbeat rh_status.json
+    # held when sync_code ran, and status is only written during market hours, so at the
+    # open that heartbeat is the previous session's last pass - whether or not the daemon
+    # survived the night, which measured 10-27 to 11-04 it usually does - and the gap is
+    # ~18h of shut market. A mid-day adoption cannot reach this branch at all: its gap is one
+    # heartbeat plus the restart, ~110s, well under DOWNTIME_MIN_SEC. So the bound
+    # below is not belt-and-braces, it is the whole safety property.
+
+    PLANNED_SHA = "ccac4de"
+
+    def _marked(self, stamp):
+        """A ledger carrying the mark sync_code leaves just before it exits 42."""
+        return {"alerts": {"planned_restart_stamp": stamp,
+                           "planned_restart_to": self.PLANNED_SHA}}
+
+    def test_the_daemons_own_code_restart_is_reported_as_a_note(self):
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 2, time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1, "the minutes are real and still get reported")
+        subject, body = sent[0]
+        self.assertIn("adopted new code at ccac4de", subject)
+        self.assertNotIn("blind", subject, "a restart the daemon scheduled is not blindness")
+        self.assertIn("MARKET MINUTES in this gap are the daemon's own restart", body)
+        self.assertIn("the market was shut", body,
+                      "it must disclaim the overnight remainder, not bill 66h as a restart")
+        self.assertNotIn("stops could not have", body,
+                         "the unmanaged-positions warning belongs to a real outage")
+
+    def test_the_same_gap_without_the_mark_is_still_an_alert(self):
+        """The control. Only sync_code sets the mark, and only after the gate passed."""
+        sent, _ = self.call(self.stamp_ago(4000), 2, time.time() - 999999)
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind 2 market minute(s)", sent[0][0])
+
+    def test_the_mark_cannot_excuse_more_minutes_than_a_restart_can_cost(self):
+        """The safety control, and the only reason the bound exists.
+
+        A morning where the scheduled task failed to fire until 10:30 carries the SAME
+        mark and the SAME stamp as a clean adoption - sync_code sets it on the first
+        full pass either way, and the stamp is yesterday's heartbeat in both cases.
+        Nothing in the mark distinguishes them. The market minutes do: a 52s restart
+        costs two, a task that fired 45 minutes late costs 45. Without this bound that
+        second morning would have arrived as "nothing was wrong, it needs no action".
+        """
+        stamp = self.stamp_ago(4000)
+        over = D.PLANNED_RESTART_MAX_MIN + 1
+        sent, _ = self.call(stamp, over, time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind %d market minute(s)" % over, sent[0][0],
+                      "past the bound it is blindness again, mark or no mark")
+        self.assertIn("stops could not have", sent[0][1],
+                      "and the unmanaged-positions warning comes back with it")
+
+    def test_the_mark_still_covers_a_restart_at_the_bound(self):
+        """The other side of the line, so the bound is pinned from both directions."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, D.PLANNED_RESTART_MAX_MIN, time.time() - 999999,
+                            led=self._marked(stamp))
+        self.assertIn("adopted new code", sent[0][0])
+
+    def test_a_mark_cannot_file_a_quiet_note_when_the_boot_time_is_unreadable(self):
+        """Cloud's D2, 2026-11-03. The mark's premise is that ONLY the daemon went away, and
+        an unreadable boot time is exactly what cannot establish that - a reboot inside the
+        gap already overrides the mark, so a failed read has to fall to the same side. Before
+        the fix the planned branch overwrote the cause the boot-is-None branch had just set,
+        so the sentence saying the boot time was unknown vanished and the mail said the gap
+        needed no action: this file's rule is that an unmeasurable thing is never read as
+        fine, and I had broken it in the one branch where it was convenient."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 3, None, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        subject, body = sent[0]
+        self.assertIn("blind 3 market minute(s)", subject,
+                      "a mark filed a gap nobody could measure as needing no action")
+        self.assertIn("boot time", body)
+        self.assertIn("code-adoption restart IS on record", body,
+                      "falling back to the alert must not throw away what we do know")
+
+    def test_control_a_mark_with_a_readable_boot_is_still_the_quiet_note(self):
+        """The control, so the fix above is a narrowing and not a removal."""
+        stamp = self.stamp_ago(4000)
+        sent, _ = self.call(stamp, 3, time.time() - 999999, led=self._marked(stamp))
+        self.assertIn("adopted new code", sent[0][0])
+
+    def test_a_mark_from_an_earlier_restart_cannot_quiet_a_later_gap(self):
+        """It is keyed to ONE heartbeat - the same key the dedupe uses - so it can never
+        become a standing permission to go quiet."""
+        sent, _ = self.call(self.stamp_ago(4000), 2, time.time() - 999999,
+                            led=self._marked("2026-01-01T09:45"))
+        self.assertEqual(len(sent), 1)
+        self.assertIn("blind 2 market minute(s)", sent[0][0])
+
+    def test_a_reboot_inside_a_planned_restart_is_still_an_outage(self):
+        """A machine that went away during what we thought was a clean restart is exactly
+        what this function was written for, so `rebooted` overrides the mark."""
+        stamp = self.stamp_ago(31)
+        sent, _ = self.call(stamp, 31, time.time() - 300, led=self._marked(stamp))
+        self.assertEqual(len(sent), 1)
+        self.assertNotIn("adopted new code", sent[0][0])
+        self.assertIn("The LAPTOP went down", sent[0][1])
+
+    def test_a_planned_restart_that_cost_no_market_minutes_sends_nothing_at_all(self):
+        """The floor is untouched: the ordinary case is a restart inside a closed market."""
+        stamp = self.stamp_ago(4000)
+        sent, logged = self.call(stamp, D.DOWNTIME_MIN_MARKET_MIN - 1,
+                                 time.time() - 999999, led=self._marked(stamp))
+        self.assertEqual(sent, [])
+        self.assertTrue(any("not alerting" in m for m in logged), logged)
+
+    def test_the_note_is_deduped_like_any_other_report(self):
+        led = self._marked(self.stamp_ago(4000))
+        stamp = led["alerts"]["planned_restart_stamp"]
+        self.call(stamp, 2, time.time() - 999999, led=led)
+        self.call(stamp, 2, time.time() - 999999, led=led)
+        self.assertEqual(len(self.sent), 1, "a second restart must not re-send the note")
+
+    # ---- what it must actually report ------------------------------------------------
+
+    def test_market_minutes_lost_are_named_in_the_subject(self):
+        sent, _ = self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.assertEqual(len(sent), 1)
+        subject, body = sent[0]
+        self.assertIn("blind 31 market minute(s)", subject)
+        self.assertTrue(subject.startswith(D.SESSION_NAME + ":"),
+                        "Devon's rule: the subject says which session must act")
+        self.assertIn("The LAPTOP went down", body)
+        self.assertIn("Kernel-Power 41", body, "point him at where the cause is recorded")
+        self.assertIn("stops could not have", body,
+                      "the exposure, not just the downtime: positions sat unmanaged")
+
+    def test_a_reboot_outside_market_hours_still_mails(self):
+        """No trading time lost, but his trading laptop restarting is his to know."""
+        sent, _ = self.call(self.stamp_ago(4000), 0, time.time() - 300)
+        self.assertEqual(len(sent), 1)
+        self.assertIn("market was shut", sent[0][0])
+
+    def test_a_gap_with_the_machine_still_up_points_at_the_task_without_asserting_it(self):
+        """It must report what the uptime counter SAID, not what that implies.
+
+        Cloud's 2026-10-08 audit, item 3: Fast Startup keeps the kernel across a Shut
+        down, so the counter may not reset and a human shutdown could read as "the
+        machine never left". The wording has to leave that open or the mail blames the
+        task for something Windows did.
+        """
+        sent, _ = self.call(self.stamp_ago(31), 31, time.time() - 999999)
+        self.assertIn("scheduled task", sent[0][1])
+        self.assertIn("Fast Startup", sent[0][1], "name the counter's blind spot")
+        self.assertNotIn("STAYED UP", sent[0][1], "too strong for a single uptime read")
+
+    def test_an_unreadable_boot_time_still_mails_and_says_so(self):
+        sent, _ = self.call(self.stamp_ago(31), 31, None)
+        self.assertEqual(len(sent), 1)
+        self.assertIn("is unknown", sent[0][1])
+
+    # ---- the dampener this file has got wrong five times -----------------------------
+
+    def test_a_second_restart_inside_one_outage_does_not_re_alert(self):
+        led = {}
+        self.call(self.stamp_ago(31), 31, time.time() - 300, led)
+        self.assertEqual(len(self.sent), 1)
+        self.call(self.stamp_ago(31), 31, time.time() - 300, led)
+        self.assertEqual(len(self.sent), 1, "the dedupe key must live on the LEDGER, "
+                                            "not in a module global a restart clears")
+
+    def test_a_failed_send_parks_the_report_and_does_not_latch(self):
+        """Cloud's 2026-10-08 audit, item 2, and its follow-up.
+
+        This runs about 40 seconds after boot, exactly when the network may not be up.
+        The first fix stopped a failed send being filed as delivered, but left the
+        report with nowhere to live: the evidence is the stale ts in rh_status.json and
+        the first pass overwrites it, so the promised retry could never happen. The
+        report is now parked on the ledger, which outlives that file.
+        """
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("downtime_reported", alerts, "a failed send must not latch")
+        parked = alerts.get("pending_downtime")
+        self.assertIsNotNone(parked, "the report must survive the failed send")
+        self.assertIn("blind 31 market minute(s)", parked["subject"])
+        self.assertEqual(parked["stamp"], self.stamp_ago(31))
+        self.assertEqual(parked["tries"], 1)
+
+    def test_the_parked_report_goes_once_the_network_is_back(self):
+        """The exact sequence cloud reproduced: the heartbeat file is gone by then."""
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.sent.clear()
+        D.retry_pending_downtime(self.ledger)          # what the main loop calls each pass
+        self.assertEqual(len(self.sent), 1, "the parked report must send")
+        self.assertIn("blind 31 market minute(s)", self.sent[0][0])
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("pending_downtime", alerts, "delivered, so unpark it")
+        self.assertEqual(alerts.get("downtime_reported"), self.stamp_ago(31))
+        D.retry_pending_downtime(self.ledger)
+        self.assertEqual(len(self.sent), 1, "and every later pass must send nothing")
+
+    def test_the_retry_gives_up_loudly_rather_than_forever(self):
+        """Both channels dead is its own alarm, not something to retry until reboot."""
+        with mock.patch.object(D, "notify", lambda s, b, untrusted=False: False):
+            self.call(self.stamp_ago(31), 31, time.time() - 300)
+            for _ in range(D.DOWNTIME_RETRY_MAX):
+                D.retry_pending_downtime(self.ledger)
+        alerts = self.ledger.get("alerts", {})
+        self.assertNotIn("pending_downtime", alerts, "must stop, or it logs every pass forever")
+        self.assertEqual(alerts.get("downtime_reported"), self.stamp_ago(31))
+        self.assertTrue(any("GIVEN UP" in m for m in self.logged), self.logged)
+
+    def test_the_retry_is_free_when_nothing_is_parked(self):
+        """It runs on EVERY pass, before the market gate, so it must cost nothing."""
+        D.retry_pending_downtime({})
+        D.retry_pending_downtime({"alerts": {}})
+        self.assertEqual(self.sent, [])
+        self.assertEqual(self.logged, [])
+
+    def test_the_retry_never_raises_on_a_damaged_record(self):
+        """It is called from the top of the main loop; it must never stop the daemon."""
+        for bad in ({"alerts": {"pending_downtime": {}}},
+                    {"alerts": {"pending_downtime": {"tries": "x"}}}):
+            D.retry_pending_downtime(bad)
+        self.assertTrue(True, "no exception escaped")
+
+    def test_a_delivered_send_is_recorded(self):
+        """Control for the test above: with delivery working, the dampener must latch."""
+        self.call(self.stamp_ago(31), 31, time.time() - 300)
+        self.assertIn("downtime_reported", self.ledger.get("alerts", {}))
+
+    def test_the_dedupe_is_per_outage_not_forever(self):
+        """A new gap has a new ending heartbeat, so it must mail again."""
+        led = {}
+        self.call(self.stamp_ago(31), 31, time.time() - 300, led)
+        self.call(self.stamp_ago(90), 31, time.time() - 300, led)
+        self.assertEqual(len(self.sent), 2)
+
+    # ---- it must never be the reason the daemon fails to start -----------------------
+
+    def test_no_heartbeat_on_disk_is_silent(self):
+        sent, _ = self.call(None, 31, time.time())
+        self.assertEqual(sent, [])
+        self.assertEqual(self.ledger, {})
+
+    def test_a_malformed_heartbeat_is_swallowed(self):
+        sent, logged = self.call("not-a-timestamp", 31, time.time())
+        self.assertEqual(sent, [])
+        self.assertTrue(any("report_downtime failed" in m for m in logged), logged)
+
+    # ---- the early closes, on a pinned clock -----------------------------------------
+
+    def _minutes(self, since, now):
+        """Real market_minutes_since with only the clock pinned. (ET naive "YYYY-MM-DD HH:MM".)"""
+        real = D.datetime
+        start = real.strptime(since, "%Y-%m-%d %H:%M").replace(tzinfo=D.bot.ET_TZ)
+        fixed = real.strptime(now, "%Y-%m-%d %H:%M").replace(tzinfo=D.bot.ET_TZ)
+
+        class At(real):
+            @classmethod
+            def now(cls, tz=None):
+                return fixed.astimezone(tz) if tz else fixed
+        with mock.patch.object(D, "datetime", At):
+            return D.market_minutes_since(start.timestamp())
+
+    def test_each_early_close_day_stops_counting_at_1255(self):
+        """The three 1 pm closes. Measured from 11:00, so the answer is 115 on a half-day.
+
+        Without this the 60-minute backstop in _maybe_alert_broker emails Devon a false
+        outage at about 13:55 on each date, and report_downtime bills the same minutes.
+        """
+        for day in sorted(D.bot.EARLY_CLOSE):
+            with self.subTest(day=day):
+                self.assertEqual(self._minutes(day + " 11:00", day + " 15:30"), 115,
+                                 "%s is a 1 pm close: 11:00-12:55 is 115 minutes" % day)
+
+    def test_an_ordinary_day_still_counts_to_1555(self):
+        """The control. A helper that returned 12:55 EVERY day would pass the test above."""
+        self.assertEqual(self._minutes("2026-11-30 11:00", "2026-11-30 17:00"), 295)
+
+    def test_the_two_differ_which_is_the_whole_point(self):
+        """Both clocks run PAST both closes, or the comparison measures the wrong thing.
+
+        My first draft pinned `now` at 15:30 for each, so the ordinary day was clipped by
+        the clock at 15:30 and the half-day by its 12:55 close: it compared a 270-minute
+        span with a 115-minute one and asserted the difference was 180. The test caught
+        it, which is the argument for the control existing at all.
+        """
+        early = self._minutes("2026-11-27 11:00", "2026-11-27 17:00")
+        ordinary = self._minutes("2026-11-30 11:00", "2026-11-30 17:00")
+        self.assertEqual((early, ordinary), (115, 295))
+        self.assertEqual(ordinary - early, 180, "a half-day is exactly three hours shorter")
+
+    def test_a_gap_straddling_an_early_close_counts_both_days_correctly(self):
+        """Why the helper had to be per-DATE: one span can cross days with different closes.
+
+        2026-11-27 is a 1 pm close, 2026-11-30 the next trading day. 11:00 to 12:55 is
+        115, plus 09:45 to 09:50 on Monday is 5.
+        """
+        self.assertEqual(self._minutes("2026-11-27 11:00", "2026-11-30 09:50"), 120)
+
+    def test_a_holiday_inside_the_span_still_counts_nothing(self):
+        """session_bounds returns None on holidays, so deleting the local check kept this."""
+        self.assertEqual(self._minutes("2026-12-24 13:30", "2026-12-26 09:45"), 0,
+                         "12-24 after its 12:55 close, 12-25 a holiday, 12-26 up to the open")
+
+    # ---- the wiring, read from SOURCE ------------------------------------------------
+
+    def test_the_retry_is_wired_into_the_main_loop_before_the_market_gate(self):
+        """Without this nothing notices if the call site is dropped.
+
+        A mutation run on 2026-10-08 removed `retry_pending_downtime(led)` from main()'s
+        loop and every behavioural test here still passed: the retry would then only run
+        at startup, which is precisely the hole it was written to close, because the
+        first pass overwrites the heartbeat the startup path reads. Position matters too
+        - it sits above the HALT check and the market gate, since neither a paused bot
+        nor a shut market makes the outage it is reporting less true.
+        """
+        import ast
+
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "rh_daemon.py"), encoding="utf-8") as f:
+            src = f.read()
+        main = next(n for n in ast.walk(ast.parse(src))
+                    if isinstance(n, ast.FunctionDef) and n.name == "main")
+        loop = next(n for n in ast.walk(main) if isinstance(n, ast.While))
+
+        def calls(node):
+            return [c.func.id for c in ast.walk(node)
+                    if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)]
+
+        top = [name for stmt in loop.body for name in calls(stmt)]
+        self.assertIn("retry_pending_downtime", top,
+                      "the retry must run every pass, not only at startup")
+        gate = [i for i, stmt in enumerate(loop.body)
+                if any(isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute)
+                       and c.func.attr == "check_market" for c in ast.walk(stmt))]
+        retry_at = next(i for i, stmt in enumerate(loop.body)
+                        if "retry_pending_downtime" in calls(stmt))
+        if gate:
+            self.assertLess(retry_at, gate[0],
+                            "a report parked out of session must not wait for an open")
+
+    # ---- the boot clock itself --------------------------------------------------------
+
+    def test_implied_boot_is_in_the_past_and_plausible(self):
+        """Control: if this returned None everywhere, the reboot branch would never run."""
+        boot = D._implied_boot_epoch()
+        if boot is None:
+            self.skipTest("no uptime counter on this platform")
+        self.assertLess(boot, time.time())
+        self.assertGreater(boot, time.time() - 400 * 24 * 3600, "implausible boot time")
+
+
+class SyncCodeLeavesTheMark(unittest.TestCase):
+    """THE WIRING. Without this, every planned-restart test above still passes while the
+    feature never fires once in production.
+
+    report_downtime compares its mark against the heartbeat stamp it reads out of
+    rh_status.json, so sync_code has to store THAT value and nothing else. A mark under a
+    different key, or holding the sha where the stamp belongs, would be silently inert -
+    which is the exact shape of the bug that had three of my tests passing against
+    unfixed code last week. So this drives the real sync_code, with only git and the
+    gate's child process standing in.
+    """
+
+    HEARTBEAT = "2026-11-03T09:46"
+
+    def test_it_records_the_heartbeat_the_report_will_compare_against(self):
+        seen = {}
+
+        class _R:
+            returncode, stdout, stderr = 0, "", ""
+
+        def fake_run(cmd, **kw):
+            r = _R()
+            if cmd and cmd[0] == "git":
+                if cmd[1] == "rev-parse":
+                    r.stdout = "newsha0000000\n"        # HEAD has moved past _run_head
+                elif cmd[1] == "diff":
+                    r.stdout = "rh_daemon.py\n"          # ...and a CODE_FILE changed
+            return r                                     # the gate's child exits 0
+
+        led = {}
+        with mock.patch.object(D, "subprocess", mock.Mock(run=fake_run)), \
+             mock.patch.object(D, "_run_head", "oldsha0000000"), \
+             mock.patch.object(D, "_load", lambda p, d=None: {"ts": self.HEARTBEAT}), \
+             mock.patch.object(D, "log", lambda *a, **k: None), \
+             mock.patch.object(D, "_remember_alerts", lambda l, **kw: seen.update(kw)):
+            self.assertTrue(D.sync_code(led),
+                            "the gate passed, so sync_code must ask for the restart")
+        self.assertEqual(seen.get("planned_restart_stamp"), self.HEARTBEAT,
+                         "report_downtime compares the mark against the status heartbeat, "
+                         "so the mark must BE that heartbeat: %r" % (seen,))
+        self.assertEqual(seen.get("planned_restart_to"), "newsha0",
+                         "the note names the commit it came back on: %r" % (seen,))
+
+    def test_a_refused_restart_leaves_no_mark(self):
+        """A gate rejection keeps the daemon on known-good code - no gap, so no mark. One
+        left behind here would quiet the NEXT real outage that happened to share its
+        heartbeat."""
+        seen = {}
+
+        class _R:
+            returncode, stdout, stderr = 0, "", ""
+
+        def fake_run(cmd, **kw):
+            r = _R()
+            if cmd and cmd[0] == "git":
+                if cmd[1] == "rev-parse":
+                    r.stdout = "newsha0000000\n"
+                elif cmd[1] == "diff":
+                    r.stdout = "rh_daemon.py\n"
+            else:
+                r.returncode = 1                         # the selftest gate REFUSES
+            return r
+
+        with mock.patch.object(D, "subprocess", mock.Mock(run=fake_run)), \
+             mock.patch.object(D, "_run_head", "oldsha0000000"), \
+             mock.patch.object(D, "_load", lambda p, d=None: {"ts": self.HEARTBEAT}), \
+             mock.patch.object(D, "log", lambda *a, **k: None), \
+             mock.patch.object(D, "notify", lambda *a, **k: True), \
+             mock.patch.object(D, "_remember_alerts", lambda l, **kw: seen.update(kw)):
+            self.assertFalse(D.sync_code({}), "a failed gate must not restart")
+        self.assertNotIn("planned_restart_stamp", seen, "%r" % (seen,))
+
+
+if __name__ == "__main__":
+    unittest.main()
